@@ -1,0 +1,63 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Work out the path to ClientGenerator.exe -->
+  <Choose>
+    <!-- Using NuGet packages -->
+    <When Condition="Exists('$(MSBuildThisFileDirectory)..\tools')">
+      <PropertyGroup>
+        <CodeGenToolExeDir>$(MSBuildThisFileDirectory)..\tools</CodeGenToolExeDir>
+      </PropertyGroup>
+    </When>
+    <!-- Internal build within Akka.Interfaced solution -->
+    <When Condition="Exists('$(MSBuildThisFileDirectory)..\CodeGenerator')">
+      <PropertyGroup>
+        <CodeGenToolExeDir>$(MSBuildThisFileDirectory)..\CodeGenerator\bin\Debug</CodeGenToolExeDir>
+      </PropertyGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="HasTrailingSlash('$(CodeGenToolExeDir)')">
+      <PropertyGroup>
+        <CodeGenToolExe>$(CodeGenToolExeDir)CodeGenerator.exe</CodeGenToolExe>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <CodeGenToolExe>$(CodeGenToolExeDir)\CodeGenerator.exe</CodeGenToolExe>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <!-- Code Generation Task -->
+  <Target Name="AkkaInterfacedPreprocessing"
+          AfterTargets="BeforeCompile;ResolveReferences"
+          BeforeTargets="CoreCompile"
+          Inputs="@(Compile);@(ReferencePath)"
+          Outputs="$(ProjectDir)$(IntermediateOutputPath)$(TargetName)$(TargetExt)">
+    <Message Text="[AkkaInterfacedPreprocessing] - Project=$(ProjectName)" Importance="high"/>
+    <Message Text="[AkkaInterfacedPreprocessing] 
+- Using CodeGenToolExe location=$(CodeGenToolExe)
+" />
+    <Touch Files="$(ProjectDir)Properties\Akka.Interfaced.CodeGen.cs"
+      Condition="!Exists('$(ProjectDir)Properties\Akka.Interfaced.CodeGen.cs')"
+      ForceTouch="true"
+      AlwaysCreate="true"
+      ContinueOnError="true" />
+    <PropertyGroup>
+      <ArgsFile>$(IntermediateOutputPath)$(TargetName).CodeGen.Args.txt</ArgsFile>
+      <SourceFiles>@(Compile->'%(Identity)', ';')</SourceFiles>
+      <ReferenceFiles>@(ReferencePath->'%(Identity)', ';')</ReferenceFiles>
+    </PropertyGroup>
+    <Message Text="[AkkaInterfacedPreprocessing] - Code-gen args file=$(ArgsFile)"/>
+    <WriteLinesToFile Overwrite="true" File="$(ArgsFile)" Lines=""/>
+    <WriteLinesToFile File="$(ArgsFile)" Lines="--path=$(ProjectDir)"/>
+    <WriteLinesToFile File="$(ArgsFile)" Lines="--source=$([MSBuild]::Escape($(SourceFiles)))"/>
+    <WriteLinesToFile File="$(ArgsFile)" Lines="--reference=$([MSBuild]::Escape($(ReferenceFiles)))"/>
+    <WriteLinesToFile File="$(ArgsFile)" Lines="--define=$([MSBuild]::Escape($(DefineConstants)))"/>
+    <WriteLinesToFile File="$(ArgsFile)" Lines="--target=$(AkkaInterfacedTarget)" Condition="$(AkkaInterfacedTarget) != ''"/>
+    <WriteLinesToFile File="$(ArgsFile)" Lines="--slimclient=$(AkkaInterfacedSlimClient)" Condition="$(AkkaInterfacedSlimClient) != ''"/>
+    <WriteLinesToFile File="$(ArgsFile)" Lines="--protobuf=$(AkkaInterfacedProtobuf)" Condition="$(AkkaInterfacedProtobuf) != ''"/>
+    <Exec Command='"$(CodeGenToolExe)" "@$(ArgsFile)"' />
+  </Target>
+
+</Project>
