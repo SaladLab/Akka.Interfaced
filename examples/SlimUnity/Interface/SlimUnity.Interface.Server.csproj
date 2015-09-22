@@ -66,8 +66,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="TypeAlias, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\TypeAlias.1.0.0\lib\net40\TypeAlias.dll</HintPath>
+    <Reference Include="TypeAlias, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\TypeAlias.1.0.1\lib\net40\TypeAlias.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

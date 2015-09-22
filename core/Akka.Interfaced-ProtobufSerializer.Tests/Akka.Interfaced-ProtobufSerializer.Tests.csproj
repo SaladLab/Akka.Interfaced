@@ -20,8 +20,8 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>b0edf53b</NuGetPackageImportStamp>
     <TargetFrameworkProfile />
-	<BaseIntermediateOutputPath>..\..\output\$(AssemblyName)\obj\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\output\$(AssemblyName)\bin\$(Configuration)\</OutputPath>		
+    <BaseIntermediateOutputPath>..\..\output\$(AssemblyName)\obj\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\output\$(AssemblyName)\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -59,8 +59,8 @@
       <HintPath>..\..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="TypeAlias, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\TypeAlias.1.0.0\lib\net40\TypeAlias.dll</HintPath>
+    <Reference Include="TypeAlias, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\TypeAlias.1.0.1\lib\net40\TypeAlias.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">

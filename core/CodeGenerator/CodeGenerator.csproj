@@ -57,14 +57,8 @@
     <Reference Include="Microsoft.CodeAnalysis.Workspaces.Desktop">
       <HintPath>..\..\packages\Microsoft.CodeAnalysis.Workspaces.Common.1.0.0\lib\net45\Microsoft.CodeAnalysis.Workspaces.Desktop.dll</HintPath>
     </Reference>
-    <Reference Include="NetLegacySupport.Action, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NetLegacySupport.Action.1.0.3\lib\net40\NetLegacySupport.Action.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NetLegacySupport.ConcurrentDictionary, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NetLegacySupport.ConcurrentDictionary.1.0.2\lib\net40\NetLegacySupport.ConcurrentDictionary.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    
+    
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable">
       <HintPath>..\..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
@@ -93,10 +87,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TypeAlias, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\TypeAlias.1.0.1\lib\net40\TypeAlias.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyLoader.cs" />
