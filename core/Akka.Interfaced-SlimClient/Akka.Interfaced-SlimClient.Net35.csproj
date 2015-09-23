@@ -11,8 +11,8 @@
     <AssemblyName>Akka.Interfaced-SlimClient.Net35</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>.\obj\$(AssemblyName)\$(Configuration)\</BaseIntermediateOutputPath>
-    <OutputPath>.\bin\$(AssemblyName)\$(Configuration)\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\output\$(AssemblyName)\obj\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\output\$(AssemblyName)\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
