@@ -1,5 +1,7 @@
 # Akka.Interfaced
 
+![Build](https://api.travis-ci.org/SaladbowlCreative/Akka.Interfaced.svg?branch=master)
+
 Akka.Interfaced provides the interfaced way for actor messaging in Akka.NET
 This is still in progress.
 
