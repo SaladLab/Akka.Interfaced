@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Akka.Actor;
+﻿using Akka.Actor;
 
 namespace Akka.Interfaced
 {
@@ -13,7 +7,7 @@ namespace Akka.Interfaced
         public INotificationChannel Channel { get; protected set; }
         public int ObserverId { get; protected set; }
 
-        public InterfacedObserver(INotificationChannel channel, int observerId)
+        protected InterfacedObserver(INotificationChannel channel, int observerId)
         {
             Channel = channel;
             ObserverId = observerId;
@@ -21,7 +15,7 @@ namespace Akka.Interfaced
 
         protected void Notify(IInvokable message)
         {
-            Channel.Notify(new NotificationMessage {ObserverId = ObserverId, Message = message});
+            Channel.Notify(new NotificationMessage { ObserverId = ObserverId, Message = message });
         }
 
         // TODO: Subscribe / Unsubscribe 때 객체가 달라도 논리적으로 올바르게 동작하려면

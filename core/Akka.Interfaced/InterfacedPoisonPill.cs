@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Akka.Interfaced
+﻿namespace Akka.Interfaced
 {
     // Followings are special traits for InterfacedPoisonPill compared with PoisonPill
     // - It handles async messages of InterfacedMessage

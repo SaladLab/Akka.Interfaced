@@ -79,7 +79,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                 stream.Write7BitEncodedInt(0);
                 return;
             }
-            
+
             var bytes = Encoding.UTF8.GetBytes(value);
             stream.Write7BitEncodedInt(value.Length + 1);
             stream.Write(bytes, 0, bytes.Length);

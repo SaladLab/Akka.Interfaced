@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Akka.Actor;
 
@@ -14,13 +11,13 @@ namespace Akka.Interfaced
         public IRequestWaiter RequestWaiter { get; protected set; }
         public TimeSpan? Timeout { get; protected set; }
 
-        public InterfacedActorRef(IActorRef actor)
+        protected InterfacedActorRef(IActorRef actor)
         {
             Actor = actor;
             RequestWaiter = DefaultRequestWaiter.Instance;
         }
 
-        public InterfacedActorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null)
+        protected InterfacedActorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null)
         {
             Actor = actor;
             RequestWaiter = requestWaiter;
@@ -56,7 +53,7 @@ namespace Akka.Interfaced
                     else if (t.IsCanceled)
                         throw new TaskCanceledException();
                     else
-                        return (T) t.Result;
+                        return (T)t.Result;
                 }, TaskContinuationOptions.ExecuteSynchronously);
             }
             else
@@ -69,7 +66,8 @@ namespace Akka.Interfaced
 
     internal class DefaultRequestWaiter : IRequestWaiter
     {
-        Task<object> IRequestWaiter.SendRequestAndReceive(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+        Task<object> IRequestWaiter.SendRequestAndReceive(IActorRef target, RequestMessage requestMessage,
+                                                          TimeSpan? timeout)
         {
             requestMessage.RequestId = -1;
             return target.Ask<ReplyMessage>(requestMessage, timeout).ContinueWith(t =>

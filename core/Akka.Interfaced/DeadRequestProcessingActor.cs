@@ -1,6 +1,6 @@
-﻿using Akka.Actor;
+﻿using System;
+using Akka.Actor;
 using Akka.Event;
-using System;
 
 namespace Akka.Interfaced
 {

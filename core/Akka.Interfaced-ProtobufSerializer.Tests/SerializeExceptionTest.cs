@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Akka.Actor;
-using Akka.Configuration;
-using Akka.Interfaced;
 using ProtoBuf;
 using TypeAlias;
 using Xunit;
@@ -18,7 +13,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             var serializer = new ProtobufSerializer(null);
 
             var exception = new ArgumentException("Test");
-            var obj = new ReplyMessage {Exception = exception};
+            var obj = new ReplyMessage { Exception = exception };
             var bytes = serializer.ToBinary(obj);
 
             var obj2 = (ReplyMessage)serializer.FromBinary(bytes, null);
@@ -26,7 +21,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         }
 
         [ProtoContract, TypeAlias]
-        class TestException : Exception
+        private class TestException : Exception
         {
             [ProtoMember(1)] public int ErrorCode;
             [ProtoMember(2)] public string ErrorDetail;
@@ -37,7 +32,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             var serializer = new ProtobufSerializer(null);
 
-            var exception = new TestException {ErrorCode = 1000, ErrorDetail = "Test"};
+            var exception = new TestException { ErrorCode = 1000, ErrorDetail = "Test" };
             var obj = new ReplyMessage { Exception = exception };
             var bytes = serializer.ToBinary(obj);
 

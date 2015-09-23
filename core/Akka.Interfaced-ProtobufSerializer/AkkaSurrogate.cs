@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Akka;
 using Akka.Actor;
-using Akka.IO;
 using ProtoBuf;
 using ProtoBuf.Meta;
 
@@ -22,18 +14,20 @@ namespace Akka.Interfaced.ProtobufSerializer
         {
             [ProtoMember(1)] public string Path;
 
-            public static readonly Type Target = typeof (Akka.Actor.ActorPath);
+            public static readonly Type Target = typeof(Akka.Actor.ActorPath);
 
             public static implicit operator ActorPath(Akka.Actor.ActorPath value)
             {
-                if (value == null) return null;
+                if (value == null)
+                    return null;
                 var path = ((Akka.Actor.ActorPath.Surrogate)value.ToSurrogate(CurrentSystem)).Path;
                 return new ActorPath { Path = path };
             }
 
             public static implicit operator Akka.Actor.ActorPath(ActorPath surrogate)
             {
-                if (surrogate == null) return null;
+                if (surrogate == null)
+                    return null;
                 var obj = ((new Akka.Actor.ActorPath.Surrogate(surrogate.Path)).FromSurrogate(CurrentSystem));
                 return (Akka.Actor.ActorPath)obj;
             }
@@ -51,7 +45,8 @@ namespace Akka.Interfaced.ProtobufSerializer
 
             public static implicit operator Address(Akka.Actor.Address value)
             {
-                if (value == null) return null;
+                if (value == null)
+                    return null;
                 var obj = new Address
                 {
                     Protocol = value.Protocol,
@@ -64,7 +59,8 @@ namespace Akka.Interfaced.ProtobufSerializer
 
             public static implicit operator Akka.Actor.Address(Address surrogate)
             {
-                if (surrogate == null) return null;
+                if (surrogate == null)
+                    return null;
                 var obj = new Akka.Actor.Address(surrogate.Protocol, surrogate.System, surrogate.Host, surrogate.Port);
                 return obj;
             }
@@ -83,19 +79,21 @@ namespace Akka.Interfaced.ProtobufSerializer
 
             public static implicit operator ActorRefBase(Akka.Actor.ActorRefBase value)
             {
-                if (value == null) return null;
+                if (value == null)
+                    return null;
                 var path = ((Akka.Actor.ActorRefBase.Surrogate)value.ToSurrogate(CurrentSystem)).Path;
                 return new ActorRefBase { Path = path };
             }
 
             public static implicit operator Akka.Actor.ActorRefBase(ActorRefBase surrogate)
             {
-                if (surrogate == null) return null;
+                if (surrogate == null)
+                    return null;
                 var obj = ((new Akka.Actor.ActorRefBase.Surrogate(surrogate.Path)).FromSurrogate(CurrentSystem));
                 return (Akka.Actor.ActorRefBase)obj;
             }
         }
-        
+
         public static void Register(RuntimeTypeModel typeModel)
         {
             typeModel.Add(ActorPath.Target, false).SetSurrogate(typeof(ActorPath));

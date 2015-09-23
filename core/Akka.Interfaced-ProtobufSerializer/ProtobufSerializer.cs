@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Akka;
 using Akka.Actor;
-using Akka.IO;
 using ProtoBuf.Meta;
 using TypeAlias;
 
@@ -108,7 +102,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                     {
                         AkkaSurrogate.CurrentSystem = null;
                     }
-                    
+
                     return ms.ToArray();
                 }
             }
@@ -122,7 +116,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                 {
                     if (replyMessage.Exception == null && replyMessage.Result == null)
                     {
-                        ms.WriteByte((byte) MessageCode.ReplyWithNothing);
+                        ms.WriteByte((byte)MessageCode.ReplyWithNothing);
                         ms.Write32BitEncodedInt(replyMessage.RequestId);
                     }
                     else if (replyMessage.Exception != null)
@@ -154,17 +148,18 @@ namespace Akka.Interfaced.ProtobufSerializer
                         }
                     }
                     return ms.ToArray();
-                }                
+                }
             }
 
-            throw new InvalidOperationException("ProtobufSerializer supports only NotificationMessage, RequestMessage and ReplyMessage.");
+            throw new InvalidOperationException(
+                "ProtobufSerializer supports only NotificationMessage, RequestMessage and ReplyMessage.");
         }
 
         public override object FromBinary(byte[] bytes, Type type)
         {
             using (var ms = new MemoryStream(bytes))
             {
-                var code = (MessageCode) ms.ReadByte();
+                var code = (MessageCode)ms.ReadByte();
                 switch (code)
                 {
                     case MessageCode.Notification:
@@ -209,7 +204,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                         try
                         {
                             AkkaSurrogate.CurrentSystem = system;
-                            requestMessage.Message = (IAsyncInvokable) _typeModel.Deserialize(ms, message, messageType);
+                            requestMessage.Message = (IAsyncInvokable)_typeModel.Deserialize(ms, message, messageType);
                         }
                         finally
                         {
@@ -251,7 +246,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                         try
                         {
                             AkkaSurrogate.CurrentSystem = system;
-                            replyMessage.Result = (IValueGetable) _typeModel.Deserialize(ms, result, resultType);
+                            replyMessage.Result = (IValueGetable)_typeModel.Deserialize(ms, result, resultType);
                         }
                         finally
                         {
@@ -284,7 +279,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                 // Write string with length 0x80 for making msb of first byte set
                 var name = type.AssemblyQualifiedName;
                 var bytes = Encoding.UTF8.GetBytes(name);
-                stream.Write7BitEncodedInt(0x80 + bytes.Length); 
+                stream.Write7BitEncodedInt(0x80 + bytes.Length);
                 stream.Write(bytes, 0, bytes.Length);
             }
         }
@@ -298,7 +293,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                 var b1 = stream.ReadByte();
                 var b2 = stream.ReadByte();
                 var b3 = stream.ReadByte();
-                var typeAlias = ((int) (firstByte) << 24) | ((int) (b1) << 16) | ((int) (b2) << 8) | ((int) (b3));
+                var typeAlias = ((int)(firstByte) << 24) | ((int)(b1) << 16) | ((int)(b2) << 8) | ((int)(b3));
                 return _typeTable.GetType(typeAlias);
             }
             else

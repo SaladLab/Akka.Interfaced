@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Akka.Actor;
-using Akka.Configuration;
-using Akka.Interfaced;
 using ProtoBuf;
 using TypeAlias;
 using Xunit;
@@ -29,7 +25,10 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             [ProtoMember(1)] public System.String v;
 
-            public object Value { get { return v; }  }
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         [ProtoContract, TypeAlias]

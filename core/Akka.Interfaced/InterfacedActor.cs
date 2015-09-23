@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
-using System.Threading;
 
 namespace Akka.Interfaced
 {
@@ -37,12 +36,14 @@ namespace Akka.Interfaced
 
                 var interfaceMap = type.GetInterfaceMap(ifs);
 
-                var messageTableType = interfaceMap.InterfaceType.Assembly.GetTypes()
-                    .Where(t =>
-                    {
-                        var attr = t.GetCustomAttribute<MessageTableForInterfacedActorAttribute>();
-                        return (attr != null && attr.Type == ifs);
-                    }).FirstOrDefault();
+                var messageTableType =
+                    interfaceMap.InterfaceType.Assembly.GetTypes()
+                                .Where(t =>
+                                {
+                                    var attr = t.GetCustomAttribute<MessageTableForInterfacedActorAttribute>();
+                                    return (attr != null && attr.Type == ifs);
+                                })
+                                .FirstOrDefault();
 
                 if (messageTableType == null)
                 {
@@ -70,7 +71,8 @@ namespace Akka.Interfaced
                     var targetMethod = interfaceMap.TargetMethods[i];
                     var invokeMessageType = messageTable[i, 0];
 
-                    var isReentrant = targetMethod.CustomAttributes.Any(x => x.AttributeType == typeof(ReentrantAttribute));
+                    var isReentrant = targetMethod.CustomAttributes
+                                                  .Any(x => x.AttributeType == typeof(ReentrantAttribute));
                     MessageHandler handler = (self, requestMessage) => requestMessage.Message.Invoke(self);
 
                     if (handlerBuilder != null)
@@ -178,7 +180,7 @@ namespace Akka.Interfaced
             }
 
             var noticeMessage = message as NotificationMessage;
-            if (noticeMessage!= null)
+            if (noticeMessage != null)
             {
                 // Observer 찾기
 
@@ -210,8 +212,8 @@ namespace Akka.Interfaced
                 using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                 {
                     taskRunMessage.Function()
-                        .ContinueWith(t => OnTaskCompleted(taskRunMessage.IsReentrant),
-                                      TaskContinuationOptions.ExecuteSynchronously);
+                                  .ContinueWith(t => OnTaskCompleted(taskRunMessage.IsReentrant),
+                                                TaskContinuationOptions.ExecuteSynchronously);
                 }
                 return;
             }
@@ -256,16 +258,27 @@ namespace Akka.Interfaced
             Stash.Stash();
         }
 
-        private void OnTaskCompleted(Task<IValueGetable> t, IActorRef sender, RequestMessage requestMessage, MessageHandlerInfo info)
+        private void OnTaskCompleted(Task<IValueGetable> t, IActorRef sender, RequestMessage requestMessage,
+                                     MessageHandlerInfo info)
         {
             try
             {
                 if (requestMessage != null && requestMessage.RequestId != 0)
                 {
                     if (t.IsFaulted)
-                        sender.Tell(new ReplyMessage { RequestId = requestMessage.RequestId, Exception = t.Exception.Flatten().InnerExceptions.FirstOrDefault() ?? t.Exception });
+                        sender.Tell(new ReplyMessage
+                        {
+                            RequestId = requestMessage.RequestId,
+                            Exception =
+                                t.Exception.Flatten().InnerExceptions.FirstOrDefault() ??
+                                t.Exception
+                        });
                     else if (t.IsCanceled)
-                        sender.Tell(new ReplyMessage { RequestId = requestMessage.RequestId, Exception = new TaskCanceledException() });
+                        sender.Tell(new ReplyMessage
+                        {
+                            RequestId = requestMessage.RequestId,
+                            Exception = new TaskCanceledException()
+                        });
                     else
                         sender.Tell(new ReplyMessage { RequestId = requestMessage.RequestId, Result = t.Result });
                 }
@@ -305,7 +318,8 @@ namespace Akka.Interfaced
         private Dictionary<int, TaskCompletionSource<object>> _requestMap;
         private int _lastRequestId;
 
-        Task<object> IRequestWaiter.SendRequestAndReceive(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+        Task<object> IRequestWaiter.SendRequestAndReceive(IActorRef target, RequestMessage requestMessage,
+                                                          TimeSpan? timeout)
         {
             // Issue requestId and register it in table
 
@@ -330,7 +344,7 @@ namespace Akka.Interfaced
             if (timeout != null && timeout.Value != Timeout.InfiniteTimeSpan && timeout.Value > default(TimeSpan))
             {
                 var cancellationSource = new CancellationTokenSource();
-                cancellationSource.Token.Register(() => 
+                cancellationSource.Token.Register(() =>
                 {
                     lock (_requestLock)
                     {
@@ -340,7 +354,7 @@ namespace Akka.Interfaced
                 });
                 cancellationSource.CancelAfter(timeout.Value);
             }
-            
+
             // Fire request
 
             requestMessage.RequestId = requestId;
