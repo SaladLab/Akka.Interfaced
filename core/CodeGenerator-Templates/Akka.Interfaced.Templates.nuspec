@@ -18,7 +18,7 @@
   </metadata>
   <files>
     <!-- base path: /bin/build -->
-    <file src="..\..\core\CodeGenerator-Templates\Akka.Interfaced.Templates.targets" target="build" />
+    <file src="..\..\core\CodeGenerator-Templates\Akka.Interfaced.Templates.Common.targets" target="build\Akka.Interfaced.Templates.targets" />
     <file src="..\..\core\CodeGenerator-Templates\Akka.Interfaced.Templates.props" target="build" />
     <file src="..\..\output\CodeGenerator\bin\Release\*.exe" target="tools" />
     <file src="..\..\output\CodeGenerator\bin\Release\*.dll" target="tools" />
