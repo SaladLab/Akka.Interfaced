@@ -101,7 +101,7 @@ Target "AssemblyInfo" <| fun _ ->
             |> Path.GetDirectoryName
             |> Path.GetFileName
 
-        CreateFSharpAssemblyInfo file [ 
+        CreateCSharpAssemblyInfo file [ 
             Attribute.Title title
             Attribute.Product product
             Attribute.Description description
@@ -211,7 +211,7 @@ let createNugetPackages _ =
         System.IO.File.Copy(fileName, target @@ Path.GetFileName(fileName))
 
     ensureDirectory nugetDir
-    for nuspec in !! "**/*.nuspec" do
+    for nuspec in !! "./core/**/*.nuspec" do
         printfn "Creating nuget packages for %s" nuspec
         
         CleanDir workingDir
@@ -316,7 +316,7 @@ let publishNugetPackages _ =
             let result = ExecProcess (fun info -> 
                     info.FileName <- nugetExe
                     info.WorkingDirectory <- (Path.GetDirectoryName (FullName packageFile))
-                    info.Arguments <- args (packageFile, accessKey,url)) (System.TimeSpan.FromMinutes 1.0)
+                    info.Arguments <- args (packageFile, accessKey,url)) (System.TimeSpan.FromMinutes 10.0)
             enableProcessTracing <- tracing
             if result <> 0 then failwithf "Error during NuGet symbol push. %s %s" nugetExe (args (packageFile, "key omitted",url))
         with exn -> 
@@ -426,8 +426,8 @@ Target "HelpNuget" <| fun _ ->
 
 // nuget dependencies
 "CleanNuget" ==> "CreateNuget"
-//"CleanNuget" ==> "BuildRelease" ==> "Nuget"
-"CleanNuget" ==> "Nuget"
+"CleanNuget" ==> "BuildRelease" ==> "Nuget"
+//"CleanNuget" ==> "Nuget"
 
 //docs dependencies
 //"BuildRelease" ==> "Docs" ==> "AzureDocsDeploy" ==> "PublishDocs"
