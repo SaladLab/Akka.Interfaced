@@ -96,7 +96,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.targets')" />
+  <Import Project="$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.Common.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.Common.targets')" />
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>

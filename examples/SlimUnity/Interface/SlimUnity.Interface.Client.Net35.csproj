@@ -85,7 +85,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.targets')" />
+  <Import Project="$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.Common.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.Common.targets')" />
   <PropertyGroup>
     <PostBuildEvent>"$(SolutionDir)tools\protobuf-net\precompile.exe" "$(TargetPath)" -o:InterfaceProtobufSerializer.dll -t:InterfaceProtobufSerializer "-f:.NETFramework\v3.5\Profile\Unity Subset v3.5"
 COPY /Y "$(TargetDir)InterfaceProtobufSerializer.dll" "$(SolutionDir)examples\SlimUnity\Program.Client\Assets\Script\Shared"

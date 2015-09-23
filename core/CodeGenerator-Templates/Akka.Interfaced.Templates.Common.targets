@@ -11,7 +11,7 @@
     <!-- Internal build within Akka.Interfaced solution -->
     <When Condition="Exists('$(MSBuildThisFileDirectory)..\CodeGenerator')">
       <PropertyGroup>
-        <CodeGenToolExeDir>$(MSBuildThisFileDirectory)..\CodeGenerator\bin\Debug</CodeGenToolExeDir>
+        <CodeGenToolExeDir>$(MSBuildThisFileDirectory)..\..\output\CodeGenerator\bin\Debug</CodeGenToolExeDir>
       </PropertyGroup>
     </When>
   </Choose>
