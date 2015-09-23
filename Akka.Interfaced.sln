@@ -119,6 +119,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Base", "cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Base.Net35", "core\Akka.Interfaced-Base\Akka.Interfaced-Base.Net35.csproj", "{C3A4D803-AAB9-4B8E-B575-4E06B7CF61FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.Tests.Interface", "core\Akka.Interfaced.Tests.Interface\Akka.Interfaced.Tests.Interface.csproj", "{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -459,6 +464,18 @@ Global
 		{C3A4D803-AAB9-4B8E-B575-4E06B7CF61FB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{C3A4D803-AAB9-4B8E-B575-4E06B7CF61FB}.Release|Win32.ActiveCfg = Release|Any CPU
 		{C3A4D803-AAB9-4B8E-B575-4E06B7CF61FB}.Release|Win32.Build.0 = Release|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Debug|Win32.Build.0 = Debug|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -496,5 +513,6 @@ Global
 		{B02EE770-61C3-427D-BBEC-5980DF85169E} = {B839E078-4D46-4981-B2D4-A9621A99F9AA}
 		{C0D22336-C49E-4245-B39D-0B3083C28205} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
 		{C3A4D803-AAB9-4B8E-B575-4E06B7CF61FB} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
+		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
 	EndGlobalSection
 EndGlobal

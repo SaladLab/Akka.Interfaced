@@ -39,10 +39,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    
-    
+    <Reference Include="Akka, Version=1.0.4.12, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Akka.1.0.4\lib\net45\Akka.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.TestKit, Version=1.0.4.12, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Akka.TestKit.1.0.4\lib\net45\Akka.TestKit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.TestKit.Xunit2, Version=1.0.4.12, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Akka.TestKit.Xunit2.1.0.4\lib\net45\Akka.TestKit.Xunit2.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
-    
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
       <Private>True</Private>
@@ -65,8 +78,11 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="TestBasic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestPoisonPill.cs" />
+    <Compile Include="TestStartStopEvent.cs" />
+    <Compile Include="TestWorkOrder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
@@ -74,6 +90,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">
+      <Project>{c0d22336-c49e-4245-b39d-0b3083c28205}</Project>
+      <Name>Akka.Interfaced-Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Akka.Interfaced.Tests.Interface\Akka.Interfaced.Tests.Interface.csproj">
+      <Project>{c3c9c547-bdbb-47ca-80bc-f97d2e7b884c}</Project>
+      <Name>Akka.Interfaced.Tests.Interface</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Akka.Interfaced\Akka.Interfaced.csproj">
       <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>
       <Name>Akka.Interfaced</Name>
