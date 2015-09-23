@@ -43,7 +43,9 @@ let preReleaseVersion = version + "-beta"
 
 let isUnstableDocs = hasBuildParam "unstable"
 let isPreRelease = hasBuildParam "nugetprerelease"
-let release = if isPreRelease then ReleaseNotesHelper.ReleaseNotes.New(version, version + "-beta", parsedRelease.Notes) else parsedRelease
+let release = if isPreRelease
+              then ReleaseNotesHelper.ReleaseNotes.New(version, version + "-" + (getBuildParam "nugetprerelease"), parsedRelease.Notes)
+              else parsedRelease
 
 printfn "Assembly version: %s\nNuget version; %s\n" release.AssemblyVersion release.NugetVersion
 
@@ -92,7 +94,7 @@ Target "AssemblyInfo" <| fun _ ->
         Attribute.Version version
         Attribute.FileVersion version ] <| AssemblyInfoFileConfig(false)
 
-    for file in !! "./core/**/AssemblyInfo.fs" do
+    for file in !! "./core/**/AssemblyInfo.cs" do
         let title =
             file
             |> Path.GetDirectoryName
@@ -150,66 +152,11 @@ Target "CleanTests" <| fun _ ->
 // Run tests
 //--------------------------------------------------------------------------------
 
-open XUnit2Helper
-Target "RunTests" <| fun _ ->  
-    let msTestAssemblies = !! "src/**/bin/Release/Akka.TestKit.VsTest.Tests.dll"
-    let nunitTestAssemblies = !! "src/**/bin/Release/Akka.TestKit.NUnit.Tests.dll"
-    let xunitTestAssemblies = !! "src/**/bin/Release/*.Tests.dll" -- 
-                                    "src/**/bin/Release/Akka.TestKit.VsTest.Tests.dll" -- 
-                                    "src/**/bin/Release/Akka.TestKit.NUnit.Tests.dll" 
+Target "RunTests" DoNothing
 
-    mkdir testOutput
+Target "RunTestsMono" DoNothing
 
-    MSTest (fun p -> p) msTestAssemblies
-    nunitTestAssemblies
-    |> NUnit (fun p -> 
-        {p with
-            DisableShadowCopy = true; 
-            OutputFile = testOutput + @"\NUnitTestResults.xml"})
-
-    let xunitToolPath = findToolInSubPath "xunit.console.exe" "src/packages/xunit.runner.console*/tools"
-    printfn "Using XUnit runner: %s" xunitToolPath
-    xUnit2
-        (fun p -> { p with OutputDir = testOutput; ToolPath = xunitToolPath })
-        xunitTestAssemblies
-
-Target "RunTestsMono" <| fun _ ->  
-    let xunitTestAssemblies = !! "src/**/bin/Release Mono/*.Tests.dll"
-
-    mkdir testOutput
-
-    let xunitToolPath = findToolInSubPath "xunit.console.exe" "src/packages/xunit.runner.console*/tools"
-    printfn "Using XUnit runner: %s" xunitToolPath
-    xUnit2
-        (fun p -> { p with OutputDir = testOutput; ToolPath = xunitToolPath })
-        xunitTestAssemblies
-
-Target "MultiNodeTests" <| fun _ ->
-    let testSearchPath =
-        let assemblyFilter = getBuildParamOrDefault "spec-assembly" String.Empty
-        sprintf "src/**/bin/Release/*%s*.Tests.MultiNode.dll" assemblyFilter
-
-    let multiNodeTestPath = findToolInSubPath "Akka.MultiNodeTestRunner.exe" "bin/core/Akka.MultiNodeTestRunner*"
-    let multiNodeTestAssemblies = !! testSearchPath
-    printfn "Using MultiNodeTestRunner: %s" multiNodeTestPath
-
-    let runMultiNodeSpec assembly =
-        let spec = getBuildParam "spec"
-
-        let args = new StringBuilder()
-                |> append assembly
-                |> append "-Dmultinode.enable-filesink=on"
-                |> appendIfNotNullOrEmpty spec "-Dmultinode.test-spec="
-                |> toText
-
-        let result = ExecProcess(fun info -> 
-            info.FileName <- multiNodeTestPath
-            info.WorkingDirectory <- (Path.GetDirectoryName (FullName multiNodeTestPath))
-            info.Arguments <- args) (System.TimeSpan.FromMinutes 60.0) (* This is a VERY long running task. *)
-        if result <> 0 then failwithf "MultiNodeTestRunner failed. %s %s" multiNodeTestPath args
-    
-    multiNodeTestAssemblies |> Seq.iter (runMultiNodeSpec)
-
+Target "MultiNodeTests" DoNothing
 
 //--------------------------------------------------------------------------------
 // Nuget targets 
@@ -219,19 +166,21 @@ module Nuget =
     // add Akka dependency for other projects
     let getAkkaDependency project =
         match project with
-        | "Akka.Interfaced" -> ["Akka.Interfaced-Base", release.NugetVersion]
+        | "Akka.Interfaced" -> [ "Akka.Interfaced-Base", release.NugetVersion ]
         | "Akka.Interfaced-Base" -> []
         | "Akka.Interfaced-ProtobufSerializer" -> [ "Akka.Interfaced", release.NugetVersion ]
-        | "Akka.Interfaced-SlimClient" -> ["Akka.Interfaced-Base", release.NugetVersion]
+        | "Akka.Interfaced-SlimClient" -> [ "Akka.Interfaced-Base", release.NugetVersion ]
         | "Akka.Interfaced-SlimSocketBase" -> []
-        | "Akka.Interfaced-SlimSocketClient" -> []
-        | "Akka.Interfaced-SlimSocketServer" -> []
+        | "Akka.Interfaced-SlimSocketClient" -> [ "Akka.Interfaced-SlimSocketBase", release.NugetVersion ]
+        | "Akka.Interfaced-SlimSocketServer" -> [ "Akka.Interfaced-SlimSocketBase", release.NugetVersion ]
+        | "Akka.Interfaced.Templates" -> [ "Akka.Interfaced", release.NugetVersion ]
+        | "Akka.Interfaced.Templates.SlimClient" -> [ "Akka.Interfaced-SlimClient", release.NugetVersion ]
         | _ -> []
 
     // used to add -pre suffix to pre-release packages
     let getProjectVersion project =
       match project with
-      | _ -> preReleaseVersion
+      | _ -> release.NugetVersion
 
 open Nuget
 
@@ -254,22 +203,23 @@ let createNugetPackages _ =
             not (directoryExists dir)
         runWithRetries del 3 |> ignore
 
+    // Workaround of FileHelper.CopyFiles problem
+    // FileHelper.CopyFiles may still own a handle of target directory after copy finished,
+    // which makes removing target directory to fail.
+    // (Exception: System.UnauthorizedAccessException: Access to the path '~\bin\build\lib\net45' is denied.)
+    let copyFileToDir target fileName =
+        System.IO.File.Copy(fileName, target @@ Path.GetFileName(fileName))
+
     ensureDirectory nugetDir
     for nuspec in !! "**/*.nuspec" do
         printfn "Creating nuget packages for %s" nuspec
         
         CleanDir workingDir
-
-        let project = Path.GetFileNameWithoutExtension nuspec 
-        let projectDir = Path.GetDirectoryName nuspec
-        let projectFile = (!! (projectDir @@ project + ".*sproj")) |> Seq.head
-        let releaseDir = outputDir @@ project @@ @"bin\Release"// projectDir @@ @"bin\Release"
-        let packages = projectDir @@ "packages.config"
-        let packageDependencies = if (fileExists packages) then (getDependencies packages) else []
-        let dependencies = packageDependencies @ getAkkaDependency project
-        let releaseVersion = getProjectVersion project
-
-        let pack outputDir symbolPackage =
+        
+        if nuspec.Contains "Templates" then do
+            let project = Path.GetFileNameWithoutExtension nuspec
+            let releaseVersion = getProjectVersion project
+            let dependencies = getAkkaDependency project
             NuGetHelper.NuGet
                 (fun p ->
                     { p with
@@ -281,40 +231,75 @@ let createNugetPackages _ =
                         ReleaseNotes = release.Notes |> String.concat "\n"
                         Version = releaseVersion
                         Tags = tags |> String.concat " "
-                        OutputPath = outputDir
+                        OutputPath = nugetDir
                         WorkingDir = workingDir
-                        SymbolPackage = symbolPackage
                         Dependencies = dependencies })
                 nuspec
+        else do
+            let project = Path.GetFileNameWithoutExtension nuspec 
+            let projectDir = Path.GetDirectoryName nuspec
+            let projectFile = (!! (projectDir @@ project + ".*sproj")) |> Seq.head
+            let releaseDir = outputDir @@ project @@ @"bin\Release"
+            let release35Dir = outputDir @@ (project + ".Net35") @@ @"bin\Release"
+            let packages = projectDir @@ "packages.config"
+            let packageDependencies = if (fileExists packages) then (getDependencies packages) else []
+            let dependencies = packageDependencies @ getAkkaDependency project
+            let releaseVersion = getProjectVersion project
 
-        // Copy dll, pdb and xml to libdir = workingDir/lib/net45/
-        ensureDirectory libDir
-        !! (releaseDir @@ project + ".dll")
-        ++ (releaseDir @@ project + ".pdb")
-        ++ (releaseDir @@ project + ".xml")
-        ++ (releaseDir @@ project + ".ExternalAnnotations.xml")
-        |> CopyFiles libDir
+            let pack outputDir symbolPackage =
+                NuGetHelper.NuGet
+                    (fun p ->
+                        { p with
+                            Description = description
+                            Authors = authors
+                            Copyright = copyright
+                            Project =  project
+                            Properties = ["Configuration", "Release"]
+                            ReleaseNotes = release.Notes |> String.concat "\n"
+                            Version = releaseVersion
+                            Tags = tags |> String.concat " "
+                            OutputPath = outputDir
+                            WorkingDir = workingDir
+                            SymbolPackage = symbolPackage
+                            Dependencies = dependencies })
+                    nuspec
 
-        // TODO: net35
+            // Copy dll, pdb and xml to libdir = workingDir/lib/net45/
+            ensureDirectory libDir
+            !! (releaseDir @@ project + ".dll")
+            ++ (releaseDir @@ project + ".pdb")
+            ++ (releaseDir @@ project + ".xml")
+            ++ (releaseDir @@ project + ".ExternalAnnotations.xml")
+            |> Seq.iter (copyFileToDir libDir) 
+
+            // Copy dll, pdb and xml to lib35dir = workingDir/lib/net35/
+            if Directory.Exists(release35Dir) then do
+                printfn "Detect .Net35 output: %s" release35Dir
+                ensureDirectory lib35Dir
+                !! (release35Dir @@ project + ".Net35.dll")
+                ++ (release35Dir @@ project + ".Net35.pdb")
+                ++ (release35Dir @@ project + ".Net35.xml")
+                ++ (release35Dir @@ project + ".Net35.ExternalAnnotations.xml")
+                |> Seq.iter (copyFileToDir lib35Dir)
+
+            // Copy all src-files (.cs and .fs files) to workingDir/src
+            let nugetSrcDir = workingDir @@ @"src/"
+            // CreateDir nugetSrcDir
+
+            let isCs = hasExt ".cs"
+            let isFs = hasExt ".fs"
+            let isAssemblyInfo f = (filename f).Contains("AssemblyInfo")
+            let isSrc f = (isCs f || isFs f) && not (isAssemblyInfo f) 
+            CopyDir nugetSrcDir projectDir isSrc
         
-        // Copy all src-files (.cs and .fs files) to workingDir/src
-        let nugetSrcDir = workingDir @@ @"src/"
-        //CreateDir nugetSrcDir
+            //Remove workingDir/src/obj and workingDir/src/bin
+            removeDir (nugetSrcDir @@ "obj")
+            removeDir (nugetSrcDir @@ "bin")
 
-        let isCs = hasExt ".cs"
-        let isFs = hasExt ".fs"
-        let isAssemblyInfo f = (filename f).Contains("AssemblyInfo")
-        let isSrc f = (isCs f || isFs f) && not (isAssemblyInfo f) 
-        CopyDir nugetSrcDir projectDir isSrc
-        
-        //Remove workingDir/src/obj and workingDir/src/bin
-        removeDir (nugetSrcDir @@ "obj")
-        removeDir (nugetSrcDir @@ "bin")
+            // Create both normal nuget package and symbols nuget package. 
+            // Uses the files we copied to workingDir and outputs to nugetdir
+            pack nugetDir NugetSymbolPackage.Nuspec
 
-        // Create both normal nuget package and symbols nuget package. 
-        // Uses the files we copied to workingDir and outputs to nugetdir
-        pack nugetDir NugetSymbolPackage.Nuspec
-        
         removeDir workingDir
 
 let publishNugetPackages _ = 
@@ -428,56 +413,6 @@ Target "HelpNuget" <| fun _ ->
       "                                   and symbols packages to http://xyz"
       ""]
 
-Target "HelpDocs" <| fun _ ->
-    List.iter printfn [
-      "usage: "
-      "build Docs"
-      "Just builds the API docs for Akka.NET locally. Does not attempt to publish."
-      ""
-      "build PublishDocs azureKey=<key> "
-      "                  azureUrl=<url> "
-      "                 [unstable=true]"
-      ""
-      "Arguments for PublishDocs target:"
-      "   azureKey=<key>             Azure blob storage key."
-      "                              Used to authenticate to the storage account."
-      ""
-      "   azureUrl=<url>             Base URL for Azure storage container."
-      "                              FAKE will automatically set container"
-      "                              names based on build parameters."
-      ""
-      "   [unstable=true]            Indicates that we'll publish to an Azure"
-      "                              container named 'unstable'. If this param"
-      "                              is not present we'll publish to containers"
-      "                              'stable' and the 'release.version'"
-      ""
-      "In order to publish documentation all of these values must be provided."
-      "Examples:"
-      "  build PublishDocs azureKey=1s9HSAHA+..."
-      "                    azureUrl=http://fooaccount.blob.core.windows.net/docs"
-      "                                   Build and publish docs to http://fooaccount.blob.core.windows.net/docs/stable"
-      "                                   and http://fooaccount.blob.core.windows.net/docs/{release.version}"
-      ""
-      "  build PublishDocs azureKey=1s9HSAHA+..."
-      "                    azureUrl=http://fooaccount.blob.core.windows.net/docs"
-      "                    unstable=true"
-      "                                   Build and publish docs to http://fooaccount.blob.core.windows.net/docs/unstable"
-      ""]
-
-Target "HelpMultiNodeTests" <| fun _ ->
-    List.iter printfn [
-      "usage: "
-      "build MultiNodeTests [spec-assembly=<filter>]"
-      "Just runs the MultiNodeTests. Does not build the projects."
-      ""
-      "Arguments for MultiNodeTests target:"
-      "   [spec-assembly=<filter>]  Restrict which spec projects are run."
-      ""
-      "       Alters the discovery filter to enable restricting which specs are run."
-      "       If not supplied the filter used is '*.Tests.Multinode.Dll'"
-      "       When supplied this is altered to '*<filter>*.Tests.Multinode.Dll'"
-      ""]
-
 //--------------------------------------------------------------------------------
 //  Target dependencies
 //--------------------------------------------------------------------------------
@@ -500,12 +435,12 @@ Target "HelpMultiNodeTests" <| fun _ ->
 Target "All" DoNothing
 "BuildRelease" ==> "All"
 "RunTests" ==> "All"
-"MultiNodeTests" ==> "All"
+//"MultiNodeTests" ==> "All"
 "Nuget" ==> "All"
 
 Target "AllTests" DoNothing //used for Mono builds, due to Mono 4.0 bug with FAKE / NuGet https://github.com/fsharp/fsharp/issues/427
 "BuildRelease" ==> "AllTests"
 "RunTests" ==> "AllTests"
-"MultiNodeTests" ==> "AllTests"
+//"MultiNodeTests" ==> "AllTests"
 
 RunTargetOrDefault "Help"
