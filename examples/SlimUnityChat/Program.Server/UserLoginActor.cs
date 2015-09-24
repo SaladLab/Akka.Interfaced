@@ -27,8 +27,8 @@ namespace SlimUnityChat.Program.Server
             _clientSession = clientSession;
         }
 
-        protected static MessageDispatcher<UserLoginActor>.MessageHandler OnBuildHandler(
-            MessageDispatcher<UserLoginActor>.MessageHandler handler, MethodInfo method)
+        protected static RequestMessageHandler<UserLoginActor> OnBuildHandler(
+            RequestMessageHandler<UserLoginActor> handler, MethodInfo method)
         {
             return LogHandlerBuilder.BuildHandler(self => self._logger, handler, method, true);
         }

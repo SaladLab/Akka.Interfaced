@@ -68,7 +68,7 @@ namespace Akka.Interfaced
             {
                 var sender = Sender;
 
-                var handler = Dispatcher.GetHandler(requestMessage.Message.GetType());
+                var handler = Dispatcher.GetRequestMessageHandler(requestMessage.Message.GetType());
                 if (handler == null)
                 {
                     sender.Tell(new ReplyMessage
@@ -166,6 +166,32 @@ namespace Akka.Interfaced
                 return;
             }
 
+            var plainMessageHandler = Dispatcher.GetPlainMessageHandler(message.GetType());
+            if (plainMessageHandler != null)
+            {
+                if (plainMessageHandler.IsTask)
+                {
+                    var context = new MessageHandleContext { Self = Self, Sender = Sender };
+                    if (plainMessageHandler.IsReentrant == false)
+                    {
+                        BecomeStacked(OnReceiveInAtomicTask);
+                        _currentAtomicContext = context;
+                    }
+
+                    using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
+                    {
+                        plainMessageHandler.Handler((T)this, message)
+                                           .ContinueWith(t => OnTaskCompleted(plainMessageHandler.IsReentrant),
+                                                         TaskContinuationOptions.ExecuteSynchronously);
+                    }
+                }
+                else
+                {
+                    plainMessageHandler.Handler((T)this, message);
+                }
+                return;
+            }
+
             OnReceiveUnhandled(message);
         }
 
@@ -192,7 +218,7 @@ namespace Akka.Interfaced
         }
 
         private void OnTaskCompleted(Task<IValueGetable> t, IActorRef sender, RequestMessage requestMessage,
-                                     MessageDispatcher<T>.MessageHandlerInfo info)
+                                     MessageDispatcher<T>.RequestMessageHandlerInfo info)
         {
             try
             {

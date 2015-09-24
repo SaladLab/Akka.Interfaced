@@ -6,25 +6,41 @@ using System.Threading.Tasks;
 
 namespace Akka.Interfaced
 {
+    public delegate Task<IValueGetable> RequestMessageHandler<in T>(T self, RequestMessage requestMessage);
+    public delegate Task PlainMessageHandler<in T>(T self, object message);
+
     public class MessageDispatcher<T> where T : class
     {
-        public delegate Task<IValueGetable> MessageHandler(T self, RequestMessage requestMessage);
-
-        public class MessageHandlerInfo
+        public class RequestMessageHandlerInfo
         {
             public Type InterfaceType;
             public bool IsReentrant;
-            public MessageHandler Handler;
+            public RequestMessageHandler<T> Handler;
         }
+        private Dictionary<Type, RequestMessageHandlerInfo> _requestMessageTable;
 
-        private Dictionary<Type, MessageHandlerInfo> _type2InfoMap;
+        public class PlainMessageHandlerInfo
+        {
+            public bool IsReentrant;
+            public bool IsTask;
+            public PlainMessageHandler<T> Handler;
+        }
+        private Dictionary<Type, PlainMessageHandlerInfo> _plainMessageTable;
 
         public MessageDispatcher()
         {
-            _type2InfoMap = new Dictionary<Type, MessageHandlerInfo>();
+            BuildRequestMessageTable();
+            BuildPlainMessageTable();
+        }
+
+        private void BuildRequestMessageTable()
+        {
+            _requestMessageTable = new Dictionary<Type, RequestMessageHandlerInfo>();
 
             var type = typeof(T);
             var handlerBuilder = type.GetMethod("OnBuildHandler", BindingFlags.Static | BindingFlags.NonPublic);
+
+            // Explicit interface handler
 
             foreach (var ifs in type.GetInterfaces())
             {
@@ -70,14 +86,14 @@ namespace Akka.Interfaced
 
                     var isReentrant = targetMethod.CustomAttributes
                                                   .Any(x => x.AttributeType == typeof(ReentrantAttribute));
-                    MessageHandler handler = (self, requestMessage) => requestMessage.Message.Invoke(self);
+                    RequestMessageHandler<T> handler = (self, requestMessage) => requestMessage.Message.Invoke(self);
 
                     if (handlerBuilder != null)
                     {
-                        handler = (MessageHandler)handlerBuilder.Invoke(null, new object[] { handler, targetMethod });
+                        handler = (RequestMessageHandler<T>)handlerBuilder.Invoke(null, new object[] { handler, targetMethod });
                     }
 
-                    _type2InfoMap[invokeMessageType] = new MessageHandlerInfo
+                    _requestMessageTable[invokeMessageType] = new RequestMessageHandlerInfo
                     {
                         InterfaceType = ifs,
                         IsReentrant = isReentrant,
@@ -85,12 +101,52 @@ namespace Akka.Interfaced
                     };
                 }
             }
+
+            // TODO: Implicit interface handler
         }
 
-        public MessageHandlerInfo GetHandler(Type type)
+        public RequestMessageHandlerInfo GetRequestMessageHandler(Type type)
         {
-            MessageHandlerInfo info;
-            return _type2InfoMap.TryGetValue(type, out info) ? info : null;
+            RequestMessageHandlerInfo info;
+            return _requestMessageTable.TryGetValue(type, out info) ? info : null;
+        }
+
+        private void BuildPlainMessageTable()
+        {
+            _plainMessageTable = new Dictionary<Type, PlainMessageHandlerInfo>();
+
+            var type = typeof(T);
+            // var handlerBuilder = type.GetMethod("OnBuildHandler", BindingFlags.Static | BindingFlags.NonPublic);
+
+            var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            foreach (var method in methods)
+            {
+                var attr = method.GetCustomAttribute<MessageDispatchAttribute>();
+                if (attr == null)
+                    continue;
+
+                var messageType = attr.Type ?? method.GetParameters()[0].ParameterType;
+                var isTask = (method.ReturnType.Name.StartsWith("Task"));
+                var isReentrant = method.CustomAttributes.Any(x => x.AttributeType == typeof(ReentrantAttribute));
+
+                var handler = isTask
+                                  ? DelegateBuilderSimpleTask.Build<T>(method)
+                                  : DelegateBuilderSimpleFunc.Build<T>(method);
+
+                var info = new PlainMessageHandlerInfo
+                {
+                    IsReentrant = isReentrant,
+                    IsTask = isTask,
+                    Handler = (PlainMessageHandler<T>)handler
+                };
+                _plainMessageTable.Add(messageType, info);
+            }
+        }
+
+        public PlainMessageHandlerInfo GetPlainMessageHandler(Type type)
+        {
+            PlainMessageHandlerInfo info;
+            return _plainMessageTable.TryGetValue(type, out info) ? info : null;
         }
     }
 }
