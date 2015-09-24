@@ -21,7 +21,7 @@ namespace Basic.Program
 
         Task ICounter.IncCounter(int delta)
         {
-            _counter.WithRequestWaiter(null).IncCounter(delta).Wait();
+            _counter.IncCounter(delta);
             return Task.FromResult(0);
         }
 

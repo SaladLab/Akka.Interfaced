@@ -304,6 +304,18 @@ public class Communicator
         _closeTriggered = true;
     }
 
+    internal void SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage)
+    {
+        // TODO: This request doesn't need reply, so it's better to remove reply processing
+
+        SendRequestPacket(new Packet
+        {
+            Type = PacketType.Request,
+            ActorId = ((SlimActorRef)target).Id,
+            Message = requestMessage.Message,
+        }, null);
+    }
+
     internal Task SendRequestAndWait(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
     {
         var t = new SlimTask();
@@ -352,7 +364,8 @@ public class Communicator
     {
         packet.RequestId = ++_lastRequestId;
 
-        _requestReplyMap.Add(packet.RequestId, completionHandler);
+        if (completionHandler != null)
+            _requestReplyMap.Add(packet.RequestId, completionHandler);
 
         if (_state == StateType.Connected)
             _tcpConnection.SendPacket(packet);

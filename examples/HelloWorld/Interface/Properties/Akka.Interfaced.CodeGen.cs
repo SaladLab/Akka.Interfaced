@@ -71,7 +71,13 @@ namespace HelloWorld.Interface
         public object Value { get { return v; } }
     }
 
-    public class HelloWorldRef : InterfacedActorRef, IHelloWorld
+    public interface IHelloWorld_NoReply
+    {
+        void SayHello(System.String name);
+        void GetHelloCount();
+    }
+
+    public class HelloWorldRef : InterfacedActorRef, IHelloWorld, IHelloWorld_NoReply
     {
         public HelloWorldRef(IActorRef actor)
             : base(actor)
@@ -81,6 +87,11 @@ namespace HelloWorld.Interface
         public HelloWorldRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IHelloWorld_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public HelloWorldRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -109,6 +120,24 @@ namespace HelloWorld.Interface
                 Message = new IHelloWorld__GetHelloCount__Invoke {  }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        void IHelloWorld_NoReply.SayHello(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IHelloWorld__SayHello__Invoke { name = name }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IHelloWorld_NoReply.GetHelloCount()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IHelloWorld__GetHelloCount__Invoke {  }
+            };
+            SendRequest(requestMessage);
         }
     }
 }

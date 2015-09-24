@@ -2,7 +2,7 @@
 
 namespace Akka.Interfaced.Tests
 {
-    public interface ISimple : IInterfacedActor
+    public interface IBasic : IInterfacedActor
     {
         Task Call();
         Task CallWithParameter(int value);

@@ -6,39 +6,39 @@ using System;
 
 namespace Akka.Interfaced.Tests
 {
-    public class SimpleActor : InterfacedActor<SimpleActor>, ISimple
+    public class BasicActor : InterfacedActor<BasicActor>, IBasic
     {
         private List<object> _blackhole;
 
-        public SimpleActor() : this(null) { }
+        public BasicActor() : this(null) { }
 
-        public SimpleActor(List<object> blackhole)
+        public BasicActor(List<object> blackhole)
         {
             _blackhole = blackhole;
         }
 
-        Task ISimple.Call()
+        Task IBasic.Call()
         {
             return Task.FromResult(0);
         }
 
-        Task ISimple.CallWithParameter(int value)
+        Task IBasic.CallWithParameter(int value)
         {
             _blackhole.Add(value);
             return Task.FromResult(0);
         }
 
-        Task<int> ISimple.CallWithParameterAndReturn(int value)
+        Task<int> IBasic.CallWithParameterAndReturn(int value)
         {
             return Task.FromResult(value);
         }
 
-        Task<int> ISimple.CallWithReturn()
+        Task<int> IBasic.CallWithReturn()
         {
             return Task.FromResult(1);
         }
 
-        async Task<int> ISimple.ThrowException(bool throwException)
+        async Task<int> IBasic.ThrowException(bool throwException)
         {
             if (throwException)
                 throw new ArgumentException("throwException");
@@ -53,8 +53,8 @@ namespace Akka.Interfaced.Tests
         [Fact]
         public async Task Test_BasicActor_Call()
         {
-            var actor = ActorOfAsTestActorRef<SimpleActor>();
-            var a = new SimpleRef(actor);
+            var actor = ActorOfAsTestActorRef<BasicActor>();
+            var a = new BasicRef(actor);
             await a.Call();
         }
 
@@ -62,8 +62,8 @@ namespace Akka.Interfaced.Tests
         public async Task Test_BasicActor_CallWithParameter()
         {
             var blackhole = new List<object>();
-            var actor = ActorOfAsTestActorRef<SimpleActor>(Props.Create<SimpleActor>(blackhole));
-            var a = new SimpleRef(actor);
+            var actor = ActorOfAsTestActorRef<BasicActor>(Props.Create<BasicActor>(blackhole));
+            var a = new BasicRef(actor);
             await a.CallWithParameter(1);
             Assert.Equal(1, blackhole[0]);
         }
@@ -72,8 +72,8 @@ namespace Akka.Interfaced.Tests
         public async Task Test_BasicActor_CallWithParameterAndReturn()
         {
             var blackhole = new List<object>();
-            var actor = ActorOfAsTestActorRef<SimpleActor>();
-            var a = new SimpleRef(actor);
+            var actor = ActorOfAsTestActorRef<BasicActor>();
+            var a = new BasicRef(actor);
             var r = await a.CallWithParameterAndReturn(1);
             Assert.Equal(1, r);
         }
@@ -81,8 +81,8 @@ namespace Akka.Interfaced.Tests
         [Fact]
         public async Task Test_BasicActor_CallWithReturn()
         {
-            var actor = ActorOfAsTestActorRef<SimpleActor>();
-            var a = new SimpleRef(actor);
+            var actor = ActorOfAsTestActorRef<BasicActor>();
+            var a = new BasicRef(actor);
             var r = await a.CallWithReturn();
             Assert.Equal(1, r);
         }
@@ -90,8 +90,8 @@ namespace Akka.Interfaced.Tests
         [Fact]
         public async Task Test_BasicActor_ThrowException_Throw()
         {
-            var actor = ActorOfAsTestActorRef<SimpleActor>();
-            var a = new SimpleRef(actor);
+            var actor = ActorOfAsTestActorRef<BasicActor>();
+            var a = new BasicRef(actor);
 
             await Assert.ThrowsAsync<ArgumentException>(async () =>
             {
@@ -102,8 +102,8 @@ namespace Akka.Interfaced.Tests
         [Fact]
         public async Task Test_BasicActor_ThrowException_NoThrow()
         {
-            var actor = ActorOfAsTestActorRef<SimpleActor>();
-            var a = new SimpleRef(actor);
+            var actor = ActorOfAsTestActorRef<BasicActor>();
+            var a = new BasicRef(actor);
             var r = await a.ThrowException(false);
             Assert.Equal(1, r);
         }

@@ -35,9 +35,14 @@ namespace SlimHttp.Program.Client
         private int _lastRequestId;
 
 #if NET20 || NET35
+        void ISlimRequestWaiter.SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage)
+        {
+            SendRequest(target, requestMessage);
+        }
+
         Task ISlimRequestWaiter.SendRequestAndWait(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
         {
-            var httpWebRequest = SendRequest(target, requestMessage, timeout);
+            var httpWebRequest = SendRequest(target, requestMessage);
             var task = new SlimTask();
             task.WebRequest = httpWebRequest;
             task.WaitEvent = new ManualResetEvent(false);
@@ -47,7 +52,7 @@ namespace SlimHttp.Program.Client
 
         Task<T> ISlimRequestWaiter.SendRequestAndReceive<T>(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
         {
-            var httpWebRequest = SendRequest(target, requestMessage, timeout);
+            var httpWebRequest = SendRequest(target, requestMessage);
             var task = new SlimTask<T>();
             task.WebRequest = httpWebRequest;
             task.WaitEvent = new ManualResetEvent(false);
@@ -96,11 +101,16 @@ namespace SlimHttp.Program.Client
             }
         }
 #else
+        void ISlimRequestWaiter.SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage)
+        {
+            SendRequest(target, requestMessage);
+        }
+
         async Task ISlimRequestWaiter.SendRequestAndWait(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
         {
             // Get result from stream
 
-            var httpWebRequest = SendRequest(target, requestMessage, timeout);
+            var httpWebRequest = SendRequest(target, requestMessage);
             var response = await httpWebRequest.GetResponseAsync();
             var reply = GetReplyFromStream(response.GetResponseStream());
 
@@ -112,7 +122,7 @@ namespace SlimHttp.Program.Client
         {
             // Get result from stream
 
-            var httpWebRequest = SendRequest(target, requestMessage, timeout);
+            var httpWebRequest = SendRequest(target, requestMessage);
             var response = await httpWebRequest.GetResponseAsync();
             var reply = GetReplyFromStream(response.GetResponseStream());
 
@@ -123,7 +133,7 @@ namespace SlimHttp.Program.Client
         }
 #endif
 
-        private HttpWebRequest SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
+        private HttpWebRequest SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage)
         {
             var actorId = ((SlimActorRef)target).Id;
             var uri = new Uri(Root, "/actor/" + actorId);

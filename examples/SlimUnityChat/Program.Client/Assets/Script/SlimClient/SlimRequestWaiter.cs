@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Text;
 using Akka.Interfaced;
 
 class SlimRequestWaiter : ISlimRequestWaiter
 {
     public Communicator Communicator { get; internal set; }
+
+    void ISlimRequestWaiter.SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage)
+    {
+        Communicator.SendRequest(target, requestMessage);
+    }
 
     Task ISlimRequestWaiter.SendRequestAndWait(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
     {

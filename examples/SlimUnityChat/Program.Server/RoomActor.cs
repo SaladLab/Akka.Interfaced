@@ -132,7 +132,7 @@ namespace SlimUnityChat.Program.Server
 
                 _removed = true;
 
-                _clusterContext.RoomDirectory.WithRequestWaiter(null).RemoveRoom(_name);
+                _clusterContext.RoomDirectory.WithNoReply().RemoveRoom(_name);
             }
         }
 

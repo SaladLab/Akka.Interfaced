@@ -90,8 +90,15 @@ namespace SlimUnityChat.Interface
         }
     }
 
+    public interface IOccupant_NoReply
+    {
+        void Say(System.String msg, System.String senderUserId = null);
+        void GetHistory();
+        void Invite(System.String targetUserId, System.String senderUserId = null);
+    }
+
     [ProtoContract, TypeAlias]
-    public class OccupantRef : InterfacedActorRef, IOccupant
+    public class OccupantRef : InterfacedActorRef, IOccupant, IOccupant_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -112,6 +119,11 @@ namespace SlimUnityChat.Interface
         public OccupantRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IOccupant_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public OccupantRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -149,6 +161,33 @@ namespace SlimUnityChat.Interface
                 Message = new IOccupant__Invite__Invoke { targetUserId = targetUserId, senderUserId = senderUserId }
             };
             return SendRequestAndWait(requestMessage);
+        }
+
+        void IOccupant_NoReply.Say(System.String msg, System.String senderUserId)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IOccupant__Say__Invoke { msg = msg, senderUserId = senderUserId }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IOccupant_NoReply.GetHistory()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IOccupant__GetHistory__Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IOccupant_NoReply.Invite(System.String targetUserId, System.String senderUserId)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IOccupant__Invite__Invoke { targetUserId = targetUserId, senderUserId = senderUserId }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -211,8 +250,14 @@ namespace SlimUnityChat.Interface
         }
     }
 
+    public interface IRoom_NoReply
+    {
+        void Enter(System.String userId, SlimUnityChat.Interface.IRoomObserver observer);
+        void Exit(System.String userId);
+    }
+
     [ProtoContract, TypeAlias]
-    public class RoomRef : InterfacedActorRef, IRoom
+    public class RoomRef : InterfacedActorRef, IRoom, IRoom_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -233,6 +278,11 @@ namespace SlimUnityChat.Interface
         public RoomRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IRoom_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public RoomRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -261,6 +311,24 @@ namespace SlimUnityChat.Interface
                 Message = new IRoom__Exit__Invoke { userId = userId }
             };
             return SendRequestAndWait(requestMessage);
+        }
+
+        void IRoom_NoReply.Enter(System.String userId, SlimUnityChat.Interface.IRoomObserver observer)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IRoom__Enter__Invoke { userId = userId, observer = (SlimUnityChat.Interface.RoomObserver)observer }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IRoom_NoReply.Exit(System.String userId)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IRoom__Exit__Invoke { userId = userId }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -345,8 +413,15 @@ namespace SlimUnityChat.Interface
         public object Value { get { return v; } }
     }
 
+    public interface IRoomDirectory_NoReply
+    {
+        void GetOrCreateRoom(System.String name);
+        void RemoveRoom(System.String name);
+        void GetRoomList();
+    }
+
     [ProtoContract, TypeAlias]
-    public class RoomDirectoryRef : InterfacedActorRef, IRoomDirectory
+    public class RoomDirectoryRef : InterfacedActorRef, IRoomDirectory, IRoomDirectory_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -367,6 +442,11 @@ namespace SlimUnityChat.Interface
         public RoomDirectoryRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IRoomDirectory_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public RoomDirectoryRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -404,6 +484,33 @@ namespace SlimUnityChat.Interface
                 Message = new IRoomDirectory__GetRoomList__Invoke {  }
             };
             return SendRequestAndReceive<System.Collections.Generic.List<System.String>>(requestMessage);
+        }
+
+        void IRoomDirectory_NoReply.GetOrCreateRoom(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IRoomDirectory__GetOrCreateRoom__Invoke { name = name }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IRoomDirectory_NoReply.RemoveRoom(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IRoomDirectory__RemoveRoom__Invoke { name = name }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IRoomDirectory_NoReply.GetRoomList()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IRoomDirectory__GetRoomList__Invoke {  }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -465,8 +572,14 @@ namespace SlimUnityChat.Interface
         }
     }
 
+    public interface IRoomDirectoryWorker_NoReply
+    {
+        void CreateRoom(System.String name);
+        void RemoveRoom(System.String name);
+    }
+
     [ProtoContract, TypeAlias]
-    public class RoomDirectoryWorkerRef : InterfacedActorRef, IRoomDirectoryWorker
+    public class RoomDirectoryWorkerRef : InterfacedActorRef, IRoomDirectoryWorker, IRoomDirectoryWorker_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -487,6 +600,11 @@ namespace SlimUnityChat.Interface
         public RoomDirectoryWorkerRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IRoomDirectoryWorker_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public RoomDirectoryWorkerRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -515,6 +633,24 @@ namespace SlimUnityChat.Interface
                 Message = new IRoomDirectoryWorker__RemoveRoom__Invoke { name = name }
             };
             return SendRequestAndWait(requestMessage);
+        }
+
+        void IRoomDirectoryWorker_NoReply.CreateRoom(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IRoomDirectoryWorker__CreateRoom__Invoke { name = name }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IRoomDirectoryWorker_NoReply.RemoveRoom(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IRoomDirectoryWorker__RemoveRoom__Invoke { name = name }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -639,8 +775,17 @@ namespace SlimUnityChat.Interface
         }
     }
 
+    public interface IUser_NoReply
+    {
+        void GetId();
+        void GetRoomList();
+        void EnterRoom(System.String name, System.Int32 observerId);
+        void ExitFromRoom(System.String name);
+        void Whisper(System.String targetUserId, System.String message);
+    }
+
     [ProtoContract, TypeAlias]
-    public class UserRef : InterfacedActorRef, IUser
+    public class UserRef : InterfacedActorRef, IUser, IUser_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -661,6 +806,11 @@ namespace SlimUnityChat.Interface
         public UserRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IUser_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public UserRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -716,6 +866,51 @@ namespace SlimUnityChat.Interface
                 Message = new IUser__Whisper__Invoke { targetUserId = targetUserId, message = message }
             };
             return SendRequestAndWait(requestMessage);
+        }
+
+        void IUser_NoReply.GetId()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUser__GetId__Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IUser_NoReply.GetRoomList()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUser__GetRoomList__Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IUser_NoReply.EnterRoom(System.String name, System.Int32 observerId)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUser__EnterRoom__Invoke { name = name, observerId = observerId }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IUser_NoReply.ExitFromRoom(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUser__ExitFromRoom__Invoke { name = name }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IUser_NoReply.Whisper(System.String targetUserId, System.String message)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUser__Whisper__Invoke { targetUserId = targetUserId, message = message }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -793,8 +988,15 @@ namespace SlimUnityChat.Interface
         public object Value { get { return v; } }
     }
 
+    public interface IUserDirectory_NoReply
+    {
+        void RegisterUser(System.String userId, SlimUnityChat.Interface.IUser user);
+        void UnregisterUser(System.String userId);
+        void GetUser(System.String userId);
+    }
+
     [ProtoContract, TypeAlias]
-    public class UserDirectoryRef : InterfacedActorRef, IUserDirectory
+    public class UserDirectoryRef : InterfacedActorRef, IUserDirectory, IUserDirectory_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -815,6 +1017,11 @@ namespace SlimUnityChat.Interface
         public UserDirectoryRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IUserDirectory_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public UserDirectoryRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -852,6 +1059,33 @@ namespace SlimUnityChat.Interface
                 Message = new IUserDirectory__GetUser__Invoke { userId = userId }
             };
             return SendRequestAndReceive<SlimUnityChat.Interface.IUser>(requestMessage);
+        }
+
+        void IUserDirectory_NoReply.RegisterUser(System.String userId, SlimUnityChat.Interface.IUser user)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUserDirectory__RegisterUser__Invoke { userId = userId, user = (SlimUnityChat.Interface.UserRef)user }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IUserDirectory_NoReply.UnregisterUser(System.String userId)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUserDirectory__UnregisterUser__Invoke { userId = userId }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IUserDirectory_NoReply.GetUser(System.String userId)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUserDirectory__GetUser__Invoke { userId = userId }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -900,8 +1134,13 @@ namespace SlimUnityChat.Interface
         public object Value { get { return v; } }
     }
 
+    public interface IUserLogin_NoReply
+    {
+        void Login(System.String id, System.String password, System.Int32 observerId);
+    }
+
     [ProtoContract, TypeAlias]
-    public class UserLoginRef : InterfacedActorRef, IUserLogin
+    public class UserLoginRef : InterfacedActorRef, IUserLogin, IUserLogin_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -924,6 +1163,11 @@ namespace SlimUnityChat.Interface
         {
         }
 
+        public IUserLogin_NoReply WithNoReply()
+        {
+            return this;
+        }
+
         public UserLoginRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
             return new UserLoginRef(Actor, requestWaiter, Timeout);
@@ -941,6 +1185,15 @@ namespace SlimUnityChat.Interface
                 Message = new IUserLogin__Login__Invoke { id = id, password = password, observerId = observerId }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        void IUserLogin_NoReply.Login(System.String id, System.String password, System.Int32 observerId)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUserLogin__Login__Invoke { id = id, password = password, observerId = observerId }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -993,8 +1246,14 @@ namespace SlimUnityChat.Interface
         }
     }
 
+    public interface IUserMessasing_NoReply
+    {
+        void Whisper(SlimUnityChat.Interface.ChatItem chatItem);
+        void Invite(System.String invitorUserId, System.String roomName);
+    }
+
     [ProtoContract, TypeAlias]
-    public class UserMessasingRef : InterfacedActorRef, IUserMessasing
+    public class UserMessasingRef : InterfacedActorRef, IUserMessasing, IUserMessasing_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -1015,6 +1274,11 @@ namespace SlimUnityChat.Interface
         public UserMessasingRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IUserMessasing_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public UserMessasingRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -1043,6 +1307,24 @@ namespace SlimUnityChat.Interface
                 Message = new IUserMessasing__Invite__Invoke { invitorUserId = invitorUserId, roomName = roomName }
             };
             return SendRequestAndWait(requestMessage);
+        }
+
+        void IUserMessasing_NoReply.Whisper(SlimUnityChat.Interface.ChatItem chatItem)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUserMessasing__Whisper__Invoke { chatItem = chatItem }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IUserMessasing_NoReply.Invite(System.String invitorUserId, System.String roomName)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IUserMessasing__Invite__Invoke { invitorUserId = invitorUserId, roomName = roomName }
+            };
+            SendRequest(requestMessage);
         }
     }
 }

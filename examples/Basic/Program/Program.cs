@@ -76,9 +76,9 @@ namespace Basic.Program
         static async Task TestCounter(IActorRef actor)
         {
             var c = new CounterRef(actor);
-            await c.WithRequestWaiter(null).IncCounter(1);
-            await c.WithRequestWaiter(null).IncCounter(2);
-            await c.WithRequestWaiter(null).IncCounter(3);
+            c.WithNoReply().IncCounter(1);
+            c.WithNoReply().IncCounter(2);
+            c.WithNoReply().IncCounter(3);
             Console.WriteLine(await c.GetCounter());
         }
 

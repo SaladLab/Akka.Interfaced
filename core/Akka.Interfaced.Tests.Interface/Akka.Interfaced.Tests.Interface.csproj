@@ -49,11 +49,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IDummy.cs" />
     <Compile Include="IOverloaded.cs" />
-    <Compile Include="ISimple.cs" />
+    <Compile Include="IBasic.cs" />
     <Compile Include="IWorker.cs" />
     <Compile Include="Properties\Akka.Interfaced.CodeGen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">
@@ -64,9 +68,6 @@
       <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>
       <Name>Akka.Interfaced</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.Common.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.Common.targets')" />

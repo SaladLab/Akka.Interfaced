@@ -16,6 +16,11 @@ namespace Akka.Interfaced
             Timeout = timeout;
         }
 
+        protected void SendRequest(SlimRequestMessage requestMessage)
+        {
+            RequestWaiter.SendRequest(Actor, requestMessage);
+        }
+
         protected Task SendRequestAndWait(SlimRequestMessage requestMessage)
         {
             return RequestWaiter.SendRequestAndWait(Actor, requestMessage, Timeout);

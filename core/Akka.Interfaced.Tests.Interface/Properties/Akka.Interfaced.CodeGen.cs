@@ -12,6 +12,336 @@ using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Interfaced;
 
+#region Akka.Interfaced.Tests.IBasic
+
+namespace Akka.Interfaced.Tests
+{
+    [MessageTableForInterfacedActor(typeof(IBasic))]
+    public static class IBasic__MessageTable
+    {
+        public static Type[,] GetMessageTypes()
+        {
+            return new Type[,]
+            {
+                {typeof(IBasic__Call__Invoke), null},
+                {typeof(IBasic__CallWithParameter__Invoke), null},
+                {typeof(IBasic__CallWithReturn__Invoke), typeof(IBasic__CallWithReturn__Return)},
+                {typeof(IBasic__CallWithParameterAndReturn__Invoke), typeof(IBasic__CallWithParameterAndReturn__Return)},
+                {typeof(IBasic__ThrowException__Invoke), typeof(IBasic__ThrowException__Return)},
+            };
+        }
+    }
+
+    public class IBasic__Call__Invoke : IInterfacedMessage, IAsyncInvokable
+    {
+        public Type GetInterfaceType() { return typeof(IBasic); }
+
+        public async Task<IValueGetable> Invoke(object target)
+        {
+            await ((IBasic)target).Call();
+            return null;
+        }
+    }
+
+    public class IBasic__CallWithParameter__Invoke : IInterfacedMessage, IAsyncInvokable
+    {
+        public System.Int32 value;
+
+        public Type GetInterfaceType() { return typeof(IBasic); }
+
+        public async Task<IValueGetable> Invoke(object target)
+        {
+            await ((IBasic)target).CallWithParameter(value);
+            return null;
+        }
+    }
+
+    public class IBasic__CallWithReturn__Invoke : IInterfacedMessage, IAsyncInvokable
+    {
+        public Type GetInterfaceType() { return typeof(IBasic); }
+
+        public async Task<IValueGetable> Invoke(object target)
+        {
+            var __v = await((IBasic)target).CallWithReturn();
+            return (IValueGetable)(new IBasic__CallWithReturn__Return { v = __v });
+        }
+    }
+
+    public class IBasic__CallWithReturn__Return : IInterfacedMessage, IValueGetable
+    {
+        public System.Int32 v;
+
+        public Type GetInterfaceType() { return typeof(IBasic); }
+
+        public object Value { get { return v; } }
+    }
+
+    public class IBasic__CallWithParameterAndReturn__Invoke : IInterfacedMessage, IAsyncInvokable
+    {
+        public System.Int32 value;
+
+        public Type GetInterfaceType() { return typeof(IBasic); }
+
+        public async Task<IValueGetable> Invoke(object target)
+        {
+            var __v = await((IBasic)target).CallWithParameterAndReturn(value);
+            return (IValueGetable)(new IBasic__CallWithParameterAndReturn__Return { v = __v });
+        }
+    }
+
+    public class IBasic__CallWithParameterAndReturn__Return : IInterfacedMessage, IValueGetable
+    {
+        public System.Int32 v;
+
+        public Type GetInterfaceType() { return typeof(IBasic); }
+
+        public object Value { get { return v; } }
+    }
+
+    public class IBasic__ThrowException__Invoke : IInterfacedMessage, IAsyncInvokable
+    {
+        public System.Boolean throwException;
+
+        public Type GetInterfaceType() { return typeof(IBasic); }
+
+        public async Task<IValueGetable> Invoke(object target)
+        {
+            var __v = await((IBasic)target).ThrowException(throwException);
+            return (IValueGetable)(new IBasic__ThrowException__Return { v = __v });
+        }
+    }
+
+    public class IBasic__ThrowException__Return : IInterfacedMessage, IValueGetable
+    {
+        public System.Int32 v;
+
+        public Type GetInterfaceType() { return typeof(IBasic); }
+
+        public object Value { get { return v; } }
+    }
+
+    public interface IBasic_NoReply
+    {
+        void Call();
+        void CallWithParameter(System.Int32 value);
+        void CallWithReturn();
+        void CallWithParameterAndReturn(System.Int32 value);
+        void ThrowException(System.Boolean throwException);
+    }
+
+    public class BasicRef : InterfacedActorRef, IBasic, IBasic_NoReply
+    {
+        public BasicRef(IActorRef actor)
+            : base(actor)
+        {
+        }
+
+        public BasicRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
+            : base(actor, requestWaiter, timeout)
+        {
+        }
+
+        public IBasic_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public BasicRef WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new BasicRef(Actor, requestWaiter, Timeout);
+        }
+
+        public BasicRef WithTimeout(TimeSpan? timeout)
+        {
+            return new BasicRef(Actor, RequestWaiter, timeout);
+        }
+
+        public Task Call()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IBasic__Call__Invoke {  }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task CallWithParameter(System.Int32 value)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IBasic__CallWithParameter__Invoke { value = value }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task<System.Int32> CallWithReturn()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IBasic__CallWithReturn__Invoke {  }
+            };
+            return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        public Task<System.Int32> CallWithParameterAndReturn(System.Int32 value)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IBasic__CallWithParameterAndReturn__Invoke { value = value }
+            };
+            return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        public Task<System.Int32> ThrowException(System.Boolean throwException)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IBasic__ThrowException__Invoke { throwException = throwException }
+            };
+            return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        void IBasic_NoReply.Call()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IBasic__Call__Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IBasic_NoReply.CallWithParameter(System.Int32 value)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IBasic__CallWithParameter__Invoke { value = value }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IBasic_NoReply.CallWithReturn()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IBasic__CallWithReturn__Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IBasic_NoReply.CallWithParameterAndReturn(System.Int32 value)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IBasic__CallWithParameterAndReturn__Invoke { value = value }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IBasic_NoReply.ThrowException(System.Boolean throwException)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IBasic__ThrowException__Invoke { throwException = throwException }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+}
+
+#endregion
+
+#region Akka.Interfaced.Tests.IDummy
+
+namespace Akka.Interfaced.Tests
+{
+    [MessageTableForInterfacedActor(typeof(IDummy))]
+    public static class IDummy__MessageTable
+    {
+        public static Type[,] GetMessageTypes()
+        {
+            return new Type[,]
+            {
+                {typeof(IDummy__Call__Invoke), typeof(IDummy__Call__Return)},
+            };
+        }
+    }
+
+    public class IDummy__Call__Invoke : IInterfacedMessage, IAsyncInvokable
+    {
+        public System.Object param;
+
+        public Type GetInterfaceType() { return typeof(IDummy); }
+
+        public async Task<IValueGetable> Invoke(object target)
+        {
+            var __v = await((IDummy)target).Call(param);
+            return (IValueGetable)(new IDummy__Call__Return { v = __v });
+        }
+    }
+
+    public class IDummy__Call__Return : IInterfacedMessage, IValueGetable
+    {
+        public System.Object v;
+
+        public Type GetInterfaceType() { return typeof(IDummy); }
+
+        public object Value { get { return v; } }
+    }
+
+    public interface IDummy_NoReply
+    {
+        void Call(System.Object param);
+    }
+
+    public class DummyRef : InterfacedActorRef, IDummy, IDummy_NoReply
+    {
+        public DummyRef(IActorRef actor)
+            : base(actor)
+        {
+        }
+
+        public DummyRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
+            : base(actor, requestWaiter, timeout)
+        {
+        }
+
+        public IDummy_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public DummyRef WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new DummyRef(Actor, requestWaiter, Timeout);
+        }
+
+        public DummyRef WithTimeout(TimeSpan? timeout)
+        {
+            return new DummyRef(Actor, RequestWaiter, timeout);
+        }
+
+        public Task<System.Object> Call(System.Object param)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IDummy__Call__Invoke { param = param }
+            };
+            return SendRequestAndReceive<System.Object>(requestMessage);
+        }
+
+        void IDummy_NoReply.Call(System.Object param)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IDummy__Call__Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+}
+
+#endregion
+
 #region Akka.Interfaced.Tests.IOverloaded
 
 namespace Akka.Interfaced.Tests
@@ -99,7 +429,14 @@ namespace Akka.Interfaced.Tests
         public object Value { get { return v; } }
     }
 
-    public class OverloadedRef : InterfacedActorRef, IOverloaded
+    public interface IOverloaded_NoReply
+    {
+        void Min(System.Int32 a, System.Int32 b);
+        void Min(System.Int32 a, System.Int32 b, System.Int32 c);
+        void Min(params System.Int32[] nums);
+    }
+
+    public class OverloadedRef : InterfacedActorRef, IOverloaded, IOverloaded_NoReply
     {
         public OverloadedRef(IActorRef actor)
             : base(actor)
@@ -109,6 +446,11 @@ namespace Akka.Interfaced.Tests
         public OverloadedRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IOverloaded_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public OverloadedRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -147,184 +489,32 @@ namespace Akka.Interfaced.Tests
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
-    }
-}
 
-#endregion
-
-#region Akka.Interfaced.Tests.ISimple
-
-namespace Akka.Interfaced.Tests
-{
-    [MessageTableForInterfacedActor(typeof(ISimple))]
-    public static class ISimple__MessageTable
-    {
-        public static Type[,] GetMessageTypes()
-        {
-            return new Type[,]
-            {
-                {typeof(ISimple__Call__Invoke), null},
-                {typeof(ISimple__CallWithParameter__Invoke), null},
-                {typeof(ISimple__CallWithReturn__Invoke), typeof(ISimple__CallWithReturn__Return)},
-                {typeof(ISimple__CallWithParameterAndReturn__Invoke), typeof(ISimple__CallWithParameterAndReturn__Return)},
-                {typeof(ISimple__ThrowException__Invoke), typeof(ISimple__ThrowException__Return)},
-            };
-        }
-    }
-
-    public class ISimple__Call__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(ISimple); }
-
-        public async Task<IValueGetable> Invoke(object target)
-        {
-            await ((ISimple)target).Call();
-            return null;
-        }
-    }
-
-    public class ISimple__CallWithParameter__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 value;
-
-        public Type GetInterfaceType() { return typeof(ISimple); }
-
-        public async Task<IValueGetable> Invoke(object target)
-        {
-            await ((ISimple)target).CallWithParameter(value);
-            return null;
-        }
-    }
-
-    public class ISimple__CallWithReturn__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(ISimple); }
-
-        public async Task<IValueGetable> Invoke(object target)
-        {
-            var __v = await((ISimple)target).CallWithReturn();
-            return (IValueGetable)(new ISimple__CallWithReturn__Return { v = __v });
-        }
-    }
-
-    public class ISimple__CallWithReturn__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
-
-        public Type GetInterfaceType() { return typeof(ISimple); }
-
-        public object Value { get { return v; } }
-    }
-
-    public class ISimple__CallWithParameterAndReturn__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 value;
-
-        public Type GetInterfaceType() { return typeof(ISimple); }
-
-        public async Task<IValueGetable> Invoke(object target)
-        {
-            var __v = await((ISimple)target).CallWithParameterAndReturn(value);
-            return (IValueGetable)(new ISimple__CallWithParameterAndReturn__Return { v = __v });
-        }
-    }
-
-    public class ISimple__CallWithParameterAndReturn__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
-
-        public Type GetInterfaceType() { return typeof(ISimple); }
-
-        public object Value { get { return v; } }
-    }
-
-    public class ISimple__ThrowException__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Boolean throwException;
-
-        public Type GetInterfaceType() { return typeof(ISimple); }
-
-        public async Task<IValueGetable> Invoke(object target)
-        {
-            var __v = await((ISimple)target).ThrowException(throwException);
-            return (IValueGetable)(new ISimple__ThrowException__Return { v = __v });
-        }
-    }
-
-    public class ISimple__ThrowException__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
-
-        public Type GetInterfaceType() { return typeof(ISimple); }
-
-        public object Value { get { return v; } }
-    }
-
-    public class SimpleRef : InterfacedActorRef, ISimple
-    {
-        public SimpleRef(IActorRef actor)
-            : base(actor)
-        {
-        }
-
-        public SimpleRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
-            : base(actor, requestWaiter, timeout)
-        {
-        }
-
-        public SimpleRef WithRequestWaiter(IRequestWaiter requestWaiter)
-        {
-            return new SimpleRef(Actor, requestWaiter, Timeout);
-        }
-
-        public SimpleRef WithTimeout(TimeSpan? timeout)
-        {
-            return new SimpleRef(Actor, RequestWaiter, timeout);
-        }
-
-        public Task Call()
+        void IOverloaded_NoReply.Min(System.Int32 a, System.Int32 b)
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISimple__Call__Invoke {  }
+                Message = new IOverloaded__Min__Invoke { a = a, b = b }
             };
-            return SendRequestAndWait(requestMessage);
+            SendRequest(requestMessage);
         }
 
-        public Task CallWithParameter(System.Int32 value)
+        void IOverloaded_NoReply.Min(System.Int32 a, System.Int32 b, System.Int32 c)
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISimple__CallWithParameter__Invoke { value = value }
+                Message = new IOverloaded__Min_2__Invoke { a = a, b = b, c = c }
             };
-            return SendRequestAndWait(requestMessage);
+            SendRequest(requestMessage);
         }
 
-        public Task<System.Int32> CallWithReturn()
+        void IOverloaded_NoReply.Min(params System.Int32[] nums)
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISimple__CallWithReturn__Invoke {  }
+                Message = new IOverloaded__Min_3__Invoke { nums = nums }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
-        }
-
-        public Task<System.Int32> CallWithParameterAndReturn(System.Int32 value)
-        {
-            var requestMessage = new RequestMessage
-            {
-                Message = new ISimple__CallWithParameterAndReturn__Invoke { value = value }
-            };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
-        }
-
-        public Task<System.Int32> ThrowException(System.Boolean throwException)
-        {
-            var requestMessage = new RequestMessage
-            {
-                Message = new ISimple__ThrowException__Invoke { throwException = throwException }
-            };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            SendRequest(requestMessage);
         }
     }
 }
@@ -374,7 +564,13 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class WorkerRef : InterfacedActorRef, IWorker
+    public interface IWorker_NoReply
+    {
+        void Atomic(System.Int32 id);
+        void Reentrant(System.Int32 id);
+    }
+
+    public class WorkerRef : InterfacedActorRef, IWorker, IWorker_NoReply
     {
         public WorkerRef(IActorRef actor)
             : base(actor)
@@ -384,6 +580,11 @@ namespace Akka.Interfaced.Tests
         public WorkerRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IWorker_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public WorkerRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -412,6 +613,24 @@ namespace Akka.Interfaced.Tests
                 Message = new IWorker__Reentrant__Invoke { id = id }
             };
             return SendRequestAndWait(requestMessage);
+        }
+
+        void IWorker_NoReply.Atomic(System.Int32 id)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IWorker__Atomic__Invoke { id = id }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IWorker_NoReply.Reentrant(System.Int32 id)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IWorker__Reentrant__Invoke { id = id }
+            };
+            SendRequest(requestMessage);
         }
     }
 }

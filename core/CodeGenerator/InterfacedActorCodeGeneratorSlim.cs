@@ -81,11 +81,33 @@ namespace CodeGen
                 }
             }
 
+            // NoReply Interface
+            {
+                var sb = new StringBuilder();
+                var interfaceName = Utility.GetNoReplyInterfaceName(type);
+
+                sb.AppendFormat("public interface {0}\n", interfaceName);
+                sb.Append("{\n");
+
+                foreach (var method in methods)
+                {
+                    var parameters = method.GetParameters();
+                    var paramStr = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
+                    sb.AppendFormat("\tvoid {0}({1});\n", method.Name, paramStr);
+                }
+
+                sb.Append("}");
+                writer.AddCode(sb.ToString());
+            }
+
             // ActorRef
             {
                 var sb = new StringBuilder();
                 var refClassName = Utility.GetActorRefClassName(type);
-                sb.AppendFormat("public class {0} : InterfacedSlimActorRef\n", refClassName);
+                var noReplyInterfaceName = Utility.GetNoReplyInterfaceName(type);
+
+                sb.AppendFormat("public class {0} : InterfacedSlimActorRef, {1}\n",
+                                refClassName, noReplyInterfaceName);
                 sb.Append("{\n");
 
                 // Constructor (detailed one)
@@ -93,6 +115,14 @@ namespace CodeGen
                 sb.AppendFormat("\tpublic {0}(ISlimActorRef actor, ISlimRequestWaiter requestWaiter, TimeSpan? timeout)\n", refClassName);
                 sb.AppendFormat("\t\t: base(actor, requestWaiter, timeout)\n");
                 sb.Append("\t{\n");
+                sb.Append("\t}\n");
+
+                // WithNoReply
+
+                sb.Append("\n");
+                sb.AppendFormat("\tpublic {0} WithNoReply()\n", noReplyInterfaceName);
+                sb.Append("\t{\n");
+                sb.AppendFormat("\t\treturn this;\n");
                 sb.Append("\t}\n");
 
                 // WithRequestWaiter
@@ -111,13 +141,15 @@ namespace CodeGen
                 sb.AppendFormat("\t\treturn new {0}(Actor, RequestWaiter, timeout);\n", refClassName);
                 sb.Append("\t}\n");
 
+                // IInterface message methods
+
                 foreach (var method in methods)
                 {
                     var messageName = method2MessageNameMap[method];
                     var parameters = method.GetParameters();
 
                     var parameterNames = string.Join(", ", parameters.Select(p => p.Name));
-                    var parameterTypeNames = string.Join(", ", parameters.Select(p => (p.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") + Utility.GetTypeName(p.ParameterType) + " " + p.Name + Utility.GetParameterDefaultExpression(p)));
+                    var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
                     var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + Utility.GetTransportTypeCasting(p.ParameterType) + p.Name));
                     var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
 
@@ -141,6 +173,34 @@ namespace CodeGen
                         sb.AppendFormat("\t\treturn SendRequestAndReceive<{0}>(requestMessage);\n", Utility.GetTypeName(returnType));
                     else
                         sb.AppendFormat("\t\treturn SendRequestAndWait(requestMessage);\n");
+
+                    sb.Append("\t}\n");
+                }
+
+                // IInterface_NoReply message methods
+
+                foreach (var method in methods)
+                {
+                    var messageName = method2MessageNameMap[method];
+                    var parameters = method.GetParameters();
+
+                    var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, false)));
+                    var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + Utility.GetTransportTypeCasting(p.ParameterType) + p.Name));
+
+                    // Request Methods
+
+                    sb.Append("\n");
+                    sb.AppendFormat("\tvoid {0}.{1}({2})\n",
+                                    noReplyInterfaceName, method.Name, parameterTypeNames);
+
+                    sb.Append("\t{\n");
+
+                    sb.AppendFormat("\t\tvar requestMessage = new SlimRequestMessage\n");
+                    sb.Append("\t\t{\n");
+                    sb.AppendFormat("\t\t\tMessage = new {0} {{ {1} }}\n", messageName.Item1, parameterInits);
+                    sb.Append("\t\t};\n");
+
+                    sb.AppendFormat("\t\tSendRequest(requestMessage);\n");
 
                     sb.Append("\t}\n");
                 }

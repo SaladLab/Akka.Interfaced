@@ -49,11 +49,22 @@ namespace SlimHttp.Interface
         public object Value { get { return v; } }
     }
 
-    public class CalculatorRef : InterfacedSlimActorRef
+    public interface ICalculator_NoReply
+    {
+        void Concat(System.String a, System.String b);
+        void Sum(System.Int32 a, System.Int32 b);
+    }
+
+    public class CalculatorRef : InterfacedSlimActorRef, ICalculator_NoReply
     {
         public CalculatorRef(ISlimActorRef actor, ISlimRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public ICalculator_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public CalculatorRef WithRequestWaiter(ISlimRequestWaiter requestWaiter)
@@ -82,6 +93,24 @@ namespace SlimHttp.Interface
                 Message = new ICalculator__Sum__Invoke { a = a, b = b }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        void ICalculator_NoReply.Concat(System.String a, System.String b)
+        {
+            var requestMessage = new SlimRequestMessage
+            {
+                Message = new ICalculator__Concat__Invoke { a = a, b = b }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ICalculator_NoReply.Sum(System.Int32 a, System.Int32 b)
+        {
+            var requestMessage = new SlimRequestMessage
+            {
+                Message = new ICalculator__Sum__Invoke { a = a, b = b }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -113,11 +142,22 @@ namespace SlimHttp.Interface
         public object Value { get { return v; } }
     }
 
-    public class CounterRef : InterfacedSlimActorRef
+    public interface ICounter_NoReply
+    {
+        void IncCounter(System.Int32 delta);
+        void GetCounter();
+    }
+
+    public class CounterRef : InterfacedSlimActorRef, ICounter_NoReply
     {
         public CounterRef(ISlimActorRef actor, ISlimRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public ICounter_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public CounterRef WithRequestWaiter(ISlimRequestWaiter requestWaiter)
@@ -146,6 +186,24 @@ namespace SlimHttp.Interface
                 Message = new ICounter__GetCounter__Invoke {  }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        void ICounter_NoReply.IncCounter(System.Int32 delta)
+        {
+            var requestMessage = new SlimRequestMessage
+            {
+                Message = new ICounter__IncCounter__Invoke { delta = delta }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ICounter_NoReply.GetCounter()
+        {
+            var requestMessage = new SlimRequestMessage
+            {
+                Message = new ICounter__GetCounter__Invoke {  }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -242,11 +300,26 @@ namespace SlimHttp.Interface
         public object Value { get { return v; } }
     }
 
-    public class PedanticRef : InterfacedSlimActorRef
+    public interface IPedantic_NoReply
+    {
+        void TestCall();
+        void TestOptional(System.Nullable<System.Int32> value);
+        void TestTuple(System.Tuple<System.Int32, System.String> value);
+        void TestParams(params System.Int32[] values);
+        void TestPassClass(SlimHttp.Interface.TestParam param);
+        void TestReturnClass(System.Int32 value, System.Int32 offset);
+    }
+
+    public class PedanticRef : InterfacedSlimActorRef, IPedantic_NoReply
     {
         public PedanticRef(ISlimActorRef actor, ISlimRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IPedantic_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public PedanticRef WithRequestWaiter(ISlimRequestWaiter requestWaiter)
@@ -311,6 +384,60 @@ namespace SlimHttp.Interface
                 Message = new IPedantic__TestReturnClass__Invoke { value = value, offset = offset }
             };
             return SendRequestAndReceive<SlimHttp.Interface.TestResult>(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestCall()
+        {
+            var requestMessage = new SlimRequestMessage
+            {
+                Message = new IPedantic__TestCall__Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestOptional(System.Nullable<System.Int32> value)
+        {
+            var requestMessage = new SlimRequestMessage
+            {
+                Message = new IPedantic__TestOptional__Invoke { value = (System.Nullable<System.Int32>)value }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestTuple(System.Tuple<System.Int32, System.String> value)
+        {
+            var requestMessage = new SlimRequestMessage
+            {
+                Message = new IPedantic__TestTuple__Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestParams(params System.Int32[] values)
+        {
+            var requestMessage = new SlimRequestMessage
+            {
+                Message = new IPedantic__TestParams__Invoke { values = values }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestPassClass(SlimHttp.Interface.TestParam param)
+        {
+            var requestMessage = new SlimRequestMessage
+            {
+                Message = new IPedantic__TestPassClass__Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestReturnClass(System.Int32 value, System.Int32 offset)
+        {
+            var requestMessage = new SlimRequestMessage
+            {
+                Message = new IPedantic__TestReturnClass__Invoke { value = value, offset = offset }
+            };
+            SendRequest(requestMessage);
         }
     }
 }

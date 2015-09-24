@@ -26,41 +26,28 @@ namespace Akka.Interfaced
 
         // Request & Reply
 
-        private static readonly Task CompletedTask = Task.FromResult(true);
+        protected void SendRequest(RequestMessage requestMessage)
+        {
+            Actor.Tell(requestMessage);
+        }
 
         protected Task SendRequestAndWait(RequestMessage requestMessage)
         {
-            if (RequestWaiter != null)
-            {
-                return RequestWaiter.SendRequestAndReceive(Actor, requestMessage, Timeout);
-            }
-            else
-            {
-                Actor.Tell(requestMessage);
-                return CompletedTask;
-            }
+            return RequestWaiter.SendRequestAndReceive(Actor, requestMessage, Timeout);
         }
 
         protected Task<T> SendRequestAndReceive<T>(RequestMessage requestMessage)
         {
-            if (RequestWaiter != null)
+            var task = RequestWaiter.SendRequestAndReceive(Actor, requestMessage, Timeout);
+            return task.ContinueWith(t =>
             {
-                var task = RequestWaiter.SendRequestAndReceive(Actor, requestMessage, Timeout);
-                return task.ContinueWith(t =>
-                {
-                    if (t.IsFaulted)
-                        throw t.Exception.Flatten().InnerExceptions.FirstOrDefault() ?? t.Exception;
-                    else if (t.IsCanceled)
-                        throw new TaskCanceledException();
-                    else
-                        return (T)t.Result;
-                }, TaskContinuationOptions.ExecuteSynchronously);
-            }
-            else
-            {
-                Actor.Tell(requestMessage);
-                return Task.FromResult(default(T));
-            }
+                if (t.IsFaulted)
+                    throw t.Exception.Flatten().InnerExceptions.FirstOrDefault() ?? t.Exception;
+                else if (t.IsCanceled)
+                    throw new TaskCanceledException();
+                else
+                    return (T)t.Result;
+            }, TaskContinuationOptions.ExecuteSynchronously);
         }
     }
 

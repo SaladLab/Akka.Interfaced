@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace CodeGen
 {
@@ -56,6 +57,11 @@ namespace CodeGen
                    type.GetInterfaces().Any(i => i.FullName == "Akka.Interfaced.IInterfacedObserver");
         }
 
+        public static string GetNoReplyInterfaceName(Type type)
+        {
+            return type.Name + "_NoReply";
+        }
+
         public static string GetActorRefClassName(Type type)
         {
             return type.Name.Substring(1) + "Ref";
@@ -77,6 +83,13 @@ namespace CodeGen
                 return null;
 
             return (string)pi.GetValue(attr);
+        }
+
+        public static string GetParameterDeclaration(ParameterInfo pi, bool includeDefaultExpression)
+        {
+            return (pi.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") +
+                   (Utility.GetTypeName(pi.ParameterType) + " " + pi.Name) +
+                   (includeDefaultExpression ? Utility.GetParameterDefaultExpression(pi) : "");
         }
 
         public static string GetParameterDefaultExpression(ParameterInfo pi)

@@ -49,10 +49,10 @@ namespace SlimUnityChat.Program.Server
         private void UnlinkAll()
         {
             foreach (var room in _enteredRoomMap.Values)
-                room.WithRequestWaiter(null).Exit(_id);
+                room.WithNoReply().Exit(_id);
             _enteredRoomMap.Clear();
 
-            _clusterContext.UserDirectory.WithRequestWaiter(null).UnregisterUser(_id);
+            _clusterContext.UserDirectory.WithNoReply().UnregisterUser(_id);
         }
 
         Task<string> IUser.GetId()

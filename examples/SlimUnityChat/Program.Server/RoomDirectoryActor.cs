@@ -98,7 +98,7 @@ namespace SlimUnityChat.Program.Server
                 return Task.FromResult(0);
 
             _roomTable.Remove(name);
-            room.Item1.WithRequestWaiter(null).RemoveRoom(name);
+            room.Item1.WithNoReply().RemoveRoom(name);
 
             return Task.FromResult(true);
         }

@@ -81,6 +81,7 @@
     <Compile Include="TestBasic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestPoisonPill.cs" />
+    <Compile Include="TestRef.cs" />
     <Compile Include="TestStartStopEvent.cs" />
     <Compile Include="TestWorkOrder.cs" />
   </ItemGroup>

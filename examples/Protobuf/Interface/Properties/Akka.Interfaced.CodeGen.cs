@@ -77,8 +77,14 @@ namespace Protobuf.Interface
         public object Value { get { return v; } }
     }
 
+    public interface IHelloWorld_NoReply
+    {
+        void SayHello(System.String name);
+        void GetHelloCount();
+    }
+
     [ProtoContract, TypeAlias]
-    public class HelloWorldRef : InterfacedActorRef, IHelloWorld
+    public class HelloWorldRef : InterfacedActorRef, IHelloWorld, IHelloWorld_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -99,6 +105,11 @@ namespace Protobuf.Interface
         public HelloWorldRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IHelloWorld_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public HelloWorldRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -127,6 +138,24 @@ namespace Protobuf.Interface
                 Message = new IHelloWorld__GetHelloCount__Invoke {  }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        void IHelloWorld_NoReply.SayHello(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IHelloWorld__SayHello__Invoke { name = name }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IHelloWorld_NoReply.GetHelloCount()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IHelloWorld__GetHelloCount__Invoke {  }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -287,8 +316,18 @@ namespace Protobuf.Interface
         public object Value { get { return v; } }
     }
 
+    public interface IPedantic_NoReply
+    {
+        void TestCall();
+        void TestOptional(System.Nullable<System.Int32> value);
+        void TestTuple(System.Tuple<System.Int32, System.String> value);
+        void TestParams(params System.Int32[] values);
+        void TestPassClass(Protobuf.Interface.TestParam param);
+        void TestReturnClass(System.Int32 value, System.Int32 offset);
+    }
+
     [ProtoContract, TypeAlias]
-    public class PedanticRef : InterfacedActorRef, IPedantic
+    public class PedanticRef : InterfacedActorRef, IPedantic, IPedantic_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -309,6 +348,11 @@ namespace Protobuf.Interface
         public PedanticRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IPedantic_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public PedanticRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -373,6 +417,60 @@ namespace Protobuf.Interface
                 Message = new IPedantic__TestReturnClass__Invoke { value = value, offset = offset }
             };
             return SendRequestAndReceive<Protobuf.Interface.TestResult>(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestCall()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IPedantic__TestCall__Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestOptional(System.Nullable<System.Int32> value)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IPedantic__TestOptional__Invoke { value = (System.Nullable<System.Int32>)value }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestTuple(System.Tuple<System.Int32, System.String> value)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IPedantic__TestTuple__Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestParams(params System.Int32[] values)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IPedantic__TestParams__Invoke { values = values }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestPassClass(Protobuf.Interface.TestParam param)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IPedantic__TestPassClass__Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IPedantic_NoReply.TestReturnClass(System.Int32 value, System.Int32 offset)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IPedantic__TestReturnClass__Invoke { value = value, offset = offset }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -467,8 +565,15 @@ namespace Protobuf.Interface
         public object Value { get { return v; } }
     }
 
+    public interface ISurrogate_NoReply
+    {
+        void GetPath(Akka.Actor.ActorPath path);
+        void GetAddress(Akka.Actor.Address address);
+        void GetSelf();
+    }
+
     [ProtoContract, TypeAlias]
-    public class SurrogateRef : InterfacedActorRef, ISurrogate
+    public class SurrogateRef : InterfacedActorRef, ISurrogate, ISurrogate_NoReply
     {
         [ProtoMember(1)] private ActorRefBase _actor
         {
@@ -489,6 +594,11 @@ namespace Protobuf.Interface
         public SurrogateRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public ISurrogate_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public SurrogateRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -526,6 +636,33 @@ namespace Protobuf.Interface
                 Message = new ISurrogate__GetSelf__Invoke {  }
             };
             return SendRequestAndReceive<Akka.Actor.ActorRefBase>(requestMessage);
+        }
+
+        void ISurrogate_NoReply.GetPath(Akka.Actor.ActorPath path)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ISurrogate__GetPath__Invoke { path = path }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISurrogate_NoReply.GetAddress(Akka.Actor.Address address)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ISurrogate__GetAddress__Invoke { address = address }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISurrogate_NoReply.GetSelf()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ISurrogate__GetSelf__Invoke {  }
+            };
+            SendRequest(requestMessage);
         }
     }
 }

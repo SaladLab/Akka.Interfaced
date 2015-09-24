@@ -75,7 +75,13 @@ namespace Basic.Interface
         public object Value { get { return v; } }
     }
 
-    public class CalculatorRef : InterfacedActorRef, ICalculator
+    public interface ICalculator_NoReply
+    {
+        void Concat(System.String a, System.String b);
+        void Sum(System.Int32 a, System.Int32 b);
+    }
+
+    public class CalculatorRef : InterfacedActorRef, ICalculator, ICalculator_NoReply
     {
         public CalculatorRef(IActorRef actor)
             : base(actor)
@@ -85,6 +91,11 @@ namespace Basic.Interface
         public CalculatorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public ICalculator_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public CalculatorRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -113,6 +124,24 @@ namespace Basic.Interface
                 Message = new ICalculator__Sum__Invoke { a = a, b = b }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        void ICalculator_NoReply.Concat(System.String a, System.String b)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ICalculator__Concat__Invoke { a = a, b = b }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ICalculator_NoReply.Sum(System.Int32 a, System.Int32 b)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ICalculator__Sum__Invoke { a = a, b = b }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -169,7 +198,13 @@ namespace Basic.Interface
         public object Value { get { return v; } }
     }
 
-    public class CounterRef : InterfacedActorRef, ICounter
+    public interface ICounter_NoReply
+    {
+        void IncCounter(System.Int32 delta);
+        void GetCounter();
+    }
+
+    public class CounterRef : InterfacedActorRef, ICounter, ICounter_NoReply
     {
         public CounterRef(IActorRef actor)
             : base(actor)
@@ -179,6 +214,11 @@ namespace Basic.Interface
         public CounterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public ICounter_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public CounterRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -207,6 +247,24 @@ namespace Basic.Interface
                 Message = new ICounter__GetCounter__Invoke {  }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        void ICounter_NoReply.IncCounter(System.Int32 delta)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ICounter__IncCounter__Invoke { delta = delta }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ICounter_NoReply.GetCounter()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ICounter__GetCounter__Invoke {  }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -286,7 +344,15 @@ namespace Basic.Interface
         }
     }
 
-    public class EventGeneratorRef : InterfacedActorRef, IEventGenerator
+    public interface IEventGenerator_NoReply
+    {
+        void Subscribe(Basic.Interface.IEventObserver observer);
+        void Unsubscribe(Basic.Interface.IEventObserver observer);
+        void Buy(System.String name, System.Int32 price);
+        void Sell(System.String name, System.Int32 price);
+    }
+
+    public class EventGeneratorRef : InterfacedActorRef, IEventGenerator, IEventGenerator_NoReply
     {
         public EventGeneratorRef(IActorRef actor)
             : base(actor)
@@ -296,6 +362,11 @@ namespace Basic.Interface
         public EventGeneratorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IEventGenerator_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public EventGeneratorRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -342,6 +413,42 @@ namespace Basic.Interface
                 Message = new IEventGenerator__Sell__Invoke { name = name, price = price }
             };
             return SendRequestAndWait(requestMessage);
+        }
+
+        void IEventGenerator_NoReply.Subscribe(Basic.Interface.IEventObserver observer)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IEventGenerator__Subscribe__Invoke { observer = (Basic.Interface.EventObserver)observer }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IEventGenerator_NoReply.Unsubscribe(Basic.Interface.IEventObserver observer)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IEventGenerator__Unsubscribe__Invoke { observer = (Basic.Interface.EventObserver)observer }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IEventGenerator_NoReply.Buy(System.String name, System.Int32 price)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IEventGenerator__Buy__Invoke { name = name, price = price }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IEventGenerator_NoReply.Sell(System.String name, System.Int32 price)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IEventGenerator__Sell__Invoke { name = name, price = price }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -435,7 +542,14 @@ namespace Basic.Interface
         public object Value { get { return v; } }
     }
 
-    public class OverloadedRef : InterfacedActorRef, IOverloaded
+    public interface IOverloaded_NoReply
+    {
+        void Min(System.Int32 a, System.Int32 b);
+        void Min(System.Int32 a, System.Int32 b, System.Int32 c);
+        void Min(params System.Int32[] nums);
+    }
+
+    public class OverloadedRef : InterfacedActorRef, IOverloaded, IOverloaded_NoReply
     {
         public OverloadedRef(IActorRef actor)
             : base(actor)
@@ -445,6 +559,11 @@ namespace Basic.Interface
         public OverloadedRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IOverloaded_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public OverloadedRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -482,6 +601,33 @@ namespace Basic.Interface
                 Message = new IOverloaded__Min_3__Invoke { nums = nums }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        void IOverloaded_NoReply.Min(System.Int32 a, System.Int32 b)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IOverloaded__Min__Invoke { a = a, b = b }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IOverloaded_NoReply.Min(System.Int32 a, System.Int32 b, System.Int32 c)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IOverloaded__Min_2__Invoke { a = a, b = b, c = c }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IOverloaded_NoReply.Min(params System.Int32[] nums)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IOverloaded__Min_3__Invoke { nums = nums }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
@@ -531,7 +677,13 @@ namespace Basic.Interface
         }
     }
 
-    public class WorkerRef : InterfacedActorRef, IWorker
+    public interface IWorker_NoReply
+    {
+        void Atomic(System.String name);
+        void Reentrant(System.String name);
+    }
+
+    public class WorkerRef : InterfacedActorRef, IWorker, IWorker_NoReply
     {
         public WorkerRef(IActorRef actor)
             : base(actor)
@@ -541,6 +693,11 @@ namespace Basic.Interface
         public WorkerRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
         {
+        }
+
+        public IWorker_NoReply WithNoReply()
+        {
+            return this;
         }
 
         public WorkerRef WithRequestWaiter(IRequestWaiter requestWaiter)
@@ -569,6 +726,24 @@ namespace Basic.Interface
                 Message = new IWorker__Reentrant__Invoke { name = name }
             };
             return SendRequestAndWait(requestMessage);
+        }
+
+        void IWorker_NoReply.Atomic(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IWorker__Atomic__Invoke { name = name }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IWorker_NoReply.Reentrant(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new IWorker__Reentrant__Invoke { name = name }
+            };
+            SendRequest(requestMessage);
         }
     }
 }
