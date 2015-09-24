@@ -74,9 +74,27 @@ namespace CodeGen
                     for (var i = 0; i < parameters.Length; i++)
                     {
                         var parameter = parameters[i];
-                        var attr = (Options.UseProtobuf) ? string.Format("[ProtoMember({0})] ", i + 1) : "";
-                        sb.AppendFormat("\t{0}public {1} {2};\n",
-                            attr, Utility.GetTransportTypeName(parameter.ParameterType), parameter.Name);
+
+                        var attr = "";
+                        var defaultValueExpression = "";
+                        if (Options.UseProtobuf)
+                        {
+                            var defaultValueAttr =
+                                parameter.HasNonTrivialDefaultValue()
+                                    ? string.Format(", DefaultValue({0})",
+                                                    Utility.GetValueLiteral(parameter.DefaultValue))
+                                    : "";
+                            attr = string.Format("[ProtoMember({0}){1}] ", i + 1, defaultValueAttr);
+
+                            if (parameter.HasNonTrivialDefaultValue())
+                            {
+                                defaultValueExpression = " = " + Utility.GetValueLiteral(parameter.DefaultValue);
+                            }
+                        }
+
+                        sb.AppendFormat("\t{0}public {1} {2}{3};\n",
+                                        attr, Utility.GetTransportTypeName(parameter.ParameterType),
+                                        parameter.Name, defaultValueExpression);
                     }
 
                     if (parameters.Length > 0)

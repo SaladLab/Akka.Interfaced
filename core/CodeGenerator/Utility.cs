@@ -87,28 +87,39 @@ namespace CodeGen
 
         public static string GetParameterDeclaration(ParameterInfo pi, bool includeDefaultExpression)
         {
+            var defaultValue = pi.HasDefaultValue ? GetValueLiteral(pi.DefaultValue) : "";
             return (pi.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") +
                    (Utility.GetTypeName(pi.ParameterType) + " " + pi.Name) +
-                   (includeDefaultExpression ? Utility.GetParameterDefaultExpression(pi) : "");
+                   (includeDefaultExpression && defaultValue != "" ? " = " + defaultValue : "");
         }
 
-        public static string GetParameterDefaultExpression(ParameterInfo pi)
+        public static bool HasNonTrivialDefaultValue(this ParameterInfo pi)
         {
-            if (pi.HasDefaultValue == false)
-                return "";
+            if (pi.HasDefaultValue == false || pi.DefaultValue == null)
+                return false;
 
-            if (pi.DefaultValue == null)
-                return " = null";
+            if (pi.DefaultValue.GetType().IsValueType == false)
+                return false;
 
-            var type = pi.DefaultValue.GetType();
+            return pi.DefaultValue.Equals(Activator.CreateInstance(pi.ParameterType)) == false;
+        }
+
+        public static string GetValueLiteral(object value)
+        {
+            // NOTE: For simple implementation, escaping string is not considered.
+
+            if (value == null)
+                return "null";
+
+            var type = value.GetType();
 
             if (type == typeof(string))
-                return string.Format(" = \"{0}\"", pi.DefaultValue);
+                return string.Format("\"{0}\"", value);
 
             if (type == typeof(char))
-                return string.Format(" = '{0}'", pi.DefaultValue);
+                return string.Format("'{0}'", value);
 
-            return string.Format(" = {0}", pi.DefaultValue);
+            return string.Format("{0}", value);
         }
     }
 }

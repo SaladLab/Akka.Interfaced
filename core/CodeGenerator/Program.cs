@@ -87,6 +87,7 @@ namespace CodeGen
                 {
                     writer.AddUsing("ProtoBuf");
                     writer.AddUsing("TypeAlias");
+                    writer.AddUsing("System.ComponentModel");
                 }
 
                 var actorTypes = assembly.GetTypes().OrderBy(t => t.FullName).Where(t => Utility.IsActorInterface(t)).ToArray();

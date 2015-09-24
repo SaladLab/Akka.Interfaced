@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Akka.Interfaced;
 using ProtoBuf;
 using TypeAlias;
+using System.ComponentModel;
 
 #region SlimUnity.Interface.ICalculator
 
