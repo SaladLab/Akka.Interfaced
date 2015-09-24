@@ -11,86 +11,7 @@ namespace Akka.Interfaced
     public abstract class InterfacedActor<T> : UntypedActor, IWithUnboundedStash, IRequestWaiter
         where T : InterfacedActor<T>
     {
-        public delegate Task<IValueGetable> MessageHandler(T self, RequestMessage requestMessage);
-
-        private class MessageHandlerInfo
-        {
-            public Type InterfaceType;
-            public bool IsReentrant;
-            public MessageHandler Handler;
-        }
-
-        private static Dictionary<Type, MessageHandlerInfo> Type2InfoMap;
-
-        static InterfacedActor()
-        {
-            Type2InfoMap = new Dictionary<Type, MessageHandlerInfo>();
-
-            var type = typeof(T);
-            var handlerBuilder = type.GetMethod("OnBuildHandler", BindingFlags.Static | BindingFlags.NonPublic);
-
-            foreach (var ifs in type.GetInterfaces())
-            {
-                if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedActor)))
-                    continue;
-
-                var interfaceMap = type.GetInterfaceMap(ifs);
-
-                var messageTableType =
-                    interfaceMap.InterfaceType.Assembly.GetTypes()
-                                .Where(t =>
-                                {
-                                    var attr = t.GetCustomAttribute<MessageTableForInterfacedActorAttribute>();
-                                    return (attr != null && attr.Type == ifs);
-                                })
-                                .FirstOrDefault();
-
-                if (messageTableType == null)
-                {
-                    throw new InvalidOperationException(
-                        string.Format("Cannot find message table class for {0}", ifs.FullName));
-                }
-
-                var queryMethodInfo = messageTableType.GetMethod("GetMessageTypes");
-                if (queryMethodInfo == null)
-                {
-                    throw new InvalidOperationException(
-                        string.Format("Cannot find {0}.GetMessageTypes method", messageTableType.FullName));
-                }
-
-                var messageTable = (Type[,])queryMethodInfo.Invoke(null, new object[] { });
-                if (messageTable == null || messageTable.GetLength(0) != interfaceMap.InterfaceMethods.Length)
-                {
-                    throw new InvalidOperationException(
-                        string.Format("Mismatched messageTable from {0}", messageTableType.FullName));
-                }
-
-                for (var i = 0; i < interfaceMap.InterfaceMethods.Length; i++)
-                {
-                    var interfaceMethod = interfaceMap.InterfaceMethods[i];
-                    var targetMethod = interfaceMap.TargetMethods[i];
-                    var invokeMessageType = messageTable[i, 0];
-
-                    var isReentrant = targetMethod.CustomAttributes
-                                                  .Any(x => x.AttributeType == typeof(ReentrantAttribute));
-                    MessageHandler handler = (self, requestMessage) => requestMessage.Message.Invoke(self);
-
-                    if (handlerBuilder != null)
-                    {
-                        handler = (MessageHandler)handlerBuilder.Invoke(null, new object[] { handler, targetMethod });
-                    }
-
-                    Type2InfoMap[invokeMessageType] = new MessageHandlerInfo
-                    {
-                        InterfaceType = ifs,
-                        IsReentrant = isReentrant,
-                        Handler = handler
-                    };
-                }
-            }
-
-            Console.WriteLine("# Build<{0}> has {1} items", type.Name, Type2InfoMap.Count);
-        }
+        private static MessageDispatcher<T> Dispatcher = new MessageDispatcher<T>();
 
         // Stash for stashing incoming messages while atomic handler is running
         public IStash Stash { get; set; }
@@ -147,8 +68,8 @@ namespace Akka.Interfaced
             {
                 var sender = Sender;
 
-                MessageHandlerInfo info;
-                if (Type2InfoMap.TryGetValue(requestMessage.Message.GetType(), out info) == false)
+                var handler = Dispatcher.GetHandler(requestMessage.Message.GetType());
+                if (handler == null)
                 {
                     sender.Tell(new ReplyMessage
                     {
@@ -159,7 +80,7 @@ namespace Akka.Interfaced
                 }
 
                 var context = new MessageHandleContext { Self = Self, Sender = Sender };
-                if (info.IsReentrant == false)
+                if (handler.IsReentrant == false)
                 {
                     BecomeStacked(OnReceiveInAtomicTask);
                     _currentAtomicContext = context;
@@ -167,9 +88,9 @@ namespace Akka.Interfaced
 
                 using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                 {
-                    info.Handler((T)this, requestMessage)
-                        .ContinueWith(t => OnTaskCompleted(t, Sender, requestMessage, info),
-                                      TaskContinuationOptions.ExecuteSynchronously);
+                    handler.Handler((T)this, requestMessage)
+                           .ContinueWith(t => OnTaskCompleted(t, Sender, requestMessage, handler),
+                                         TaskContinuationOptions.ExecuteSynchronously);
                 }
                 return;
             }
@@ -271,7 +192,7 @@ namespace Akka.Interfaced
         }
 
         private void OnTaskCompleted(Task<IValueGetable> t, IActorRef sender, RequestMessage requestMessage,
-                                     MessageHandlerInfo info)
+                                     MessageDispatcher<T>.MessageHandlerInfo info)
         {
             try
             {
@@ -281,9 +202,8 @@ namespace Akka.Interfaced
                         sender.Tell(new ReplyMessage
                         {
                             RequestId = requestMessage.RequestId,
-                            Exception =
-                                t.Exception.Flatten().InnerExceptions.FirstOrDefault() ??
-                                t.Exception
+                            Exception = t.Exception.Flatten().InnerExceptions.FirstOrDefault() ??
+                                        t.Exception
                         });
                     else if (t.IsCanceled)
                         sender.Tell(new ReplyMessage

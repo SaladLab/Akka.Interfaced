@@ -53,6 +53,7 @@
     <Compile Include="InterfacedActor.cs" />
     <Compile Include="InterfacedActorRef.cs" />
     <Compile Include="IRequestWaiter.cs" />
+    <Compile Include="MessageDispatcher.cs" />
     <Compile Include="MessageTableAttribute.cs" />
     <Compile Include="NotificationMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
