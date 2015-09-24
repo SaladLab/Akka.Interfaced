@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyrightAttribute("Copyright © 2015 Saladbowl Creative")]
 [assembly: AssemblyCompanyAttribute("Saladbowl Creative")]
 [assembly: ComVisibleAttribute(false)]
-[assembly: CLSCompliantAttribute(true)]
+[assembly: CLSCompliantAttribute(false)]
 [assembly: AssemblyVersionAttribute("0.1.0.0")]
 [assembly: AssemblyFileVersionAttribute("0.1.0.0")]
 namespace System {
