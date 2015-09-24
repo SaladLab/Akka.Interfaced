@@ -99,7 +99,7 @@ namespace CodeGen
                 return false;
 
             if (pi.DefaultValue.GetType().IsValueType == false)
-                return false;
+                return true;
 
             return pi.DefaultValue.Equals(Activator.CreateInstance(pi.ParameterType)) == false;
         }

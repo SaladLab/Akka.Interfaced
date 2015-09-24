@@ -53,7 +53,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
     {
         [ProtoMember(1), DefaultValue(1)] public System.Int32 a = 1;
         [ProtoMember(2), DefaultValue(2)] public System.Int32 b = 2;
-        [ProtoMember(3)] public System.String c;
+        [ProtoMember(3), DefaultValue("Test")] public System.String c = "Test";
 
         public Type GetInterfaceType() { return typeof(IDefault); }
 
