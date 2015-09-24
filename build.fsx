@@ -108,7 +108,7 @@ Target "AssemblyInfo" <| fun _ ->
             Attribute.Copyright copyright
             Attribute.Company company
             Attribute.ComVisible false
-            Attribute.CLSCompliant true
+            Attribute.CLSCompliant false
             Attribute.Version version
             Attribute.FileVersion version ]
 
