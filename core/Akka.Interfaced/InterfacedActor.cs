@@ -92,14 +92,26 @@ namespace Akka.Interfaced
             Console.WriteLine("# Build<{0}> has {1} items", type.Name, Type2InfoMap.Count);
         }
 
-        // Atomic Task 를 처리중일 때 들어오는 메시지를 지연 처리하기 위한 Stash
+        // Stash for stashing incoming messages while atomic handler is running
         public IStash Stash { get; set; }
 
-        // 현재 진행중인 Atomic Task 의 컨텍스트. 진행중인 Atomic Task 가 없으면 Null.
+        // Task context for current atomic task. If no atomic task now, it will be null.
         private MessageHandleContext _currentAtomicContext;
 
-        // ObserverId -> Observer dictionary for bookkeeping registered observers
+        // Variable to issue unique local observer ID.
+        private int _lastIssuedObserverId;
+
+        // ObserverId -> Observer dictionary for bookkeeping registered observers.
         private Dictionary<int, IInterfacedObserver> _observerMap;
+
+        // TODO: Check lock should be required to keep safe?
+        private object _requestLock = new object();
+
+        // RequestId -> TCS dictionary for make continuation work when we get reply.
+        private Dictionary<int, TaskCompletionSource<object>> _requestMap;
+
+        // Variable to issue unique local request ID.
+        private int _lastRequestId;
 
         // Atomic async OnPreStart event (it will be called after PreStart)
         protected virtual Task OnPreStart()
@@ -314,10 +326,6 @@ namespace Akka.Interfaced
 
         // from IRequestWaiter
 
-        private object _requestLock = new object();
-        private Dictionary<int, TaskCompletionSource<object>> _requestMap;
-        private int _lastRequestId;
-
         Task<object> IRequestWaiter.SendRequestAndReceive(IActorRef target, RequestMessage requestMessage,
                                                           TimeSpan? timeout)
         {
@@ -403,6 +411,38 @@ namespace Akka.Interfaced
         protected virtual void OnReceiveUnhandled(object message)
         {
             Unhandled(message);
+        }
+
+        // observer support
+
+        protected int IssueObserverId()
+        {
+            return ++_lastIssuedObserverId;
+        }
+
+        protected void AddObserver(int observerId, IInterfacedObserver observer)
+        {
+            if (_observerMap == null)
+                _observerMap = new Dictionary<int, IInterfacedObserver>();
+
+            _observerMap.Add(observerId, observer);
+        }
+
+        protected IInterfacedObserver GetObserver(int observerId)
+        {
+            if (_observerMap == null)
+                return null;
+
+            IInterfacedObserver observer;
+            return _observerMap.TryGetValue(observerId, out observer) ? observer : null;
+        }
+
+        protected bool RemoveObserver(int observerId)
+        {
+            if (_observerMap == null)
+                return false;
+
+            return _observerMap.Remove(observerId);
         }
     }
 }

@@ -1388,6 +1388,11 @@ namespace SlimUnityChat.Interface
         {
         }
 
+        public RoomObserver(IActorRef target, int observerId)
+            : base(new ActorNotificationChannel(target), observerId)
+        {
+        }
+
         public RoomObserver(INotificationChannel channel, int observerId)
             : base(channel, observerId)
         {
@@ -1459,6 +1464,11 @@ namespace SlimUnityChat.Interface
 
         private UserEventObserver()
             : base(null, 0)
+        {
+        }
+
+        public UserEventObserver(IActorRef target, int observerId)
+            : base(new ActorNotificationChannel(target), observerId)
         {
         }
 

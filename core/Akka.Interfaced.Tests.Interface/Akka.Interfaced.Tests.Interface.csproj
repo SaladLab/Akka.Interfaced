@@ -50,8 +50,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IDummy.cs" />
+    <Compile Include="ISubject.cs" />
     <Compile Include="IOverloaded.cs" />
     <Compile Include="IBasic.cs" />
+    <Compile Include="ISubjectObserver.cs" />
     <Compile Include="IWorker.cs" />
     <Compile Include="Properties\Akka.Interfaced.CodeGen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

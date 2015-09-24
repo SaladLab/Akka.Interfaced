@@ -57,7 +57,6 @@ namespace CodeGen
 
             foreach (var method in methods)
             {
-                var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
                 var messageName = method2MessageNameMap[method];
 
                 // Invoke message
@@ -125,12 +124,22 @@ namespace CodeGen
                     sb.Append("\n");
                 }
 
-                // Constructor
+                // Constructor (IActorRef)
 
+                sb.AppendFormat("\tpublic {0}(IActorRef target, int observerId)\n", className);
+                sb.AppendFormat("\t\t: base(new ActorNotificationChannel(target), observerId)\n");
+                sb.Append("\t{\n");
+                sb.Append("\t}\n");
+
+                // Constructor (INotificationChannel)
+
+                sb.Append("\n");
                 sb.AppendFormat("\tpublic {0}(INotificationChannel channel, int observerId)\n", className);
                 sb.AppendFormat("\t\t: base(channel, observerId)\n");
                 sb.Append("\t{\n");
                 sb.Append("\t}\n");
+
+                // Observer method messages
 
                 foreach (var method in methods)
                 {

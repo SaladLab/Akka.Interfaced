@@ -18,13 +18,24 @@ namespace Akka.Interfaced
             Channel.Notify(new NotificationMessage { ObserverId = ObserverId, Message = message });
         }
 
-        // TODO: Subscribe / Unsubscribe 때 객체가 달라도 논리적으로 올바르게 동작하려면
-        //       Hash, Equal 을 override 해야 한다
+        public override bool Equals(object obj)
+        {
+            var o = obj as InterfacedObserver;
+            if (o == null)
+                return false;
+
+            return Channel.Equals(o.Channel) && ObserverId == o.ObserverId;
+        }
+
+        public override int GetHashCode()
+        {
+            return (Channel.GetHashCode() * 17) + ObserverId;
+        }
     }
 
     public class ActorNotificationChannel : INotificationChannel
     {
-        public IActorRef Actor { get; private set; }
+        public IActorRef Actor { get; }
 
         public ActorNotificationChannel(IActorRef actor)
         {
@@ -34,6 +45,20 @@ namespace Akka.Interfaced
         public void Notify(NotificationMessage notificationMessage)
         {
             Actor.Tell(notificationMessage);
+        }
+
+        public override bool Equals(object obj)
+        {
+            var c = obj as ActorNotificationChannel;
+            if (c == null)
+                return false;
+
+            return Actor.Equals(c.Actor);
+        }
+
+        public override int GetHashCode()
+        {
+            return Actor.GetHashCode();
         }
     }
 }

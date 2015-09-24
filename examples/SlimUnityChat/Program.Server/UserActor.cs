@@ -24,7 +24,7 @@ namespace SlimUnityChat.Program.Server
             _clusterContext = clusterContext;
             _clientSession = clientSession;
             _id = id;
-            _eventObserver = new UserEventObserver(new ActorNotificationChannel(_clientSession), observerId);
+            _eventObserver = new UserEventObserver(_clientSession, observerId);
             _enteredRoomMap = new Dictionary<string, RoomRef>();
         }
 
@@ -81,7 +81,7 @@ namespace SlimUnityChat.Program.Server
 
             // Let's enter the room !
 
-            var observer = new RoomObserver(new ActorNotificationChannel(_clientSession), observerId);
+            var observer = new RoomObserver(_clientSession, observerId);
             var info = await room.Enter(_id, observer);
 
             // Bind an occupant actor with client session

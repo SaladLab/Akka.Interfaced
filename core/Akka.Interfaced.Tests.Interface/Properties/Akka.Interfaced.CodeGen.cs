@@ -521,6 +521,155 @@ namespace Akka.Interfaced.Tests
 
 #endregion
 
+#region Akka.Interfaced.Tests.ISubject
+
+namespace Akka.Interfaced.Tests
+{
+    [MessageTableForInterfacedActor(typeof(ISubject))]
+    public static class ISubject__MessageTable
+    {
+        public static Type[,] GetMessageTypes()
+        {
+            return new Type[,]
+            {
+                {typeof(ISubject__MakeEvent__Invoke), null},
+                {typeof(ISubject__Subscribe__Invoke), null},
+                {typeof(ISubject__Unsubscribe__Invoke), null},
+            };
+        }
+    }
+
+    public class ISubject__MakeEvent__Invoke : IInterfacedMessage, IAsyncInvokable
+    {
+        public System.String eventName;
+
+        public Type GetInterfaceType() { return typeof(ISubject); }
+
+        public async Task<IValueGetable> Invoke(object target)
+        {
+            await ((ISubject)target).MakeEvent(eventName);
+            return null;
+        }
+    }
+
+    public class ISubject__Subscribe__Invoke : IInterfacedMessage, IAsyncInvokable
+    {
+        public Akka.Interfaced.Tests.SubjectObserver observer;
+
+        public Type GetInterfaceType() { return typeof(ISubject); }
+
+        public async Task<IValueGetable> Invoke(object target)
+        {
+            await ((ISubject)target).Subscribe(observer);
+            return null;
+        }
+    }
+
+    public class ISubject__Unsubscribe__Invoke : IInterfacedMessage, IAsyncInvokable
+    {
+        public Akka.Interfaced.Tests.SubjectObserver observer;
+
+        public Type GetInterfaceType() { return typeof(ISubject); }
+
+        public async Task<IValueGetable> Invoke(object target)
+        {
+            await ((ISubject)target).Unsubscribe(observer);
+            return null;
+        }
+    }
+
+    public interface ISubject_NoReply
+    {
+        void MakeEvent(System.String eventName);
+        void Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer);
+        void Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer);
+    }
+
+    public class SubjectRef : InterfacedActorRef, ISubject, ISubject_NoReply
+    {
+        public SubjectRef(IActorRef actor)
+            : base(actor)
+        {
+        }
+
+        public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)
+            : base(actor, requestWaiter, timeout)
+        {
+        }
+
+        public ISubject_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public SubjectRef WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new SubjectRef(Actor, requestWaiter, Timeout);
+        }
+
+        public SubjectRef WithTimeout(TimeSpan? timeout)
+        {
+            return new SubjectRef(Actor, RequestWaiter, timeout);
+        }
+
+        public Task MakeEvent(System.String eventName)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ISubject__MakeEvent__Invoke { eventName = eventName }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ISubject__Subscribe__Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ISubject__Unsubscribe__Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        void ISubject_NoReply.MakeEvent(System.String eventName)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ISubject__MakeEvent__Invoke { eventName = eventName }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubject_NoReply.Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ISubject__Subscribe__Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubject_NoReply.Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
+        {
+            var requestMessage = new RequestMessage
+            {
+                Message = new ISubject__Unsubscribe__Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+}
+
+#endregion
+
 #region Akka.Interfaced.Tests.IWorker
 
 namespace Akka.Interfaced.Tests
@@ -631,6 +780,42 @@ namespace Akka.Interfaced.Tests
                 Message = new IWorker__Reentrant__Invoke { id = id }
             };
             SendRequest(requestMessage);
+        }
+    }
+}
+
+#endregion
+
+#region Akka.Interfaced.Tests.ISubjectObserver
+
+namespace Akka.Interfaced.Tests
+{
+    public class ISubjectObserver__Event__Invoke : IInvokable
+    {
+        public System.String eventName;
+
+        public void Invoke(object target)
+        {
+            ((ISubjectObserver)target).Event(eventName);
+        }
+    }
+
+    public class SubjectObserver : InterfacedObserver, ISubjectObserver
+    {
+        public SubjectObserver(IActorRef target, int observerId)
+            : base(new ActorNotificationChannel(target), observerId)
+        {
+        }
+
+        public SubjectObserver(INotificationChannel channel, int observerId)
+            : base(channel, observerId)
+        {
+        }
+
+        public void Event(System.String eventName)
+        {
+            var message = new ISubjectObserver__Event__Invoke { eventName = eventName };
+            Notify(message);
         }
     }
 }
