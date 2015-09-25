@@ -80,7 +80,9 @@
   <ItemGroup>
     <Compile Include="TestBasic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestMessageDispatch.cs" />
+    <Compile Include="TestMessageDispatch.Plain.cs" />
+    <Compile Include="TestMessageDispatch.Request.cs" />
+    <Compile Include="TestMessageDispatch.RequestExtended.cs" />
     <Compile Include="TestObserver.cs" />
     <Compile Include="TestPoisonPill.cs" />
     <Compile Include="TestRef.cs" />

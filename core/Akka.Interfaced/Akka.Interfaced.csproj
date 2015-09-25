@@ -49,11 +49,12 @@
     <Compile Include="DeadRequestProcessingActor.cs" />
     <Compile Include="IAsyncInvokable.cs" />
     <Compile Include="INotificationChannel.cs" />
+    <Compile Include="IExtendedInterface.cs" />
     <Compile Include="InterfacedObserver.cs" />
     <Compile Include="InterfacedActor.cs" />
     <Compile Include="InterfacedActorRef.cs" />
     <Compile Include="IRequestWaiter.cs" />
-    <Compile Include="MessageDispatchAttribute.cs" />
+    <Compile Include="MessageHandlerAttribute.cs" />
     <Compile Include="MessageDispatcher.cs" />
     <Compile Include="MessageDispatcherInternalHelper.cs" />
     <Compile Include="MessageTableAttribute.cs" />

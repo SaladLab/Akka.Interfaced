@@ -23,11 +23,11 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestMessageDispatchActor : InterfacedActor<TestMessageDispatchActor>, IDummy
+    public class TestMessageDispatchPlainActor : InterfacedActor<TestMessageDispatchPlainActor>, IDummy
     {
         private List<string> _eventLog;
 
-        public TestMessageDispatchActor(List<string> eventLog)
+        public TestMessageDispatchPlainActor(List<string> eventLog)
         {
             _eventLog = eventLog;
         }
@@ -37,13 +37,13 @@ namespace Akka.Interfaced.Tests
             return Task.FromResult(param);
         }
 
-        [MessageDispatch]
+        [MessageHandler]
         private void OnMessage(PlainMessages.Func message)
         {
             _eventLog.Add(message.Value + "_1");
         }
 
-        [MessageDispatch]
+        [MessageHandler]
         private async Task OnMessage(PlainMessages.TaskAtomic message)
         {
             _eventLog.Add(message.Value + "_1");
@@ -51,7 +51,7 @@ namespace Akka.Interfaced.Tests
             _eventLog.Add(message.Value + "_2");
         }
 
-        [MessageDispatch, Reentrant]
+        [MessageHandler, Reentrant]
         private async Task OnMessage(PlainMessages.TaskReentrant message)
         {
             _eventLog.Add(message.Value + "_1");
@@ -60,14 +60,14 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestMessageDispatch : Akka.TestKit.Xunit2.TestKit
+    public class TestMessageDispatchPlain : Akka.TestKit.Xunit2.TestKit
     {
         [Fact]
         public async Task Test_can_handle_plain_message()
         {
             var eventLog = new List<string>();
-            var actor = ActorOfAsTestActorRef<TestMessageDispatchActor>(
-                Props.Create<TestMessageDispatchActor>(eventLog));
+            var actor = ActorOfAsTestActorRef<TestMessageDispatchPlainActor>(
+                Props.Create<TestMessageDispatchPlainActor>(eventLog));
 
             actor.Tell(new PlainMessages.Func { Value = "A" });
 
@@ -81,8 +81,8 @@ namespace Akka.Interfaced.Tests
         public async Task Test_can_handle_plain_message_in_atomic_way()
         {
             var eventLog = new List<string>();
-            var actor = ActorOfAsTestActorRef<TestMessageDispatchActor>(
-                Props.Create<TestMessageDispatchActor>(eventLog));
+            var actor = ActorOfAsTestActorRef<TestMessageDispatchPlainActor>(
+                Props.Create<TestMessageDispatchPlainActor>(eventLog));
 
             actor.Tell(new PlainMessages.TaskAtomic { Value = "A" });
             actor.Tell(new PlainMessages.TaskAtomic { Value = "B" });
@@ -97,8 +97,8 @@ namespace Akka.Interfaced.Tests
         public async Task Test_can_handle_plain_message_in_reentrant_way()
         {
             var eventLog = new List<string>();
-            var actor = ActorOfAsTestActorRef<TestMessageDispatchActor>(
-                Props.Create<TestMessageDispatchActor>(eventLog));
+            var actor = ActorOfAsTestActorRef<TestMessageDispatchPlainActor>(
+                Props.Create<TestMessageDispatchPlainActor>(eventLog));
 
             actor.Tell(new PlainMessages.TaskReentrant { Value = "A" });
             actor.Tell(new PlainMessages.TaskReentrant { Value = "B" });
