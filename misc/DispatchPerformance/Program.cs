@@ -4,8 +4,9 @@
     {
         static void Main(string[] args)
         {
-            // PerfDispatchTest.Run();
-            PerfInvokeTest.Run();
+            PerfDispatchTest.Run();
+            // PerfInvokeTest.Run();
+            PerfRequestTest.Run();
         }
     }
 }

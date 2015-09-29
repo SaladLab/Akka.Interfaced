@@ -14,17 +14,17 @@ namespace DispatchPerformance
 
         public static void Run()
         {
-            for (int i = 0; i < 2; i++)
-            {
-                DoNothing();
-                DoGetType();
-                ManualAsDispatch();
-                ManualIsDispatch();
-                TypeDictionaryDispatch();
-                TypeHandleDictionaryDispatch();
-                TypeStringDictionaryDispatch();
-                Console.WriteLine("");
-            }
+            Console.WriteLine("***** PerfDispatchTest *****\n");
+
+            DoNothing();
+            DoGetType();
+            ManualAsDispatch();
+            ManualIsDispatch();
+            TypeDictionaryDispatch();
+            TypeHandleDictionaryDispatch();
+            TypeStringDictionaryDispatch();
+
+            Console.WriteLine("");
         }
 
         private static void DoNothing()
@@ -333,7 +333,9 @@ namespace DispatchPerformance
             }
             sw.Stop();
 
-            Console.WriteLine($"{testName.PadRight(30, ' ')} {sw.ElapsedMilliseconds} ms");
+            var elapsed = sw.ElapsedMilliseconds;
+            var unit = (double)elapsed * 1000000 / TestCount;
+            Console.WriteLine($"{testName,-30} {elapsed,6} ms {unit,2} ps");
         }
     }
 }

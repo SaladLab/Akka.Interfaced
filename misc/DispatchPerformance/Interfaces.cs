@@ -8,6 +8,11 @@ namespace DispatchPerformance
         Type GetInterfaceType();
     }
 
+    public interface IInvokable
+    {
+        IValueGetable Invoke(object target);
+    }
+
     public interface IAsyncInvokable
     {
         Task<IValueGetable> Invoke(object target);

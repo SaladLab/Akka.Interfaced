@@ -17,18 +17,18 @@ namespace DispatchPerformance
         {
             for (int i = 0; i < 1; i++)
             {
-                //DoNothing();
-                //DoCallDirectRaw();
-                //DoCallDirectAsync();
-                //DoCallRaw();
-                //DoCallAsync();
+                DoNothing();
+                DoCallDirectRaw();
+                DoCallDirectAsync();
+                DoCallRaw();
+                DoCallAsync();
                 DoCallContinueAsync();
-                //DoCallFuncRaw();
-                //DoCallFuncAsync();
-                //DoCallMethodInvokeRaw();
-                //DoCallMethodInvokeAsync();
-                //DoCallCompiledRaw();
-                //DoCallCompiledAsync();
+                DoCallFuncRaw();
+                DoCallFuncAsync();
+                DoCallMethodInvokeRaw();
+                DoCallMethodInvokeAsync();
+                DoCallCompiledRaw();
+                DoCallCompiledAsync();
             }
         }
 
@@ -72,12 +72,10 @@ namespace DispatchPerformance
         private static void DoCallAsync()
         {
             var r = 0;
-            var methodInfo = typeof(TestActor).GetInterfaceMap(typeof(ITest)).TargetMethods[0];
-            var handler = CreateDelegate<TestActor, ITest__Min00__Invoke>(methodInfo);
             RunTest<TestActor>("DoCallAsync", (actor, msg) =>
             {
                 var m = (ITest__Min00__Invoke)msg;
-                r += m.Invoke(actor).Result != null ? 1 : 0;
+                r += (int)m.Invoke(actor).Result.Value;
             });
         }
 
@@ -133,7 +131,7 @@ namespace DispatchPerformance
         private static void DoCallMethodInvokeAsync()
         {
             var r = 0;
-            var methodInfo = typeof (TestActor).GetInterfaceMap(typeof (ITest)).TargetMethods[0];
+            var methodInfo = typeof(TestActor).GetInterfaceMap(typeof(ITest)).TargetMethods[0];
             RunTest<TestActor>("DoCallMethodInvokeAsync", (actor, msg) =>
             {
                 var m = (ITest__Min00__Invoke)msg;
@@ -216,7 +214,9 @@ namespace DispatchPerformance
             }
             sw.Stop();
 
-            Console.WriteLine($"{testName.PadRight(30, ' ')} {sw.ElapsedMilliseconds} ms");
+            var elapsed = sw.ElapsedMilliseconds;
+            var unit = (double)elapsed * 1000000 / TestCount;
+            Console.WriteLine($"{testName,-30} {elapsed,6} ms {unit,2} ps");
         }
     }
 }

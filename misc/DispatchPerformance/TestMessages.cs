@@ -88,7 +88,7 @@ namespace DispatchPerformance
         public Task<IValueGetable> Invoke_Continue(object target)
         {
             return ((ITest)target).Min01(a, b).ContinueWith(
-                t => (IValueGetable)(new Temp__Result {v = t.Result}),
+                t => (IValueGetable)(new Temp__Result { v = t.Result }),
                 TaskContinuationOptions.ExecuteSynchronously);
         }
 
