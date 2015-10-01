@@ -12,17 +12,6 @@ namespace DispatchPerformance
     // This is a delegate that I want to check performance of
     // - public delegate Task<IValueGetable> RequestMessageHandler<in T>(T self, RequestMessage requestMessage);
 
-    // 직접 호출하느냐?
-    // - 함수 포인터를 들고 있느냐 아니냐의 차이
-    // Interface 로 하느냐 아니면 Method Generation 을 하느냐?
-    // - Interface 가 Task 만 부를 수 있지만 비교를 위해
-    // - 으아!
-    //   - Expression Tree 가 더 빨라!
-    //   - http://stackoverflow.com/questions/4211418/why-is-func-created-from-expressionfunc-slower-than-func-declared-direct/4211839#4211839
-    //   - http://stackoverflow.com/questions/5568294/compiled-c-sharp-lambda-expressions-performance?rq=1
-    // ContinueWith 를 사용하느냐 Func / Await 를 사용하느냐?
-    // - ContinueWith 가 생각보다 느리다?
-
     static class PerfRequestTest
     {
         public static void Run()
@@ -53,12 +42,17 @@ namespace DispatchPerformance
             public int b;
         }
 
+        // Scenario1 tests
+        // - Direct sync call 
+        // - Direct async cal
+        // - Indirect sync call
+        // - Indirect async call
         private static void RunScenario1()
         {
             const int TestCount = 100000000;
             var testMessage = new TestMessage1 { a = 1, b = 2 };
 
-            Console.WriteLine("***** RunScenario1 *****\n");
+            Console.WriteLine("***** PerfRequestTest-1 *****\n");
 
             RunTest("Nothing", TestCount, testMessage, (TestActor1 actor, object message) =>
             {
@@ -131,12 +125,17 @@ namespace DispatchPerformance
             }
         }
 
+        // Scenario2 tests
+        // - Call by interface method
+        // - Call by interface method calling another delegate
+        // - Call by method-info
+        // - Call by compiled expression that calls method by method-info
         private static void RunScenario2()
         {
             const int TestCount = 100000000;
             var testMessage = new TestMessage2 { a = 1, b = 2 };
 
-            Console.WriteLine("***** RunScenario2 *****\n");
+            Console.WriteLine("***** PerfRequestTest-2 *****\n");
 
             RunTest("Interface", TestCount, testMessage, (TestActor2 actor, object message) =>
             {
@@ -212,24 +211,6 @@ namespace DispatchPerformance
                     Expression.Assign(replyVar, Expression.New(typeof(TReply).GetConstructor(Type.EmptyTypes))),
                     Expression.Assign(Expression.Field(replyVar, "v"), resultVar),
                     replyVar);
-                    //Expression.Convert(replyVar, typeof(IValueGetable)));
-
-                //// TEST
-                //{
-                //    var da = AppDomain.CurrentDomain.DefineDynamicAssembly(
-                //        new AssemblyName("dyn"), // call it whatever you want
-                //        AssemblyBuilderAccess.Save);
-
-                //    var dm = da.DefineDynamicModule("dyn_mod", "dyn.dll");
-                //    var dt = dm.DefineType("dyn_type");
-                //    var methodx = dt.DefineMethod(
-                //        "Foo",
-                //        MethodAttributes.Public | MethodAttributes.Static);
-
-                //    Expression.Lambda(body, instance, message).CompileToMethod(methodx);
-                //    dt.CreateType();
-                //    da.Save("dyn.dll");
-                //}
 
                 return (Func<TTarget, object, IValueGetable>)Expression.Lambda(body, instance, message).Compile();
             }
@@ -256,12 +237,17 @@ namespace DispatchPerformance
             public int b;
         }
 
+        // Scenario3 tests
+        // - Async call by plain await
+        // - Async call by compiled expression with an async helper function
+        // - Async call by ContinueWith
+        // - Async call by compiled expression with ContinueWith
         private static void RunScenario3()
         {
             const int TestCount = 10000000;
             var testMessage = new TestMessage3 { a = 1, b = 2 };
 
-            Console.WriteLine("***** RunScenario3 *****\n");
+            Console.WriteLine("***** PerfRequestTest-3 *****\n");
 
             var minAsyncMethod1 = (Func<TestActor3, int, int, Task<int>>)Delegate.CreateDelegate(
                 typeof(Func<TestActor3, int, int, Task<int>>), typeof(TestActor3).GetMethod("MinAsync"));
