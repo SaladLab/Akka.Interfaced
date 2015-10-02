@@ -72,8 +72,8 @@ namespace CodeGen
 
             foreach (var method in methods)
             {
+                var payloadTypeName = method2PayloadTypeNameMap[method];
                 var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
-                var messageName = method2PayloadTypeNameMap[method];
 
                 // Invoke payload
                 {
@@ -84,12 +84,12 @@ namespace CodeGen
 
                     if (Options.UseSlimClient)
                     {
-                        sb.AppendFormat("\tpublic class {0} : IInterfacedPayload\n", messageName.Item1);
+                        sb.AppendFormat("\tpublic class {0} : IInterfacedPayload\n", payloadTypeName.Item1);
                     }
                     else
                     {
                         sb.AppendFormat("\tpublic class {0} : IInterfacedPayload, {1}IAsyncInvokable\n",
-                            messageName.Item1,
+                            payloadTypeName.Item1,
                             tagName != null ? "ITagOverridable, " : "");
                     }
 
@@ -151,7 +151,7 @@ namespace CodeGen
                             sb.AppendFormat("\t\t\tvar __v = await(({0})target).{1}({2});\n",
                                 type.Name, method.Name, parameterNames);
                             sb.AppendFormat("\t\t\treturn (IValueGetable)(new {0} {{ v = {1}__v }});\n",
-                                messageName.Item2, Utility.GetTransportTypeCasting(returnType));
+                                payloadTypeName.Item2, Utility.GetTransportTypeCasting(returnType));
                         }
                         else
                         {
@@ -173,7 +173,7 @@ namespace CodeGen
                     if (Options.UseProtobuf)
                         sb.AppendFormat("\t[ProtoContract, TypeAlias]\n");
 
-                    sb.AppendFormat("\tpublic class {0} : IInterfacedPayload, IValueGetable\n", messageName.Item2);
+                    sb.AppendFormat("\tpublic class {0} : IInterfacedPayload, IValueGetable\n", payloadTypeName.Item2);
                     sb.Append("\t{\n");
 
                     var attr = (Options.UseProtobuf) ? "[ProtoMember(1)] " : "";

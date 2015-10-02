@@ -124,7 +124,7 @@ namespace SlimUnityChat.Program.Server
                         Type = PacketType.Notification,
                         ActorId = actorId,
                         RequestId = notificationMessage.ObserverId,
-                        Message = notificationMessage.Message,
+                        Message = notificationMessage.InvokePayload,
                     });
                 }
                 return;

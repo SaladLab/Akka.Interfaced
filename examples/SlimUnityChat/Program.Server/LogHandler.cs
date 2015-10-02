@@ -51,9 +51,9 @@ namespace SlimUnityChat.Program.Server
             }
         }
 
-        public static RequestMessageHandler<T> BuildHandler<T>(
+        public static RequestHandler<T> BuildHandler<T>(
             Func<T, ILog> logHandler,
-            RequestMessageHandler<T> handler,
+            RequestHandler<T> handler,
             MethodInfo method,
             bool inclusive = false)
             where T : InterfacedActor<T>

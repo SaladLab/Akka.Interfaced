@@ -15,7 +15,7 @@ namespace Akka.Interfaced
 
         protected void Notify(IInvokable message)
         {
-            Channel.Notify(new NotificationMessage { ObserverId = ObserverId, Message = message });
+            Channel.Notify(new NotificationMessage { ObserverId = ObserverId, InvokePayload = message });
         }
 
         public override bool Equals(object obj)

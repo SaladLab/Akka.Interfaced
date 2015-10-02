@@ -121,14 +121,14 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             var obj = new NotificationMessage
             {
                 ObserverId = 10,
-                Message = new TestNotificationMessage { a = "Namaste" }
+                InvokePayload = new TestNotificationMessage { a = "Namaste" }
             };
 
             var bytes = serializer.ToBinary(obj);
 
             var obj2 = (NotificationMessage)serializer.FromBinary(bytes, null);
             Assert.Equal(obj.ObserverId, obj2.ObserverId);
-            Assert.Equal(((TestNotificationMessage)obj.Message).a, ((TestNotificationMessage)obj2.Message).a);
+            Assert.Equal(((TestNotificationMessage)obj.InvokePayload).a, ((TestNotificationMessage)obj2.InvokePayload).a);
         }
     }
 }

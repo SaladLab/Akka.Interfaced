@@ -3,6 +3,6 @@
     public class SlimNotificationMessage
     {
         public int ObserverId;
-        public object Message;
+        public IInvokable InvokePayload;
     }
 }

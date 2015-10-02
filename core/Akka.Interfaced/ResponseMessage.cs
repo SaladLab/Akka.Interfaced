@@ -2,6 +2,7 @@
 
 namespace Akka.Interfaced
 {
+    // Method invoke response message
     public class ResponseMessage
     {
         public int RequestId;

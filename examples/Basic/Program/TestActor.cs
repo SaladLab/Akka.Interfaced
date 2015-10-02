@@ -21,8 +21,8 @@ namespace Basic.Program
     {
         private int _counter;
 
-        protected static RequestMessageHandler<TestActor> OnBuildHandler(
-            RequestMessageHandler<TestActor> handler, MethodInfo method)
+        protected static RequestHandler<TestActor> OnBuildHandler(
+            RequestHandler<TestActor> handler, MethodInfo method)
         {
             var hasLogAttribute = method.CustomAttributes.Any(x => x.AttributeType == typeof(LogAttribute));
             if (hasLogAttribute)

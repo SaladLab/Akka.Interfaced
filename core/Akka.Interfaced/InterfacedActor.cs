@@ -11,7 +11,8 @@ namespace Akka.Interfaced
     public abstract class InterfacedActor<T> : UntypedActor, IWithUnboundedStash, IRequestWaiter
         where T : InterfacedActor<T>
     {
-        private static MessageDispatcher<T> Dispatcher = new MessageDispatcher<T>();
+        private static MessageDispatcher<T> MessageDispatcher = new MessageDispatcher<T>();
+        private static RequestDispatcher<T> RequestDispatcher = new RequestDispatcher<T>();
 
         // Stash for stashing incoming messages while atomic handler is running
         public IStash Stash { get; set; }
@@ -68,7 +69,7 @@ namespace Akka.Interfaced
             {
                 var sender = Sender;
 
-                var handler = Dispatcher.GetRequestMessageHandler(requestMessage.InvokePayload.GetType());
+                var handler = RequestDispatcher.GetRequestHandler(requestMessage.InvokePayload.GetType());
                 if (handler == null)
                 {
                     sender.Tell(new ResponseMessage
@@ -126,7 +127,7 @@ namespace Akka.Interfaced
 
                 // Observer Call
 
-                noticeMessage.Message.Invoke(observer);
+                noticeMessage.InvokePayload.Invoke(observer);
 
                 // - noticeMessage.ObserverId 로 Observer 찾아서
                 // - Invokable 실행!
@@ -166,13 +167,13 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var plainMessageHandler = Dispatcher.GetPlainMessageHandler(message.GetType());
-            if (plainMessageHandler != null)
+            var messageHandler = MessageDispatcher.GetMessageHandler(message.GetType());
+            if (messageHandler != null)
             {
-                if (plainMessageHandler.IsTask)
+                if (messageHandler.IsTask)
                 {
                     var context = new MessageHandleContext { Self = Self, Sender = Sender };
-                    if (plainMessageHandler.IsReentrant == false)
+                    if (messageHandler.IsReentrant == false)
                     {
                         BecomeStacked(OnReceiveInAtomicTask);
                         _currentAtomicContext = context;
@@ -180,14 +181,14 @@ namespace Akka.Interfaced
 
                     using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                     {
-                        plainMessageHandler.Handler((T)this, message)
-                                           .ContinueWith(t => OnTaskCompleted(plainMessageHandler.IsReentrant),
+                        messageHandler.Handler((T)this, message)
+                                           .ContinueWith(t => OnTaskCompleted(messageHandler.IsReentrant),
                                                          TaskContinuationOptions.ExecuteSynchronously);
                     }
                 }
                 else
                 {
-                    plainMessageHandler.Handler((T)this, message);
+                    messageHandler.Handler((T)this, message);
                 }
                 return;
             }
@@ -218,7 +219,7 @@ namespace Akka.Interfaced
         }
 
         private void OnTaskCompleted(Task<IValueGetable> t, IActorRef sender, RequestMessage requestMessage,
-                                     MessageDispatcher<T>.RequestMessageHandlerInfo info)
+                                     RequestDispatcher<T>.RequestHandlerInfo info)
         {
             try
             {

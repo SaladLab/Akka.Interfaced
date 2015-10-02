@@ -754,25 +754,28 @@ namespace Basic.Interface
 
 namespace Basic.Interface
 {
-    public class IEventObserver__OnBuy__Invoke : IInvokable
+    public static class IEventObserver_PayloadTable
     {
-        public System.String name;
-        public System.Int32 price;
-
-        public void Invoke(object target)
+        public class OnBuy_Invoke : IInvokable
         {
-            ((IEventObserver)target).OnBuy(name, price);
+            public System.String name;
+            public System.Int32 price;
+
+            public void Invoke(object target)
+            {
+                ((IEventObserver)target).OnBuy(name, price);
+            }
         }
-    }
 
-    public class IEventObserver__OnSell__Invoke : IInvokable
-    {
-        public System.String name;
-        public System.Int32 price;
-
-        public void Invoke(object target)
+        public class OnSell_Invoke : IInvokable
         {
-            ((IEventObserver)target).OnSell(name, price);
+            public System.String name;
+            public System.Int32 price;
+
+            public void Invoke(object target)
+            {
+                ((IEventObserver)target).OnSell(name, price);
+            }
         }
     }
 
@@ -790,14 +793,14 @@ namespace Basic.Interface
 
         public void OnBuy(System.String name, System.Int32 price)
         {
-            var message = new IEventObserver__OnBuy__Invoke { name = name, price = price };
-            Notify(message);
+            var payload = new IEventObserver_PayloadTable.OnBuy_Invoke { name = name, price = price };
+            Notify(payload);
         }
 
         public void OnSell(System.String name, System.Int32 price)
         {
-            var message = new IEventObserver__OnSell__Invoke { name = name, price = price };
-            Notify(message);
+            var payload = new IEventObserver_PayloadTable.OnSell_Invoke { name = name, price = price };
+            Notify(payload);
         }
     }
 }

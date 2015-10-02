@@ -189,7 +189,7 @@ namespace Basic.Program
             void INotificationChannel.Notify(NotificationMessage notificationMessage)
             {
                 if (Observer != null)
-                    notificationMessage.Message.Invoke(Observer);
+                    notificationMessage.InvokePayload.Invoke(Observer);
             }
         }
 
@@ -213,8 +213,8 @@ namespace Basic.Program
             var actor = System.ActorOf<TestStartStopEvent>();
             var w = new WorkerRef(actor);
             Console.WriteLine(w.Actor.Path);
-            w.Atomic("1");
-            w.Atomic("2");
+            w.WithNoReply().Atomic("1");
+            w.WithNoReply().Atomic("2");
             // w.Reentrant("2");
             await w.Actor.GracefulStop(TimeSpan.FromSeconds(10), InterfacedPoisonPill.Instance);
         }

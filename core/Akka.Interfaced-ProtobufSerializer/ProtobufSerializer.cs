@@ -63,11 +63,11 @@ namespace Akka.Interfaced.ProtobufSerializer
 
                     // write message
 
-                    WriteType(ms, notificationMessage.Message.GetType());
+                    WriteType(ms, notificationMessage.InvokePayload.GetType());
                     try
                     {
                         AkkaSurrogate.CurrentSystem = system;
-                        _typeModel.Serialize(ms, notificationMessage.Message);
+                        _typeModel.Serialize(ms, notificationMessage.InvokePayload);
                     }
                     finally
                     {
@@ -179,7 +179,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                         try
                         {
                             AkkaSurrogate.CurrentSystem = system;
-                            notificationMessage.Message = (IInvokable)_typeModel.Deserialize(ms, message, messageType);
+                            notificationMessage.InvokePayload = (IInvokable)_typeModel.Deserialize(ms, message, messageType);
                         }
                         finally
                         {

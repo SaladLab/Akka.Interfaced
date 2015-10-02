@@ -790,13 +790,16 @@ namespace Akka.Interfaced.Tests
 
 namespace Akka.Interfaced.Tests
 {
-    public class ISubjectObserver__Event__Invoke : IInvokable
+    public static class ISubjectObserver_PayloadTable
     {
-        public System.String eventName;
-
-        public void Invoke(object target)
+        public class Event_Invoke : IInvokable
         {
-            ((ISubjectObserver)target).Event(eventName);
+            public System.String eventName;
+
+            public void Invoke(object target)
+            {
+                ((ISubjectObserver)target).Event(eventName);
+            }
         }
     }
 
@@ -814,8 +817,8 @@ namespace Akka.Interfaced.Tests
 
         public void Event(System.String eventName)
         {
-            var message = new ISubjectObserver__Event__Invoke { eventName = eventName };
-            Notify(message);
+            var payload = new ISubjectObserver_PayloadTable.Event_Invoke { eventName = eventName };
+            Notify(payload);
         }
     }
 }

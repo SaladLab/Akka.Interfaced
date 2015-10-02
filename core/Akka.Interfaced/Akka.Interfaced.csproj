@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="ActorSynchronizationContext.cs" />
     <Compile Include="DeadRequestProcessingActor.cs" />
+    <Compile Include="ExtendedHandlerAttribute.cs" />
     <Compile Include="IAsyncInvokable.cs" />
     <Compile Include="INotificationChannel.cs" />
     <Compile Include="IExtendedInterface.cs" />
@@ -61,6 +62,8 @@
     <Compile Include="NotificationMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReentrantAttribute.cs" />
+    <Compile Include="RequestDispatcher.cs" />
+    <Compile Include="RequestDispatcherIternalHelper.cs" />
     <Compile Include="ResponseMessage.cs" />
     <Compile Include="RequestMessage.cs" />
     <Compile Include="InterfacedPoisonPill.cs" />

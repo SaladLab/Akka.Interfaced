@@ -553,36 +553,39 @@ namespace SlimUnityChat.Interface
 
 namespace SlimUnityChat.Interface
 {
-    [ProtoContract, TypeAlias]
-    public class IRoomObserver__Enter__Invoke : IInvokable
+    public static class IRoomObserver_PayloadTable
     {
-        [ProtoMember(1)] public System.String userId;
-
-        public void Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Enter_Invoke : IInvokable
         {
-            ((IRoomObserver)target).Enter(userId);
+            [ProtoMember(1)] public System.String userId;
+
+            public void Invoke(object target)
+            {
+                ((IRoomObserver)target).Enter(userId);
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IRoomObserver__Exit__Invoke : IInvokable
-    {
-        [ProtoMember(1)] public System.String userId;
-
-        public void Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Exit_Invoke : IInvokable
         {
-            ((IRoomObserver)target).Exit(userId);
+            [ProtoMember(1)] public System.String userId;
+
+            public void Invoke(object target)
+            {
+                ((IRoomObserver)target).Exit(userId);
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IRoomObserver__Say__Invoke : IInvokable
-    {
-        [ProtoMember(1)] public SlimUnityChat.Interface.ChatItem chatItem;
-
-        public void Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Say_Invoke : IInvokable
         {
-            ((IRoomObserver)target).Say(chatItem);
+            [ProtoMember(1)] public SlimUnityChat.Interface.ChatItem chatItem;
+
+            public void Invoke(object target)
+            {
+                ((IRoomObserver)target).Say(chatItem);
+            }
         }
     }
 }
@@ -593,26 +596,29 @@ namespace SlimUnityChat.Interface
 
 namespace SlimUnityChat.Interface
 {
-    [ProtoContract, TypeAlias]
-    public class IUserEventObserver__Whisper__Invoke : IInvokable
+    public static class IUserEventObserver_PayloadTable
     {
-        [ProtoMember(1)] public SlimUnityChat.Interface.ChatItem chatItem;
-
-        public void Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Whisper_Invoke : IInvokable
         {
-            ((IUserEventObserver)target).Whisper(chatItem);
+            [ProtoMember(1)] public SlimUnityChat.Interface.ChatItem chatItem;
+
+            public void Invoke(object target)
+            {
+                ((IUserEventObserver)target).Whisper(chatItem);
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUserEventObserver__Invite__Invoke : IInvokable
-    {
-        [ProtoMember(1)] public System.String invitorUserId;
-        [ProtoMember(2)] public System.String roomName;
-
-        public void Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Invite_Invoke : IInvokable
         {
-            ((IUserEventObserver)target).Invite(invitorUserId, roomName);
+            [ProtoMember(1)] public System.String invitorUserId;
+            [ProtoMember(2)] public System.String roomName;
+
+            public void Invoke(object target)
+            {
+                ((IUserEventObserver)target).Invite(invitorUserId, roomName);
+            }
         }
     }
 }

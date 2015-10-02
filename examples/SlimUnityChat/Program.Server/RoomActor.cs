@@ -35,8 +35,8 @@ namespace SlimUnityChat.Program.Server
             _userMap = new Dictionary<string, UserData>();
         }
 
-        protected static RequestMessageHandler<RoomActor> OnBuildHandler(
-            RequestMessageHandler<RoomActor> handler, MethodInfo method)
+        protected static RequestHandler<RoomActor> OnBuildHandler(
+            RequestHandler<RoomActor> handler, MethodInfo method)
         {
             return LogHandlerBuilder.BuildHandler(self => self._logger, handler, method, true);
         }
