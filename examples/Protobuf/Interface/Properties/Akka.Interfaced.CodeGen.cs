@@ -19,63 +19,63 @@ using System.ComponentModel;
 
 namespace Protobuf.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IHelloWorld))]
-    public static class IHelloWorld__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IHelloWorld))]
+    public static class IHelloWorld_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IHelloWorld__SayHello__Invoke), typeof(IHelloWorld__SayHello__Return)},
-                {typeof(IHelloWorld__GetHelloCount__Invoke), typeof(IHelloWorld__GetHelloCount__Return)},
+                {typeof(SayHello_Invoke), typeof(SayHello_Return)},
+                {typeof(GetHelloCount_Invoke), typeof(GetHelloCount_Return)},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IHelloWorld__SayHello__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String name;
-
-        public Type GetInterfaceType() { return typeof(IHelloWorld); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class SayHello_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IHelloWorld)target).SayHello(name);
-            return (IValueGetable)(new IHelloWorld__SayHello__Return { v = __v });
+            [ProtoMember(1)] public System.String name;
+
+            public Type GetInterfaceType() { return typeof(IHelloWorld); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IHelloWorld)target).SayHello(name);
+                return (IValueGetable)(new SayHello_Return { v = __v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IHelloWorld__SayHello__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.String v;
-
-        public Type GetInterfaceType() { return typeof(IHelloWorld); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IHelloWorld__GetHelloCount__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(IHelloWorld); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class SayHello_Return : IInterfacedPayload, IValueGetable
         {
-            var __v = await((IHelloWorld)target).GetHelloCount();
-            return (IValueGetable)(new IHelloWorld__GetHelloCount__Return { v = __v });
+            [ProtoMember(1)] public System.String v;
+
+            public Type GetInterfaceType() { return typeof(IHelloWorld); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IHelloWorld__GetHelloCount__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Int32 v;
+        [ProtoContract, TypeAlias]
+        public class GetHelloCount_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType() { return typeof(IHelloWorld); }
 
-        public Type GetInterfaceType() { return typeof(IHelloWorld); }
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IHelloWorld)target).GetHelloCount();
+                return (IValueGetable)(new GetHelloCount_Return { v = __v });
+            }
+        }
 
-        public object Value { get { return v; } }
+        [ProtoContract, TypeAlias]
+        public class GetHelloCount_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(IHelloWorld); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IHelloWorld_NoReply
@@ -127,7 +127,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IHelloWorld__SayHello__Invoke { name = name }
+                InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
             };
             return SendRequestAndReceive<System.String>(requestMessage);
         }
@@ -136,7 +136,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IHelloWorld__GetHelloCount__Invoke {  }
+                InvokePayload = new IHelloWorld_PayloadTable.GetHelloCount_Invoke {  }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -145,7 +145,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IHelloWorld__SayHello__Invoke { name = name }
+                InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }
@@ -154,7 +154,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IHelloWorld__GetHelloCount__Invoke {  }
+                InvokePayload = new IHelloWorld_PayloadTable.GetHelloCount_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -167,154 +167,154 @@ namespace Protobuf.Interface
 
 namespace Protobuf.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IPedantic))]
-    public static class IPedantic__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IPedantic))]
+    public static class IPedantic_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IPedantic__TestCall__Invoke), null},
-                {typeof(IPedantic__TestOptional__Invoke), typeof(IPedantic__TestOptional__Return)},
-                {typeof(IPedantic__TestTuple__Invoke), typeof(IPedantic__TestTuple__Return)},
-                {typeof(IPedantic__TestParams__Invoke), typeof(IPedantic__TestParams__Return)},
-                {typeof(IPedantic__TestPassClass__Invoke), typeof(IPedantic__TestPassClass__Return)},
-                {typeof(IPedantic__TestReturnClass__Invoke), typeof(IPedantic__TestReturnClass__Return)},
+                {typeof(TestCall_Invoke), null},
+                {typeof(TestOptional_Invoke), typeof(TestOptional_Return)},
+                {typeof(TestTuple_Invoke), typeof(TestTuple_Return)},
+                {typeof(TestParams_Invoke), typeof(TestParams_Return)},
+                {typeof(TestPassClass_Invoke), typeof(TestPassClass_Return)},
+                {typeof(TestReturnClass_Invoke), typeof(TestReturnClass_Return)},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestCall__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class TestCall_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IPedantic)target).TestCall();
-            return null;
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IPedantic)target).TestCall();
+                return null;
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestOptional__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.Nullable<System.Int32> value;
-
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class TestOptional_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IPedantic)target).TestOptional(value);
-            return (IValueGetable)(new IPedantic__TestOptional__Return { v = (System.Nullable<System.Int32>)__v });
+            [ProtoMember(1)] public System.Nullable<System.Int32> value;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IPedantic)target).TestOptional(value);
+                return (IValueGetable)(new TestOptional_Return { v = (System.Nullable<System.Int32>)__v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestOptional__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Nullable<System.Int32> v;
-
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestTuple__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.Tuple<System.Int32, System.String> value;
-
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class TestOptional_Return : IInterfacedPayload, IValueGetable
         {
-            var __v = await((IPedantic)target).TestTuple(value);
-            return (IValueGetable)(new IPedantic__TestTuple__Return { v = (System.Tuple<System.Int32, System.String>)__v });
+            [ProtoMember(1)] public System.Nullable<System.Int32> v;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestTuple__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Tuple<System.Int32, System.String> v;
-
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestParams__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.Int32[] values;
-
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class TestTuple_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IPedantic)target).TestParams(values);
-            return (IValueGetable)(new IPedantic__TestParams__Return { v = __v });
+            [ProtoMember(1)] public System.Tuple<System.Int32, System.String> value;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IPedantic)target).TestTuple(value);
+                return (IValueGetable)(new TestTuple_Return { v = (System.Tuple<System.Int32, System.String>)__v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestParams__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Int32[] v;
-
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestPassClass__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public Protobuf.Interface.TestParam param;
-
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class TestTuple_Return : IInterfacedPayload, IValueGetable
         {
-            var __v = await((IPedantic)target).TestPassClass(param);
-            return (IValueGetable)(new IPedantic__TestPassClass__Return { v = __v });
+            [ProtoMember(1)] public System.Tuple<System.Int32, System.String> v;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestPassClass__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.String v;
-
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestReturnClass__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.Int32 value;
-        [ProtoMember(2)] public System.Int32 offset;
-
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class TestParams_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IPedantic)target).TestReturnClass(value, offset);
-            return (IValueGetable)(new IPedantic__TestReturnClass__Return { v = __v });
+            [ProtoMember(1)] public System.Int32[] values;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IPedantic)target).TestParams(values);
+                return (IValueGetable)(new TestParams_Return { v = __v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestReturnClass__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public Protobuf.Interface.TestResult v;
+        [ProtoContract, TypeAlias]
+        public class TestParams_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Int32[] v;
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
+            public Type GetInterfaceType() { return typeof(IPedantic); }
 
-        public object Value { get { return v; } }
+            public object Value { get { return v; } }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class TestPassClass_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            [ProtoMember(1)] public Protobuf.Interface.TestParam param;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IPedantic)target).TestPassClass(param);
+                return (IValueGetable)(new TestPassClass_Return { v = __v });
+            }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class TestPassClass_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.String v;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public object Value { get { return v; } }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class TestReturnClass_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            [ProtoMember(1)] public System.Int32 value;
+            [ProtoMember(2)] public System.Int32 offset;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IPedantic)target).TestReturnClass(value, offset);
+                return (IValueGetable)(new TestReturnClass_Return { v = __v });
+            }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class TestReturnClass_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public Protobuf.Interface.TestResult v;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IPedantic_NoReply
@@ -370,7 +370,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestCall__Invoke {  }
+                InvokePayload = new IPedantic_PayloadTable.TestCall_Invoke {  }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -379,7 +379,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestOptional__Invoke { value = (System.Nullable<System.Int32>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = (System.Nullable<System.Int32>)value }
             };
             return SendRequestAndReceive<System.Nullable<System.Int32>>(requestMessage);
         }
@@ -388,7 +388,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestTuple__Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
             };
             return SendRequestAndReceive<System.Tuple<System.Int32, System.String>>(requestMessage);
         }
@@ -397,7 +397,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestParams__Invoke { values = values }
+                InvokePayload = new IPedantic_PayloadTable.TestParams_Invoke { values = values }
             };
             return SendRequestAndReceive<System.Int32[]>(requestMessage);
         }
@@ -406,7 +406,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestPassClass__Invoke { param = param }
+                InvokePayload = new IPedantic_PayloadTable.TestPassClass_Invoke { param = param }
             };
             return SendRequestAndReceive<System.String>(requestMessage);
         }
@@ -415,7 +415,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestReturnClass__Invoke { value = value, offset = offset }
+                InvokePayload = new IPedantic_PayloadTable.TestReturnClass_Invoke { value = value, offset = offset }
             };
             return SendRequestAndReceive<Protobuf.Interface.TestResult>(requestMessage);
         }
@@ -424,7 +424,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestCall__Invoke {  }
+                InvokePayload = new IPedantic_PayloadTable.TestCall_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -433,7 +433,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestOptional__Invoke { value = (System.Nullable<System.Int32>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = (System.Nullable<System.Int32>)value }
             };
             SendRequest(requestMessage);
         }
@@ -442,7 +442,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestTuple__Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
             };
             SendRequest(requestMessage);
         }
@@ -451,7 +451,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestParams__Invoke { values = values }
+                InvokePayload = new IPedantic_PayloadTable.TestParams_Invoke { values = values }
             };
             SendRequest(requestMessage);
         }
@@ -460,7 +460,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestPassClass__Invoke { param = param }
+                InvokePayload = new IPedantic_PayloadTable.TestPassClass_Invoke { param = param }
             };
             SendRequest(requestMessage);
         }
@@ -469,7 +469,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IPedantic__TestReturnClass__Invoke { value = value, offset = offset }
+                InvokePayload = new IPedantic_PayloadTable.TestReturnClass_Invoke { value = value, offset = offset }
             };
             SendRequest(requestMessage);
         }
@@ -482,88 +482,88 @@ namespace Protobuf.Interface
 
 namespace Protobuf.Interface
 {
-    [MessageTableForInterfacedActor(typeof(ISurrogate))]
-    public static class ISurrogate__MessageTable
+    [PayloadTableForInterfacedActor(typeof(ISurrogate))]
+    public static class ISurrogate_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(ISurrogate__GetPath__Invoke), typeof(ISurrogate__GetPath__Return)},
-                {typeof(ISurrogate__GetAddress__Invoke), typeof(ISurrogate__GetAddress__Return)},
-                {typeof(ISurrogate__GetSelf__Invoke), typeof(ISurrogate__GetSelf__Return)},
+                {typeof(GetPath_Invoke), typeof(GetPath_Return)},
+                {typeof(GetAddress_Invoke), typeof(GetAddress_Return)},
+                {typeof(GetSelf_Invoke), typeof(GetSelf_Return)},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class ISurrogate__GetPath__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public Akka.Actor.ActorPath path;
-
-        public Type GetInterfaceType() { return typeof(ISurrogate); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetPath_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((ISurrogate)target).GetPath(path);
-            return (IValueGetable)(new ISurrogate__GetPath__Return { v = __v });
+            [ProtoMember(1)] public Akka.Actor.ActorPath path;
+
+            public Type GetInterfaceType() { return typeof(ISurrogate); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((ISurrogate)target).GetPath(path);
+                return (IValueGetable)(new GetPath_Return { v = __v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class ISurrogate__GetPath__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public Akka.Actor.ActorPath v;
-
-        public Type GetInterfaceType() { return typeof(ISurrogate); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class ISurrogate__GetAddress__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public Akka.Actor.Address address;
-
-        public Type GetInterfaceType() { return typeof(ISurrogate); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetPath_Return : IInterfacedPayload, IValueGetable
         {
-            var __v = await((ISurrogate)target).GetAddress(address);
-            return (IValueGetable)(new ISurrogate__GetAddress__Return { v = __v });
+            [ProtoMember(1)] public Akka.Actor.ActorPath v;
+
+            public Type GetInterfaceType() { return typeof(ISurrogate); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class ISurrogate__GetAddress__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public Akka.Actor.Address v;
-
-        public Type GetInterfaceType() { return typeof(ISurrogate); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class ISurrogate__GetSelf__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(ISurrogate); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetAddress_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((ISurrogate)target).GetSelf();
-            return (IValueGetable)(new ISurrogate__GetSelf__Return { v = __v });
+            [ProtoMember(1)] public Akka.Actor.Address address;
+
+            public Type GetInterfaceType() { return typeof(ISurrogate); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((ISurrogate)target).GetAddress(address);
+                return (IValueGetable)(new GetAddress_Return { v = __v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class ISurrogate__GetSelf__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public Akka.Actor.ActorRefBase v;
+        [ProtoContract, TypeAlias]
+        public class GetAddress_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public Akka.Actor.Address v;
 
-        public Type GetInterfaceType() { return typeof(ISurrogate); }
+            public Type GetInterfaceType() { return typeof(ISurrogate); }
 
-        public object Value { get { return v; } }
+            public object Value { get { return v; } }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class GetSelf_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType() { return typeof(ISurrogate); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((ISurrogate)target).GetSelf();
+                return (IValueGetable)(new GetSelf_Return { v = __v });
+            }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class GetSelf_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public Akka.Actor.ActorRefBase v;
+
+            public Type GetInterfaceType() { return typeof(ISurrogate); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface ISurrogate_NoReply
@@ -616,7 +616,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISurrogate__GetPath__Invoke { path = path }
+                InvokePayload = new ISurrogate_PayloadTable.GetPath_Invoke { path = path }
             };
             return SendRequestAndReceive<Akka.Actor.ActorPath>(requestMessage);
         }
@@ -625,7 +625,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISurrogate__GetAddress__Invoke { address = address }
+                InvokePayload = new ISurrogate_PayloadTable.GetAddress_Invoke { address = address }
             };
             return SendRequestAndReceive<Akka.Actor.Address>(requestMessage);
         }
@@ -634,7 +634,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISurrogate__GetSelf__Invoke {  }
+                InvokePayload = new ISurrogate_PayloadTable.GetSelf_Invoke {  }
             };
             return SendRequestAndReceive<Akka.Actor.ActorRefBase>(requestMessage);
         }
@@ -643,7 +643,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISurrogate__GetPath__Invoke { path = path }
+                InvokePayload = new ISurrogate_PayloadTable.GetPath_Invoke { path = path }
             };
             SendRequest(requestMessage);
         }
@@ -652,7 +652,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISurrogate__GetAddress__Invoke { address = address }
+                InvokePayload = new ISurrogate_PayloadTable.GetAddress_Invoke { address = address }
             };
             SendRequest(requestMessage);
         }
@@ -661,7 +661,7 @@ namespace Protobuf.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISurrogate__GetSelf__Invoke {  }
+                InvokePayload = new ISurrogate_PayloadTable.GetSelf_Invoke {  }
             };
             SendRequest(requestMessage);
         }

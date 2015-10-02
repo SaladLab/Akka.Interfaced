@@ -50,7 +50,7 @@ namespace Akka.Interfaced
                     continue;
 
                 var interfaceMap = type.GetInterfaceMap(ifs);
-                var messageTable = GetInterfaceMessageTable(ifs);
+                var messageTable = GetInterfacePayloadTypeTable(ifs);
 
                 for (var i = 0; i < interfaceMap.InterfaceMethods.Length; i++)
                 {
@@ -59,7 +59,7 @@ namespace Akka.Interfaced
 
                     var isReentrant = targetMethod.CustomAttributes
                                                   .Any(x => x.AttributeType == typeof(ReentrantAttribute));
-                    RequestMessageHandler<T> handler = (self, requestMessage) => requestMessage.Message.Invoke(self);
+                    RequestMessageHandler<T> handler = (self, requestMessage) => requestMessage.InvokePayload.Invoke(self);
 
                     if (handlerBuilder != null)
                     {
@@ -88,7 +88,7 @@ namespace Akka.Interfaced
                     .SelectMany(t => t.GenericTypeArguments);
             foreach (var ifs in extendedInterfaces)
             {
-                var messageTable = GetInterfaceMessageTable(ifs);
+                var messageTable = GetInterfacePayloadTypeTable(ifs);
                 var interfaceMethods = ifs.GetMethods();
 
                 for (var i = 0; i < interfaceMethods.Length; i++)
@@ -135,7 +135,7 @@ namespace Akka.Interfaced
                             : DelegateBuilderHandlerExtendedFunc.Build<T>(
                                 messageTable[i, 0], messageTable[i, 1], targetMethod);
                     RequestMessageHandler<T> handler =
-                        (self, requestMessage) => invokeDelegate(self, requestMessage.Message);
+                        (self, requestMessage) => invokeDelegate(self, requestMessage.InvokePayload);
 
                     if (handlerBuilder != null)
                     {
@@ -158,38 +158,38 @@ namespace Akka.Interfaced
             }
         }
 
-        private static Type[,] GetInterfaceMessageTable(Type interfaceType)
+        private static Type[,] GetInterfacePayloadTypeTable(Type interfaceType)
         {
-            var messageTableType =
+            var payloadTableType =
                 interfaceType.Assembly.GetTypes()
                              .Where(t =>
                              {
-                                 var attr = t.GetCustomAttribute<MessageTableForInterfacedActorAttribute>();
+                                 var attr = t.GetCustomAttribute<PayloadTableForInterfacedActorAttribute>();
                                  return (attr != null && attr.Type == interfaceType);
                              })
                              .FirstOrDefault();
 
-            if (messageTableType == null)
+            if (payloadTableType == null)
             {
                 throw new InvalidOperationException(
-                    string.Format("Cannot find message table class for {0}", interfaceType.FullName));
+                    string.Format("Cannot find payload table class for {0}", interfaceType.FullName));
             }
 
-            var queryMethodInfo = messageTableType.GetMethod("GetMessageTypes");
+            var queryMethodInfo = payloadTableType.GetMethod("GetPayloadTypes");
             if (queryMethodInfo == null)
             {
                 throw new InvalidOperationException(
-                    string.Format("Cannot find {0}.GetMessageTypes method", messageTableType.FullName));
+                    string.Format("Cannot find {0}.GetPayloadTypes method", payloadTableType.FullName));
             }
 
-            var messageTable = (Type[,])queryMethodInfo.Invoke(null, new object[] { });
-            if (messageTable == null || messageTable.GetLength(0) != interfaceType.GetMethods().Length)
+            var payloadTypes = (Type[,])queryMethodInfo.Invoke(null, new object[] { });
+            if (payloadTypes == null || payloadTypes.GetLength(0) != interfaceType.GetMethods().Length)
             {
                 throw new InvalidOperationException(
-                    string.Format("Mismatched messageTable from {0}", messageTableType.FullName));
+                    string.Format("Mismatched messageTable from {0}", payloadTableType.FullName));
             }
 
-            return messageTable;
+            return payloadTypes;
         }
 
         private static bool AreParameterTypesEqual(ParameterInfo[] a, ParameterInfo[] b)

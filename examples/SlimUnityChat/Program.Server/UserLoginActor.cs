@@ -96,7 +96,7 @@ namespace SlimUnityChat.Program.Server
 
             // Bind user actor with client session, which makes client to communicate with this actor.
 
-            var reply = await _clientSession.Ask<ClientSession.BindActorReplyMessage>(
+            var reply = await _clientSession.Ask<ClientSession.BindActorResponseMessage>(
                 new ClientSession.BindActorRequestMessage { Actor = user, InterfaceType = typeof(IUser) });
 
             return reply.ActorId;

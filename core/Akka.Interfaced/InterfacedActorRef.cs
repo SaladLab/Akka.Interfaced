@@ -24,7 +24,7 @@ namespace Akka.Interfaced
             Timeout = timeout;
         }
 
-        // Request & Reply
+        // Request & Response
 
         protected void SendRequest(RequestMessage requestMessage)
         {
@@ -57,16 +57,16 @@ namespace Akka.Interfaced
                                                           TimeSpan? timeout)
         {
             requestMessage.RequestId = -1;
-            return target.Ask<ReplyMessage>(requestMessage, timeout).ContinueWith(t =>
+            return target.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
             {
-                var replyMessage = t.Result;
-                if (replyMessage.Exception != null)
+                var response = t.Result;
+                if (response.Exception != null)
                 {
-                    throw replyMessage.Exception;
+                    throw response.Exception;
                 }
                 else
                 {
-                    var getable = replyMessage.Result;
+                    var getable = response.ReturnPayload;
                     if (getable != null)
                         return getable.Value;
                     else

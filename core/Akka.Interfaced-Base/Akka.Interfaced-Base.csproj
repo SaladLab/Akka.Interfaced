@@ -30,15 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    
-    
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-    
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IInterfacedActor.cs" />
-    <Compile Include="IInterfacedMessage.cs" />
+    <Compile Include="IInterfacedPayload.cs" />
     <Compile Include="IInterfacedObserver.cs" />
     <Compile Include="IInvokable.cs" />
     <Compile Include="ITagOverridable.cs" />

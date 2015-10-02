@@ -93,20 +93,11 @@ namespace CodeGen
                 var actorTypes = assembly.GetTypes().OrderBy(t => t.FullName).Where(t => Utility.IsActorInterface(t)).ToArray();
                 var observerTypes = assembly.GetTypes().OrderBy(t => t.FullName).Where(t => Utility.IsObserverInterface(t)).ToArray();
 
-                if (options.UseSlimClient)
-                {
-                    var actorCodeGen = new InterfacedActorCodeGeneratorSlim() { Options = options };
-                    foreach (var type in actorTypes)
-                        actorCodeGen.GenerateCode(type, writer);
-                }
-                else
-                {
-                    var actorCodeGen = new InterfacedActorCodeGeneratorFull() { Options = options };
-                    foreach (var type in actorTypes)
-                        actorCodeGen.GenerateCode(type, writer);
-                }
+                var actorCodeGen = new InterfacedActorCodeGenerator() { Options = options };
+                foreach (var type in actorTypes)
+                    actorCodeGen.GenerateCode(type, writer);
 
-                var observerCodeGen = new InterfacedObserverCodeGeneratorFull() { Options = options };
+                var observerCodeGen = new InterfacedObserverCodeGenerator() { Options = options };
                 foreach (var type in observerTypes)
                     observerCodeGen.GenerateCode(type, writer);
 

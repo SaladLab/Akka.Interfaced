@@ -6,7 +6,7 @@ namespace Akka.Interfaced.SlimSocketBase
     {
         Notification = 1, 
         Request = 2,
-        Reply = 3,
+        Response = 3,
     }
 
     public class Packet

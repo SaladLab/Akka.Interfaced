@@ -171,7 +171,7 @@ namespace Akka.Interfaced.SlimSocketBase
             if ((header & 0x80) != 0)
             {
                 var messageTypeAlias = stream.Read7BitEncodedInt();
-                int messageLen = stream.Read32BitEncodedInt();
+                var messageLen = stream.Read32BitEncodedInt();
 
                 Type type = _data.TypeTable.GetType(messageTypeAlias);
                 if (type == null)

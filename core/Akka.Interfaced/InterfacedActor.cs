@@ -28,7 +28,7 @@ namespace Akka.Interfaced
         // TODO: Check lock should be required to keep safe?
         private object _requestLock = new object();
 
-        // RequestId -> TCS dictionary for make continuation work when we get reply.
+        // RequestId -> TCS dictionary for make continuation work when we get response.
         private Dictionary<int, TaskCompletionSource<object>> _requestMap;
 
         // Variable to issue unique local request ID.
@@ -68,10 +68,10 @@ namespace Akka.Interfaced
             {
                 var sender = Sender;
 
-                var handler = Dispatcher.GetRequestMessageHandler(requestMessage.Message.GetType());
+                var handler = Dispatcher.GetRequestMessageHandler(requestMessage.InvokePayload.GetType());
                 if (handler == null)
                 {
-                    sender.Tell(new ReplyMessage
+                    sender.Tell(new ResponseMessage
                     {
                         RequestId = requestMessage.RequestId,
                         Exception = new InvalidMessageException("Cannot find handler")
@@ -105,10 +105,10 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var replyMessage = message as ReplyMessage;
-            if (replyMessage != null)
+            var responseMessage = message as ResponseMessage;
+            if (responseMessage != null)
             {
-                OnReplyMessage(replyMessage);
+                OnResponseMessage(responseMessage);
                 return;
             }
 
@@ -207,10 +207,10 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var replyMessage = message as ReplyMessage;
-            if (replyMessage != null)
+            var response = message as ResponseMessage;
+            if (response != null)
             {
-                OnReplyMessage(replyMessage);
+                OnResponseMessage(response);
                 return;
             }
 
@@ -225,20 +225,20 @@ namespace Akka.Interfaced
                 if (requestMessage != null && requestMessage.RequestId != 0)
                 {
                     if (t.IsFaulted)
-                        sender.Tell(new ReplyMessage
+                        sender.Tell(new ResponseMessage
                         {
                             RequestId = requestMessage.RequestId,
                             Exception = t.Exception.Flatten().InnerExceptions.FirstOrDefault() ??
                                         t.Exception
                         });
                     else if (t.IsCanceled)
-                        sender.Tell(new ReplyMessage
+                        sender.Tell(new ResponseMessage
                         {
                             RequestId = requestMessage.RequestId,
                             Exception = new TaskCanceledException()
                         });
                     else
-                        sender.Tell(new ReplyMessage { RequestId = requestMessage.RequestId, Result = t.Result });
+                        sender.Tell(new ResponseMessage { RequestId = requestMessage.RequestId, ReturnPayload = t.Result });
                 }
 
                 if (info.IsReentrant == false)
@@ -316,19 +316,19 @@ namespace Akka.Interfaced
             return tcs.Task;
         }
 
-        private void OnReplyMessage(ReplyMessage replyMessage)
+        private void OnResponseMessage(ResponseMessage response)
         {
             TaskCompletionSource<object> tcs;
             lock (_requestLock)
             {
-                if (_requestMap == null || _requestMap.TryGetValue(replyMessage.RequestId, out tcs) == false)
+                if (_requestMap == null || _requestMap.TryGetValue(response.RequestId, out tcs) == false)
                     return;
             }
 
-            if (replyMessage.Exception != null)
-                tcs.SetException(replyMessage.Exception);
+            if (response.Exception != null)
+                tcs.SetException(response.Exception);
             else
-                tcs.SetResult(replyMessage.Result != null ? replyMessage.Result.Value : null);
+                tcs.SetResult(response.ReturnPayload != null ? response.ReturnPayload.Value : null);
         }
 
         // async support

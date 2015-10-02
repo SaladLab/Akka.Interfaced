@@ -2,10 +2,9 @@
 
 namespace Akka.Interfaced
 {
-    public class SlimReplyMessage
+    public class SlimRequestMessage
     {
         public int RequestId;
-        public object Result;
-        public Exception Exception;
+        public object InvokePayload;
     }
 }

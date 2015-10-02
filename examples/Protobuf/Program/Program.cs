@@ -22,7 +22,7 @@ namespace Protobuf.Program
                 throw new InvalidProgramException("!");
 
             // Serialization debug options (serialize-messages = on) cannot be used,
-            // because ProtobufSerializer supports Request/ReplyMessage only (not internal messages).
+            // because ProtobufSerializer supports Request/ResponseMessage only (not internal messages).
             // To test serialization all testing actors will be created on server system and
             // every requests will be delivered from client system.
 
@@ -36,7 +36,7 @@ namespace Protobuf.Program
                     serialization-bindings {
                       ""Akka.Interfaced.NotificationMessage, Akka.Interfaced"" = proto
                       ""Akka.Interfaced.RequestMessage, Akka.Interfaced"" = proto
-                      ""Akka.Interfaced.ReplyMessage, Akka.Interfaced"" = proto
+                      ""Akka.Interfaced.ResponseMessage, Akka.Interfaced"" = proto
                     }
                   }
                   remote {

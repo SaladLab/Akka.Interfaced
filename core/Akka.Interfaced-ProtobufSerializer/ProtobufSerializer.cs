@@ -92,11 +92,11 @@ namespace Akka.Interfaced.ProtobufSerializer
 
                     // write message
 
-                    WriteType(ms, requestMessage.Message.GetType());
+                    WriteType(ms, requestMessage.InvokePayload.GetType());
                     try
                     {
                         AkkaSurrogate.CurrentSystem = system;
-                        _typeModel.Serialize(ms, requestMessage.Message);
+                        _typeModel.Serialize(ms, requestMessage.InvokePayload);
                     }
                     finally
                     {
@@ -107,40 +107,40 @@ namespace Akka.Interfaced.ProtobufSerializer
                 }
             }
 
-            // ReplyMessage
+            // ResponseMessage
 
-            var replyMessage = obj as ReplyMessage;
-            if (replyMessage != null)
+            var responseMessage = obj as ResponseMessage;
+            if (responseMessage != null)
             {
                 using (var ms = new MemoryStream())
                 {
-                    if (replyMessage.Exception == null && replyMessage.Result == null)
+                    if (responseMessage.Exception == null && responseMessage.ReturnPayload == null)
                     {
                         ms.WriteByte((byte)MessageCode.ReplyWithNothing);
-                        ms.Write32BitEncodedInt(replyMessage.RequestId);
+                        ms.Write32BitEncodedInt(responseMessage.RequestId);
                     }
-                    else if (replyMessage.Exception != null)
+                    else if (responseMessage.Exception != null)
                     {
                         ms.WriteByte((byte)MessageCode.ReplyWithException);
-                        ms.Write32BitEncodedInt(replyMessage.RequestId);
+                        ms.Write32BitEncodedInt(responseMessage.RequestId);
 
-                        var exceptionType = replyMessage.Exception.GetType();
+                        var exceptionType = responseMessage.Exception.GetType();
                         WriteType(ms, exceptionType);
                         if (_typeModel.CanSerialize(exceptionType))
-                            _typeModel.Serialize(ms, replyMessage.Exception);
+                            _typeModel.Serialize(ms, responseMessage.Exception);
                     }
                     else
                     {
                         ms.WriteByte((byte)MessageCode.ReplyWithResult);
-                        ms.Write32BitEncodedInt(replyMessage.RequestId);
+                        ms.Write32BitEncodedInt(responseMessage.RequestId);
 
                         // write result
 
-                        WriteType(ms, replyMessage.Result.GetType());
+                        WriteType(ms, responseMessage.ReturnPayload.GetType());
                         try
                         {
                             AkkaSurrogate.CurrentSystem = system;
-                            _typeModel.Serialize(ms, replyMessage.Result);
+                            _typeModel.Serialize(ms, responseMessage.ReturnPayload);
                         }
                         finally
                         {
@@ -152,7 +152,7 @@ namespace Akka.Interfaced.ProtobufSerializer
             }
 
             throw new InvalidOperationException(
-                "ProtobufSerializer supports only NotificationMessage, RequestMessage and ReplyMessage.");
+                "ProtobufSerializer supports only NotificationMessage, RequestMessage and ResponseMessage.");
         }
 
         public override object FromBinary(byte[] bytes, Type type)
@@ -204,7 +204,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                         try
                         {
                             AkkaSurrogate.CurrentSystem = system;
-                            requestMessage.Message = (IAsyncInvokable)_typeModel.Deserialize(ms, message, messageType);
+                            requestMessage.InvokePayload = (IAsyncInvokable)_typeModel.Deserialize(ms, message, messageType);
                         }
                         finally
                         {
@@ -214,13 +214,13 @@ namespace Akka.Interfaced.ProtobufSerializer
                     }
                     case MessageCode.ReplyWithNothing:
                     {
-                        var replyMessage = new ReplyMessage();
+                        var replyMessage = new ResponseMessage();
                         replyMessage.RequestId = ms.Read32BitEncodedInt();
                         return replyMessage;
                     }
                     case MessageCode.ReplyWithException:
                     {
-                        var replyMessage = new ReplyMessage();
+                        var replyMessage = new ResponseMessage();
                         replyMessage.RequestId = ms.Read32BitEncodedInt();
 
                         var exceptionType = ReadType(ms);
@@ -233,7 +233,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                     {
                         // read requestId
 
-                        var replyMessage = new ReplyMessage();
+                        var replyMessage = new ResponseMessage();
                         replyMessage.RequestId = ms.Read32BitEncodedInt();
 
                         // read result
@@ -246,7 +246,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                         try
                         {
                             AkkaSurrogate.CurrentSystem = system;
-                            replyMessage.Result = (IValueGetable)_typeModel.Deserialize(ms, result, resultType);
+                            replyMessage.ReturnPayload = (IValueGetable)_typeModel.Deserialize(ms, result, resultType);
                         }
                         finally
                         {

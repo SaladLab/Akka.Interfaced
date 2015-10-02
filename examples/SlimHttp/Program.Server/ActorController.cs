@@ -76,10 +76,10 @@ namespace SlimHttp.Program.Server
 
             if (request.RequestId != 0)
             {
-                var reply = await actor.Ask<ReplyMessage>(new RequestMessage
+                var reply = await actor.Ask<ResponseMessage>(new RequestMessage
                 {
                     RequestId = request.RequestId,
-                    Message = message
+                    InvokePayload = message
                 });
                 if (reply != null)
                 {
@@ -89,14 +89,14 @@ namespace SlimHttp.Program.Server
                         reply2.Exception = reply.Exception;
                         Console.WriteLine("* Actor({0}) -> {1}", id, reply.Exception);
                     }
-                    else if (reply.Result != null)
+                    else if (reply.ReturnPayload != null)
                     {
-                        reply2.ResultType = reply.Result.GetType().FullName;
-                        var value = reply.Result.Value;
+                        reply2.ResultType = reply.ReturnPayload.GetType().FullName;
+                        var value = reply.ReturnPayload.Value;
                         if (value != null)
                         {
                             reply2.ResultData = JToken.FromObject(value);
-                            Console.WriteLine("* Actor({0}) -> {1} {2}", id, reply.Result.GetType().Name, reply2.ResultData.ToString(Formatting.None));
+                            Console.WriteLine("* Actor({0}) -> {1} {2}", id, reply.ReturnPayload.GetType().Name, reply2.ResultData.ToString(Formatting.None));
                         }
                         else
                         {
@@ -116,7 +116,7 @@ namespace SlimHttp.Program.Server
             }
             else
             {
-                actor.Tell(new RequestMessage {Message = message});
+                actor.Tell(new RequestMessage {InvokePayload = message});
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
         }

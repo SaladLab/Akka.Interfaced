@@ -50,15 +50,15 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             var obj = new RequestMessage
             {
                 RequestId = 12345678,
-                Message = new TestInvokableMessage { a = "Hello", b = "World" }
+                InvokePayload = new TestInvokableMessage { a = "Hello", b = "World" }
             };
 
             var bytes = serializer.ToBinary(obj);
 
             var obj2 = (RequestMessage)serializer.FromBinary(bytes, null);
             Assert.Equal(obj.RequestId, obj2.RequestId);
-            Assert.Equal(((TestInvokableMessage)obj.Message).a, ((TestInvokableMessage)obj2.Message).a);
-            Assert.Equal(((TestInvokableMessage)obj.Message).b, ((TestInvokableMessage)obj2.Message).b);
+            Assert.Equal(((TestInvokableMessage)obj.InvokePayload).a, ((TestInvokableMessage)obj2.InvokePayload).a);
+            Assert.Equal(((TestInvokableMessage)obj.InvokePayload).b, ((TestInvokableMessage)obj2.InvokePayload).b);
         }
 
         [Fact]
@@ -66,14 +66,14 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             var serializer = new ProtobufSerializer(null);
 
-            var obj = new ReplyMessage
+            var obj = new ResponseMessage
             {
                 RequestId = 12345678,
             };
 
             var bytes = serializer.ToBinary(obj);
 
-            var obj2 = (ReplyMessage)serializer.FromBinary(bytes, null);
+            var obj2 = (ResponseMessage)serializer.FromBinary(bytes, null);
             Assert.Equal(obj.RequestId, obj2.RequestId);
         }
 
@@ -82,7 +82,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             var serializer = new ProtobufSerializer(null);
 
-            var obj = new ReplyMessage
+            var obj = new ResponseMessage
             {
                 RequestId = 12345678,
                 Exception = new Exception("Test-Exception")
@@ -90,7 +90,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
 
             var bytes = serializer.ToBinary(obj);
 
-            var obj2 = (ReplyMessage)serializer.FromBinary(bytes, null);
+            var obj2 = (ResponseMessage)serializer.FromBinary(bytes, null);
             Assert.Equal(obj.RequestId, obj2.RequestId);
             Assert.NotNull(obj2.Exception);
         }
@@ -100,17 +100,17 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             var serializer = new ProtobufSerializer(null);
 
-            var obj = new ReplyMessage
+            var obj = new ResponseMessage
             {
                 RequestId = 12345678,
-                Result = new TestReturnMessage { v = "HelloWorld" }
+                ReturnPayload = new TestReturnMessage { v = "HelloWorld" }
             };
 
             var bytes = serializer.ToBinary(obj);
 
-            var obj2 = (ReplyMessage)serializer.FromBinary(bytes, typeof(TestReturnMessage));
+            var obj2 = (ResponseMessage)serializer.FromBinary(bytes, typeof(TestReturnMessage));
             Assert.Equal(obj.RequestId, obj2.RequestId);
-            Assert.Equal(((TestReturnMessage)obj.Result).Value, ((TestReturnMessage)obj2.Result).Value);
+            Assert.Equal(((TestReturnMessage)obj.ReturnPayload).Value, ((TestReturnMessage)obj2.ReturnPayload).Value);
         }
 
         [Fact]

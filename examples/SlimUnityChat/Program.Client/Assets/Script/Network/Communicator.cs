@@ -279,15 +279,15 @@ public class Communicator
                     _recvSimplePackets.Add(p);
                 break;
 			
-            case PacketType.Reply:
-                Action<SlimReplyMessage> handler;
-                if (_requestReplyMap.TryGetValue(p.RequestId, out handler))
+            case PacketType.Response:
+                Action<SlimResponseMessage> handler;
+                if (_requestResponseMap.TryGetValue(p.RequestId, out handler))
                 {
-                    _requestReplyMap.Remove(p.RequestId);
-                    handler(new SlimReplyMessage
+                    _requestResponseMap.Remove(p.RequestId);
+                    handler(new SlimResponseMessage
                     {
                         RequestId = p.RequestId,
-                        Result = p.Message,
+                        ReturnPayload = (IValueGetable)p.Message,
                         Exception = p.Exception
                     });
                 }
@@ -311,7 +311,7 @@ public class Communicator
         {
             Type = PacketType.Request,
             ActorId = ((SlimActorRef)target).Id,
-            Message = requestMessage.Message,
+            Message = requestMessage.InvokePayload,
         }, null);
     }
 
@@ -324,7 +324,7 @@ public class Communicator
         {
             Type = PacketType.Request,
             ActorId = ((SlimActorRef)target).Id,
-            Message = requestMessage.Message,
+            Message = requestMessage.InvokePayload,
         }, r =>
         {
             if (r.Exception != null)
@@ -344,27 +344,27 @@ public class Communicator
         {
             Type = PacketType.Request,
             ActorId = ((SlimActorRef)target).Id,
-            Message = requestMessage.Message,
+            Message = requestMessage.InvokePayload,
         }, r =>
         {
             if (r.Exception != null)
                 t.Exception = r.Exception;
-            else if (r.Result != null)
-                t.Result = (T)((IValueGetable)r.Result).Value;
+            else if (r.ReturnPayload != null)
+                t.Result = (T)((IValueGetable)r.ReturnPayload).Value;
         });
         return t;
     }
 
     private int _lastRequestId = 0;
     private List<Packet> _requestPackets = new List<Packet>();
-    private Dictionary<int, Action<SlimReplyMessage>> _requestReplyMap = new Dictionary<int, Action<SlimReplyMessage>>();
+    private Dictionary<int, Action<SlimResponseMessage>> _requestResponseMap = new Dictionary<int, Action<SlimResponseMessage>>();
 
-    private void SendRequestPacket(Packet packet, Action<SlimReplyMessage> completionHandler)
+    private void SendRequestPacket(Packet packet, Action<SlimResponseMessage> completionHandler)
     {
         packet.RequestId = ++_lastRequestId;
 
         if (completionHandler != null)
-            _requestReplyMap.Add(packet.RequestId, completionHandler);
+            _requestResponseMap.Add(packet.RequestId, completionHandler);
 
         if (_state == StateType.Connected)
             _tcpConnection.SendPacket(packet);

@@ -69,8 +69,8 @@ namespace SlimUnityChat.Program.Server
                     try
                     {
                         log = logHandler(self);
-                        var requestName = requestMessage.Message.GetType().Name;
-                        var requestJson = JsonConvert.SerializeObject(requestMessage.Message, _settings);
+                        var requestName = requestMessage.InvokePayload.GetType().Name;
+                        var requestJson = JsonConvert.SerializeObject(requestMessage.InvokePayload, _settings);
                         log.TraceFormat(
                             "#{0} -> {1} {2}",
                             requestMessage.RequestId, methodShortName, requestJson);

@@ -29,8 +29,8 @@ namespace Basic.Program
             {
                 return async delegate(TestActor self, RequestMessage requestMessage)
                 {
-                    var requestName = requestMessage.Message.GetType().Name;
-                    var requestJson = JsonConvert.SerializeObject(requestMessage.Message, Formatting.None);
+                    var requestName = requestMessage.InvokePayload.GetType().Name;
+                    var requestJson = JsonConvert.SerializeObject(requestMessage.InvokePayload, Formatting.None);
                     Console.WriteLine("* Request: {0} #{1} <{2}>", requestName, requestMessage.RequestId, requestJson);
                     
                     var watch = new Stopwatch();

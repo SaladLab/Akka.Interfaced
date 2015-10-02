@@ -21,15 +21,15 @@ namespace Akka.Interfaced
             var deadLetter = message as DeadLetter;
             if (deadLetter != null)
             {
-                var requestMessage = deadLetter.Message as RequestMessage;
-                if (requestMessage != null && requestMessage.RequestId != 0)
+                var request = deadLetter.Message as RequestMessage;
+                if (request != null && request.RequestId != 0)
                 {
-                    var replyMessage = new ReplyMessage
+                    var response = new ResponseMessage
                     {
-                        RequestId = requestMessage.RequestId,
+                        RequestId = request.RequestId,
                         Exception = new InvalidOperationException("Actor not found")
                     };
-                    deadLetter.Sender.Tell(replyMessage);
+                    deadLetter.Sender.Tell(response);
                 }
             }
         }

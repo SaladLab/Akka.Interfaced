@@ -23,16 +23,16 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             var serializer = new ProtobufSerializer(null);
 
-            var obj = new ReplyMessage
+            var obj = new ResponseMessage
             {
                 RequestId = 12345678,
-                Result = new PathReturnMessage { v = ActorPath.Parse("akka://system@host:1234/user/protobuf") }
+                ReturnPayload = new PathReturnMessage { v = ActorPath.Parse("akka://system@host:1234/user/protobuf") }
             };
 
             var bytes = serializer.ToBinary(obj);
 
-            var obj2 = (ReplyMessage)serializer.FromBinary(bytes, null);
-            Assert.Equal(obj.Result.Value.ToString(), obj2.Result.Value.ToString());
+            var obj2 = (ResponseMessage)serializer.FromBinary(bytes, null);
+            Assert.Equal(obj.ReturnPayload.Value.ToString(), obj2.ReturnPayload.Value.ToString());
         }
 
         [ProtoContract, TypeAlias]
@@ -51,16 +51,16 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             var serializer = new ProtobufSerializer(null);
 
-            var obj = new ReplyMessage
+            var obj = new ResponseMessage
             {
                 RequestId = 12345678,
-                Result = new AddressReturnMessage { v = Address.Parse("akka://system@host:1234") }
+                ReturnPayload = new AddressReturnMessage { v = Address.Parse("akka://system@host:1234") }
             };
 
             var bytes = serializer.ToBinary(obj);
 
-            var obj2 = (ReplyMessage)serializer.FromBinary(bytes, null);
-            Assert.Equal(obj.Result.Value.ToString(), obj2.Result.Value.ToString());
+            var obj2 = (ResponseMessage)serializer.FromBinary(bytes, null);
+            Assert.Equal(obj.ReturnPayload.Value.ToString(), obj2.ReturnPayload.Value.ToString());
         }
     }
 }

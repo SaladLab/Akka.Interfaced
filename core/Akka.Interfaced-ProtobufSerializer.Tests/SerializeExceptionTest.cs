@@ -13,10 +13,10 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             var serializer = new ProtobufSerializer(null);
 
             var exception = new ArgumentException("Test");
-            var obj = new ReplyMessage { Exception = exception };
+            var obj = new ResponseMessage { Exception = exception };
             var bytes = serializer.ToBinary(obj);
 
-            var obj2 = (ReplyMessage)serializer.FromBinary(bytes, null);
+            var obj2 = (ResponseMessage)serializer.FromBinary(bytes, null);
             Assert.Equal(obj.Exception.GetType(), obj2.Exception.GetType());
         }
 
@@ -33,10 +33,10 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             var serializer = new ProtobufSerializer(null);
 
             var exception = new TestException { ErrorCode = 1000, ErrorDetail = "Test" };
-            var obj = new ReplyMessage { Exception = exception };
+            var obj = new ResponseMessage { Exception = exception };
             var bytes = serializer.ToBinary(obj);
 
-            var obj2 = (ReplyMessage)serializer.FromBinary(bytes, null);
+            var obj2 = (ResponseMessage)serializer.FromBinary(bytes, null);
             Assert.Equal(obj.Exception.GetType(), obj2.Exception.GetType());
 
             var exception2 = (TestException)obj.Exception;

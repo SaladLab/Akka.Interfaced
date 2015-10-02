@@ -57,6 +57,11 @@ namespace CodeGen
                    type.GetInterfaces().Any(i => i.FullName == "Akka.Interfaced.IInterfacedObserver");
         }
 
+        public static string GetPayloadTableClassName(Type type)
+        {
+            return type.Name + "_PayloadTable";
+        }
+
         public static string GetNoReplyInterfaceName(Type type)
         {
             return type.Name + "_NoReply";

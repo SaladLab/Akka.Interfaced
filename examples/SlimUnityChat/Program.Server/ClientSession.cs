@@ -33,7 +33,7 @@ namespace SlimUnityChat.Program.Server
             public object TagValue;
         }
 
-        public class BindActorReplyMessage
+        public class BindActorResponseMessage
         {
             public int ActorId;
         }
@@ -130,8 +130,8 @@ namespace SlimUnityChat.Program.Server
                 return;
             }
 
-            var replyMessage = message as ReplyMessage;
-            if (replyMessage != null)
+            var response = message as ResponseMessage;
+            if (response != null)
             {
                 var actorId = GetBoundActorId(Sender);
                 if (actorId != 0)
@@ -139,11 +139,11 @@ namespace SlimUnityChat.Program.Server
                     // TODO: Sender 에 접근하지 않고 ActorId 를 얻을 수 있도록 하자 (성능 이슈)
                     _connection.Send(new Packet
                     {
-                        Type = PacketType.Reply,
+                        Type = PacketType.Response,
                         ActorId = actorId,
-                        RequestId = replyMessage.RequestId,
-                        Message = replyMessage.Result,
-                        Exception = replyMessage.Exception
+                        RequestId = response.RequestId,
+                        Message = response.ReturnPayload,
+                        Exception = response.Exception
                     });
                 }
                 return;
@@ -156,7 +156,7 @@ namespace SlimUnityChat.Program.Server
                     bindActorRequestMessage.Actor,
                     bindActorRequestMessage.InterfaceType,
                     bindActorRequestMessage.TagValue);
-                Sender.Tell(new BindActorReplyMessage { ActorId = actorId });
+                Sender.Tell(new BindActorResponseMessage { ActorId = actorId });
                 return;
             }
 
@@ -196,7 +196,7 @@ namespace SlimUnityChat.Program.Server
             {
                 if (actor.InterfaceType != null)
                 {
-                    var msg = (IInterfacedMessage)p.Message;
+                    var msg = (IInterfacedPayload)p.Message;
                     if (msg == null || msg.GetInterfaceType() != actor.InterfaceType)
                     {
                         Console.WriteLine("Got packet but weired! {0}", msg.GetType());
@@ -213,7 +213,7 @@ namespace SlimUnityChat.Program.Server
                 actor.Actor.Tell(new RequestMessage
                 {
                     RequestId = p.RequestId,
-                    Message = (IAsyncInvokable)p.Message
+                    InvokePayload = (IAsyncInvokable)p.Message
                 }, _self);
             }
         }

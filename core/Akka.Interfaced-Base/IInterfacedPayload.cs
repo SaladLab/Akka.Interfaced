@@ -5,7 +5,7 @@ namespace Akka.Interfaced
     /// <summary>
     ///   Define a interfaced message class.
     /// </summary>
-    public interface IInterfacedMessage
+    public interface IInterfacedPayload
     {
         /// <summary>
         ///   Return owner interface type 

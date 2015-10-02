@@ -18,60 +18,73 @@ using System.ComponentModel;
 
 namespace SlimUnity.Interface
 {
-    [ProtoContract, TypeAlias]
-    public class ICalculator__Concat__Invoke : IInterfacedMessage
+    public static class ICalculator_PayloadTable
     {
-        [ProtoMember(1)] public System.String a;
-        [ProtoMember(2)] public System.String b;
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,]
+            {
+                {typeof(Concat_Invoke), typeof(Concat_Return)},
+                {typeof(Sum_Invoke), typeof(Sum_Return)},
+                {typeof(Sum_2_Invoke), typeof(Sum_2_Return)},
+            };
+        }
 
-        public Type GetInterfaceType() { return typeof(ICalculator); }
-    }
+        [ProtoContract, TypeAlias]
+        public class Concat_Invoke : IInterfacedPayload
+        {
+            [ProtoMember(1)] public System.String a;
+            [ProtoMember(2)] public System.String b;
 
-    [ProtoContract, TypeAlias]
-    public class ICalculator__Concat__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.String v;
+            public Type GetInterfaceType() { return typeof(ICalculator); }
+        }
 
-        public Type GetInterfaceType() { return typeof(ICalculator); }
+        [ProtoContract, TypeAlias]
+        public class Concat_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.String v;
 
-        public object Value { get { return v; } }
-    }
+            public Type GetInterfaceType() { return typeof(ICalculator); }
 
-    [ProtoContract, TypeAlias]
-    public class ICalculator__Sum__Invoke : IInterfacedMessage
-    {
-        [ProtoMember(1)] public System.Int32 a;
-        [ProtoMember(2)] public System.Int32 b;
+            public object Value { get { return v; } }
+        }
 
-        public Type GetInterfaceType() { return typeof(ICalculator); }
-    }
+        [ProtoContract, TypeAlias]
+        public class Sum_Invoke : IInterfacedPayload
+        {
+            [ProtoMember(1)] public System.Int32 a;
+            [ProtoMember(2)] public System.Int32 b;
 
-    [ProtoContract, TypeAlias]
-    public class ICalculator__Sum__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Int32 v;
+            public Type GetInterfaceType() { return typeof(ICalculator); }
+        }
 
-        public Type GetInterfaceType() { return typeof(ICalculator); }
+        [ProtoContract, TypeAlias]
+        public class Sum_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Int32 v;
 
-        public object Value { get { return v; } }
-    }
+            public Type GetInterfaceType() { return typeof(ICalculator); }
 
-    [ProtoContract, TypeAlias]
-    public class ICalculator__Sum_2__Invoke : IInterfacedMessage
-    {
-        [ProtoMember(1)] public System.Tuple<System.Int32, System.Int32> v;
+            public object Value { get { return v; } }
+        }
 
-        public Type GetInterfaceType() { return typeof(ICalculator); }
-    }
+        [ProtoContract, TypeAlias]
+        public class Sum_2_Invoke : IInterfacedPayload
+        {
+            [ProtoMember(1)] public System.Tuple<System.Int32, System.Int32> v;
 
-    [ProtoContract, TypeAlias]
-    public class ICalculator__Sum_2__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Int32 v;
+            public Type GetInterfaceType() { return typeof(ICalculator); }
+        }
 
-        public Type GetInterfaceType() { return typeof(ICalculator); }
+        [ProtoContract, TypeAlias]
+        public class Sum_2_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Int32 v;
 
-        public object Value { get { return v; } }
+            public Type GetInterfaceType() { return typeof(ICalculator); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface ICalculator_NoReply
@@ -81,7 +94,7 @@ namespace SlimUnity.Interface
         void Sum(System.Tuple<System.Int32, System.Int32> v);
     }
 
-    public class CalculatorRef : InterfacedSlimActorRef, ICalculator_NoReply
+    public class CalculatorRef : InterfacedSlimActorRef, ICalculator, ICalculator_NoReply
     {
         public CalculatorRef(ISlimActorRef actor, ISlimRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
@@ -107,7 +120,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new ICalculator__Concat__Invoke { a = a, b = b }
+                InvokePayload = new ICalculator_PayloadTable.Concat_Invoke { a = a, b = b }
             };
             return SendRequestAndReceive<System.String>(requestMessage);
         }
@@ -116,7 +129,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new ICalculator__Sum__Invoke { a = a, b = b }
+                InvokePayload = new ICalculator_PayloadTable.Sum_Invoke { a = a, b = b }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -125,7 +138,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new ICalculator__Sum_2__Invoke { v = (System.Tuple<System.Int32, System.Int32>)v }
+                InvokePayload = new ICalculator_PayloadTable.Sum_2_Invoke { v = (System.Tuple<System.Int32, System.Int32>)v }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -134,7 +147,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new ICalculator__Concat__Invoke { a = a, b = b }
+                InvokePayload = new ICalculator_PayloadTable.Concat_Invoke { a = a, b = b }
             };
             SendRequest(requestMessage);
         }
@@ -143,7 +156,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new ICalculator__Sum__Invoke { a = a, b = b }
+                InvokePayload = new ICalculator_PayloadTable.Sum_Invoke { a = a, b = b }
             };
             SendRequest(requestMessage);
         }
@@ -152,7 +165,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new ICalculator__Sum_2__Invoke { v = (System.Tuple<System.Int32, System.Int32>)v }
+                InvokePayload = new ICalculator_PayloadTable.Sum_2_Invoke { v = (System.Tuple<System.Int32, System.Int32>)v }
             };
             SendRequest(requestMessage);
         }
@@ -165,28 +178,40 @@ namespace SlimUnity.Interface
 
 namespace SlimUnity.Interface
 {
-    [ProtoContract, TypeAlias]
-    public class ICounter__IncCounter__Invoke : IInterfacedMessage
+    public static class ICounter_PayloadTable
     {
-        [ProtoMember(1)] public System.Int32 delta;
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,]
+            {
+                {typeof(IncCounter_Invoke), null},
+                {typeof(GetCounter_Invoke), typeof(GetCounter_Return)},
+            };
+        }
 
-        public Type GetInterfaceType() { return typeof(ICounter); }
-    }
+        [ProtoContract, TypeAlias]
+        public class IncCounter_Invoke : IInterfacedPayload
+        {
+            [ProtoMember(1)] public System.Int32 delta;
 
-    [ProtoContract, TypeAlias]
-    public class ICounter__GetCounter__Invoke : IInterfacedMessage
-    {
-        public Type GetInterfaceType() { return typeof(ICounter); }
-    }
+            public Type GetInterfaceType() { return typeof(ICounter); }
+        }
 
-    [ProtoContract, TypeAlias]
-    public class ICounter__GetCounter__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Int32 v;
+        [ProtoContract, TypeAlias]
+        public class GetCounter_Invoke : IInterfacedPayload
+        {
+            public Type GetInterfaceType() { return typeof(ICounter); }
+        }
 
-        public Type GetInterfaceType() { return typeof(ICounter); }
+        [ProtoContract, TypeAlias]
+        public class GetCounter_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Int32 v;
 
-        public object Value { get { return v; } }
+            public Type GetInterfaceType() { return typeof(ICounter); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface ICounter_NoReply
@@ -195,7 +220,7 @@ namespace SlimUnity.Interface
         void GetCounter();
     }
 
-    public class CounterRef : InterfacedSlimActorRef, ICounter_NoReply
+    public class CounterRef : InterfacedSlimActorRef, ICounter, ICounter_NoReply
     {
         public CounterRef(ISlimActorRef actor, ISlimRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
@@ -221,7 +246,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new ICounter__IncCounter__Invoke { delta = delta }
+                InvokePayload = new ICounter_PayloadTable.IncCounter_Invoke { delta = delta }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -230,7 +255,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new ICounter__GetCounter__Invoke {  }
+                InvokePayload = new ICounter_PayloadTable.GetCounter_Invoke {  }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -239,7 +264,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new ICounter__IncCounter__Invoke { delta = delta }
+                InvokePayload = new ICounter_PayloadTable.IncCounter_Invoke { delta = delta }
             };
             SendRequest(requestMessage);
         }
@@ -248,7 +273,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new ICounter__GetCounter__Invoke {  }
+                InvokePayload = new ICounter_PayloadTable.GetCounter_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -261,101 +286,117 @@ namespace SlimUnity.Interface
 
 namespace SlimUnity.Interface
 {
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestCall__Invoke : IInterfacedMessage
+    public static class IPedantic_PayloadTable
     {
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-    }
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,]
+            {
+                {typeof(TestCall_Invoke), null},
+                {typeof(TestOptional_Invoke), typeof(TestOptional_Return)},
+                {typeof(TestTuple_Invoke), typeof(TestTuple_Return)},
+                {typeof(TestParams_Invoke), typeof(TestParams_Return)},
+                {typeof(TestPassClass_Invoke), typeof(TestPassClass_Return)},
+                {typeof(TestReturnClass_Invoke), typeof(TestReturnClass_Return)},
+            };
+        }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestOptional__Invoke : IInterfacedMessage
-    {
-        [ProtoMember(1)] public System.Nullable<System.Int32> value;
+        [ProtoContract, TypeAlias]
+        public class TestCall_Invoke : IInterfacedPayload
+        {
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+        }
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-    }
+        [ProtoContract, TypeAlias]
+        public class TestOptional_Invoke : IInterfacedPayload
+        {
+            [ProtoMember(1)] public System.Nullable<System.Int32> value;
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestOptional__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Nullable<System.Int32> v;
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+        }
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
+        [ProtoContract, TypeAlias]
+        public class TestOptional_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Nullable<System.Int32> v;
 
-        public object Value { get { return v; } }
-    }
+            public Type GetInterfaceType() { return typeof(IPedantic); }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestTuple__Invoke : IInterfacedMessage
-    {
-        [ProtoMember(1)] public System.Tuple<System.Int32, System.String> value;
+            public object Value { get { return v; } }
+        }
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-    }
+        [ProtoContract, TypeAlias]
+        public class TestTuple_Invoke : IInterfacedPayload
+        {
+            [ProtoMember(1)] public System.Tuple<System.Int32, System.String> value;
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestTuple__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Tuple<System.Int32, System.String> v;
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+        }
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
+        [ProtoContract, TypeAlias]
+        public class TestTuple_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Tuple<System.Int32, System.String> v;
 
-        public object Value { get { return v; } }
-    }
+            public Type GetInterfaceType() { return typeof(IPedantic); }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestParams__Invoke : IInterfacedMessage
-    {
-        [ProtoMember(1)] public System.Int32[] values;
+            public object Value { get { return v; } }
+        }
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-    }
+        [ProtoContract, TypeAlias]
+        public class TestParams_Invoke : IInterfacedPayload
+        {
+            [ProtoMember(1)] public System.Int32[] values;
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestParams__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Int32[] v;
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+        }
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
+        [ProtoContract, TypeAlias]
+        public class TestParams_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Int32[] v;
 
-        public object Value { get { return v; } }
-    }
+            public Type GetInterfaceType() { return typeof(IPedantic); }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestPassClass__Invoke : IInterfacedMessage
-    {
-        [ProtoMember(1)] public SlimUnity.Interface.TestParam param;
+            public object Value { get { return v; } }
+        }
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-    }
+        [ProtoContract, TypeAlias]
+        public class TestPassClass_Invoke : IInterfacedPayload
+        {
+            [ProtoMember(1)] public SlimUnity.Interface.TestParam param;
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestPassClass__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.String v;
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+        }
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
+        [ProtoContract, TypeAlias]
+        public class TestPassClass_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.String v;
 
-        public object Value { get { return v; } }
-    }
+            public Type GetInterfaceType() { return typeof(IPedantic); }
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestReturnClass__Invoke : IInterfacedMessage
-    {
-        [ProtoMember(1)] public System.Int32 value;
-        [ProtoMember(2)] public System.Int32 offset;
+            public object Value { get { return v; } }
+        }
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
-    }
+        [ProtoContract, TypeAlias]
+        public class TestReturnClass_Invoke : IInterfacedPayload
+        {
+            [ProtoMember(1)] public System.Int32 value;
+            [ProtoMember(2)] public System.Int32 offset;
 
-    [ProtoContract, TypeAlias]
-    public class IPedantic__TestReturnClass__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public SlimUnity.Interface.TestResult v;
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+        }
 
-        public Type GetInterfaceType() { return typeof(IPedantic); }
+        [ProtoContract, TypeAlias]
+        public class TestReturnClass_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public SlimUnity.Interface.TestResult v;
 
-        public object Value { get { return v; } }
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IPedantic_NoReply
@@ -368,7 +409,7 @@ namespace SlimUnity.Interface
         void TestReturnClass(System.Int32 value, System.Int32 offset);
     }
 
-    public class PedanticRef : InterfacedSlimActorRef, IPedantic_NoReply
+    public class PedanticRef : InterfacedSlimActorRef, IPedantic, IPedantic_NoReply
     {
         public PedanticRef(ISlimActorRef actor, ISlimRequestWaiter requestWaiter, TimeSpan? timeout)
             : base(actor, requestWaiter, timeout)
@@ -394,7 +435,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestCall__Invoke {  }
+                InvokePayload = new IPedantic_PayloadTable.TestCall_Invoke {  }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -403,7 +444,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestOptional__Invoke { value = (System.Nullable<System.Int32>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = (System.Nullable<System.Int32>)value }
             };
             return SendRequestAndReceive<System.Nullable<System.Int32>>(requestMessage);
         }
@@ -412,7 +453,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestTuple__Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
             };
             return SendRequestAndReceive<System.Tuple<System.Int32, System.String>>(requestMessage);
         }
@@ -421,7 +462,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestParams__Invoke { values = values }
+                InvokePayload = new IPedantic_PayloadTable.TestParams_Invoke { values = values }
             };
             return SendRequestAndReceive<System.Int32[]>(requestMessage);
         }
@@ -430,7 +471,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestPassClass__Invoke { param = param }
+                InvokePayload = new IPedantic_PayloadTable.TestPassClass_Invoke { param = param }
             };
             return SendRequestAndReceive<System.String>(requestMessage);
         }
@@ -439,7 +480,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestReturnClass__Invoke { value = value, offset = offset }
+                InvokePayload = new IPedantic_PayloadTable.TestReturnClass_Invoke { value = value, offset = offset }
             };
             return SendRequestAndReceive<SlimUnity.Interface.TestResult>(requestMessage);
         }
@@ -448,7 +489,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestCall__Invoke {  }
+                InvokePayload = new IPedantic_PayloadTable.TestCall_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -457,7 +498,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestOptional__Invoke { value = (System.Nullable<System.Int32>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = (System.Nullable<System.Int32>)value }
             };
             SendRequest(requestMessage);
         }
@@ -466,7 +507,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestTuple__Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
             };
             SendRequest(requestMessage);
         }
@@ -475,7 +516,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestParams__Invoke { values = values }
+                InvokePayload = new IPedantic_PayloadTable.TestParams_Invoke { values = values }
             };
             SendRequest(requestMessage);
         }
@@ -484,7 +525,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestPassClass__Invoke { param = param }
+                InvokePayload = new IPedantic_PayloadTable.TestPassClass_Invoke { param = param }
             };
             SendRequest(requestMessage);
         }
@@ -493,7 +534,7 @@ namespace SlimUnity.Interface
         {
             var requestMessage = new SlimRequestMessage
             {
-                Message = new IPedantic__TestReturnClass__Invoke { value = value, offset = offset }
+                InvokePayload = new IPedantic_PayloadTable.TestReturnClass_Invoke { value = value, offset = offset }
             };
             SendRequest(requestMessage);
         }

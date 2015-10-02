@@ -57,11 +57,11 @@
     <Compile Include="MessageHandlerAttribute.cs" />
     <Compile Include="MessageDispatcher.cs" />
     <Compile Include="MessageDispatcherInternalHelper.cs" />
-    <Compile Include="MessageTableAttribute.cs" />
+    <Compile Include="PayloadTableAttribute.cs" />
     <Compile Include="NotificationMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReentrantAttribute.cs" />
-    <Compile Include="ReplyMessage.cs" />
+    <Compile Include="ResponseMessage.cs" />
     <Compile Include="RequestMessage.cs" />
     <Compile Include="InterfacedPoisonPill.cs" />
     <Compile Include="SynchronizationContextSwitcher.cs" />

@@ -16,63 +16,63 @@ using Akka.Interfaced;
 
 namespace Basic.Interface
 {
-    [MessageTableForInterfacedActor(typeof(ICalculator))]
-    public static class ICalculator__MessageTable
+    [PayloadTableForInterfacedActor(typeof(ICalculator))]
+    public static class ICalculator_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(ICalculator__Concat__Invoke), typeof(ICalculator__Concat__Return)},
-                {typeof(ICalculator__Sum__Invoke), typeof(ICalculator__Sum__Return)},
+                {typeof(Concat_Invoke), typeof(Concat_Return)},
+                {typeof(Sum_Invoke), typeof(Sum_Return)},
             };
         }
-    }
 
-    public class ICalculator__Concat__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.String a;
-        public System.String b;
-
-        public Type GetInterfaceType() { return typeof(ICalculator); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Concat_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((ICalculator)target).Concat(a, b);
-            return (IValueGetable)(new ICalculator__Concat__Return { v = __v });
+            public System.String a;
+            public System.String b;
+
+            public Type GetInterfaceType() { return typeof(ICalculator); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((ICalculator)target).Concat(a, b);
+                return (IValueGetable)(new Concat_Return { v = __v });
+            }
         }
-    }
 
-    public class ICalculator__Concat__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.String v;
-
-        public Type GetInterfaceType() { return typeof(ICalculator); }
-
-        public object Value { get { return v; } }
-    }
-
-    public class ICalculator__Sum__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 a;
-        public System.Int32 b;
-
-        public Type GetInterfaceType() { return typeof(ICalculator); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Concat_Return : IInterfacedPayload, IValueGetable
         {
-            var __v = await((ICalculator)target).Sum(a, b);
-            return (IValueGetable)(new ICalculator__Sum__Return { v = __v });
+            public System.String v;
+
+            public Type GetInterfaceType() { return typeof(ICalculator); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    public class ICalculator__Sum__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
+        public class Sum_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.Int32 a;
+            public System.Int32 b;
 
-        public Type GetInterfaceType() { return typeof(ICalculator); }
+            public Type GetInterfaceType() { return typeof(ICalculator); }
 
-        public object Value { get { return v; } }
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((ICalculator)target).Sum(a, b);
+                return (IValueGetable)(new Sum_Return { v = __v });
+            }
+        }
+
+        public class Sum_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(ICalculator); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface ICalculator_NoReply
@@ -112,7 +112,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ICalculator__Concat__Invoke { a = a, b = b }
+                InvokePayload = new ICalculator_PayloadTable.Concat_Invoke { a = a, b = b }
             };
             return SendRequestAndReceive<System.String>(requestMessage);
         }
@@ -121,7 +121,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ICalculator__Sum__Invoke { a = a, b = b }
+                InvokePayload = new ICalculator_PayloadTable.Sum_Invoke { a = a, b = b }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -130,7 +130,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ICalculator__Concat__Invoke { a = a, b = b }
+                InvokePayload = new ICalculator_PayloadTable.Concat_Invoke { a = a, b = b }
             };
             SendRequest(requestMessage);
         }
@@ -139,7 +139,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ICalculator__Sum__Invoke { a = a, b = b }
+                InvokePayload = new ICalculator_PayloadTable.Sum_Invoke { a = a, b = b }
             };
             SendRequest(requestMessage);
         }
@@ -152,50 +152,50 @@ namespace Basic.Interface
 
 namespace Basic.Interface
 {
-    [MessageTableForInterfacedActor(typeof(ICounter))]
-    public static class ICounter__MessageTable
+    [PayloadTableForInterfacedActor(typeof(ICounter))]
+    public static class ICounter_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(ICounter__IncCounter__Invoke), null},
-                {typeof(ICounter__GetCounter__Invoke), typeof(ICounter__GetCounter__Return)},
+                {typeof(IncCounter_Invoke), null},
+                {typeof(GetCounter_Invoke), typeof(GetCounter_Return)},
             };
         }
-    }
 
-    public class ICounter__IncCounter__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 delta;
-
-        public Type GetInterfaceType() { return typeof(ICounter); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class IncCounter_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((ICounter)target).IncCounter(delta);
-            return null;
+            public System.Int32 delta;
+
+            public Type GetInterfaceType() { return typeof(ICounter); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((ICounter)target).IncCounter(delta);
+                return null;
+            }
         }
-    }
 
-    public class ICounter__GetCounter__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(ICounter); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class GetCounter_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((ICounter)target).GetCounter();
-            return (IValueGetable)(new ICounter__GetCounter__Return { v = __v });
+            public Type GetInterfaceType() { return typeof(ICounter); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((ICounter)target).GetCounter();
+                return (IValueGetable)(new GetCounter_Return { v = __v });
+            }
         }
-    }
 
-    public class ICounter__GetCounter__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
+        public class GetCounter_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
 
-        public Type GetInterfaceType() { return typeof(ICounter); }
+            public Type GetInterfaceType() { return typeof(ICounter); }
 
-        public object Value { get { return v; } }
+            public object Value { get { return v; } }
+        }
     }
 
     public interface ICounter_NoReply
@@ -235,7 +235,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ICounter__IncCounter__Invoke { delta = delta }
+                InvokePayload = new ICounter_PayloadTable.IncCounter_Invoke { delta = delta }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -244,7 +244,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ICounter__GetCounter__Invoke {  }
+                InvokePayload = new ICounter_PayloadTable.GetCounter_Invoke {  }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -253,7 +253,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ICounter__IncCounter__Invoke { delta = delta }
+                InvokePayload = new ICounter_PayloadTable.IncCounter_Invoke { delta = delta }
             };
             SendRequest(requestMessage);
         }
@@ -262,7 +262,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ICounter__GetCounter__Invoke {  }
+                InvokePayload = new ICounter_PayloadTable.GetCounter_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -275,72 +275,72 @@ namespace Basic.Interface
 
 namespace Basic.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IEventGenerator))]
-    public static class IEventGenerator__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IEventGenerator))]
+    public static class IEventGenerator_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IEventGenerator__Subscribe__Invoke), null},
-                {typeof(IEventGenerator__Unsubscribe__Invoke), null},
-                {typeof(IEventGenerator__Buy__Invoke), null},
-                {typeof(IEventGenerator__Sell__Invoke), null},
+                {typeof(Subscribe_Invoke), null},
+                {typeof(Unsubscribe_Invoke), null},
+                {typeof(Buy_Invoke), null},
+                {typeof(Sell_Invoke), null},
             };
         }
-    }
 
-    public class IEventGenerator__Subscribe__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Basic.Interface.EventObserver observer;
-
-        public Type GetInterfaceType() { return typeof(IEventGenerator); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Subscribe_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IEventGenerator)target).Subscribe(observer);
-            return null;
+            public Basic.Interface.EventObserver observer;
+
+            public Type GetInterfaceType() { return typeof(IEventGenerator); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IEventGenerator)target).Subscribe(observer);
+                return null;
+            }
         }
-    }
 
-    public class IEventGenerator__Unsubscribe__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Basic.Interface.EventObserver observer;
-
-        public Type GetInterfaceType() { return typeof(IEventGenerator); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Unsubscribe_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IEventGenerator)target).Unsubscribe(observer);
-            return null;
+            public Basic.Interface.EventObserver observer;
+
+            public Type GetInterfaceType() { return typeof(IEventGenerator); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IEventGenerator)target).Unsubscribe(observer);
+                return null;
+            }
         }
-    }
 
-    public class IEventGenerator__Buy__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.String name;
-        public System.Int32 price;
-
-        public Type GetInterfaceType() { return typeof(IEventGenerator); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Buy_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IEventGenerator)target).Buy(name, price);
-            return null;
+            public System.String name;
+            public System.Int32 price;
+
+            public Type GetInterfaceType() { return typeof(IEventGenerator); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IEventGenerator)target).Buy(name, price);
+                return null;
+            }
         }
-    }
 
-    public class IEventGenerator__Sell__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.String name;
-        public System.Int32 price;
-
-        public Type GetInterfaceType() { return typeof(IEventGenerator); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Sell_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IEventGenerator)target).Sell(name, price);
-            return null;
+            public System.String name;
+            public System.Int32 price;
+
+            public Type GetInterfaceType() { return typeof(IEventGenerator); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IEventGenerator)target).Sell(name, price);
+                return null;
+            }
         }
     }
 
@@ -383,7 +383,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IEventGenerator__Subscribe__Invoke { observer = (Basic.Interface.EventObserver)observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -392,7 +392,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IEventGenerator__Unsubscribe__Invoke { observer = (Basic.Interface.EventObserver)observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -401,7 +401,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IEventGenerator__Buy__Invoke { name = name, price = price }
+                InvokePayload = new IEventGenerator_PayloadTable.Buy_Invoke { name = name, price = price }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -410,7 +410,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IEventGenerator__Sell__Invoke { name = name, price = price }
+                InvokePayload = new IEventGenerator_PayloadTable.Sell_Invoke { name = name, price = price }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -419,7 +419,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IEventGenerator__Subscribe__Invoke { observer = (Basic.Interface.EventObserver)observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
             };
             SendRequest(requestMessage);
         }
@@ -428,7 +428,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IEventGenerator__Unsubscribe__Invoke { observer = (Basic.Interface.EventObserver)observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
             };
             SendRequest(requestMessage);
         }
@@ -437,7 +437,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IEventGenerator__Buy__Invoke { name = name, price = price }
+                InvokePayload = new IEventGenerator_PayloadTable.Buy_Invoke { name = name, price = price }
             };
             SendRequest(requestMessage);
         }
@@ -446,7 +446,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IEventGenerator__Sell__Invoke { name = name, price = price }
+                InvokePayload = new IEventGenerator_PayloadTable.Sell_Invoke { name = name, price = price }
             };
             SendRequest(requestMessage);
         }
@@ -459,87 +459,87 @@ namespace Basic.Interface
 
 namespace Basic.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IOverloaded))]
-    public static class IOverloaded__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IOverloaded))]
+    public static class IOverloaded_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IOverloaded__Min__Invoke), typeof(IOverloaded__Min__Return)},
-                {typeof(IOverloaded__Min_2__Invoke), typeof(IOverloaded__Min_2__Return)},
-                {typeof(IOverloaded__Min_3__Invoke), typeof(IOverloaded__Min_3__Return)},
+                {typeof(Min_Invoke), typeof(Min_Return)},
+                {typeof(Min_2_Invoke), typeof(Min_2_Return)},
+                {typeof(Min_3_Invoke), typeof(Min_3_Return)},
             };
         }
-    }
 
-    public class IOverloaded__Min__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 a;
-        public System.Int32 b;
-
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Min_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IOverloaded)target).Min(a, b);
-            return (IValueGetable)(new IOverloaded__Min__Return { v = __v });
+            public System.Int32 a;
+            public System.Int32 b;
+
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IOverloaded)target).Min(a, b);
+                return (IValueGetable)(new Min_Return { v = __v });
+            }
         }
-    }
 
-    public class IOverloaded__Min__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
-
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
-
-        public object Value { get { return v; } }
-    }
-
-    public class IOverloaded__Min_2__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 a;
-        public System.Int32 b;
-        public System.Int32 c;
-
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Min_Return : IInterfacedPayload, IValueGetable
         {
-            var __v = await((IOverloaded)target).Min(a, b, c);
-            return (IValueGetable)(new IOverloaded__Min_2__Return { v = __v });
+            public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    public class IOverloaded__Min_2__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
-
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
-
-        public object Value { get { return v; } }
-    }
-
-    public class IOverloaded__Min_3__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32[] nums;
-
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Min_2_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IOverloaded)target).Min(nums);
-            return (IValueGetable)(new IOverloaded__Min_3__Return { v = __v });
+            public System.Int32 a;
+            public System.Int32 b;
+            public System.Int32 c;
+
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IOverloaded)target).Min(a, b, c);
+                return (IValueGetable)(new Min_2_Return { v = __v });
+            }
         }
-    }
 
-    public class IOverloaded__Min_3__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
+        public class Min_2_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
 
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
 
-        public object Value { get { return v; } }
+            public object Value { get { return v; } }
+        }
+
+        public class Min_3_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.Int32[] nums;
+
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IOverloaded)target).Min(nums);
+                return (IValueGetable)(new Min_3_Return { v = __v });
+            }
+        }
+
+        public class Min_3_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IOverloaded_NoReply
@@ -580,7 +580,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min__Invoke { a = a, b = b }
+                InvokePayload = new IOverloaded_PayloadTable.Min_Invoke { a = a, b = b }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -589,7 +589,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min_2__Invoke { a = a, b = b, c = c }
+                InvokePayload = new IOverloaded_PayloadTable.Min_2_Invoke { a = a, b = b, c = c }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -598,7 +598,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min_3__Invoke { nums = nums }
+                InvokePayload = new IOverloaded_PayloadTable.Min_3_Invoke { nums = nums }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -607,7 +607,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min__Invoke { a = a, b = b }
+                InvokePayload = new IOverloaded_PayloadTable.Min_Invoke { a = a, b = b }
             };
             SendRequest(requestMessage);
         }
@@ -616,7 +616,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min_2__Invoke { a = a, b = b, c = c }
+                InvokePayload = new IOverloaded_PayloadTable.Min_2_Invoke { a = a, b = b, c = c }
             };
             SendRequest(requestMessage);
         }
@@ -625,7 +625,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min_3__Invoke { nums = nums }
+                InvokePayload = new IOverloaded_PayloadTable.Min_3_Invoke { nums = nums }
             };
             SendRequest(requestMessage);
         }
@@ -638,42 +638,42 @@ namespace Basic.Interface
 
 namespace Basic.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IWorker))]
-    public static class IWorker__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IWorker))]
+    public static class IWorker_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IWorker__Atomic__Invoke), null},
-                {typeof(IWorker__Reentrant__Invoke), null},
+                {typeof(Atomic_Invoke), null},
+                {typeof(Reentrant_Invoke), null},
             };
         }
-    }
 
-    public class IWorker__Atomic__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.String name;
-
-        public Type GetInterfaceType() { return typeof(IWorker); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Atomic_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IWorker)target).Atomic(name);
-            return null;
+            public System.String name;
+
+            public Type GetInterfaceType() { return typeof(IWorker); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IWorker)target).Atomic(name);
+                return null;
+            }
         }
-    }
 
-    public class IWorker__Reentrant__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.String name;
-
-        public Type GetInterfaceType() { return typeof(IWorker); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Reentrant_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IWorker)target).Reentrant(name);
-            return null;
+            public System.String name;
+
+            public Type GetInterfaceType() { return typeof(IWorker); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IWorker)target).Reentrant(name);
+                return null;
+            }
         }
     }
 
@@ -714,7 +714,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IWorker__Atomic__Invoke { name = name }
+                InvokePayload = new IWorker_PayloadTable.Atomic_Invoke { name = name }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -723,7 +723,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IWorker__Reentrant__Invoke { name = name }
+                InvokePayload = new IWorker_PayloadTable.Reentrant_Invoke { name = name }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -732,7 +732,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IWorker__Atomic__Invoke { name = name }
+                InvokePayload = new IWorker_PayloadTable.Atomic_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }
@@ -741,7 +741,7 @@ namespace Basic.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IWorker__Reentrant__Invoke { name = name }
+                InvokePayload = new IWorker_PayloadTable.Reentrant_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }

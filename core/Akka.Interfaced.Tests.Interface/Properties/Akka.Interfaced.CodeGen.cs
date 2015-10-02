@@ -16,108 +16,108 @@ using Akka.Interfaced;
 
 namespace Akka.Interfaced.Tests
 {
-    [MessageTableForInterfacedActor(typeof(IBasic))]
-    public static class IBasic__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IBasic))]
+    public static class IBasic_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IBasic__Call__Invoke), null},
-                {typeof(IBasic__CallWithParameter__Invoke), null},
-                {typeof(IBasic__CallWithReturn__Invoke), typeof(IBasic__CallWithReturn__Return)},
-                {typeof(IBasic__CallWithParameterAndReturn__Invoke), typeof(IBasic__CallWithParameterAndReturn__Return)},
-                {typeof(IBasic__ThrowException__Invoke), typeof(IBasic__ThrowException__Return)},
+                {typeof(Call_Invoke), null},
+                {typeof(CallWithParameter_Invoke), null},
+                {typeof(CallWithReturn_Invoke), typeof(CallWithReturn_Return)},
+                {typeof(CallWithParameterAndReturn_Invoke), typeof(CallWithParameterAndReturn_Return)},
+                {typeof(ThrowException_Invoke), typeof(ThrowException_Return)},
             };
         }
-    }
 
-    public class IBasic__Call__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(IBasic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Call_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IBasic)target).Call();
-            return null;
+            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IBasic)target).Call();
+                return null;
+            }
         }
-    }
 
-    public class IBasic__CallWithParameter__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 value;
-
-        public Type GetInterfaceType() { return typeof(IBasic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class CallWithParameter_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IBasic)target).CallWithParameter(value);
-            return null;
+            public System.Int32 value;
+
+            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IBasic)target).CallWithParameter(value);
+                return null;
+            }
         }
-    }
 
-    public class IBasic__CallWithReturn__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(IBasic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class CallWithReturn_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IBasic)target).CallWithReturn();
-            return (IValueGetable)(new IBasic__CallWithReturn__Return { v = __v });
+            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IBasic)target).CallWithReturn();
+                return (IValueGetable)(new CallWithReturn_Return { v = __v });
+            }
         }
-    }
 
-    public class IBasic__CallWithReturn__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
-
-        public Type GetInterfaceType() { return typeof(IBasic); }
-
-        public object Value { get { return v; } }
-    }
-
-    public class IBasic__CallWithParameterAndReturn__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 value;
-
-        public Type GetInterfaceType() { return typeof(IBasic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class CallWithReturn_Return : IInterfacedPayload, IValueGetable
         {
-            var __v = await((IBasic)target).CallWithParameterAndReturn(value);
-            return (IValueGetable)(new IBasic__CallWithParameterAndReturn__Return { v = __v });
+            public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    public class IBasic__CallWithParameterAndReturn__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
-
-        public Type GetInterfaceType() { return typeof(IBasic); }
-
-        public object Value { get { return v; } }
-    }
-
-    public class IBasic__ThrowException__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Boolean throwException;
-
-        public Type GetInterfaceType() { return typeof(IBasic); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class CallWithParameterAndReturn_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IBasic)target).ThrowException(throwException);
-            return (IValueGetable)(new IBasic__ThrowException__Return { v = __v });
+            public System.Int32 value;
+
+            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IBasic)target).CallWithParameterAndReturn(value);
+                return (IValueGetable)(new CallWithParameterAndReturn_Return { v = __v });
+            }
         }
-    }
 
-    public class IBasic__ThrowException__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
+        public class CallWithParameterAndReturn_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
 
-        public Type GetInterfaceType() { return typeof(IBasic); }
+            public Type GetInterfaceType() { return typeof(IBasic); }
 
-        public object Value { get { return v; } }
+            public object Value { get { return v; } }
+        }
+
+        public class ThrowException_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.Boolean throwException;
+
+            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IBasic)target).ThrowException(throwException);
+                return (IValueGetable)(new ThrowException_Return { v = __v });
+            }
+        }
+
+        public class ThrowException_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IBasic_NoReply
@@ -160,7 +160,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IBasic__Call__Invoke {  }
+                InvokePayload = new IBasic_PayloadTable.Call_Invoke {  }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -169,7 +169,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IBasic__CallWithParameter__Invoke { value = value }
+                InvokePayload = new IBasic_PayloadTable.CallWithParameter_Invoke { value = value }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -178,7 +178,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IBasic__CallWithReturn__Invoke {  }
+                InvokePayload = new IBasic_PayloadTable.CallWithReturn_Invoke {  }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -187,7 +187,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IBasic__CallWithParameterAndReturn__Invoke { value = value }
+                InvokePayload = new IBasic_PayloadTable.CallWithParameterAndReturn_Invoke { value = value }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -196,7 +196,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IBasic__ThrowException__Invoke { throwException = throwException }
+                InvokePayload = new IBasic_PayloadTable.ThrowException_Invoke { throwException = throwException }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -205,7 +205,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IBasic__Call__Invoke {  }
+                InvokePayload = new IBasic_PayloadTable.Call_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -214,7 +214,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IBasic__CallWithParameter__Invoke { value = value }
+                InvokePayload = new IBasic_PayloadTable.CallWithParameter_Invoke { value = value }
             };
             SendRequest(requestMessage);
         }
@@ -223,7 +223,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IBasic__CallWithReturn__Invoke {  }
+                InvokePayload = new IBasic_PayloadTable.CallWithReturn_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -232,7 +232,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IBasic__CallWithParameterAndReturn__Invoke { value = value }
+                InvokePayload = new IBasic_PayloadTable.CallWithParameterAndReturn_Invoke { value = value }
             };
             SendRequest(requestMessage);
         }
@@ -241,7 +241,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IBasic__ThrowException__Invoke { throwException = throwException }
+                InvokePayload = new IBasic_PayloadTable.ThrowException_Invoke { throwException = throwException }
             };
             SendRequest(requestMessage);
         }
@@ -254,38 +254,38 @@ namespace Akka.Interfaced.Tests
 
 namespace Akka.Interfaced.Tests
 {
-    [MessageTableForInterfacedActor(typeof(IDummy))]
-    public static class IDummy__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IDummy))]
+    public static class IDummy_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IDummy__Call__Invoke), typeof(IDummy__Call__Return)},
+                {typeof(Call_Invoke), typeof(Call_Return)},
             };
         }
-    }
 
-    public class IDummy__Call__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Object param;
-
-        public Type GetInterfaceType() { return typeof(IDummy); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Call_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IDummy)target).Call(param);
-            return (IValueGetable)(new IDummy__Call__Return { v = __v });
+            public System.Object param;
+
+            public Type GetInterfaceType() { return typeof(IDummy); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IDummy)target).Call(param);
+                return (IValueGetable)(new Call_Return { v = __v });
+            }
         }
-    }
 
-    public class IDummy__Call__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Object v;
+        public class Call_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Object v;
 
-        public Type GetInterfaceType() { return typeof(IDummy); }
+            public Type GetInterfaceType() { return typeof(IDummy); }
 
-        public object Value { get { return v; } }
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IDummy_NoReply
@@ -324,7 +324,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IDummy__Call__Invoke { param = param }
+                InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
             };
             return SendRequestAndReceive<System.Object>(requestMessage);
         }
@@ -333,7 +333,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IDummy__Call__Invoke { param = param }
+                InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
             };
             SendRequest(requestMessage);
         }
@@ -346,87 +346,87 @@ namespace Akka.Interfaced.Tests
 
 namespace Akka.Interfaced.Tests
 {
-    [MessageTableForInterfacedActor(typeof(IOverloaded))]
-    public static class IOverloaded__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IOverloaded))]
+    public static class IOverloaded_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IOverloaded__Min__Invoke), typeof(IOverloaded__Min__Return)},
-                {typeof(IOverloaded__Min_2__Invoke), typeof(IOverloaded__Min_2__Return)},
-                {typeof(IOverloaded__Min_3__Invoke), typeof(IOverloaded__Min_3__Return)},
+                {typeof(Min_Invoke), typeof(Min_Return)},
+                {typeof(Min_2_Invoke), typeof(Min_2_Return)},
+                {typeof(Min_3_Invoke), typeof(Min_3_Return)},
             };
         }
-    }
 
-    public class IOverloaded__Min__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 a;
-        public System.Int32 b;
-
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Min_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IOverloaded)target).Min(a, b);
-            return (IValueGetable)(new IOverloaded__Min__Return { v = __v });
+            public System.Int32 a;
+            public System.Int32 b;
+
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IOverloaded)target).Min(a, b);
+                return (IValueGetable)(new Min_Return { v = __v });
+            }
         }
-    }
 
-    public class IOverloaded__Min__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
-
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
-
-        public object Value { get { return v; } }
-    }
-
-    public class IOverloaded__Min_2__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 a;
-        public System.Int32 b;
-        public System.Int32 c;
-
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Min_Return : IInterfacedPayload, IValueGetable
         {
-            var __v = await((IOverloaded)target).Min(a, b, c);
-            return (IValueGetable)(new IOverloaded__Min_2__Return { v = __v });
+            public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    public class IOverloaded__Min_2__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
-
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
-
-        public object Value { get { return v; } }
-    }
-
-    public class IOverloaded__Min_3__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32[] nums;
-
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Min_2_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IOverloaded)target).Min(nums);
-            return (IValueGetable)(new IOverloaded__Min_3__Return { v = __v });
+            public System.Int32 a;
+            public System.Int32 b;
+            public System.Int32 c;
+
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IOverloaded)target).Min(a, b, c);
+                return (IValueGetable)(new Min_2_Return { v = __v });
+            }
         }
-    }
 
-    public class IOverloaded__Min_3__Return : IInterfacedMessage, IValueGetable
-    {
-        public System.Int32 v;
+        public class Min_2_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
 
-        public Type GetInterfaceType() { return typeof(IOverloaded); }
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
 
-        public object Value { get { return v; } }
+            public object Value { get { return v; } }
+        }
+
+        public class Min_3_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.Int32[] nums;
+
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IOverloaded)target).Min(nums);
+                return (IValueGetable)(new Min_3_Return { v = __v });
+            }
+        }
+
+        public class Min_3_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IOverloaded_NoReply
@@ -467,7 +467,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min__Invoke { a = a, b = b }
+                InvokePayload = new IOverloaded_PayloadTable.Min_Invoke { a = a, b = b }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -476,7 +476,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min_2__Invoke { a = a, b = b, c = c }
+                InvokePayload = new IOverloaded_PayloadTable.Min_2_Invoke { a = a, b = b, c = c }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -485,7 +485,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min_3__Invoke { nums = nums }
+                InvokePayload = new IOverloaded_PayloadTable.Min_3_Invoke { nums = nums }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -494,7 +494,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min__Invoke { a = a, b = b }
+                InvokePayload = new IOverloaded_PayloadTable.Min_Invoke { a = a, b = b }
             };
             SendRequest(requestMessage);
         }
@@ -503,7 +503,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min_2__Invoke { a = a, b = b, c = c }
+                InvokePayload = new IOverloaded_PayloadTable.Min_2_Invoke { a = a, b = b, c = c }
             };
             SendRequest(requestMessage);
         }
@@ -512,7 +512,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOverloaded__Min_3__Invoke { nums = nums }
+                InvokePayload = new IOverloaded_PayloadTable.Min_3_Invoke { nums = nums }
             };
             SendRequest(requestMessage);
         }
@@ -525,56 +525,56 @@ namespace Akka.Interfaced.Tests
 
 namespace Akka.Interfaced.Tests
 {
-    [MessageTableForInterfacedActor(typeof(ISubject))]
-    public static class ISubject__MessageTable
+    [PayloadTableForInterfacedActor(typeof(ISubject))]
+    public static class ISubject_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(ISubject__MakeEvent__Invoke), null},
-                {typeof(ISubject__Subscribe__Invoke), null},
-                {typeof(ISubject__Unsubscribe__Invoke), null},
+                {typeof(MakeEvent_Invoke), null},
+                {typeof(Subscribe_Invoke), null},
+                {typeof(Unsubscribe_Invoke), null},
             };
         }
-    }
 
-    public class ISubject__MakeEvent__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.String eventName;
-
-        public Type GetInterfaceType() { return typeof(ISubject); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class MakeEvent_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((ISubject)target).MakeEvent(eventName);
-            return null;
+            public System.String eventName;
+
+            public Type GetInterfaceType() { return typeof(ISubject); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((ISubject)target).MakeEvent(eventName);
+                return null;
+            }
         }
-    }
 
-    public class ISubject__Subscribe__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Akka.Interfaced.Tests.SubjectObserver observer;
-
-        public Type GetInterfaceType() { return typeof(ISubject); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Subscribe_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((ISubject)target).Subscribe(observer);
-            return null;
+            public Akka.Interfaced.Tests.SubjectObserver observer;
+
+            public Type GetInterfaceType() { return typeof(ISubject); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((ISubject)target).Subscribe(observer);
+                return null;
+            }
         }
-    }
 
-    public class ISubject__Unsubscribe__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Akka.Interfaced.Tests.SubjectObserver observer;
-
-        public Type GetInterfaceType() { return typeof(ISubject); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Unsubscribe_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((ISubject)target).Unsubscribe(observer);
-            return null;
+            public Akka.Interfaced.Tests.SubjectObserver observer;
+
+            public Type GetInterfaceType() { return typeof(ISubject); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((ISubject)target).Unsubscribe(observer);
+                return null;
+            }
         }
     }
 
@@ -616,7 +616,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISubject__MakeEvent__Invoke { eventName = eventName }
+                InvokePayload = new ISubject_PayloadTable.MakeEvent_Invoke { eventName = eventName }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -625,7 +625,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISubject__Subscribe__Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -634,7 +634,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISubject__Unsubscribe__Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -643,7 +643,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISubject__MakeEvent__Invoke { eventName = eventName }
+                InvokePayload = new ISubject_PayloadTable.MakeEvent_Invoke { eventName = eventName }
             };
             SendRequest(requestMessage);
         }
@@ -652,7 +652,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISubject__Subscribe__Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
             };
             SendRequest(requestMessage);
         }
@@ -661,7 +661,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new ISubject__Unsubscribe__Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
             };
             SendRequest(requestMessage);
         }
@@ -674,42 +674,42 @@ namespace Akka.Interfaced.Tests
 
 namespace Akka.Interfaced.Tests
 {
-    [MessageTableForInterfacedActor(typeof(IWorker))]
-    public static class IWorker__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IWorker))]
+    public static class IWorker_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IWorker__Atomic__Invoke), null},
-                {typeof(IWorker__Reentrant__Invoke), null},
+                {typeof(Atomic_Invoke), null},
+                {typeof(Reentrant_Invoke), null},
             };
         }
-    }
 
-    public class IWorker__Atomic__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 id;
-
-        public Type GetInterfaceType() { return typeof(IWorker); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Atomic_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IWorker)target).Atomic(id);
-            return null;
+            public System.Int32 id;
+
+            public Type GetInterfaceType() { return typeof(IWorker); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IWorker)target).Atomic(id);
+                return null;
+            }
         }
-    }
 
-    public class IWorker__Reentrant__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public System.Int32 id;
-
-        public Type GetInterfaceType() { return typeof(IWorker); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        public class Reentrant_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IWorker)target).Reentrant(id);
-            return null;
+            public System.Int32 id;
+
+            public Type GetInterfaceType() { return typeof(IWorker); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IWorker)target).Reentrant(id);
+                return null;
+            }
         }
     }
 
@@ -750,7 +750,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IWorker__Atomic__Invoke { id = id }
+                InvokePayload = new IWorker_PayloadTable.Atomic_Invoke { id = id }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -759,7 +759,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IWorker__Reentrant__Invoke { id = id }
+                InvokePayload = new IWorker_PayloadTable.Reentrant_Invoke { id = id }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -768,7 +768,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IWorker__Atomic__Invoke { id = id }
+                InvokePayload = new IWorker_PayloadTable.Atomic_Invoke { id = id }
             };
             SendRequest(requestMessage);
         }
@@ -777,7 +777,7 @@ namespace Akka.Interfaced.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IWorker__Reentrant__Invoke { id = id }
+                InvokePayload = new IWorker_PayloadTable.Reentrant_Invoke { id = id }
             };
             SendRequest(requestMessage);
         }

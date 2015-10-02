@@ -87,7 +87,7 @@ namespace SlimUnityChat.Program.Server
 
             // Bind an occupant actor with client session
 
-            var reply = await _clientSession.Ask<ClientSession.BindActorReplyMessage>(
+            var reply = await _clientSession.Ask<ClientSession.BindActorResponseMessage>(
                 new ClientSession.BindActorRequestMessage
                 {
                     Actor = room.Actor,

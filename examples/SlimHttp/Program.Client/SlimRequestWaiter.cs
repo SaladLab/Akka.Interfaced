@@ -145,8 +145,8 @@ namespace SlimHttp.Program.Client
             var actorRequest = new ActorRequest
             {
                 RequestId = ++_lastRequestId,
-                MessageType = requestMessage.Message.GetType().FullName,
-                MessageData = JObject.Parse(JsonConvert.SerializeObject(requestMessage.Message))
+                MessageType = requestMessage.InvokePayload.GetType().FullName,
+                MessageData = JObject.Parse(JsonConvert.SerializeObject(requestMessage.InvokePayload))
             };
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))

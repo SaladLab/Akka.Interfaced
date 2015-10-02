@@ -49,7 +49,7 @@ namespace SlimUnityChat.Program.Server
                     serialization-bindings {
                       ""Akka.Interfaced.NotificationMessage, Akka.Interfaced"" = proto
                       ""Akka.Interfaced.RequestMessage, Akka.Interfaced"" = proto
-                      ""Akka.Interfaced.ReplyMessage, Akka.Interfaced"" = proto
+                      ""Akka.Interfaced.ResponseMessage, Akka.Interfaced"" = proto
                     }
                   }
                   remote {

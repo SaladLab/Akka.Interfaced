@@ -2,10 +2,10 @@
 
 namespace Akka.Interfaced
 {
-    public class ReplyMessage
+    public class ResponseMessage
     {
         public int RequestId;
-        public IValueGetable Result;
+        public IValueGetable ReturnPayload;
         public Exception Exception;
     }
 }

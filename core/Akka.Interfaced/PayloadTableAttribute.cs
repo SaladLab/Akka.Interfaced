@@ -3,11 +3,11 @@
 namespace Akka.Interfaced
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class MessageTableForInterfacedActorAttribute : Attribute
+    public sealed class PayloadTableForInterfacedActorAttribute : Attribute
     {
         public Type Type { get; private set; }
 
-        public MessageTableForInterfacedActorAttribute(Type type)
+        public PayloadTableForInterfacedActorAttribute(Type type)
         {
             Type = type;
         }

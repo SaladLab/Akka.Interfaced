@@ -65,8 +65,8 @@ namespace SlimUnity.Program.Server
 
         protected override void OnReceive(object message)
         {
-            var replyMessage = message as ReplyMessage;
-            if (replyMessage != null)
+            var response = message as ResponseMessage;
+            if (response != null)
             {
                 var targetId = 0;
                 if (Sender == _target1)
@@ -80,11 +80,11 @@ namespace SlimUnity.Program.Server
                 {
                     _connection.Send(new Packet
                     {
-                        Type = PacketType.Reply,
+                        Type = PacketType.Response,
                         ActorId = 1,
-                        RequestId = replyMessage.RequestId,
-                        Message = replyMessage.Result,
-                        Exception = replyMessage.Exception
+                        RequestId = response.RequestId,
+                        Message = response.ReturnPayload,
+                        Exception = response.Exception
                     });
                 }
             }
@@ -117,7 +117,7 @@ namespace SlimUnity.Program.Server
                 target.Tell(new RequestMessage
                 {
                     RequestId = p.RequestId,
-                    Message = (IAsyncInvokable)p.Message
+                    InvokePayload = (IAsyncInvokable)p.Message
                 }, _self);
             }
         }

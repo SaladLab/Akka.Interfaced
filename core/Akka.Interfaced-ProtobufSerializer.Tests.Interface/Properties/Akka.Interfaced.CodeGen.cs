@@ -19,48 +19,48 @@ using System.ComponentModel;
 
 namespace Akka.Interfaced.ProtobufSerializer.Tests
 {
-    [MessageTableForInterfacedActor(typeof(IDefault))]
-    public static class IDefault__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IDefault))]
+    public static class IDefault_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IDefault__Call__Invoke), null},
-                {typeof(IDefault__CallWithDefault__Invoke), null},
+                {typeof(Call_Invoke), null},
+                {typeof(CallWithDefault_Invoke), null},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IDefault__Call__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.Int32 a;
-        [ProtoMember(2)] public System.Int32 b;
-        [ProtoMember(3)] public System.String c;
-
-        public Type GetInterfaceType() { return typeof(IDefault); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Call_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IDefault)target).Call(a, b, c);
-            return null;
+            [ProtoMember(1)] public System.Int32 a;
+            [ProtoMember(2)] public System.Int32 b;
+            [ProtoMember(3)] public System.String c;
+
+            public Type GetInterfaceType() { return typeof(IDefault); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IDefault)target).Call(a, b, c);
+                return null;
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IDefault__CallWithDefault__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1), DefaultValue(1)] public System.Int32 a = 1;
-        [ProtoMember(2), DefaultValue(2)] public System.Int32 b = 2;
-        [ProtoMember(3), DefaultValue("Test")] public System.String c = "Test";
-
-        public Type GetInterfaceType() { return typeof(IDefault); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class CallWithDefault_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IDefault)target).CallWithDefault(a, b, c);
-            return null;
+            [ProtoMember(1), DefaultValue(1)] public System.Int32 a = 1;
+            [ProtoMember(2), DefaultValue(2)] public System.Int32 b = 2;
+            [ProtoMember(3), DefaultValue("Test")] public System.String c = "Test";
+
+            public Type GetInterfaceType() { return typeof(IDefault); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IDefault)target).CallWithDefault(a, b, c);
+                return null;
+            }
         }
     }
 
@@ -113,7 +113,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IDefault__Call__Invoke { a = a, b = b, c = c }
+                InvokePayload = new IDefault_PayloadTable.Call_Invoke { a = a, b = b, c = c }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -122,7 +122,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IDefault__CallWithDefault__Invoke { a = a, b = b, c = c }
+                InvokePayload = new IDefault_PayloadTable.CallWithDefault_Invoke { a = a, b = b, c = c }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -131,7 +131,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IDefault__Call__Invoke { a = a, b = b, c = c }
+                InvokePayload = new IDefault_PayloadTable.Call_Invoke { a = a, b = b, c = c }
             };
             SendRequest(requestMessage);
         }
@@ -140,7 +140,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IDefault__CallWithDefault__Invoke { a = a, b = b, c = c }
+                InvokePayload = new IDefault_PayloadTable.CallWithDefault_Invoke { a = a, b = b, c = c }
             };
             SendRequest(requestMessage);
         }

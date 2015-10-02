@@ -34,8 +34,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IInterfacedActor.cs" />
-    <Compile Include="IInterfacedMessage.cs" />
     <Compile Include="IInterfacedObserver.cs" />
+    <Compile Include="IInterfacedPayload.cs" />
     <Compile Include="IInvokable.cs" />
     <Compile Include="ITagOverridable.cs" />
     <Compile Include="IValueGetable.cs" />

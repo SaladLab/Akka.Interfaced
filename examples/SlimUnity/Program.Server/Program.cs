@@ -22,6 +22,9 @@ namespace SlimUnity.Program.Server
 
         static void Main(string[] args)
         {
+            if (typeof(ICalculator) == null)
+                throw new InvalidProgramException();
+
             System = ActorSystem.Create("MySystem");
 
             DeadRequestProcessingActor.Install(System);
@@ -31,8 +34,6 @@ namespace SlimUnity.Program.Server
             var pedantic = System.ActorOf<PedanticActor>("pedantic");
 
             StartAsync().Wait();
-
-            // TestCalculator(actor).Wait();
 
             Console.WriteLine("Enter to quit");
             Console.ReadLine();

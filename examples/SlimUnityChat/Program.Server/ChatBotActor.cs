@@ -89,14 +89,14 @@ namespace SlimUnityChat.Program.Server
             if (m.InterfaceType == typeof(IUser))
             {
                 _user = new UserRef(m.Actor);
-                Sender.Tell(new ClientSession.BindActorReplyMessage());
+                Sender.Tell(new ClientSession.BindActorResponseMessage());
                 return;
             }
 
             if (m.InterfaceType == typeof(IOccupant))
             {
                 _occupant = new OccupantRef(m.Actor);
-                Sender.Tell(new ClientSession.BindActorReplyMessage());
+                Sender.Tell(new ClientSession.BindActorResponseMessage());
                 return;
             }
 

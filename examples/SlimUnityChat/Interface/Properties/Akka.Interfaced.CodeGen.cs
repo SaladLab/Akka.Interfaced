@@ -19,75 +19,75 @@ using System.ComponentModel;
 
 namespace SlimUnityChat.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IOccupant))]
-    public static class IOccupant__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IOccupant))]
+    public static class IOccupant_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IOccupant__Say__Invoke), null},
-                {typeof(IOccupant__GetHistory__Invoke), typeof(IOccupant__GetHistory__Return)},
-                {typeof(IOccupant__Invite__Invoke), null},
+                {typeof(Say_Invoke), null},
+                {typeof(GetHistory_Invoke), typeof(GetHistory_Return)},
+                {typeof(Invite_Invoke), null},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IOccupant__Say__Invoke : IInterfacedMessage, ITagOverridable, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String msg;
-        [ProtoMember(2)] public System.String senderUserId;
-
-        public Type GetInterfaceType() { return typeof(IOccupant); }
-
-        public void SetTag(object value) { senderUserId = (System.String)value; }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Say_Invoke : IInterfacedPayload, ITagOverridable, IAsyncInvokable
         {
-            await ((IOccupant)target).Say(msg, senderUserId);
-            return null;
+            [ProtoMember(1)] public System.String msg;
+            [ProtoMember(2)] public System.String senderUserId;
+
+            public Type GetInterfaceType() { return typeof(IOccupant); }
+
+            public void SetTag(object value) { senderUserId = (System.String)value; }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IOccupant)target).Say(msg, senderUserId);
+                return null;
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IOccupant__GetHistory__Invoke : IInterfacedMessage, ITagOverridable, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(IOccupant); }
-
-        public void SetTag(object value) { }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetHistory_Invoke : IInterfacedPayload, ITagOverridable, IAsyncInvokable
         {
-            var __v = await((IOccupant)target).GetHistory();
-            return (IValueGetable)(new IOccupant__GetHistory__Return { v = (System.Collections.Generic.List<SlimUnityChat.Interface.ChatItem>)__v });
+            public Type GetInterfaceType() { return typeof(IOccupant); }
+
+            public void SetTag(object value) { }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IOccupant)target).GetHistory();
+                return (IValueGetable)(new GetHistory_Return { v = (System.Collections.Generic.List<SlimUnityChat.Interface.ChatItem>)__v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IOccupant__GetHistory__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Collections.Generic.List<SlimUnityChat.Interface.ChatItem> v;
-
-        public Type GetInterfaceType() { return typeof(IOccupant); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IOccupant__Invite__Invoke : IInterfacedMessage, ITagOverridable, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String targetUserId;
-        [ProtoMember(2)] public System.String senderUserId;
-
-        public Type GetInterfaceType() { return typeof(IOccupant); }
-
-        public void SetTag(object value) { senderUserId = (System.String)value; }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetHistory_Return : IInterfacedPayload, IValueGetable
         {
-            await ((IOccupant)target).Invite(targetUserId, senderUserId);
-            return null;
+            [ProtoMember(1)] public System.Collections.Generic.List<SlimUnityChat.Interface.ChatItem> v;
+
+            public Type GetInterfaceType() { return typeof(IOccupant); }
+
+            public object Value { get { return v; } }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class Invite_Invoke : IInterfacedPayload, ITagOverridable, IAsyncInvokable
+        {
+            [ProtoMember(1)] public System.String targetUserId;
+            [ProtoMember(2)] public System.String senderUserId;
+
+            public Type GetInterfaceType() { return typeof(IOccupant); }
+
+            public void SetTag(object value) { senderUserId = (System.String)value; }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IOccupant)target).Invite(targetUserId, senderUserId);
+                return null;
+            }
         }
     }
 
@@ -141,7 +141,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOccupant__Say__Invoke { msg = msg, senderUserId = senderUserId }
+                InvokePayload = new IOccupant_PayloadTable.Say_Invoke { msg = msg, senderUserId = senderUserId }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -150,7 +150,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOccupant__GetHistory__Invoke {  }
+                InvokePayload = new IOccupant_PayloadTable.GetHistory_Invoke {  }
             };
             return SendRequestAndReceive<System.Collections.Generic.List<SlimUnityChat.Interface.ChatItem>>(requestMessage);
         }
@@ -159,7 +159,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOccupant__Invite__Invoke { targetUserId = targetUserId, senderUserId = senderUserId }
+                InvokePayload = new IOccupant_PayloadTable.Invite_Invoke { targetUserId = targetUserId, senderUserId = senderUserId }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -168,7 +168,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOccupant__Say__Invoke { msg = msg, senderUserId = senderUserId }
+                InvokePayload = new IOccupant_PayloadTable.Say_Invoke { msg = msg, senderUserId = senderUserId }
             };
             SendRequest(requestMessage);
         }
@@ -177,7 +177,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOccupant__GetHistory__Invoke {  }
+                InvokePayload = new IOccupant_PayloadTable.GetHistory_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -186,7 +186,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IOccupant__Invite__Invoke { targetUserId = targetUserId, senderUserId = senderUserId }
+                InvokePayload = new IOccupant_PayloadTable.Invite_Invoke { targetUserId = targetUserId, senderUserId = senderUserId }
             };
             SendRequest(requestMessage);
         }
@@ -199,55 +199,55 @@ namespace SlimUnityChat.Interface
 
 namespace SlimUnityChat.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IRoom))]
-    public static class IRoom__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IRoom))]
+    public static class IRoom_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IRoom__Enter__Invoke), typeof(IRoom__Enter__Return)},
-                {typeof(IRoom__Exit__Invoke), null},
+                {typeof(Enter_Invoke), typeof(Enter_Return)},
+                {typeof(Exit_Invoke), null},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IRoom__Enter__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String userId;
-        [ProtoMember(2)] public SlimUnityChat.Interface.RoomObserver observer;
-
-        public Type GetInterfaceType() { return typeof(IRoom); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Enter_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IRoom)target).Enter(userId, observer);
-            return (IValueGetable)(new IRoom__Enter__Return { v = __v });
+            [ProtoMember(1)] public System.String userId;
+            [ProtoMember(2)] public SlimUnityChat.Interface.RoomObserver observer;
+
+            public Type GetInterfaceType() { return typeof(IRoom); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IRoom)target).Enter(userId, observer);
+                return (IValueGetable)(new Enter_Return { v = __v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IRoom__Enter__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public SlimUnityChat.Interface.RoomInfo v;
-
-        public Type GetInterfaceType() { return typeof(IRoom); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IRoom__Exit__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String userId;
-
-        public Type GetInterfaceType() { return typeof(IRoom); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Enter_Return : IInterfacedPayload, IValueGetable
         {
-            await ((IRoom)target).Exit(userId);
-            return null;
+            [ProtoMember(1)] public SlimUnityChat.Interface.RoomInfo v;
+
+            public Type GetInterfaceType() { return typeof(IRoom); }
+
+            public object Value { get { return v; } }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class Exit_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            [ProtoMember(1)] public System.String userId;
+
+            public Type GetInterfaceType() { return typeof(IRoom); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IRoom)target).Exit(userId);
+                return null;
+            }
         }
     }
 
@@ -300,7 +300,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoom__Enter__Invoke { userId = userId, observer = (SlimUnityChat.Interface.RoomObserver)observer }
+                InvokePayload = new IRoom_PayloadTable.Enter_Invoke { userId = userId, observer = (SlimUnityChat.Interface.RoomObserver)observer }
             };
             return SendRequestAndReceive<SlimUnityChat.Interface.RoomInfo>(requestMessage);
         }
@@ -309,7 +309,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoom__Exit__Invoke { userId = userId }
+                InvokePayload = new IRoom_PayloadTable.Exit_Invoke { userId = userId }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -318,7 +318,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoom__Enter__Invoke { userId = userId, observer = (SlimUnityChat.Interface.RoomObserver)observer }
+                InvokePayload = new IRoom_PayloadTable.Enter_Invoke { userId = userId, observer = (SlimUnityChat.Interface.RoomObserver)observer }
             };
             SendRequest(requestMessage);
         }
@@ -327,7 +327,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoom__Exit__Invoke { userId = userId }
+                InvokePayload = new IRoom_PayloadTable.Exit_Invoke { userId = userId }
             };
             SendRequest(requestMessage);
         }
@@ -340,78 +340,78 @@ namespace SlimUnityChat.Interface
 
 namespace SlimUnityChat.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IRoomDirectory))]
-    public static class IRoomDirectory__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IRoomDirectory))]
+    public static class IRoomDirectory_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IRoomDirectory__GetOrCreateRoom__Invoke), typeof(IRoomDirectory__GetOrCreateRoom__Return)},
-                {typeof(IRoomDirectory__RemoveRoom__Invoke), null},
-                {typeof(IRoomDirectory__GetRoomList__Invoke), typeof(IRoomDirectory__GetRoomList__Return)},
+                {typeof(GetOrCreateRoom_Invoke), typeof(GetOrCreateRoom_Return)},
+                {typeof(RemoveRoom_Invoke), null},
+                {typeof(GetRoomList_Invoke), typeof(GetRoomList_Return)},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IRoomDirectory__GetOrCreateRoom__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String name;
-
-        public Type GetInterfaceType() { return typeof(IRoomDirectory); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetOrCreateRoom_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IRoomDirectory)target).GetOrCreateRoom(name);
-            return (IValueGetable)(new IRoomDirectory__GetOrCreateRoom__Return { v = (SlimUnityChat.Interface.RoomRef)__v });
+            [ProtoMember(1)] public System.String name;
+
+            public Type GetInterfaceType() { return typeof(IRoomDirectory); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IRoomDirectory)target).GetOrCreateRoom(name);
+                return (IValueGetable)(new GetOrCreateRoom_Return { v = (SlimUnityChat.Interface.RoomRef)__v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IRoomDirectory__GetOrCreateRoom__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public SlimUnityChat.Interface.RoomRef v;
-
-        public Type GetInterfaceType() { return typeof(IRoomDirectory); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IRoomDirectory__RemoveRoom__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String name;
-
-        public Type GetInterfaceType() { return typeof(IRoomDirectory); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetOrCreateRoom_Return : IInterfacedPayload, IValueGetable
         {
-            await ((IRoomDirectory)target).RemoveRoom(name);
-            return null;
+            [ProtoMember(1)] public SlimUnityChat.Interface.RoomRef v;
+
+            public Type GetInterfaceType() { return typeof(IRoomDirectory); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IRoomDirectory__GetRoomList__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(IRoomDirectory); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class RemoveRoom_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IRoomDirectory)target).GetRoomList();
-            return (IValueGetable)(new IRoomDirectory__GetRoomList__Return { v = (System.Collections.Generic.List<System.String>)__v });
+            [ProtoMember(1)] public System.String name;
+
+            public Type GetInterfaceType() { return typeof(IRoomDirectory); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IRoomDirectory)target).RemoveRoom(name);
+                return null;
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IRoomDirectory__GetRoomList__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Collections.Generic.List<System.String> v;
+        [ProtoContract, TypeAlias]
+        public class GetRoomList_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType() { return typeof(IRoomDirectory); }
 
-        public Type GetInterfaceType() { return typeof(IRoomDirectory); }
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IRoomDirectory)target).GetRoomList();
+                return (IValueGetable)(new GetRoomList_Return { v = (System.Collections.Generic.List<System.String>)__v });
+            }
+        }
 
-        public object Value { get { return v; } }
+        [ProtoContract, TypeAlias]
+        public class GetRoomList_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Collections.Generic.List<System.String> v;
+
+            public Type GetInterfaceType() { return typeof(IRoomDirectory); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IRoomDirectory_NoReply
@@ -464,7 +464,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoomDirectory__GetOrCreateRoom__Invoke { name = name }
+                InvokePayload = new IRoomDirectory_PayloadTable.GetOrCreateRoom_Invoke { name = name }
             };
             return SendRequestAndReceive<SlimUnityChat.Interface.IRoom>(requestMessage);
         }
@@ -473,7 +473,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoomDirectory__RemoveRoom__Invoke { name = name }
+                InvokePayload = new IRoomDirectory_PayloadTable.RemoveRoom_Invoke { name = name }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -482,7 +482,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoomDirectory__GetRoomList__Invoke {  }
+                InvokePayload = new IRoomDirectory_PayloadTable.GetRoomList_Invoke {  }
             };
             return SendRequestAndReceive<System.Collections.Generic.List<System.String>>(requestMessage);
         }
@@ -491,7 +491,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoomDirectory__GetOrCreateRoom__Invoke { name = name }
+                InvokePayload = new IRoomDirectory_PayloadTable.GetOrCreateRoom_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }
@@ -500,7 +500,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoomDirectory__RemoveRoom__Invoke { name = name }
+                InvokePayload = new IRoomDirectory_PayloadTable.RemoveRoom_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }
@@ -509,7 +509,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoomDirectory__GetRoomList__Invoke {  }
+                InvokePayload = new IRoomDirectory_PayloadTable.GetRoomList_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -522,54 +522,54 @@ namespace SlimUnityChat.Interface
 
 namespace SlimUnityChat.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IRoomDirectoryWorker))]
-    public static class IRoomDirectoryWorker__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IRoomDirectoryWorker))]
+    public static class IRoomDirectoryWorker_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IRoomDirectoryWorker__CreateRoom__Invoke), typeof(IRoomDirectoryWorker__CreateRoom__Return)},
-                {typeof(IRoomDirectoryWorker__RemoveRoom__Invoke), null},
+                {typeof(CreateRoom_Invoke), typeof(CreateRoom_Return)},
+                {typeof(RemoveRoom_Invoke), null},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IRoomDirectoryWorker__CreateRoom__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String name;
-
-        public Type GetInterfaceType() { return typeof(IRoomDirectoryWorker); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class CreateRoom_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IRoomDirectoryWorker)target).CreateRoom(name);
-            return (IValueGetable)(new IRoomDirectoryWorker__CreateRoom__Return { v = (SlimUnityChat.Interface.RoomRef)__v });
+            [ProtoMember(1)] public System.String name;
+
+            public Type GetInterfaceType() { return typeof(IRoomDirectoryWorker); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IRoomDirectoryWorker)target).CreateRoom(name);
+                return (IValueGetable)(new CreateRoom_Return { v = (SlimUnityChat.Interface.RoomRef)__v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IRoomDirectoryWorker__CreateRoom__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public SlimUnityChat.Interface.RoomRef v;
-
-        public Type GetInterfaceType() { return typeof(IRoomDirectoryWorker); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IRoomDirectoryWorker__RemoveRoom__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String name;
-
-        public Type GetInterfaceType() { return typeof(IRoomDirectoryWorker); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class CreateRoom_Return : IInterfacedPayload, IValueGetable
         {
-            await ((IRoomDirectoryWorker)target).RemoveRoom(name);
-            return null;
+            [ProtoMember(1)] public SlimUnityChat.Interface.RoomRef v;
+
+            public Type GetInterfaceType() { return typeof(IRoomDirectoryWorker); }
+
+            public object Value { get { return v; } }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class RemoveRoom_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            [ProtoMember(1)] public System.String name;
+
+            public Type GetInterfaceType() { return typeof(IRoomDirectoryWorker); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IRoomDirectoryWorker)target).RemoveRoom(name);
+                return null;
+            }
         }
     }
 
@@ -622,7 +622,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoomDirectoryWorker__CreateRoom__Invoke { name = name }
+                InvokePayload = new IRoomDirectoryWorker_PayloadTable.CreateRoom_Invoke { name = name }
             };
             return SendRequestAndReceive<SlimUnityChat.Interface.IRoom>(requestMessage);
         }
@@ -631,7 +631,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoomDirectoryWorker__RemoveRoom__Invoke { name = name }
+                InvokePayload = new IRoomDirectoryWorker_PayloadTable.RemoveRoom_Invoke { name = name }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -640,7 +640,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoomDirectoryWorker__CreateRoom__Invoke { name = name }
+                InvokePayload = new IRoomDirectoryWorker_PayloadTable.CreateRoom_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }
@@ -649,7 +649,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IRoomDirectoryWorker__RemoveRoom__Invoke { name = name }
+                InvokePayload = new IRoomDirectoryWorker_PayloadTable.RemoveRoom_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }
@@ -662,117 +662,117 @@ namespace SlimUnityChat.Interface
 
 namespace SlimUnityChat.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IUser))]
-    public static class IUser__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IUser))]
+    public static class IUser_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IUser__GetId__Invoke), typeof(IUser__GetId__Return)},
-                {typeof(IUser__GetRoomList__Invoke), typeof(IUser__GetRoomList__Return)},
-                {typeof(IUser__EnterRoom__Invoke), typeof(IUser__EnterRoom__Return)},
-                {typeof(IUser__ExitFromRoom__Invoke), null},
-                {typeof(IUser__Whisper__Invoke), null},
+                {typeof(GetId_Invoke), typeof(GetId_Return)},
+                {typeof(GetRoomList_Invoke), typeof(GetRoomList_Return)},
+                {typeof(EnterRoom_Invoke), typeof(EnterRoom_Return)},
+                {typeof(ExitFromRoom_Invoke), null},
+                {typeof(Whisper_Invoke), null},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUser__GetId__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(IUser); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetId_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IUser)target).GetId();
-            return (IValueGetable)(new IUser__GetId__Return { v = __v });
+            public Type GetInterfaceType() { return typeof(IUser); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IUser)target).GetId();
+                return (IValueGetable)(new GetId_Return { v = __v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUser__GetId__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.String v;
-
-        public Type GetInterfaceType() { return typeof(IUser); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IUser__GetRoomList__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        public Type GetInterfaceType() { return typeof(IUser); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetId_Return : IInterfacedPayload, IValueGetable
         {
-            var __v = await((IUser)target).GetRoomList();
-            return (IValueGetable)(new IUser__GetRoomList__Return { v = (System.Collections.Generic.List<System.String>)__v });
+            [ProtoMember(1)] public System.String v;
+
+            public Type GetInterfaceType() { return typeof(IUser); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUser__GetRoomList__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Collections.Generic.List<System.String> v;
-
-        public Type GetInterfaceType() { return typeof(IUser); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IUser__EnterRoom__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String name;
-        [ProtoMember(2)] public System.Int32 observerId;
-
-        public Type GetInterfaceType() { return typeof(IUser); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetRoomList_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IUser)target).EnterRoom(name, observerId);
-            return (IValueGetable)(new IUser__EnterRoom__Return { v = (System.Tuple<System.Int32, SlimUnityChat.Interface.RoomInfo>)__v });
+            public Type GetInterfaceType() { return typeof(IUser); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IUser)target).GetRoomList();
+                return (IValueGetable)(new GetRoomList_Return { v = (System.Collections.Generic.List<System.String>)__v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUser__EnterRoom__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Tuple<System.Int32, SlimUnityChat.Interface.RoomInfo> v;
-
-        public Type GetInterfaceType() { return typeof(IUser); }
-
-        public object Value { get { return v; } }
-    }
-
-    [ProtoContract, TypeAlias]
-    public class IUser__ExitFromRoom__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String name;
-
-        public Type GetInterfaceType() { return typeof(IUser); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetRoomList_Return : IInterfacedPayload, IValueGetable
         {
-            await ((IUser)target).ExitFromRoom(name);
-            return null;
+            [ProtoMember(1)] public System.Collections.Generic.List<System.String> v;
+
+            public Type GetInterfaceType() { return typeof(IUser); }
+
+            public object Value { get { return v; } }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUser__Whisper__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String targetUserId;
-        [ProtoMember(2)] public System.String message;
-
-        public Type GetInterfaceType() { return typeof(IUser); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class EnterRoom_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IUser)target).Whisper(targetUserId, message);
-            return null;
+            [ProtoMember(1)] public System.String name;
+            [ProtoMember(2)] public System.Int32 observerId;
+
+            public Type GetInterfaceType() { return typeof(IUser); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IUser)target).EnterRoom(name, observerId);
+                return (IValueGetable)(new EnterRoom_Return { v = (System.Tuple<System.Int32, SlimUnityChat.Interface.RoomInfo>)__v });
+            }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class EnterRoom_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Tuple<System.Int32, SlimUnityChat.Interface.RoomInfo> v;
+
+            public Type GetInterfaceType() { return typeof(IUser); }
+
+            public object Value { get { return v; } }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class ExitFromRoom_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            [ProtoMember(1)] public System.String name;
+
+            public Type GetInterfaceType() { return typeof(IUser); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IUser)target).ExitFromRoom(name);
+                return null;
+            }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class Whisper_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            [ProtoMember(1)] public System.String targetUserId;
+            [ProtoMember(2)] public System.String message;
+
+            public Type GetInterfaceType() { return typeof(IUser); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IUser)target).Whisper(targetUserId, message);
+                return null;
+            }
         }
     }
 
@@ -828,7 +828,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUser__GetId__Invoke {  }
+                InvokePayload = new IUser_PayloadTable.GetId_Invoke {  }
             };
             return SendRequestAndReceive<System.String>(requestMessage);
         }
@@ -837,7 +837,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUser__GetRoomList__Invoke {  }
+                InvokePayload = new IUser_PayloadTable.GetRoomList_Invoke {  }
             };
             return SendRequestAndReceive<System.Collections.Generic.List<System.String>>(requestMessage);
         }
@@ -846,7 +846,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUser__EnterRoom__Invoke { name = name, observerId = observerId }
+                InvokePayload = new IUser_PayloadTable.EnterRoom_Invoke { name = name, observerId = observerId }
             };
             return SendRequestAndReceive<System.Tuple<System.Int32, SlimUnityChat.Interface.RoomInfo>>(requestMessage);
         }
@@ -855,7 +855,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUser__ExitFromRoom__Invoke { name = name }
+                InvokePayload = new IUser_PayloadTable.ExitFromRoom_Invoke { name = name }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -864,7 +864,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUser__Whisper__Invoke { targetUserId = targetUserId, message = message }
+                InvokePayload = new IUser_PayloadTable.Whisper_Invoke { targetUserId = targetUserId, message = message }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -873,7 +873,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUser__GetId__Invoke {  }
+                InvokePayload = new IUser_PayloadTable.GetId_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -882,7 +882,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUser__GetRoomList__Invoke {  }
+                InvokePayload = new IUser_PayloadTable.GetRoomList_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -891,7 +891,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUser__EnterRoom__Invoke { name = name, observerId = observerId }
+                InvokePayload = new IUser_PayloadTable.EnterRoom_Invoke { name = name, observerId = observerId }
             };
             SendRequest(requestMessage);
         }
@@ -900,7 +900,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUser__ExitFromRoom__Invoke { name = name }
+                InvokePayload = new IUser_PayloadTable.ExitFromRoom_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }
@@ -909,7 +909,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUser__Whisper__Invoke { targetUserId = targetUserId, message = message }
+                InvokePayload = new IUser_PayloadTable.Whisper_Invoke { targetUserId = targetUserId, message = message }
             };
             SendRequest(requestMessage);
         }
@@ -922,71 +922,71 @@ namespace SlimUnityChat.Interface
 
 namespace SlimUnityChat.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IUserDirectory))]
-    public static class IUserDirectory__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IUserDirectory))]
+    public static class IUserDirectory_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IUserDirectory__RegisterUser__Invoke), null},
-                {typeof(IUserDirectory__UnregisterUser__Invoke), null},
-                {typeof(IUserDirectory__GetUser__Invoke), typeof(IUserDirectory__GetUser__Return)},
+                {typeof(RegisterUser_Invoke), null},
+                {typeof(UnregisterUser_Invoke), null},
+                {typeof(GetUser_Invoke), typeof(GetUser_Return)},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUserDirectory__RegisterUser__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String userId;
-        [ProtoMember(2)] public SlimUnityChat.Interface.UserRef user;
-
-        public Type GetInterfaceType() { return typeof(IUserDirectory); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class RegisterUser_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IUserDirectory)target).RegisterUser(userId, user);
-            return null;
+            [ProtoMember(1)] public System.String userId;
+            [ProtoMember(2)] public SlimUnityChat.Interface.UserRef user;
+
+            public Type GetInterfaceType() { return typeof(IUserDirectory); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IUserDirectory)target).RegisterUser(userId, user);
+                return null;
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUserDirectory__UnregisterUser__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String userId;
-
-        public Type GetInterfaceType() { return typeof(IUserDirectory); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class UnregisterUser_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IUserDirectory)target).UnregisterUser(userId);
-            return null;
+            [ProtoMember(1)] public System.String userId;
+
+            public Type GetInterfaceType() { return typeof(IUserDirectory); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IUserDirectory)target).UnregisterUser(userId);
+                return null;
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUserDirectory__GetUser__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String userId;
-
-        public Type GetInterfaceType() { return typeof(IUserDirectory); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class GetUser_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IUserDirectory)target).GetUser(userId);
-            return (IValueGetable)(new IUserDirectory__GetUser__Return { v = (SlimUnityChat.Interface.UserRef)__v });
+            [ProtoMember(1)] public System.String userId;
+
+            public Type GetInterfaceType() { return typeof(IUserDirectory); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IUserDirectory)target).GetUser(userId);
+                return (IValueGetable)(new GetUser_Return { v = (SlimUnityChat.Interface.UserRef)__v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUserDirectory__GetUser__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public SlimUnityChat.Interface.UserRef v;
+        [ProtoContract, TypeAlias]
+        public class GetUser_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public SlimUnityChat.Interface.UserRef v;
 
-        public Type GetInterfaceType() { return typeof(IUserDirectory); }
+            public Type GetInterfaceType() { return typeof(IUserDirectory); }
 
-        public object Value { get { return v; } }
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IUserDirectory_NoReply
@@ -1039,7 +1039,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserDirectory__RegisterUser__Invoke { userId = userId, user = (SlimUnityChat.Interface.UserRef)user }
+                InvokePayload = new IUserDirectory_PayloadTable.RegisterUser_Invoke { userId = userId, user = (SlimUnityChat.Interface.UserRef)user }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -1048,7 +1048,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserDirectory__UnregisterUser__Invoke { userId = userId }
+                InvokePayload = new IUserDirectory_PayloadTable.UnregisterUser_Invoke { userId = userId }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -1057,7 +1057,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserDirectory__GetUser__Invoke { userId = userId }
+                InvokePayload = new IUserDirectory_PayloadTable.GetUser_Invoke { userId = userId }
             };
             return SendRequestAndReceive<SlimUnityChat.Interface.IUser>(requestMessage);
         }
@@ -1066,7 +1066,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserDirectory__RegisterUser__Invoke { userId = userId, user = (SlimUnityChat.Interface.UserRef)user }
+                InvokePayload = new IUserDirectory_PayloadTable.RegisterUser_Invoke { userId = userId, user = (SlimUnityChat.Interface.UserRef)user }
             };
             SendRequest(requestMessage);
         }
@@ -1075,7 +1075,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserDirectory__UnregisterUser__Invoke { userId = userId }
+                InvokePayload = new IUserDirectory_PayloadTable.UnregisterUser_Invoke { userId = userId }
             };
             SendRequest(requestMessage);
         }
@@ -1084,7 +1084,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserDirectory__GetUser__Invoke { userId = userId }
+                InvokePayload = new IUserDirectory_PayloadTable.GetUser_Invoke { userId = userId }
             };
             SendRequest(requestMessage);
         }
@@ -1097,42 +1097,42 @@ namespace SlimUnityChat.Interface
 
 namespace SlimUnityChat.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IUserLogin))]
-    public static class IUserLogin__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IUserLogin))]
+    public static class IUserLogin_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IUserLogin__Login__Invoke), typeof(IUserLogin__Login__Return)},
+                {typeof(Login_Invoke), typeof(Login_Return)},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUserLogin__Login__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String id;
-        [ProtoMember(2)] public System.String password;
-        [ProtoMember(3)] public System.Int32 observerId;
-
-        public Type GetInterfaceType() { return typeof(IUserLogin); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Login_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            var __v = await((IUserLogin)target).Login(id, password, observerId);
-            return (IValueGetable)(new IUserLogin__Login__Return { v = __v });
+            [ProtoMember(1)] public System.String id;
+            [ProtoMember(2)] public System.String password;
+            [ProtoMember(3)] public System.Int32 observerId;
+
+            public Type GetInterfaceType() { return typeof(IUserLogin); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IUserLogin)target).Login(id, password, observerId);
+                return (IValueGetable)(new Login_Return { v = __v });
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUserLogin__Login__Return : IInterfacedMessage, IValueGetable
-    {
-        [ProtoMember(1)] public System.Int32 v;
+        [ProtoContract, TypeAlias]
+        public class Login_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Int32 v;
 
-        public Type GetInterfaceType() { return typeof(IUserLogin); }
+            public Type GetInterfaceType() { return typeof(IUserLogin); }
 
-        public object Value { get { return v; } }
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IUserLogin_NoReply
@@ -1183,7 +1183,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserLogin__Login__Invoke { id = id, password = password, observerId = observerId }
+                InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observerId = observerId }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -1192,7 +1192,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserLogin__Login__Invoke { id = id, password = password, observerId = observerId }
+                InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observerId = observerId }
             };
             SendRequest(requestMessage);
         }
@@ -1205,45 +1205,45 @@ namespace SlimUnityChat.Interface
 
 namespace SlimUnityChat.Interface
 {
-    [MessageTableForInterfacedActor(typeof(IUserMessasing))]
-    public static class IUserMessasing__MessageTable
+    [PayloadTableForInterfacedActor(typeof(IUserMessasing))]
+    public static class IUserMessasing_PayloadTable
     {
-        public static Type[,] GetMessageTypes()
+        public static Type[,] GetPayloadTypes()
         {
             return new Type[,]
             {
-                {typeof(IUserMessasing__Whisper__Invoke), null},
-                {typeof(IUserMessasing__Invite__Invoke), null},
+                {typeof(Whisper_Invoke), null},
+                {typeof(Invite_Invoke), null},
             };
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUserMessasing__Whisper__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public SlimUnityChat.Interface.ChatItem chatItem;
-
-        public Type GetInterfaceType() { return typeof(IUserMessasing); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Whisper_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IUserMessasing)target).Whisper(chatItem);
-            return null;
+            [ProtoMember(1)] public SlimUnityChat.Interface.ChatItem chatItem;
+
+            public Type GetInterfaceType() { return typeof(IUserMessasing); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IUserMessasing)target).Whisper(chatItem);
+                return null;
+            }
         }
-    }
 
-    [ProtoContract, TypeAlias]
-    public class IUserMessasing__Invite__Invoke : IInterfacedMessage, IAsyncInvokable
-    {
-        [ProtoMember(1)] public System.String invitorUserId;
-        [ProtoMember(2)] public System.String roomName;
-
-        public Type GetInterfaceType() { return typeof(IUserMessasing); }
-
-        public async Task<IValueGetable> Invoke(object target)
+        [ProtoContract, TypeAlias]
+        public class Invite_Invoke : IInterfacedPayload, IAsyncInvokable
         {
-            await ((IUserMessasing)target).Invite(invitorUserId, roomName);
-            return null;
+            [ProtoMember(1)] public System.String invitorUserId;
+            [ProtoMember(2)] public System.String roomName;
+
+            public Type GetInterfaceType() { return typeof(IUserMessasing); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IUserMessasing)target).Invite(invitorUserId, roomName);
+                return null;
+            }
         }
     }
 
@@ -1296,7 +1296,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserMessasing__Whisper__Invoke { chatItem = chatItem }
+                InvokePayload = new IUserMessasing_PayloadTable.Whisper_Invoke { chatItem = chatItem }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -1305,7 +1305,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserMessasing__Invite__Invoke { invitorUserId = invitorUserId, roomName = roomName }
+                InvokePayload = new IUserMessasing_PayloadTable.Invite_Invoke { invitorUserId = invitorUserId, roomName = roomName }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -1314,7 +1314,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserMessasing__Whisper__Invoke { chatItem = chatItem }
+                InvokePayload = new IUserMessasing_PayloadTable.Whisper_Invoke { chatItem = chatItem }
             };
             SendRequest(requestMessage);
         }
@@ -1323,7 +1323,7 @@ namespace SlimUnityChat.Interface
         {
             var requestMessage = new RequestMessage
             {
-                Message = new IUserMessasing__Invite__Invoke { invitorUserId = invitorUserId, roomName = roomName }
+                InvokePayload = new IUserMessasing_PayloadTable.Invite_Invoke { invitorUserId = invitorUserId, roomName = roomName }
             };
             SendRequest(requestMessage);
         }
