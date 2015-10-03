@@ -58,65 +58,68 @@ namespace SlimUnityChat.Program.Server
             bool inclusive = false)
             where T : InterfacedActor<T>
         {
+            return null;
+            /*
 
-            var hasLogAttribute = method.CustomAttributes.Any(x => x.AttributeType == typeof(LogAttribute));
-            if (hasLogAttribute || inclusive)
-            {
-                var methodShortName = method.Name.Split('.').Last();
-                return async delegate (T self, RequestMessage requestMessage)
+                var hasLogAttribute = method.CustomAttributes.Any(x => x.AttributeType == typeof(LogAttribute));
+                if (hasLogAttribute || inclusive)
                 {
-                    ILog log = null;
-                    try
+                    var methodShortName = method.Name.Split('.').Last();
+                    return async delegate (T self, RequestMessage requestMessage)
                     {
-                        log = logHandler(self);
-                        var requestName = requestMessage.InvokePayload.GetType().Name;
-                        var requestJson = JsonConvert.SerializeObject(requestMessage.InvokePayload, _settings);
-                        log.TraceFormat(
-                            "#{0} -> {1} {2}",
-                            requestMessage.RequestId, methodShortName, requestJson);
-                    }
-                    catch (Exception e)
-                    {
-                        if (log != null)
-                            log.FatalFormat("LogHandler got an exception in intro of {0}", e, methodShortName);
-                        return null;
-                    }
-
-                    var watch = new Stopwatch();
-                    var ret = await handler(self, requestMessage);
-                    var elapsed = watch.ElapsedMilliseconds;
-
-                    if (log != null)
-                    {
+                        ILog log = null;
                         try
                         {
-                            if (ret != null)
-                            {
-                                var replyJson = JsonConvert.SerializeObject(ret.Value, _settings);
-                                log.TraceFormat(
-                                    "#{0} <- {1} {2} ({3}ms)",
-                                    requestMessage.RequestId, methodShortName, replyJson, elapsed);
-                            }
-                            else
-                            {
-                                log.TraceFormat(
-                                    "#{0} <- {1} ({2}ms)",
-                                    requestMessage.RequestId, methodShortName, elapsed);
-                            }
+                            log = logHandler(self);
+                            var requestName = requestMessage.InvokePayload.GetType().Name;
+                            var requestJson = JsonConvert.SerializeObject(requestMessage.InvokePayload, _settings);
+                            log.TraceFormat(
+                                "#{0} -> {1} {2}",
+                                requestMessage.RequestId, methodShortName, requestJson);
                         }
                         catch (Exception e)
                         {
                             if (log != null)
-                                log.FatalFormat("LogHandler got an exception in outro of {0}", e, methodShortName);
+                                log.FatalFormat("LogHandler got an exception in intro of {0}", e, methodShortName);
+                            return null;
                         }
-                    }
-                    return ret;
-                };
-            }
-            else
-            {
-                return handler;
+
+                        var watch = new Stopwatch();
+                        var ret = await handler(self, requestMessage);
+                        var elapsed = watch.ElapsedMilliseconds;
+
+                        if (log != null)
+                        {
+                            try
+                            {
+                                if (ret != null)
+                                {
+                                    var replyJson = JsonConvert.SerializeObject(ret.Value, _settings);
+                                    log.TraceFormat(
+                                        "#{0} <- {1} {2} ({3}ms)",
+                                        requestMessage.RequestId, methodShortName, replyJson, elapsed);
+                                }
+                                else
+                                {
+                                    log.TraceFormat(
+                                        "#{0} <- {1} ({2}ms)",
+                                        requestMessage.RequestId, methodShortName, elapsed);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                if (log != null)
+                                    log.FatalFormat("LogHandler got an exception in outro of {0}", e, methodShortName);
+                            }
+                        }
+                        return ret;
+                    };
+                }
+                else
+                {
+                    return handler;
+                }
+            */
             }
         }
     }
-}

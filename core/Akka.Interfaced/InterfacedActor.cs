@@ -11,8 +11,8 @@ namespace Akka.Interfaced
     public abstract class InterfacedActor<T> : UntypedActor, IWithUnboundedStash, IRequestWaiter
         where T : InterfacedActor<T>
     {
-        private static MessageDispatcher<T> MessageDispatcher = new MessageDispatcher<T>();
         private static RequestDispatcher<T> RequestDispatcher = new RequestDispatcher<T>();
+        private static MessageDispatcher<T> MessageDispatcher = new MessageDispatcher<T>();
 
         // Stash for stashing incoming messages while atomic handler is running
         public IStash Stash { get; set; }
@@ -80,18 +80,36 @@ namespace Akka.Interfaced
                     return;
                 }
 
-                var context = new MessageHandleContext { Self = Self, Sender = Sender };
-                if (handler.IsReentrant == false)
+                if (handler.Handler != null)
                 {
-                    BecomeStacked(OnReceiveInAtomicTask);
-                    _currentAtomicContext = context;
-                }
+                    // sync handle
 
-                using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
+                    var response = handler.Handler((T)this, requestMessage, null);
+                    if (requestMessage.RequestId != 0)
+                        sender.Tell(response);
+                }
+                else
                 {
-                    handler.Handler((T)this, requestMessage)
-                           .ContinueWith(t => OnTaskCompleted(t, Sender, requestMessage, handler),
-                                         TaskContinuationOptions.ExecuteSynchronously);
+                    // async handle
+
+                    var context = new MessageHandleContext { Self = Self, Sender = Sender };
+                    if (handler.IsReentrant == false)
+                    {
+                        BecomeStacked(OnReceiveInAtomicTask);
+                        _currentAtomicContext = context;
+                    }
+
+                    using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
+                    {
+                        var requestId = requestMessage.RequestId;
+                        var IsReentrant = handler.IsReentrant;
+                        handler.AsyncHandler((T)this, requestMessage, response =>
+                        {
+                            if (requestId != 0)
+                                sender.Tell(response);
+                            OnTaskCompleted(IsReentrant);
+                        });
+                    }
                 }
                 return;
             }
@@ -216,44 +234,6 @@ namespace Akka.Interfaced
             }
 
             Stash.Stash();
-        }
-
-        private void OnTaskCompleted(Task<IValueGetable> t, IActorRef sender, RequestMessage requestMessage,
-                                     RequestDispatcher<T>.RequestHandlerInfo info)
-        {
-            try
-            {
-                if (requestMessage != null && requestMessage.RequestId != 0)
-                {
-                    if (t.IsFaulted)
-                        sender.Tell(new ResponseMessage
-                        {
-                            RequestId = requestMessage.RequestId,
-                            Exception = t.Exception.Flatten().InnerExceptions.FirstOrDefault() ??
-                                        t.Exception
-                        });
-                    else if (t.IsCanceled)
-                        sender.Tell(new ResponseMessage
-                        {
-                            RequestId = requestMessage.RequestId,
-                            Exception = new TaskCanceledException()
-                        });
-                    else
-                        sender.Tell(new ResponseMessage { RequestId = requestMessage.RequestId, ReturnPayload = t.Result });
-                }
-
-                if (info.IsReentrant == false)
-                {
-                    _currentAtomicContext = null;
-                    UnbecomeStacked();
-                    Stash.UnstashAll();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("!!! ERROR in OnTaskCompleted !!!");
-                Console.WriteLine(e);
-            }
         }
 
         private void OnTaskCompleted(bool isReentrant, bool stopOnCompleted = false)

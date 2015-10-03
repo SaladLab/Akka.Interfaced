@@ -21,6 +21,7 @@ namespace Basic.Program
     {
         private int _counter;
 
+        /*
         protected static RequestHandler<TestActor> OnBuildHandler(
             RequestHandler<TestActor> handler, MethodInfo method)
         {
@@ -47,6 +48,7 @@ namespace Basic.Program
                 return handler;
             }
         }
+        */
 
         [Log]
         Task<string> ICalculator.Concat(string a, string b)

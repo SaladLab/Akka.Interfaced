@@ -36,7 +36,7 @@ namespace Basic.Program
                 TestCounter(actor).Wait();
                 TestCounter(actorAnother).Wait();
             }
-            
+
             if (true)
             {
                 TestProxyCounter().Wait();
@@ -50,6 +50,11 @@ namespace Basic.Program
             if (true)
             {
                 TestException().Wait();
+            }
+
+            if (true)
+            {
+                TestExtendedInterface().Wait();
             }
 
             if (true)
@@ -167,6 +172,18 @@ namespace Basic.Program
             {
                 Console.WriteLine("! " + e);
             }
+        }
+
+        static async Task TestExtendedInterface()
+        {
+            Console.WriteLine("***** TestExtendedInterface *****");
+
+            var actor = System.ActorOf<TestExtendedActor>();
+            var c = new CounterRef(actor);
+            c.WithNoReply().IncCounter(1);
+            c.WithNoReply().IncCounter(2);
+            c.WithNoReply().IncCounter(3);
+            Console.WriteLine(await c.GetCounter());
         }
 
         public class RawEventObserver : IEventObserver

@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.Win32;
 
 namespace Akka.Interfaced
 {
-    public delegate Task<IValueGetable> RequestHandler<in T>(T self, RequestMessage requestMessage);
-
     public class RequestDispatcher<T> where T : class
     {
         public class RequestHandlerInfo
@@ -17,6 +12,7 @@ namespace Akka.Interfaced
             public Type InterfaceType;
             public bool IsReentrant;
             public RequestHandler<T> Handler;
+            public RequestAsyncHandler<T> AsyncHandler;
         }
         private Dictionary<Type, RequestHandlerInfo> _handlerTable;
 
@@ -24,15 +20,18 @@ namespace Akka.Interfaced
         {
             BuildTable();
         }
-
+            
         private void BuildTable()
         {
             _handlerTable = new Dictionary<Type, RequestHandlerInfo>();
 
-            var type = typeof(T);
-            var handlerBuilder = type.GetMethod("OnBuildHandler", BindingFlags.Static | BindingFlags.NonPublic);
+            BuildRegularInterfaceHandler();
+            BuildExtendedInterfaceHandler();
+        }
 
-            // Regular interface handler
+        private void BuildRegularInterfaceHandler()
+        {
+            var type = typeof(T);
 
             foreach (var ifs in type.GetInterfaces())
             {
@@ -40,55 +39,62 @@ namespace Akka.Interfaced
                     continue;
 
                 var interfaceMap = type.GetInterfaceMap(ifs);
-                var messageTable = GetInterfacePayloadTypeTable(ifs);
+                var payloadTypeTable = GetInterfacePayloadTypeTable(ifs);
 
                 for (var i = 0; i < interfaceMap.InterfaceMethods.Length; i++)
                 {
                     var targetMethod = interfaceMap.TargetMethods[i];
-                    var invokeMessageType = messageTable[i, 0];
+                    var invokePayloadType = payloadTypeTable[i, 0];
+                    var returnPayloadType = payloadTypeTable[i, 1];
 
                     var isReentrant = targetMethod.CustomAttributes
                                                   .Any(x => x.AttributeType == typeof(ReentrantAttribute));
-                    RequestHandler<T> handler = (self, requestMessage) => requestMessage.InvokePayload.Invoke(self);
+                    var preHandleFilters = new List<IFilter>();
+                    var postHandleFilters = new List<IFilter>();
 
-                    if (handlerBuilder != null)
-                    {
-                        handler = (RequestHandler<T>)handlerBuilder.Invoke(null, new object[] { handler, targetMethod });
-                    }
+                    var asyncHandler = RequestHandlerBuilder.BuildAsyncHandler<T>(
+                        invokePayloadType, returnPayloadType, targetMethod,
+                        preHandleFilters, postHandleFilters);
 
-                    _handlerTable[invokeMessageType] = new RequestHandlerInfo
+                    _handlerTable[invokePayloadType] = new RequestHandlerInfo
                     {
                         InterfaceType = ifs,
                         IsReentrant = isReentrant,
-                        Handler = handler
+                        AsyncHandler = asyncHandler
                     };
                 }
             }
+        }
 
-            // Extended interface handler
+        private void BuildExtendedInterfaceHandler()
+        {
+            var type = typeof(T);
 
             var targetMethods =
                 type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
                     .Where(m => m.GetCustomAttribute<ExtendedHandlerAttribute>() != null)
                     .Select(m => Tuple.Create(m, m.GetCustomAttribute<ExtendedHandlerAttribute>()))
                     .ToList();
+
             var extendedInterfaces =
                 type.GetInterfaces()
                     .Where(t => t.FullName.StartsWith("Akka.Interfaced.IExtendedInterface"))
                     .SelectMany(t => t.GenericTypeArguments);
+
             foreach (var ifs in extendedInterfaces)
             {
-                var messageTable = GetInterfacePayloadTypeTable(ifs);
+                var payloadTypeTable = GetInterfacePayloadTypeTable(ifs);
                 var interfaceMethods = ifs.GetMethods();
 
                 for (var i = 0; i < interfaceMethods.Length; i++)
                 {
                     var interfaceMethod = interfaceMethods[i];
-                    var invokeMessageType = messageTable[i, 0];
+                    var invokePayloadType = payloadTypeTable[i, 0];
+                    var returnPayloadType = payloadTypeTable[i, 1];
                     var name = interfaceMethod.Name;
                     var parameters = interfaceMethod.GetParameters();
 
-                    // find method which can handle this invoke message
+                    // find a method which can handle this invoke payload
 
                     MethodInfo targetMethod = null;
                     foreach (var method in targetMethods)
@@ -112,34 +118,48 @@ namespace Akka.Interfaced
                     }
                     targetMethods.RemoveAll(x => x.Item1 == targetMethod);
 
-                    // create handler
+                    // build handler
 
                     var isReentrant = targetMethod.CustomAttributes
-                                                     .Any(x => x.AttributeType == typeof(ReentrantAttribute));
+                                                  .Any(x => x.AttributeType == typeof(ReentrantAttribute));
 
                     var isTask = targetMethod.ReturnType.Name.StartsWith("Task");
-                    var invokeDelegate =
-                        isTask
-                            ? DelegateBuilderHandlerExtendedTask.Build<T>(
-                                messageTable[i, 0], messageTable[i, 1], targetMethod)
-                            : DelegateBuilderHandlerExtendedFunc.Build<T>(
-                                messageTable[i, 0], messageTable[i, 1], targetMethod);
-                    RequestHandler<T> handler =
-                        (self, requestMessage) => invokeDelegate(self, requestMessage.InvokePayload);
-
-                    if (handlerBuilder != null)
+                    // TODO: async filter & sync handler
+                    if (isTask)
                     {
-                        handler = (RequestHandler<T>)handlerBuilder.Invoke(null, new object[] { handler, targetMethod });
+                        var preHandleFilters = new List<IFilter>();
+                        var postHandleFilters = new List<IFilter>();
+
+                        var asyncHandler = RequestHandlerBuilder.BuildAsyncHandler<T>(
+                            invokePayloadType, returnPayloadType, targetMethod,
+                            preHandleFilters, postHandleFilters);
+
+                        _handlerTable[invokePayloadType] = new RequestHandlerInfo
+                        {
+                            InterfaceType = ifs,
+                            IsReentrant = isReentrant,
+                            AsyncHandler = asyncHandler
+                        };
                     }
-
-                    _handlerTable[invokeMessageType] = new RequestHandlerInfo
+                    else
                     {
-                        InterfaceType = ifs,
-                        IsReentrant = isReentrant,
-                        Handler = handler
-                    };
+                        var preHandleFilters = new List<IPreHandleFilter>();
+                        var postHandleFilters = new List<IPostHandleFilter>();
+
+                        var handler = RequestHandlerBuilder.BuildHandler<T>(
+                            invokePayloadType, returnPayloadType, targetMethod,
+                            preHandleFilters, postHandleFilters);
+
+                        _handlerTable[invokePayloadType] = new RequestHandlerInfo
+                        {
+                            InterfaceType = ifs,
+                            IsReentrant = isReentrant,
+                            Handler = handler
+                        };
+                    }
                 }
             }
+
             if (targetMethods.Any())
             {
                 throw new InvalidOperationException(
