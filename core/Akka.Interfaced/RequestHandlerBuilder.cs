@@ -143,7 +143,7 @@ namespace Akka.Interfaced
                                 var preAsyncFilter = filter as IPreHandleAsyncFilter;
                                 if (preAsyncFilter != null)
                                 {
-                                    await preAsyncFilter.OnPreHandle(context);
+                                    await preAsyncFilter.OnPreHandleAsync(context);
                                 }
                             }
 
@@ -207,7 +207,7 @@ namespace Akka.Interfaced
                                 var postAsyncFilter = filter as IPostHandleAsyncFilter;
                                 if (postAsyncFilter != null)
                                 {
-                                    await postAsyncFilter.OnPostHandle(context);
+                                    await postAsyncFilter.OnPostHandleAsync(context);
                                 }
                             }
                         }

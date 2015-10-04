@@ -212,8 +212,8 @@ namespace Akka.Interfaced
             var preHandleFilters = new List<IFilter>();
             var postHandleFilters = new List<IFilter>();
 
-            foreach (var filterFactory in type.GetCustomAttributes().OfType<IFilterFactory>().Concat(
-                                          method.GetCustomAttributes().OfType<IFilterFactory>()))
+            foreach (var filterFactory in type.GetCustomAttributes().OfType<IFilterPerClassMethodFactory>().Concat(
+                                          method.GetCustomAttributes().OfType<IFilterPerClassMethodFactory>()))
             {
                 var filter = filterFactory.CreateInstance(typeof(T), method);
 

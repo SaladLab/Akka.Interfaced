@@ -23,7 +23,7 @@ namespace Akka.Interfaced
 
     public interface IPreHandleAsyncFilter : IFilter
     {
-        Task OnPreHandle(PreHandleFilterContext context);
+        Task OnPreHandleAsync(PreHandleFilterContext context);
     }
 
     public class PostHandleFilterContext
@@ -40,43 +40,6 @@ namespace Akka.Interfaced
 
     public interface IPostHandleAsyncFilter : IFilter
     {
-        Task OnPostHandle(PostHandleFilterContext context);
+        Task OnPostHandleAsync(PostHandleFilterContext context);
     }
-
-    public interface IFilterFactory
-    {
-        IFilter CreateInstance(Type actorType, MethodInfo method);
-    }
-
-    // TODO: Which one is better to support lifetime scope of filter ? 
-
-    /*
-    public interface IFilterPerInstanceFactory
-    {
-        IFilter CreateInstance(Type actorType, object self);
-    }
-
-    public interface IFilterPerInvokeFactory
-    {
-        IFilter CreateInstance(Type actorType, object self, RequestMessage request);
-    }
-
-    public enum FilterLifetimeScope
-    {
-        PerClass = 0,
-        PerInstance = 1,
-        PerInvoke = 2
-    }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class FilterLifetimeScopeAttribute : Attribute
-    {
-        public FilterLifetimeScope Scope { get;}
-
-        public FilterLifetimeScopeAttribute(FilterLifetimeScope scope)
-        {
-            Scope = scope;
-        }
-    }
-    */
 }

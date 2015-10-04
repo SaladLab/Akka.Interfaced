@@ -50,6 +50,7 @@
     <Compile Include="ExtendedHandlerAttribute.cs" />
     <Compile Include="IAsyncInvokable.cs" />
     <Compile Include="IFilter.cs" />
+    <Compile Include="IFilterFactory.cs" />
     <Compile Include="INotificationChannel.cs" />
     <Compile Include="IExtendedInterface.cs" />
     <Compile Include="InterfacedObserver.cs" />

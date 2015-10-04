@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Akka.Interfaced;
 using Newtonsoft.Json;
 using Common.Logging;
 using System.Collections.Generic;
-using Newtonsoft.Json.Converters;
 
 namespace SlimUnityChat.Program.Server
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class LogAttribute : Attribute, IFilterFactory
+    public sealed class LogAttribute : Attribute, IFilterPerClassMethodFactory
     {
-        IFilter IFilterFactory.CreateInstance(Type actorType, MethodInfo method)
+        IFilter IFilterPerClassMethodFactory.CreateInstance(Type actorType, MethodInfo method)
         {
             return new LogFilter(actorType, method);
         }

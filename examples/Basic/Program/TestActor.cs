@@ -12,52 +12,6 @@ using Basic.Interface;
 
 namespace Basic.Program
 {
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class LogAttribute : Attribute, IFilterFactory, IPreHandleFilter, IPostHandleFilter
-    {
-        int IFilter.Order
-        {
-            get
-            {
-                return 0;
-            }
-        }
-
-        IFilter IFilterFactory.CreateInstance(Type actorType, MethodInfo method)
-        {
-            return this;
-        }
-
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
-        {
-            var requestName = context.Request.InvokePayload.GetType().Name;
-            var requestJson = JsonConvert.SerializeObject(context.Request.InvokePayload, Formatting.None);
-            Console.WriteLine("* Invoke: {0} #{1} <{2}>",
-                              requestName, context.Request.RequestId, requestJson);
-        }
-
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
-        {
-            var requestName = context.Request.InvokePayload.GetType().Name;
-            if (context.Response.Exception != null)
-            {
-                Console.WriteLine("* Return: {0} #{1} Exception: {2}", 
-                                  requestName, context.Request.RequestId, context.Response.Exception);
-            }
-            else if (context.Response.ReturnPayload != null)
-            {
-                var returnJson = JsonConvert.SerializeObject(context.Response.ReturnPayload, Formatting.None);
-                Console.WriteLine("* Return: {0} #{1} <{2}>",
-                                  requestName, context.Request.RequestId, returnJson);
-            }
-            else
-            {
-                Console.WriteLine("* Return: {0} #{1} <void>",
-                                  requestName, context.Request.RequestId);
-            }
-        }
-    }
-
     public class TestActor : InterfacedActor<TestActor>, ICalculator, ICounter, IWorker
     {
         private int _counter;
