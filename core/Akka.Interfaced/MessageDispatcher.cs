@@ -13,7 +13,7 @@ namespace Akka.Interfaced
         public class MessageHandlerInfo
         {
             public bool IsReentrant;
-            public bool IsTask;
+            public bool IsAsync;
             public MessageHandler<T> Handler;
         }
         private Dictionary<Type, MessageHandlerInfo> _handlerTable;
@@ -29,9 +29,6 @@ namespace Akka.Interfaced
 
             var type = typeof(T);
 
-            // TODO: BuildHandler ?
-            // var handlerBuilder = type.GetMethod("OnBuildHandler", BindingFlags.Static | BindingFlags.NonPublic);
-
             var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (var method in methods)
             {
@@ -40,17 +37,17 @@ namespace Akka.Interfaced
                     continue;
 
                 var messageType = attr.Type ?? method.GetParameters()[0].ParameterType;
-                var isTask = (method.ReturnType.Name.StartsWith("Task"));
+                var isAsyncMethod = (method.ReturnType.Name.StartsWith("Task"));
                 var isReentrant = method.CustomAttributes.Any(x => x.AttributeType == typeof(ReentrantAttribute));
 
-                var handler = isTask
+                var handler = isAsyncMethod
                                   ? DelegateBuilderSimpleTask.Build<T>(method)
                                   : DelegateBuilderSimpleFunc.Build<T>(method);
 
                 var info = new MessageHandlerInfo
                 {
                     IsReentrant = isReentrant,
-                    IsTask = isTask,
+                    IsAsync = isAsyncMethod,
                     Handler = (MessageHandler<T>)handler
                 };
                 _handlerTable.Add(messageType, info);

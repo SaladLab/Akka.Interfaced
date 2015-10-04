@@ -78,13 +78,18 @@ namespace Akka.Interfaced
             var parameterVars = method.GetParameters().Select(p => Expression.Field(invoke, p.Name)).ToArray();
             var returnValue = Expression.Variable(typeof(TReturn), "returnValue");
             var returnPayload = Expression.Variable(typeof(TReturnPayload), "returnPayload");
+            var returnPayloadValueType = typeof(TReturnPayload).GetField("v").FieldType;
 
             var body = Expression.Block(
                 new[] { invoke, returnValue, returnPayload },
                 Expression.Assign(invoke, Expression.Convert(invokePayload, typeof(TInvokePayload))),
                 Expression.Assign(returnValue, Expression.Call(instance, method, parameterVars)),
                 Expression.Assign(returnPayload, Expression.New(typeof(TReturnPayload).GetConstructor(Type.EmptyTypes))),
-                Expression.Assign(Expression.Field(returnPayload, "v"), returnValue),
+                Expression.Assign(
+                    Expression.Field(returnPayload, "v"),
+                    returnPayloadValueType != typeof(TReturn)
+                        ? Expression.Convert(returnValue, returnPayloadValueType)
+                        : (Expression)returnValue),
                 returnPayload);
 
             return (Func<TTarget, object, IValueGetable>)Expression.Lambda(body, instance, invokePayload).Compile();
@@ -173,12 +178,17 @@ namespace Akka.Interfaced
             var taskVar = Expression.Variable(typeof(Task<TReturn>), "task");
             var returnValue = Expression.Variable(typeof(TReturn), "returnValue");
             var returnPayload = Expression.Variable(typeof(TReturnPayload), "returnPayload");
+            var returnPayloadValueType = typeof(TReturnPayload).GetField("v").FieldType;
 
             var returnWrapper = (Func<TReturn, IValueGetable>)Expression.Lambda(
                 Expression.Block(
                     new[] { returnPayload },
                     Expression.Assign(returnPayload, Expression.New(typeof(TReturnPayload).GetConstructor(Type.EmptyTypes))),
-                    Expression.Assign(Expression.Field(returnPayload, "v"), returnValue),
+                    Expression.Assign(
+                        Expression.Field(returnPayload, "v"),
+                        returnPayloadValueType != typeof(TReturn) 
+                            ? Expression.Convert(returnValue, returnPayloadValueType)
+                            : (Expression)returnValue),
                     returnPayload),
                 returnValue).Compile();
 
@@ -303,6 +313,7 @@ namespace Akka.Interfaced
             var parameterVars = method.GetParameters().Select(p => Expression.Field(invoke, p.Name)).ToArray();
             var returnValue = Expression.Variable(typeof(TReturn), "returnValue");
             var returnPayload = Expression.Variable(typeof(TReturnPayload), "returnPayload");
+            var returnPayloadValueType = typeof(TReturnPayload).GetField("v").FieldType;
             var exception = Expression.Parameter(typeof(Exception), "e");
 
             var body = Expression.TryCatch(
@@ -311,7 +322,11 @@ namespace Akka.Interfaced
                     Expression.Assign(invoke, Expression.Convert(invokePayload, typeof(TInvokePayload))),
                     Expression.Assign(returnValue, Expression.Call(instance, method, parameterVars)),
                     Expression.Assign(returnPayload, Expression.New(typeof(TReturnPayload).GetConstructor(Type.EmptyTypes))),
-                    Expression.Assign(Expression.Field(returnPayload, "v"), returnValue),
+                    Expression.Assign(
+                        Expression.Field(returnPayload, "v"),
+                        returnPayloadValueType != typeof(TReturn)
+                            ? Expression.Convert(returnValue, returnPayloadValueType)
+                            : (Expression)returnValue),
                     Expression.Call(_taskFromResultMethodInfo, returnPayload)),
                 Expression.Catch(
                     exception,

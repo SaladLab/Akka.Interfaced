@@ -110,8 +110,10 @@ namespace Akka.Interfaced
             IList<IFilter> preHandleFilters, IList<IFilter> postHandleFilters) 
             where T : class
         {
-            var handler = RequestHandlerAsyncBuilder.Build<T>(
-                invokePayloadType, returnPayloadType, method);
+            var isAsyncMethod = method.ReturnType.Name.StartsWith("Task");
+            var handler = isAsyncMethod
+                ? RequestHandlerAsyncBuilder.Build<T>(invokePayloadType, returnPayloadType, method)
+                : RequestHandlerSyncToAsyncBuilder.Build<T>(invokePayloadType, returnPayloadType, method);
 
             // TODO: Optimize this function when without async filter
             return async delegate(T self, RequestMessage request, Action<ResponseMessage> onCompleted)

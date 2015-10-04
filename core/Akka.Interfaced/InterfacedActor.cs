@@ -188,7 +188,7 @@ namespace Akka.Interfaced
             var messageHandler = MessageDispatcher.GetMessageHandler(message.GetType());
             if (messageHandler != null)
             {
-                if (messageHandler.IsTask)
+                if (messageHandler.IsAsync)
                 {
                     var context = new MessageHandleContext { Self = Self, Sender = Sender };
                     if (messageHandler.IsReentrant == false)

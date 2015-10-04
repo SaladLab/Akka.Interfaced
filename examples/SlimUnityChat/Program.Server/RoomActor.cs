@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 
 namespace SlimUnityChat.Program.Server
 {
+    [Log]
     public class RoomActor : InterfacedActor<RoomActor>, IRoom, IOccupant
     {
         private class UserData
@@ -33,12 +34,6 @@ namespace SlimUnityChat.Program.Server
             _clusterContext = clusterContext;
             _name = name;
             _userMap = new Dictionary<string, UserData>();
-        }
-
-        protected static RequestHandler<RoomActor> OnBuildHandler(
-            RequestHandler<RoomActor> handler, MethodInfo method)
-        {
-            return LogHandlerBuilder.BuildHandler(self => self._logger, handler, method, true);
         }
 
         private void NotifyToAllObservers(Action<RoomObserver> notifyAction)

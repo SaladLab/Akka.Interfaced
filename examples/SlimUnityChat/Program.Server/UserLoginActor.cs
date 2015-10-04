@@ -14,6 +14,7 @@ using System.Net;
 
 namespace SlimUnityChat.Program.Server
 {
+    [Log]
     public class UserLoginActor : InterfacedActor<UserLoginActor>, IUserLogin
     {
         private ILog _logger;
@@ -25,12 +26,6 @@ namespace SlimUnityChat.Program.Server
             _logger = LogManager.GetLogger(string.Format("UserLoginActor({0})", clientRemoteEndPoint));
             _clusterContext = clusterContext;
             _clientSession = clientSession;
-        }
-
-        protected static RequestHandler<UserLoginActor> OnBuildHandler(
-            RequestHandler<UserLoginActor> handler, MethodInfo method)
-        {
-            return LogHandlerBuilder.BuildHandler(self => self._logger, handler, method, true);
         }
 
         protected override void OnReceiveUnhandled(object message)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Akka.Interfaced
@@ -44,18 +45,38 @@ namespace Akka.Interfaced
 
     public interface IFilterFactory
     {
-        IFilter CreateInstance(Type actorType);
+        IFilter CreateInstance(Type actorType, MethodInfo method);
     }
 
-    //public class LogAttribute : IFilterFactory
-    //{
-    //}
+    // TODO: Which one is better to support lifetime scope of filter ? 
 
-    //public class LogPreFilter : IPreHandleFilter
-    //{
-    //}
+    /*
+    public interface IFilterPerInstanceFactory
+    {
+        IFilter CreateInstance(Type actorType, object self);
+    }
 
-    //public class LogPostFilter : IPostHandleFilter
-    //{
-    //}
+    public interface IFilterPerInvokeFactory
+    {
+        IFilter CreateInstance(Type actorType, object self, RequestMessage request);
+    }
+
+    public enum FilterLifetimeScope
+    {
+        PerClass = 0,
+        PerInstance = 1,
+        PerInvoke = 2
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class FilterLifetimeScopeAttribute : Attribute
+    {
+        public FilterLifetimeScope Scope { get;}
+
+        public FilterLifetimeScopeAttribute(FilterLifetimeScope scope)
+        {
+            Scope = scope;
+        }
+    }
+    */
 }

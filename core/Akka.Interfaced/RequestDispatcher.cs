@@ -47,10 +47,9 @@ namespace Akka.Interfaced
                     var invokePayloadType = payloadTypeTable[i, 0];
                     var returnPayloadType = payloadTypeTable[i, 1];
 
-                    var isReentrant = targetMethod.CustomAttributes
-                                                  .Any(x => x.AttributeType == typeof(ReentrantAttribute));
-                    var preHandleFilters = new List<IFilter>();
-                    var postHandleFilters = new List<IFilter>();
+                    var filters = CreateFilters(type, targetMethod);
+                    var preHandleFilters = filters.Item1;
+                    var postHandleFilters = filters.Item2;
 
                     var asyncHandler = RequestHandlerBuilder.BuildAsyncHandler<T>(
                         invokePayloadType, returnPayloadType, targetMethod,
@@ -59,7 +58,7 @@ namespace Akka.Interfaced
                     _handlerTable[invokePayloadType] = new RequestHandlerInfo
                     {
                         InterfaceType = ifs,
-                        IsReentrant = isReentrant,
+                        IsReentrant = IsReentrantMethod(targetMethod),
                         AsyncHandler = asyncHandler
                     };
                 }
@@ -120,15 +119,16 @@ namespace Akka.Interfaced
 
                     // build handler
 
-                    var isReentrant = targetMethod.CustomAttributes
-                                                  .Any(x => x.AttributeType == typeof(ReentrantAttribute));
+                    var isAsyncMethod = targetMethod.ReturnType.Name.StartsWith("Task");
+                    var filters = CreateFilters(type, targetMethod);
+                    var preHandleFilters = filters.Item1;
+                    var postHandleFilters = filters.Item2;
 
-                    var isTask = targetMethod.ReturnType.Name.StartsWith("Task");
-                    // TODO: async filter & sync handler
-                    if (isTask)
+                    if (isAsyncMethod ||
+                        preHandleFilters.Any(f => f is IPreHandleAsyncFilter) ||
+                        postHandleFilters.Any(f => f is IPostHandleAsyncFilter))
                     {
-                        var preHandleFilters = new List<IFilter>();
-                        var postHandleFilters = new List<IFilter>();
+                        // Async handler!
 
                         var asyncHandler = RequestHandlerBuilder.BuildAsyncHandler<T>(
                             invokePayloadType, returnPayloadType, targetMethod,
@@ -137,23 +137,23 @@ namespace Akka.Interfaced
                         _handlerTable[invokePayloadType] = new RequestHandlerInfo
                         {
                             InterfaceType = ifs,
-                            IsReentrant = isReentrant,
+                            IsReentrant = IsReentrantMethod(targetMethod),
                             AsyncHandler = asyncHandler
                         };
                     }
                     else
                     {
-                        var preHandleFilters = new List<IPreHandleFilter>();
-                        var postHandleFilters = new List<IPostHandleFilter>();
+                        // Sync handler
 
                         var handler = RequestHandlerBuilder.BuildHandler<T>(
                             invokePayloadType, returnPayloadType, targetMethod,
-                            preHandleFilters, postHandleFilters);
+                            preHandleFilters.Cast<IPreHandleFilter>().ToList(),
+                            postHandleFilters.Cast<IPostHandleFilter>().ToList());
 
                         _handlerTable[invokePayloadType] = new RequestHandlerInfo
                         {
                             InterfaceType = ifs,
-                            IsReentrant = isReentrant,
+                            IsReentrant = false,
                             Handler = handler
                         };
                     }
@@ -200,6 +200,32 @@ namespace Akka.Interfaced
             }
 
             return payloadTypes;
+        }
+
+        private static bool IsReentrantMethod(MethodInfo method)
+        {
+            return method.CustomAttributes.Any(x => x.AttributeType == typeof(ReentrantAttribute));
+        }
+
+        private static Tuple<List<IFilter>, List<IFilter>> CreateFilters(Type type, MethodInfo method)
+        {
+            var preHandleFilters = new List<IFilter>();
+            var postHandleFilters = new List<IFilter>();
+
+            foreach (var filterFactory in type.GetCustomAttributes().OfType<IFilterFactory>().Concat(
+                                          method.GetCustomAttributes().OfType<IFilterFactory>()))
+            {
+                var filter = filterFactory.CreateInstance(typeof(T), method);
+
+                if (filter is IPreHandleFilter || filter is IPreHandleAsyncFilter)
+                    preHandleFilters.Add(filter);
+
+                if (filter is IPostHandleFilter || filter is IPostHandleAsyncFilter)
+                    postHandleFilters.Add(filter);
+            }
+
+            return Tuple.Create(preHandleFilters.OrderBy(f => f.Order).ToList(), 
+                                postHandleFilters.OrderByDescending(f => f.Order).ToList());
         }
 
         private static bool AreParameterTypesEqual(ParameterInfo[] a, ParameterInfo[] b)

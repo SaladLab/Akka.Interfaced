@@ -9,6 +9,7 @@ using Common.Logging;
 
 namespace SlimUnityChat.Program.Server
 {
+    [Log]
     public class UserActor : InterfacedActor<UserActor>, IUser, IUserMessasing
     {
         private ILog _logger;
@@ -26,12 +27,6 @@ namespace SlimUnityChat.Program.Server
             _id = id;
             _eventObserver = new UserEventObserver(_clientSession, observerId);
             _enteredRoomMap = new Dictionary<string, RoomRef>();
-        }
-
-        protected static RequestHandler<UserActor> OnBuildHandler(
-            RequestHandler<UserActor> handler, MethodInfo method)
-        {
-            return LogHandlerBuilder.BuildHandler(self => self._logger, handler, method, true);
         }
 
         protected override void OnReceiveUnhandled(object message)

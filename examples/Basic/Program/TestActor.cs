@@ -13,42 +13,54 @@ using Basic.Interface;
 namespace Basic.Program
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class LogAttribute : Attribute
+    public sealed class LogAttribute : Attribute, IFilterFactory, IPreHandleFilter, IPostHandleFilter
     {
+        int IFilter.Order
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        IFilter IFilterFactory.CreateInstance(Type actorType, MethodInfo method)
+        {
+            return this;
+        }
+
+        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        {
+            var requestName = context.Request.InvokePayload.GetType().Name;
+            var requestJson = JsonConvert.SerializeObject(context.Request.InvokePayload, Formatting.None);
+            Console.WriteLine("* Invoke: {0} #{1} <{2}>",
+                              requestName, context.Request.RequestId, requestJson);
+        }
+
+        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        {
+            var requestName = context.Request.InvokePayload.GetType().Name;
+            if (context.Response.Exception != null)
+            {
+                Console.WriteLine("* Return: {0} #{1} Exception: {2}", 
+                                  requestName, context.Request.RequestId, context.Response.Exception);
+            }
+            else if (context.Response.ReturnPayload != null)
+            {
+                var returnJson = JsonConvert.SerializeObject(context.Response.ReturnPayload, Formatting.None);
+                Console.WriteLine("* Return: {0} #{1} <{2}>",
+                                  requestName, context.Request.RequestId, returnJson);
+            }
+            else
+            {
+                Console.WriteLine("* Return: {0} #{1} <void>",
+                                  requestName, context.Request.RequestId);
+            }
+        }
     }
 
     public class TestActor : InterfacedActor<TestActor>, ICalculator, ICounter, IWorker
     {
         private int _counter;
-
-        /*
-        protected static RequestHandler<TestActor> OnBuildHandler(
-            RequestHandler<TestActor> handler, MethodInfo method)
-        {
-            var hasLogAttribute = method.CustomAttributes.Any(x => x.AttributeType == typeof(LogAttribute));
-            if (hasLogAttribute)
-            {
-                return async delegate(TestActor self, RequestMessage requestMessage)
-                {
-                    var requestName = requestMessage.InvokePayload.GetType().Name;
-                    var requestJson = JsonConvert.SerializeObject(requestMessage.InvokePayload, Formatting.None);
-                    Console.WriteLine("* Request: {0} #{1} <{2}>", requestName, requestMessage.RequestId, requestJson);
-                    
-                    var watch = new Stopwatch();
-                    var ret = await handler(self, requestMessage);
-                    var elapsed = watch.ElapsedMilliseconds;
-
-                    var replyJson = JsonConvert.SerializeObject(ret, Formatting.None);
-                    Console.WriteLine("* Reply  : {0} #{1} <{2}> elapsed: {3}ms", requestName, requestMessage.RequestId, replyJson, elapsed);
-                    return ret;
-                };
-            }
-            else
-            {
-                return handler;
-            }
-        }
-        */
 
         [Log]
         Task<string> ICalculator.Concat(string a, string b)
