@@ -69,8 +69,8 @@ namespace Akka.Interfaced
             {
                 var sender = Sender;
 
-                var handler = RequestDispatcher.GetRequestHandler(requestMessage.InvokePayload.GetType());
-                if (handler == null)
+                var handlerItem = RequestDispatcher.GetHandler(requestMessage.InvokePayload.GetType());
+                if (handlerItem == null)
                 {
                     sender.Tell(new ResponseMessage
                     {
@@ -80,11 +80,11 @@ namespace Akka.Interfaced
                     return;
                 }
 
-                if (handler.Handler != null)
+                if (handlerItem.Handler != null)
                 {
                     // sync handle
 
-                    var response = handler.Handler((T)this, requestMessage, null);
+                    var response = handlerItem.Handler((T)this, requestMessage, null);
                     if (requestMessage.RequestId != 0)
                         sender.Tell(response);
                 }
@@ -93,7 +93,7 @@ namespace Akka.Interfaced
                     // async handle
 
                     var context = new MessageHandleContext { Self = Self, Sender = Sender };
-                    if (handler.IsReentrant == false)
+                    if (handlerItem.IsReentrant == false)
                     {
                         BecomeStacked(OnReceiveInAtomicTask);
                         _currentAtomicContext = context;
@@ -102,8 +102,8 @@ namespace Akka.Interfaced
                     using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                     {
                         var requestId = requestMessage.RequestId;
-                        var IsReentrant = handler.IsReentrant;
-                        handler.AsyncHandler((T)this, requestMessage, response =>
+                        var IsReentrant = handlerItem.IsReentrant;
+                        handlerItem.AsyncHandler((T)this, requestMessage, response =>
                         {
                             if (requestId != 0)
                                 sender.Tell(response);
@@ -134,7 +134,7 @@ namespace Akka.Interfaced
             var noticeMessage = message as NotificationMessage;
             if (noticeMessage != null)
             {
-                // Observer 찾기
+                // find observer
 
                 if (_observerMap == null)
                     return;
@@ -143,12 +143,9 @@ namespace Akka.Interfaced
                 if (_observerMap.TryGetValue(noticeMessage.ObserverId, out observer) == false)
                     return;
 
-                // Observer Call
+                // invoke observer event handler
 
                 noticeMessage.InvokePayload.Invoke(observer);
-
-                // - noticeMessage.ObserverId 로 Observer 찾아서
-                // - Invokable 실행!
             }
 
             var taskRunMessage = message as TaskRunMessage;
@@ -185,10 +182,10 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var messageHandler = MessageDispatcher.GetMessageHandler(message.GetType());
+            var messageHandler = MessageDispatcher.GetHandler(message.GetType());
             if (messageHandler != null)
             {
-                if (messageHandler.IsAsync)
+                if (messageHandler.AsyncHandler != null)
                 {
                     var context = new MessageHandleContext { Self = Self, Sender = Sender };
                     if (messageHandler.IsReentrant == false)
@@ -199,9 +196,9 @@ namespace Akka.Interfaced
 
                     using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                     {
-                        messageHandler.Handler((T)this, message)
-                                           .ContinueWith(t => OnTaskCompleted(messageHandler.IsReentrant),
-                                                         TaskContinuationOptions.ExecuteSynchronously);
+                        messageHandler.AsyncHandler((T)this, message)
+                                      .ContinueWith(t => OnTaskCompleted(messageHandler.IsReentrant),
+                                                    TaskContinuationOptions.ExecuteSynchronously);
                     }
                 }
                 else
