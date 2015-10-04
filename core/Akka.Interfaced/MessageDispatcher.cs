@@ -9,7 +9,8 @@ namespace Akka.Interfaced
 
         public MessageDispatcher()
         {
-            _handlerTable = MessageHandlerBuilder<T>.BuildTable();
+            var builder = new MessageHandlerBuilder<T>();
+            _handlerTable = builder.BuildTable();
         }
 
         public MessageHandlerItem<T> GetHandler(Type type)

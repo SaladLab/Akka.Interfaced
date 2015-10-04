@@ -5,17 +5,23 @@ using System.Reflection;
 
 namespace Akka.Interfaced
 {
-    public static class RequestHandlerBuilder<T> where T : class
+    public class RequestHandlerBuilder<T> where T : class
     {
-        public static Dictionary<Type, RequestHandlerItem<T>> BuildTable()
+        private Dictionary<Type, RequestHandlerItem<T>> _table;
+        private Dictionary<Type, IFilter> _filterInClassTable;
+
+        public Dictionary<Type, RequestHandlerItem<T>> BuildTable()
         {
-            var table = new Dictionary<Type, RequestHandlerItem<T>>();
-            BuildRegularInterfaceHandler(table);
-            BuildExtendedInterfaceHandler(table);
-            return table;
+            _table = new Dictionary<Type, RequestHandlerItem<T>>();
+            _filterInClassTable = new Dictionary<Type, IFilter>();
+
+            BuildRegularInterfaceHandler();
+            BuildExtendedInterfaceHandler();
+
+            return _table;
         }
 
-        private static void BuildRegularInterfaceHandler(Dictionary<Type, RequestHandlerItem<T>> table)
+        private void BuildRegularInterfaceHandler()
         {
             var type = typeof(T);
 
@@ -33,7 +39,7 @@ namespace Akka.Interfaced
                     var invokePayloadType = payloadTypeTable[i, 0];
                     var returnPayloadType = payloadTypeTable[i, 1];
 
-                    var filters = CreateFilters(type, targetMethod);
+                    var filters = GetFilters(type, targetMethod);
                     var preHandleFilters = filters.Item1;
                     var postHandleFilters = filters.Item2;
 
@@ -41,17 +47,17 @@ namespace Akka.Interfaced
                         invokePayloadType, returnPayloadType, targetMethod,
                         preHandleFilters, postHandleFilters);
 
-                    table[invokePayloadType] = new RequestHandlerItem<T>
+                    _table.Add(invokePayloadType, new RequestHandlerItem<T>
                     {
                         InterfaceType = ifs,
                         IsReentrant = IsReentrantMethod(targetMethod),
                         AsyncHandler = asyncHandler
-                    };
+                    });
                 }
             }
         }
 
-        private static void BuildExtendedInterfaceHandler(Dictionary<Type, RequestHandlerItem<T>> table)
+        private void BuildExtendedInterfaceHandler()
         {
             var type = typeof(T);
 
@@ -106,7 +112,7 @@ namespace Akka.Interfaced
                     // build handler
 
                     var isAsyncMethod = targetMethod.ReturnType.Name.StartsWith("Task");
-                    var filters = CreateFilters(type, targetMethod);
+                    var filters = GetFilters(type, targetMethod);
                     var preHandleFilters = filters.Item1;
                     var postHandleFilters = filters.Item2;
 
@@ -114,34 +120,34 @@ namespace Akka.Interfaced
                         preHandleFilters.Any(f => f is IPreHandleAsyncFilter) ||
                         postHandleFilters.Any(f => f is IPostHandleAsyncFilter))
                     {
-                        // Async handler!
+                        // async handler
 
                         var asyncHandler = BuildAsyncHandler(
                             invokePayloadType, returnPayloadType, targetMethod,
                             preHandleFilters, postHandleFilters);
 
-                        table[invokePayloadType] = new RequestHandlerItem<T>
+                        _table.Add(invokePayloadType, new RequestHandlerItem<T>
                         {
                             InterfaceType = ifs,
                             IsReentrant = IsReentrantMethod(targetMethod),
                             AsyncHandler = asyncHandler
-                        };
+                        });
                     }
                     else
                     {
-                        // Sync handler
+                        // sync handler
 
                         var handler = BuildHandler(
                             invokePayloadType, returnPayloadType, targetMethod,
                             preHandleFilters.Cast<IPreHandleFilter>().ToList(),
                             postHandleFilters.Cast<IPostHandleFilter>().ToList());
 
-                        table[invokePayloadType] = new RequestHandlerItem<T>
+                        _table.Add(invokePayloadType, new RequestHandlerItem<T>
                         {
                             InterfaceType = ifs,
                             IsReentrant = false,
                             Handler = handler
-                        };
+                        });
                     }
                 }
             }
@@ -154,54 +160,34 @@ namespace Akka.Interfaced
             }
         }
 
-        private static Type[,] GetInterfacePayloadTypeTable(Type interfaceType)
-        {
-            var payloadTableType =
-                interfaceType.Assembly.GetTypes()
-                             .Where(t =>
-                             {
-                                 var attr = t.GetCustomAttribute<PayloadTableForInterfacedActorAttribute>();
-                                 return (attr != null && attr.Type == interfaceType);
-                             })
-                             .FirstOrDefault();
-
-            if (payloadTableType == null)
-            {
-                throw new InvalidOperationException(
-                    string.Format("Cannot find payload table class for {0}", interfaceType.FullName));
-            }
-
-            var queryMethodInfo = payloadTableType.GetMethod("GetPayloadTypes");
-            if (queryMethodInfo == null)
-            {
-                throw new InvalidOperationException(
-                    string.Format("Cannot find {0}.GetPayloadTypes method", payloadTableType.FullName));
-            }
-
-            var payloadTypes = (Type[,])queryMethodInfo.Invoke(null, new object[] { });
-            if (payloadTypes == null || payloadTypes.GetLength(0) != interfaceType.GetMethods().Length)
-            {
-                throw new InvalidOperationException(
-                    string.Format("Mismatched messageTable from {0}", payloadTableType.FullName));
-            }
-
-            return payloadTypes;
-        }
-
-        private static bool IsReentrantMethod(MethodInfo method)
-        {
-            return method.CustomAttributes.Any(x => x.AttributeType == typeof(ReentrantAttribute));
-        }
-
-        private static Tuple<List<IFilter>, List<IFilter>> CreateFilters(Type type, MethodInfo method)
+        private Tuple<List<IFilter>, List<IFilter>> GetFilters(Type type, MethodInfo method)
         {
             var preHandleFilters = new List<IFilter>();
             var postHandleFilters = new List<IFilter>();
 
-            foreach (var filterFactory in type.GetCustomAttributes().OfType<IFilterPerClassMethodFactory>().Concat(
-                                          method.GetCustomAttributes().OfType<IFilterPerClassMethodFactory>()))
+            foreach (var filterFactory in type.GetCustomAttributes().OfType<IFilterFactory>().Concat(
+                                          method.GetCustomAttributes().OfType<IFilterFactory>()))
             {
-                var filter = filterFactory.CreateInstance(typeof(T), method);
+                // create filter with factory
+
+                IFilter filter = null;
+                if (filterFactory is IFilterPerClassFactory)
+                {
+                    var factoryType = filterFactory.GetType();
+                    if (_filterInClassTable.ContainsKey(factoryType) == false)
+                    {
+                        _filterInClassTable[factoryType] =
+                            ((IFilterPerClassFactory)filterFactory).CreateInstance(type);
+                    }
+                    filter = _filterInClassTable[factoryType];
+                }
+                else if (filterFactory is IFilterPerClassMethodFactory)
+                {
+                    filter = ((IFilterPerClassMethodFactory)filterFactory).CreateInstance(type, method);
+                }
+
+                // classify filter and add it to list
+                // beware that a filter can be added to both pre and post handle filter list.
 
                 if (filter is IPreHandleFilter || filter is IPreHandleAsyncFilter)
                     preHandleFilters.Add(filter);
@@ -212,19 +198,6 @@ namespace Akka.Interfaced
 
             return Tuple.Create(preHandleFilters.OrderBy(f => f.Order).ToList(),
                                 postHandleFilters.OrderByDescending(f => f.Order).ToList());
-        }
-
-        private static bool AreParameterTypesEqual(ParameterInfo[] a, ParameterInfo[] b)
-        {
-            if (a.Length != b.Length)
-                return false;
-
-            for (int i = 0; i < a.Length; i++)
-            {
-                if (a[i].ParameterType != b[i].ParameterType)
-                    return false;
-            }
-            return true;
         }
 
         private static RequestHandler<T> BuildHandler(
@@ -435,6 +408,58 @@ namespace Akka.Interfaced
 
                 return response;
             };
+        }
+
+        private static Type[,] GetInterfacePayloadTypeTable(Type interfaceType)
+        {
+            var payloadTableType =
+                interfaceType.Assembly.GetTypes()
+                             .Where(t =>
+                             {
+                                 var attr = t.GetCustomAttribute<PayloadTableForInterfacedActorAttribute>();
+                                 return (attr != null && attr.Type == interfaceType);
+                             })
+                             .FirstOrDefault();
+
+            if (payloadTableType == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format("Cannot find payload table class for {0}", interfaceType.FullName));
+            }
+
+            var queryMethodInfo = payloadTableType.GetMethod("GetPayloadTypes");
+            if (queryMethodInfo == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format("Cannot find {0}.GetPayloadTypes method", payloadTableType.FullName));
+            }
+
+            var payloadTypes = (Type[,])queryMethodInfo.Invoke(null, new object[] { });
+            if (payloadTypes == null || payloadTypes.GetLength(0) != interfaceType.GetMethods().Length)
+            {
+                throw new InvalidOperationException(
+                    string.Format("Mismatched messageTable from {0}", payloadTableType.FullName));
+            }
+
+            return payloadTypes;
+        }
+
+        private static bool IsReentrantMethod(MethodInfo method)
+        {
+            return method.CustomAttributes.Any(x => x.AttributeType == typeof(ReentrantAttribute));
+        }
+
+        private static bool AreParameterTypesEqual(ParameterInfo[] a, ParameterInfo[] b)
+        {
+            if (a.Length != b.Length)
+                return false;
+
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i].ParameterType != b[i].ParameterType)
+                    return false;
+            }
+            return true;
         }
     }
 }

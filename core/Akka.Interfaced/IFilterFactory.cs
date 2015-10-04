@@ -17,6 +17,8 @@ namespace Akka.Interfaced
         IFilter CreateInstance(Type actorType, MethodInfo method);
     }
 
+    // TODO: IMPLEMENT!
+    /*
     public interface IFilterPerInstanceFactory : IFilterFactory
     {
         IFilter CreateInstance(Type actorType, object actor);
@@ -31,4 +33,5 @@ namespace Akka.Interfaced
     {
         IFilter CreateInstance(Type actorType, object actor, RequestMessage request);
     }
+    */
 }

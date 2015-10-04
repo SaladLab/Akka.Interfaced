@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Basic.Program
 {
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public sealed class LogAttribute : Attribute, IFilterPerClassMethodFactory
     {
         IFilter IFilterPerClassMethodFactory.CreateInstance(Type actorType, MethodInfo method)
@@ -57,6 +57,45 @@ namespace Basic.Program
                 Console.WriteLine("#{0} <- {1} <void>",
                                   context.Request.RequestId, _methodShortName);
             }
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
+    public sealed class SimpleLogAttribute : Attribute, IFilterPerClassFactory
+    {
+        IFilter IFilterPerClassFactory.CreateInstance(Type actorType)
+        {
+            return new SimpleLogFilter(actorType);
+        }
+    }
+
+    public sealed class SimpleLogFilter : IPreHandleFilter, IPostHandleFilter
+    {
+        private string _typeName;
+        private int _handleCount;
+
+        public SimpleLogFilter(Type actorType)
+        {
+            _typeName = actorType.Name;
+        }
+
+        int IFilter.Order
+        {
+            get
+            {
+                return -1;
+            }
+        }
+
+        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        {
+            _handleCount += 1;
+            Console.WriteLine("@{0} : OnPreHandle #{1}", _typeName, _handleCount);
+        }
+
+        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        {
+            Console.WriteLine("@{0} : OnPostHandle", _typeName);
         }
     }
 }

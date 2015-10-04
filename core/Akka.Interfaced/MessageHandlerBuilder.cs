@@ -5,11 +5,13 @@ using System.Reflection;
 
 namespace Akka.Interfaced
 {
-    public static class MessageHandlerBuilder<T> where T : class
+    public class MessageHandlerBuilder<T> where T : class
     {
-        public static Dictionary<Type, MessageHandlerItem<T>> BuildTable()
+        private Dictionary<Type, MessageHandlerItem<T>> _table;
+
+        public Dictionary<Type, MessageHandlerItem<T>> BuildTable()
         {
-            var table = new Dictionary<Type, MessageHandlerItem<T>>();
+            _table = new Dictionary<Type, MessageHandlerItem<T>>();
 
             var type = typeof(T);
             var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -28,7 +30,7 @@ namespace Akka.Interfaced
                         IsReentrant = IsReentrantMethod(method),
                         AsyncHandler = MessageHandlerAsyncBuilder.Build<T>(method)
                     };
-                    table.Add(messageType, item);
+                    _table.Add(messageType, item);
                 }
                 else
                 {
@@ -36,11 +38,11 @@ namespace Akka.Interfaced
                     {
                         Handler = MessageHandlerFuncBuilder.Build<T>(method)
                     };
-                    table.Add(messageType, item);
+                    _table.Add(messageType, item);
                 }
             }
 
-            return table;
+            return _table;
         }
 
         private static bool IsReentrantMethod(MethodInfo method)
