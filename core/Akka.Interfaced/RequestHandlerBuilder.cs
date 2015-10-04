@@ -39,7 +39,7 @@ namespace Akka.Interfaced
                     var invokePayloadType = payloadTypeTable[i, 0];
                     var returnPayloadType = payloadTypeTable[i, 1];
 
-                    var filters = GetFilters(type, targetMethod);
+                    var filters = CreateFilters(type, targetMethod);
                     var preHandleFilters = filters.Item1;
                     var postHandleFilters = filters.Item2;
 
@@ -112,7 +112,7 @@ namespace Akka.Interfaced
                     // build handler
 
                     var isAsyncMethod = targetMethod.ReturnType.Name.StartsWith("Task");
-                    var filters = GetFilters(type, targetMethod);
+                    var filters = CreateFilters(type, targetMethod);
                     var preHandleFilters = filters.Item1;
                     var postHandleFilters = filters.Item2;
 
@@ -160,7 +160,7 @@ namespace Akka.Interfaced
             }
         }
 
-        private Tuple<List<IFilter>, List<IFilter>> GetFilters(Type type, MethodInfo method)
+        private Tuple<List<IFilter>, List<IFilter>> CreateFilters(Type type, MethodInfo method)
         {
             var preHandleFilters = new List<IFilter>();
             var postHandleFilters = new List<IFilter>();
