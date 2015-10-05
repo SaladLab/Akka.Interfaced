@@ -3,35 +3,50 @@ using System.Reflection;
 
 namespace Akka.Interfaced
 {
+    // Filter Factory
+
     public interface IFilterFactory
     {
     }
 
     public interface IFilterPerClassFactory : IFilterFactory
     {
-        IFilter CreateInstance(Type actorType);
+        void Setup(Type actorType);
+        IFilter CreateInstance();
     }
 
     public interface IFilterPerClassMethodFactory : IFilterFactory
     {
-        IFilter CreateInstance(Type actorType, MethodInfo method);
+        void Setup(Type actorType, MethodInfo method);
+        IFilter CreateInstance();
     }
 
-    // TODO: IMPLEMENT!
-    /*
     public interface IFilterPerInstanceFactory : IFilterFactory
     {
-        IFilter CreateInstance(Type actorType, object actor);
+        void Setup(Type actorType);
+        IFilter CreateInstance(object actor);
     }
 
     public interface IFilterPerInstanceMethodFactory : IFilterFactory
     {
-        IFilter CreateInstance(Type actorType, object actor, MethodInfo method);
+        void Setup(Type actorType, MethodInfo method);
+        IFilter CreateInstance(object actor);
     }
 
     public interface IFilterPerInvokeFactory : IFilterFactory
     {
-        IFilter CreateInstance(Type actorType, object actor, RequestMessage request);
+        void Setup(Type actorType, MethodInfo method);
+        IFilter CreateInstance(object actor, RequestMessage request);
     }
-    */
+
+    // Filter Accessor
+
+    public interface IFilterPerInstanceProvider
+    {
+        IFilter GetFilter(int index);
+    }
+
+    public delegate IFilter FilterAccessor(
+        IFilterPerInstanceProvider perInstanceFilterProvider,
+        IFilter[] filterPerInvokes);
 }

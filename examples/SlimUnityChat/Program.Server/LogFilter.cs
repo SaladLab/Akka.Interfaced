@@ -9,18 +9,28 @@ using System.Collections.Generic;
 namespace SlimUnityChat.Program.Server
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class LogAttribute : Attribute, IFilterPerClassMethodFactory
+    public sealed class LogAttribute : Attribute, IFilterPerInstanceMethodFactory
     {
-        IFilter IFilterPerClassMethodFactory.CreateInstance(Type actorType, MethodInfo method)
+        private FieldInfo _loggerFieldInfo;
+        private string _methodShortName;
+
+        void IFilterPerInstanceMethodFactory.Setup(Type actorType, MethodInfo method)
         {
-            return new LogFilter(actorType, method);
+            _loggerFieldInfo = actorType.GetField("_logger", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            _methodShortName = method.Name.Split('.').Last();
+        }
+
+        IFilter IFilterPerInstanceMethodFactory.CreateInstance(object actor)
+        {
+            var logger = actor != null ? (ILog)_loggerFieldInfo.GetValue(actor) : null;
+            return new LogFilter(logger, _methodShortName);
         }
     }
 
     public class LogFilter : IPreHandleFilter, IPostHandleFilter
     {
         private static readonly JsonSerializerSettings _settings;
-        private FieldInfo _loggerFieldInfo;
+        private ILog _logger;
         private string _methodShortName;
 
         static LogFilter()
@@ -31,51 +41,39 @@ namespace SlimUnityChat.Program.Server
             };
         }
 
-        public LogFilter(Type actorType, MethodInfo method)
+        public LogFilter(ILog logger, string methodShortName)
         {
-            _loggerFieldInfo = actorType.GetField("_logger", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            _methodShortName = method.Name.Split('.').Last();
+            _logger = logger;
+            _methodShortName = methodShortName;
         }
 
-        int IFilter.Order
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        int IFilter.Order => 0;
 
-        private ILog GetLogger(object actor)
-        {
-            return (ILog)_loggerFieldInfo.GetValue(actor);
-        }
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {
-            var logger = GetLogger(context.Actor);
             var invokeJson = JsonConvert.SerializeObject(context.Request.InvokePayload, _settings);
-            logger.TraceFormat("#{0} -> {1} {2}",
-                               context.Request.RequestId, _methodShortName, invokeJson);
+            _logger.TraceFormat("#{0} -> {1} {2}",
+                                context.Request.RequestId, _methodShortName, invokeJson);
         }
 
         void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
         {
-            var logger = GetLogger(context.Actor);
             if (context.Response.Exception != null)
             {
-                logger.TraceFormat("#{0} <- {1} Exception: {2}",
-                                   context.Request.RequestId, _methodShortName, context.Response.Exception);
+                _logger.TraceFormat("#{0} <- {1} Exception: {2}",
+                                    context.Request.RequestId, _methodShortName, context.Response.Exception);
             }
             else if (context.Response.ReturnPayload == null)
             {
                 var returnJson = JsonConvert.SerializeObject(context.Response.ReturnPayload, _settings);
-                logger.TraceFormat("#{0} <- {1} {2}",
-                                   context.Request.RequestId, _methodShortName, returnJson);
+                _logger.TraceFormat("#{0} <- {1} {2}",
+                                    context.Request.RequestId, _methodShortName, returnJson);
             }
             else
             {
-                logger.TraceFormat("#{0} <- {1} <void>",
-                                   context.Request.RequestId, _methodShortName);
+                _logger.TraceFormat("#{0} <- {1} <void>",
+                                    context.Request.RequestId, _methodShortName);
             }
         }
     }

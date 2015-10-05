@@ -7,10 +7,9 @@ namespace Akka.Interfaced
     {
         private Dictionary<Type, RequestHandlerItem<T>> _handlerTable;
 
-        public RequestDispatcher()
+        public RequestDispatcher(Dictionary<Type, RequestHandlerItem<T>> handlerTable)
         {
-            var builder = new RequestHandlerBuilder<T>();
-            _handlerTable = builder.BuildTable();
+            _handlerTable = handlerTable;
         }
 
         public RequestHandlerItem<T> GetHandler(Type type)

@@ -8,11 +8,22 @@ using Akka.Actor;
 
 namespace Akka.Interfaced
 {
-    public abstract class InterfacedActor<T> : UntypedActor, IWithUnboundedStash, IRequestWaiter
+    public abstract class InterfacedActor<T> : UntypedActor, IWithUnboundedStash, IRequestWaiter, IFilterPerInstanceProvider
         where T : InterfacedActor<T>
     {
-        private static RequestDispatcher<T> RequestDispatcher = new RequestDispatcher<T>();
-        private static MessageDispatcher<T> MessageDispatcher = new MessageDispatcher<T>();
+        private readonly static RequestDispatcher<T> RequestDispatcher;
+        private readonly static List<Func<object, IFilter>> PerInstanceFilterCreators;
+        private readonly static MessageDispatcher<T> MessageDispatcher;
+
+        static InterfacedActor()
+        {
+            var requestHandlerBuilder = new RequestHandlerBuilder<T>();
+            requestHandlerBuilder.Build();
+            RequestDispatcher = new RequestDispatcher<T>(requestHandlerBuilder.HandlerTable);
+            PerInstanceFilterCreators = requestHandlerBuilder.PerInstanceFilterCreators;
+
+            MessageDispatcher = new MessageDispatcher<T>();
+        }
 
         // Stash for stashing incoming messages while atomic handler is running
         public IStash Stash { get; set; }
@@ -35,6 +46,9 @@ namespace Akka.Interfaced
         // Variable to issue unique local request ID.
         private int _lastRequestId;
 
+        // PerInstance Filters!
+        private IFilter[] _perInstanceFilters;
+         
         // Atomic async OnPreStart event (it will be called after PreStart)
         protected virtual Task OnPreStart()
         {
@@ -50,6 +64,8 @@ namespace Akka.Interfaced
 
         protected override void PreStart()
         {
+            CreatePerInstanceFilters();
+
             var context = new MessageHandleContext { Self = Self, Sender = Sender };
             BecomeStacked(OnReceiveInAtomicTask);
             _currentAtomicContext = context;
@@ -367,6 +383,25 @@ namespace Akka.Interfaced
                 return false;
 
             return _observerMap.Remove(observerId);
+        }
+
+        // PerInstance Filter related
+
+        private void CreatePerInstanceFilters()
+        {
+            if (PerInstanceFilterCreators.Count > 0)
+            {
+                _perInstanceFilters = new IFilter[PerInstanceFilterCreators.Count];
+                for (var i = 0; i < PerInstanceFilterCreators.Count; i++)
+                {
+                    _perInstanceFilters[i] = PerInstanceFilterCreators[i](this);
+                }
+            }
+        }
+
+        IFilter IFilterPerInstanceProvider.GetFilter(int index)
+        {
+            return _perInstanceFilters[index];
         }
     }
 }

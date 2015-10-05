@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Akka.Interfaced;
@@ -7,55 +8,63 @@ using Newtonsoft.Json;
 namespace Basic.Program
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class LogAttribute : Attribute, IFilterPerClassMethodFactory
+    public sealed class LogAttribute : Attribute, IFilterPerInvokeFactory
     {
-        IFilter IFilterPerClassMethodFactory.CreateInstance(Type actorType, MethodInfo method)
+        private string _methodName;
+
+        void IFilterPerInvokeFactory.Setup(Type actorType, MethodInfo method)
         {
-            return new LogFilter(actorType, method);
+            _methodName = actorType.Name + "." + method.Name.Split('.').Last();
+        }
+
+        IFilter IFilterPerInvokeFactory.CreateInstance(object actor, RequestMessage request)
+        {
+            return new LogFilter(_methodName, actor, request);
         }
     }
 
     public sealed class LogFilter : IPreHandleFilter, IPostHandleFilter
     {
-        private string _methodShortName;
+        private readonly string _methodName;
+        private Stopwatch _watch;
 
-        public LogFilter(Type actorType, MethodInfo method)
+        public LogFilter(string methodName, object actor, RequestMessage request)
         {
-            _methodShortName = actorType.Name + "." + method.Name.Split('.').Last();
+            _methodName = methodName;
         }
 
-        int IFilter.Order
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        int IFilter.Order => 0;
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {
+            _watch = new Stopwatch();
+            _watch.Start();
+
             var invokeJson = JsonConvert.SerializeObject(context.Request.InvokePayload, Formatting.None);
             Console.WriteLine("#{0} -> {1} {2}",
-                              context.Request.RequestId, _methodShortName, invokeJson);
+                              context.Request.RequestId, _methodName, invokeJson);
         }
 
         void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
         {
+            _watch.Stop();
+            var elapsed = _watch.ElapsedMilliseconds;
+
             if (context.Response.Exception != null)
             {
-                Console.WriteLine("#{0} <- {1} Exception: {2}",
-                                  context.Request.RequestId, _methodShortName, context.Response.Exception);
+                Console.WriteLine("#{0} <- {1} Exception: {2} ({3}ms)",
+                                  context.Request.RequestId, _methodName, context.Response.Exception, elapsed);
             }
             else if (context.Response.ReturnPayload != null)
             {
                 var returnJson = JsonConvert.SerializeObject(context.Response.ReturnPayload, Formatting.None);
-                Console.WriteLine("#{0} <- {1} {2}",
-                                  context.Request.RequestId, _methodShortName, returnJson);
+                Console.WriteLine("#{0} <- {1} {2} ({3}ms)",
+                                  context.Request.RequestId, _methodName, returnJson, elapsed);
             }
             else
             {
-                Console.WriteLine("#{0} <- {1} <void>",
-                                  context.Request.RequestId, _methodShortName);
+                Console.WriteLine("#{0} <- {1} <void> ({2}ms)",
+                                  context.Request.RequestId, _methodName, elapsed);
             }
         }
     }
@@ -63,29 +72,30 @@ namespace Basic.Program
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public sealed class SimpleLogAttribute : Attribute, IFilterPerClassFactory
     {
-        IFilter IFilterPerClassFactory.CreateInstance(Type actorType)
+        private string _typeName;
+
+        void IFilterPerClassFactory.Setup(Type actorType)
         {
-            return new SimpleLogFilter(actorType);
+            _typeName = actorType.Name;
+        }
+
+        IFilter IFilterPerClassFactory.CreateInstance()
+        {
+            return new SimpleLogFilter(_typeName);
         }
     }
 
     public sealed class SimpleLogFilter : IPreHandleFilter, IPostHandleFilter
     {
-        private string _typeName;
+        private readonly string _typeName;
         private int _handleCount;
 
-        public SimpleLogFilter(Type actorType)
+        public SimpleLogFilter(string typeName)
         {
-            _typeName = actorType.Name;
+            _typeName = typeName;
         }
 
-        int IFilter.Order
-        {
-            get
-            {
-                return -1;
-            }
-        }
+        int IFilter.Order => -1;
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {

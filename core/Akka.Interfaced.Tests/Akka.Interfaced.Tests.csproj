@@ -78,8 +78,13 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="FilterLogBoard.cs" />
     <Compile Include="TestBasic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestFilterAsync.cs" />
+    <Compile Include="TestFilterFactory.cs" />
+    <Compile Include="TestFilterOrder.cs" />
+    <Compile Include="TestFilterPipeline.cs" />
     <Compile Include="TestMessageDispatch.Plain.cs" />
     <Compile Include="TestMessageDispatch.Request.cs" />
     <Compile Include="TestMessageDispatch.RequestExtended.cs" />
