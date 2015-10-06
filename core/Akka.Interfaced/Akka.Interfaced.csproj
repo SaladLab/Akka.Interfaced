@@ -53,6 +53,9 @@
     <Compile Include="IFilterFactory.cs" />
     <Compile Include="INotificationChannel.cs" />
     <Compile Include="IExtendedInterface.cs" />
+    <Compile Include="InterfacedActor.ObserverMap.cs" />
+    <Compile Include="InterfacedActor.PerInstanceFilterList.cs" />
+    <Compile Include="InterfacedActor.RequestWaiter.cs" />
     <Compile Include="InterfacedObserver.cs" />
     <Compile Include="InterfacedActor.cs" />
     <Compile Include="InterfacedActorRef.cs" />

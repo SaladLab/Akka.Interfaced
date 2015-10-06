@@ -31,24 +31,10 @@ namespace Akka.Interfaced
         // Task context for current atomic task. If no atomic task now, it will be null.
         private MessageHandleContext _currentAtomicContext;
 
-        // Variable to issue unique local observer ID.
-        private int _lastIssuedObserverId;
+        private InterfacedActorRequestWaiter _requestWaiter;
+        private InterfacedActorObserverMap _observerMap;
+        private InterfacedActorPerInstanceFilterList _perInstanceFilterList;
 
-        // ObserverId -> Observer dictionary for bookkeeping registered observers.
-        private Dictionary<int, IInterfacedObserver> _observerMap;
-
-        // TODO: Check lock should be required to keep safe?
-        private object _requestLock = new object();
-
-        // RequestId -> TCS dictionary for make continuation work when we get response.
-        private Dictionary<int, TaskCompletionSource<object>> _requestMap;
-
-        // Variable to issue unique local request ID.
-        private int _lastRequestId;
-
-        // PerInstance Filters!
-        private IFilter[] _perInstanceFilters;
-         
         // Atomic async OnPreStart event (it will be called after PreStart)
         protected virtual Task OnPreStart()
         {
@@ -64,7 +50,8 @@ namespace Akka.Interfaced
 
         protected override void PreStart()
         {
-            CreatePerInstanceFilters();
+            if (PerInstanceFilterCreators.Count > 0)
+                _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, PerInstanceFilterCreators);
 
             var context = new MessageHandleContext { Self = Self, Sender = Sender };
             BecomeStacked(OnReceiveInAtomicTask);
@@ -83,60 +70,14 @@ namespace Akka.Interfaced
             var requestMessage = message as RequestMessage;
             if (requestMessage != null)
             {
-                var sender = Sender;
-
-                var handlerItem = RequestDispatcher.GetHandler(requestMessage.InvokePayload.GetType());
-                if (handlerItem == null)
-                {
-                    sender.Tell(new ResponseMessage
-                    {
-                        RequestId = requestMessage.RequestId,
-                        Exception = new InvalidMessageException("Cannot find handler")
-                    });
-                    return;
-                }
-
-                if (handlerItem.Handler != null)
-                {
-                    // sync handle
-
-                    var response = handlerItem.Handler((T)this, requestMessage, null);
-                    if (requestMessage.RequestId != 0)
-                        sender.Tell(response);
-                }
-                else
-                {
-                    // async handle
-
-                    var context = new MessageHandleContext { Self = Self, Sender = Sender };
-                    if (handlerItem.IsReentrant == false)
-                    {
-                        BecomeStacked(OnReceiveInAtomicTask);
-                        _currentAtomicContext = context;
-                    }
-
-                    using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
-                    {
-                        var requestId = requestMessage.RequestId;
-                        var IsReentrant = handlerItem.IsReentrant;
-                        handlerItem.AsyncHandler((T)this, requestMessage, response =>
-                        {
-                            if (requestId != 0)
-                                sender.Tell(response);
-                            OnTaskCompleted(IsReentrant);
-                        });
-                    }
-                }
+                OnRequestMessage(requestMessage);
                 return;
             }
 
             var continuationMessage = message as TaskContinuationMessage;
             if (continuationMessage != null)
             {
-                using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(continuationMessage.Context)))
-                {
-                    continuationMessage.CallbackAction(continuationMessage.CallbackState);
-                }
+                OnTaskContinuationMessage(continuationMessage);
                 return;
             }
 
@@ -147,28 +88,66 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var noticeMessage = message as NotificationMessage;
-            if (noticeMessage != null)
+            var notificationMessage = message as NotificationMessage;
+            if (notificationMessage != null)
             {
-                // find observer
-
-                if (_observerMap == null)
-                    return;
-
-                IInterfacedObserver observer;
-                if (_observerMap.TryGetValue(noticeMessage.ObserverId, out observer) == false)
-                    return;
-
-                // invoke observer event handler
-
-                noticeMessage.InvokePayload.Invoke(observer);
+                OnNotificationMessage(notificationMessage);
+                return;
             }
 
             var taskRunMessage = message as TaskRunMessage;
             if (taskRunMessage != null)
             {
+                OnTaskRunMessage(taskRunMessage);
+                return;
+            }
+
+            var poisonPill = message as InterfacedPoisonPill;
+            if (poisonPill != null)
+            {
+                OnInterfacedPoisonPill();
+                return;
+            }
+
+            var messageHandler = MessageDispatcher.GetHandler(message.GetType());
+            if (messageHandler != null)
+            {
+                HandleMessageByHandler(message, messageHandler);
+                return;
+            }
+
+            OnReceiveUnhandled(message);
+        }
+
+        private void OnRequestMessage(RequestMessage request)
+        {
+            var sender = Sender;
+
+            var handlerItem = RequestDispatcher.GetHandler(request.InvokePayload.GetType());
+            if (handlerItem == null)
+            {
+                sender.Tell(new ResponseMessage
+                {
+                    RequestId = request.RequestId,
+                    Exception = new InvalidMessageException("Cannot find handler")
+                });
+                return;
+            }
+
+            if (handlerItem.Handler != null)
+            {
+                // sync handle
+
+                var response = handlerItem.Handler((T)this, request, null);
+                if (request.RequestId != 0)
+                    sender.Tell(response);
+            }
+            else
+            {
+                // async handle
+
                 var context = new MessageHandleContext { Self = Self, Sender = Sender };
-                if (taskRunMessage.IsReentrant == false)
+                if (handlerItem.IsReentrant == false)
                 {
                     BecomeStacked(OnReceiveInAtomicTask);
                     _currentAtomicContext = context;
@@ -176,55 +155,91 @@ namespace Akka.Interfaced
 
                 using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                 {
-                    taskRunMessage.Function()
-                                  .ContinueWith(t => OnTaskCompleted(taskRunMessage.IsReentrant),
-                                                TaskContinuationOptions.ExecuteSynchronously);
+                    var requestId = request.RequestId;
+                    var IsReentrant = handlerItem.IsReentrant;
+                    handlerItem.AsyncHandler((T)this, request, response =>
+                    {
+                        if (requestId != 0)
+                            sender.Tell(response);
+                        OnTaskCompleted(IsReentrant);
+                    });
                 }
-                return;
             }
+        }
 
-            var stopMessage = message as InterfacedPoisonPill;
-            if (stopMessage != null)
+        private static void OnTaskContinuationMessage(TaskContinuationMessage continuation)
+        {
+            using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(continuation.Context)))
             {
-                var context = new MessageHandleContext { Self = Self, Sender = Sender };
+                continuation.CallbackAction(continuation.CallbackState);
+            }
+        }
+
+        private void OnResponseMessage(ResponseMessage response)
+        {
+            if (_requestWaiter != null)
+                _requestWaiter.OnResponseMessage(response);
+        }
+
+        private void OnNotificationMessage(NotificationMessage notification)
+        {
+            if (_observerMap != null)
+                _observerMap.Notify(notification);
+        }
+
+        private void OnTaskRunMessage(TaskRunMessage taskRunMessage)
+        {
+            var context = new MessageHandleContext { Self = Self, Sender = Sender };
+            if (taskRunMessage.IsReentrant == false)
+            {
                 BecomeStacked(OnReceiveInAtomicTask);
                 _currentAtomicContext = context;
+            }
+
+            using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
+            {
+                taskRunMessage.Function()
+                              .ContinueWith(t => OnTaskCompleted(taskRunMessage.IsReentrant),
+                                            TaskContinuationOptions.ExecuteSynchronously);
+            }
+            return;
+        }
+
+        private void OnInterfacedPoisonPill()
+        {
+            var context = new MessageHandleContext { Self = Self, Sender = Sender };
+            BecomeStacked(OnReceiveInAtomicTask);
+            _currentAtomicContext = context;
+
+            using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
+            {
+                OnPreStop().ContinueWith(t => OnTaskCompleted(false, true),
+                                         TaskContinuationOptions.ExecuteSynchronously);
+            }
+        }
+
+        private void HandleMessageByHandler(object message, MessageHandlerItem<T> handlerItem)
+        {
+            if (handlerItem.AsyncHandler != null)
+            {
+                var context = new MessageHandleContext { Self = Self, Sender = Sender };
+                if (handlerItem.IsReentrant == false)
+                {
+                    BecomeStacked(OnReceiveInAtomicTask);
+                    _currentAtomicContext = context;
+                }
 
                 using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                 {
-                    OnPreStop().ContinueWith(t => OnTaskCompleted(false, true),
+                    handlerItem.AsyncHandler((T)this, message)
+                               .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
                                              TaskContinuationOptions.ExecuteSynchronously);
                 }
-                return;
             }
-
-            var messageHandler = MessageDispatcher.GetHandler(message.GetType());
-            if (messageHandler != null)
+            else
             {
-                if (messageHandler.AsyncHandler != null)
-                {
-                    var context = new MessageHandleContext { Self = Self, Sender = Sender };
-                    if (messageHandler.IsReentrant == false)
-                    {
-                        BecomeStacked(OnReceiveInAtomicTask);
-                        _currentAtomicContext = context;
-                    }
-
-                    using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
-                    {
-                        messageHandler.AsyncHandler((T)this, message)
-                                      .ContinueWith(t => OnTaskCompleted(messageHandler.IsReentrant),
-                                                    TaskContinuationOptions.ExecuteSynchronously);
-                    }
-                }
-                else
-                {
-                    messageHandler.Handler((T)this, message);
-                }
-                return;
+                handlerItem.Handler((T)this, message);
             }
-
-            OnReceiveUnhandled(message);
         }
 
         private void OnReceiveInAtomicTask(object message)
@@ -266,63 +281,13 @@ namespace Akka.Interfaced
 
         // from IRequestWaiter
 
-        Task<object> IRequestWaiter.SendRequestAndReceive(IActorRef target, RequestMessage requestMessage,
+        Task<object> IRequestWaiter.SendRequestAndReceive(IActorRef target, RequestMessage request,
                                                           TimeSpan? timeout)
         {
-            // Issue requestId and register it in table
+            if (_requestWaiter == null)
+                _requestWaiter = new InterfacedActorRequestWaiter();
 
-            int requestId;
-            TaskCompletionSource<object> tcs;
-
-            lock (_requestLock)
-            {
-                if (_requestMap == null)
-                    _requestMap = new Dictionary<int, TaskCompletionSource<object>>();
-
-                requestId = ++_lastRequestId;
-                if (requestId < 0)
-                    requestId = 1;
-
-                tcs = new TaskCompletionSource<object>();
-                _requestMap[requestId] = tcs;
-            }
-
-            // Set timeout
-
-            if (timeout != null && timeout.Value != Timeout.InfiniteTimeSpan && timeout.Value > default(TimeSpan))
-            {
-                var cancellationSource = new CancellationTokenSource();
-                cancellationSource.Token.Register(() =>
-                {
-                    lock (_requestLock)
-                    {
-                        _requestMap.Remove(requestId);
-                    }
-                    tcs.TrySetCanceled();
-                });
-                cancellationSource.CancelAfter(timeout.Value);
-            }
-
-            // Fire request
-
-            requestMessage.RequestId = requestId;
-            target.Tell(requestMessage, Self);
-            return tcs.Task;
-        }
-
-        private void OnResponseMessage(ResponseMessage response)
-        {
-            TaskCompletionSource<object> tcs;
-            lock (_requestLock)
-            {
-                if (_requestMap == null || _requestMap.TryGetValue(response.RequestId, out tcs) == false)
-                    return;
-            }
-
-            if (response.Exception != null)
-                tcs.SetException(response.Exception);
-            else
-                tcs.SetResult(response.ReturnPayload != null ? response.ReturnPayload.Value : null);
+            return _requestWaiter.SendRequestAndReceive(target, request, Self, timeout);
         }
 
         // async support
@@ -355,53 +320,38 @@ namespace Akka.Interfaced
 
         // observer support
 
+        private InterfacedActorObserverMap EnsureObserverMap()
+        {
+            if (_observerMap == null)
+                _observerMap = new InterfacedActorObserverMap();
+            return _observerMap;
+        }
+
         protected int IssueObserverId()
         {
-            return ++_lastIssuedObserverId;
+            return EnsureObserverMap().IssueId();
         }
 
         protected void AddObserver(int observerId, IInterfacedObserver observer)
         {
-            if (_observerMap == null)
-                _observerMap = new Dictionary<int, IInterfacedObserver>();
-
-            _observerMap.Add(observerId, observer);
+            EnsureObserverMap().Add(observerId, observer);
         }
 
         protected IInterfacedObserver GetObserver(int observerId)
         {
-            if (_observerMap == null)
-                return null;
-
-            IInterfacedObserver observer;
-            return _observerMap.TryGetValue(observerId, out observer) ? observer : null;
+            return _observerMap != null ? _observerMap.Get(observerId) : null;
         }
 
         protected bool RemoveObserver(int observerId)
         {
-            if (_observerMap == null)
-                return false;
-
-            return _observerMap.Remove(observerId);
+            return _observerMap != null ? _observerMap.Remove(observerId) : false;
         }
 
         // PerInstance Filter related
 
-        private void CreatePerInstanceFilters()
-        {
-            if (PerInstanceFilterCreators.Count > 0)
-            {
-                _perInstanceFilters = new IFilter[PerInstanceFilterCreators.Count];
-                for (var i = 0; i < PerInstanceFilterCreators.Count; i++)
-                {
-                    _perInstanceFilters[i] = PerInstanceFilterCreators[i](this);
-                }
-            }
-        }
-
         IFilter IFilterPerInstanceProvider.GetFilter(int index)
         {
-            return _perInstanceFilters[index];
+            return _perInstanceFilterList.Get(index);
         }
     }
 }
