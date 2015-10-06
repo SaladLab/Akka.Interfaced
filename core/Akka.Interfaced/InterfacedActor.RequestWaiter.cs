@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 
 namespace Akka.Interfaced
 {
-    public class InterfacedActorRequestWaiter
+    internal class InterfacedActorRequestWaiter
     {
         private object _requestLock = new object();
         private int _lastRequestId;

@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Akka.Actor;
+using Akka.Interfaced;
+using Akka.Persistence;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
-using Akka.Actor;
 
-namespace Akka.Interfaced
+namespace Akka.Interfaced_Persistence
 {
-    public abstract class InterfacedActor<T> : UntypedActor, IWithUnboundedStash, IRequestWaiter, IFilterPerInstanceProvider
-        where T : InterfacedActor<T>
+    public abstract class InterfacedPersistentActor<T> : UntypedPersistentActor, IWithUnboundedStash, IRequestWaiter, IFilterPerInstanceProvider
+        where T : InterfacedPersistentActor<T>
     {
         #region Static Variables
 
@@ -17,7 +16,7 @@ namespace Akka.Interfaced
         private readonly static List<Func<object, IFilter>> PerInstanceFilterCreators;
         private readonly static MessageDispatcher<T> MessageDispatcher;
 
-        static InterfacedActor()
+        static InterfacedPersistentActor()
         {
             var requestHandlerBuilder = new RequestHandlerBuilder<T>();
             requestHandlerBuilder.Build();
@@ -31,7 +30,6 @@ namespace Akka.Interfaced
 
         #region Member Variables
 
-        public IStash Stash { get; set; }
         private MessageHandleContext _currentAtomicContext;
         private InterfacedActorRequestWaiter _requestWaiter;
         private InterfacedActorObserverMap _observerMap;
@@ -69,7 +67,19 @@ namespace Akka.Interfaced
             }
         }
 
-        protected override void OnReceive(object message)
+        protected override void OnRecover(object message)
+        {
+            var messageHandler = MessageDispatcher.GetHandler(message.GetType());
+            if (messageHandler != null)
+            {
+                HandleMessageByHandler(message, messageHandler);
+                return;
+            }
+
+            OnReceiveUnhandled(message);
+        }
+
+        protected override void OnCommand(object message)
         {
             var requestMessage = message as RequestMessage;
             if (requestMessage != null)
@@ -296,7 +306,7 @@ namespace Akka.Interfaced
 
         // async support
 
-        protected new void RunTask(Action action)
+        protected void RunTask(Action action)
         {
             RunTask(() =>
             {
@@ -305,7 +315,7 @@ namespace Akka.Interfaced
             });
         }
 
-        protected new void RunTask(Func<Task> function)
+        protected void RunTask(Func<Task> function)
         {
             RunTask(function, false);
         }
@@ -357,5 +367,6 @@ namespace Akka.Interfaced
         {
             return _perInstanceFilterList.Get(index);
         }
+
     }
 }

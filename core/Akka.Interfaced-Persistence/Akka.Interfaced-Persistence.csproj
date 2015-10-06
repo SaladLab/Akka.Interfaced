@@ -1,23 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5CBDA46B-B22C-474A-8B99-E2E855A8BCA8}</ProjectGuid>
+    <ProjectGuid>{6364051D-A683-4239-BBBE-88412A8F4E8B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Akka.Interfaced</RootNamespace>
-    <AssemblyName>Akka.Interfaced</AssemblyName>
+    <RootNamespace>Akka.Interfaced.Persistence</RootNamespace>
+    <AssemblyName>Akka.Interfaced-Persistence</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>..\..\output\$(AssemblyName)\obj\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\output\$(AssemblyName)\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,16 +24,31 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka">
+    <Reference Include="Akka, Version=1.0.4.12, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Akka.1.0.4\lib\net45\Akka.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
+    <Reference Include="Akka.Persistence, Version=1.0.4.12, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Akka.Persistence.1.0.4.12-beta\lib\net45\Akka.Persistence.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers, Version=2.4.1.521, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.521\lib\net40\Google.ProtocolBuffers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers.Serialization, Version=2.4.1.521, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.521\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -42,54 +56,24 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActorSynchronizationContext.cs" />
-    <Compile Include="DeadRequestProcessingActor.cs" />
-    <Compile Include="ExtendedHandlerAttribute.cs" />
-    <Compile Include="IAsyncInvokable.cs" />
-    <Compile Include="IFilter.cs" />
-    <Compile Include="IFilterFactory.cs" />
-    <Compile Include="INotificationChannel.cs" />
-    <Compile Include="IExtendedInterface.cs" />
-    <Compile Include="InterfacedActor.ObserverMap.cs" />
-    <Compile Include="InterfacedActor.PerInstanceFilterList.cs" />
-    <Compile Include="InterfacedActor.RequestWaiter.cs" />
-    <Compile Include="InterfacedObserver.cs" />
-    <Compile Include="InterfacedActor.cs" />
-    <Compile Include="InterfacedActorRef.cs" />
-    <Compile Include="IRequestWaiter.cs" />
-    <Compile Include="MessageHandler.cs" />
-    <Compile Include="MessageHandlerAttribute.cs" />
-    <Compile Include="MessageDispatcher.cs" />
-    <Compile Include="MessageHandlerBuilderInternalHelper.cs" />
-    <Compile Include="MessageHandlerBuilder.cs" />
-    <Compile Include="PayloadTableAttribute.cs" />
-    <Compile Include="NotificationMessage.cs" />
+    <Compile Include="InterfacedPersistentActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\AssemblyInfo.Extended.cs" />
-    <Compile Include="ReentrantAttribute.cs" />
-    <Compile Include="RequestDispatcher.cs" />
-    <Compile Include="RequestHandler.cs" />
-    <Compile Include="RequestHandlerBuilder.cs" />
-    <Compile Include="RequestHandlerBuilderInternalHelpers.cs" />
-    <Compile Include="ResponseMessage.cs" />
-    <Compile Include="RequestMessage.cs" />
-    <Compile Include="InterfacedPoisonPill.cs" />
-    <Compile Include="SynchronizationContextSwitcher.cs" />
-    <Compile Include="TaskContinuationMessage.cs" />
-    <Compile Include="TaskRunMessage.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">
       <Project>{c0d22336-c49e-4245-b39d-0b3083c28205}</Project>
       <Name>Akka.Interfaced-Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Akka.Interfaced\Akka.Interfaced.csproj">
+      <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>
+      <Name>Akka.Interfaced</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
