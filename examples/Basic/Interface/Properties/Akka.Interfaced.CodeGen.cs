@@ -159,22 +159,9 @@ namespace Basic.Interface
         {
             return new Type[,]
             {
-                {typeof(IncCounter_Invoke), null},
                 {typeof(GetCounter_Invoke), typeof(GetCounter_Return)},
+                {typeof(IncCounter_Invoke), null},
             };
-        }
-
-        public class IncCounter_Invoke : IInterfacedPayload, IAsyncInvokable
-        {
-            public System.Int32 delta;
-
-            public Type GetInterfaceType() { return typeof(ICounter); }
-
-            public async Task<IValueGetable> Invoke(object target)
-            {
-                await ((ICounter)target).IncCounter(delta);
-                return null;
-            }
         }
 
         public class GetCounter_Invoke : IInterfacedPayload, IAsyncInvokable
@@ -196,12 +183,25 @@ namespace Basic.Interface
 
             public object Value { get { return v; } }
         }
+
+        public class IncCounter_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.Int32 delta;
+
+            public Type GetInterfaceType() { return typeof(ICounter); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((ICounter)target).IncCounter(delta);
+                return null;
+            }
+        }
     }
 
     public interface ICounter_NoReply
     {
-        void IncCounter(System.Int32 delta);
         void GetCounter();
+        void IncCounter(System.Int32 delta);
     }
 
     public class CounterRef : InterfacedActorRef, ICounter, ICounter_NoReply
@@ -231,15 +231,6 @@ namespace Basic.Interface
             return new CounterRef(Actor, RequestWaiter, timeout);
         }
 
-        public Task IncCounter(System.Int32 delta)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new ICounter_PayloadTable.IncCounter_Invoke { delta = delta }
-            };
-            return SendRequestAndWait(requestMessage);
-        }
-
         public Task<System.Int32> GetCounter()
         {
             var requestMessage = new RequestMessage
@@ -249,13 +240,13 @@ namespace Basic.Interface
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
 
-        void ICounter_NoReply.IncCounter(System.Int32 delta)
+        public Task IncCounter(System.Int32 delta)
         {
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new ICounter_PayloadTable.IncCounter_Invoke { delta = delta }
             };
-            SendRequest(requestMessage);
+            return SendRequestAndWait(requestMessage);
         }
 
         void ICounter_NoReply.GetCounter()
@@ -263,6 +254,15 @@ namespace Basic.Interface
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new ICounter_PayloadTable.GetCounter_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ICounter_NoReply.IncCounter(System.Int32 delta)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new ICounter_PayloadTable.IncCounter_Invoke { delta = delta }
             };
             SendRequest(requestMessage);
         }
@@ -282,37 +282,11 @@ namespace Basic.Interface
         {
             return new Type[,]
             {
-                {typeof(Subscribe_Invoke), null},
-                {typeof(Unsubscribe_Invoke), null},
                 {typeof(Buy_Invoke), null},
                 {typeof(Sell_Invoke), null},
+                {typeof(Subscribe_Invoke), null},
+                {typeof(Unsubscribe_Invoke), null},
             };
-        }
-
-        public class Subscribe_Invoke : IInterfacedPayload, IAsyncInvokable
-        {
-            public Basic.Interface.EventObserver observer;
-
-            public Type GetInterfaceType() { return typeof(IEventGenerator); }
-
-            public async Task<IValueGetable> Invoke(object target)
-            {
-                await ((IEventGenerator)target).Subscribe(observer);
-                return null;
-            }
-        }
-
-        public class Unsubscribe_Invoke : IInterfacedPayload, IAsyncInvokable
-        {
-            public Basic.Interface.EventObserver observer;
-
-            public Type GetInterfaceType() { return typeof(IEventGenerator); }
-
-            public async Task<IValueGetable> Invoke(object target)
-            {
-                await ((IEventGenerator)target).Unsubscribe(observer);
-                return null;
-            }
         }
 
         public class Buy_Invoke : IInterfacedPayload, IAsyncInvokable
@@ -342,14 +316,40 @@ namespace Basic.Interface
                 return null;
             }
         }
+
+        public class Subscribe_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public Basic.Interface.EventObserver observer;
+
+            public Type GetInterfaceType() { return typeof(IEventGenerator); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IEventGenerator)target).Subscribe(observer);
+                return null;
+            }
+        }
+
+        public class Unsubscribe_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public Basic.Interface.EventObserver observer;
+
+            public Type GetInterfaceType() { return typeof(IEventGenerator); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((IEventGenerator)target).Unsubscribe(observer);
+                return null;
+            }
+        }
     }
 
     public interface IEventGenerator_NoReply
     {
-        void Subscribe(Basic.Interface.IEventObserver observer);
-        void Unsubscribe(Basic.Interface.IEventObserver observer);
         void Buy(System.String name, System.Int32 price);
         void Sell(System.String name, System.Int32 price);
+        void Subscribe(Basic.Interface.IEventObserver observer);
+        void Unsubscribe(Basic.Interface.IEventObserver observer);
     }
 
     public class EventGeneratorRef : InterfacedActorRef, IEventGenerator, IEventGenerator_NoReply
@@ -379,24 +379,6 @@ namespace Basic.Interface
             return new EventGeneratorRef(Actor, RequestWaiter, timeout);
         }
 
-        public Task Subscribe(Basic.Interface.IEventObserver observer)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
-            };
-            return SendRequestAndWait(requestMessage);
-        }
-
-        public Task Unsubscribe(Basic.Interface.IEventObserver observer)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
-            };
-            return SendRequestAndWait(requestMessage);
-        }
-
         public Task Buy(System.String name, System.Int32 price)
         {
             var requestMessage = new RequestMessage
@@ -415,22 +397,22 @@ namespace Basic.Interface
             return SendRequestAndWait(requestMessage);
         }
 
-        void IEventGenerator_NoReply.Subscribe(Basic.Interface.IEventObserver observer)
+        public Task Subscribe(Basic.Interface.IEventObserver observer)
         {
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
             };
-            SendRequest(requestMessage);
+            return SendRequestAndWait(requestMessage);
         }
 
-        void IEventGenerator_NoReply.Unsubscribe(Basic.Interface.IEventObserver observer)
+        public Task Unsubscribe(Basic.Interface.IEventObserver observer)
         {
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
             };
-            SendRequest(requestMessage);
+            return SendRequestAndWait(requestMessage);
         }
 
         void IEventGenerator_NoReply.Buy(System.String name, System.Int32 price)
@@ -447,6 +429,24 @@ namespace Basic.Interface
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new IEventGenerator_PayloadTable.Sell_Invoke { name = name, price = price }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IEventGenerator_NoReply.Subscribe(Basic.Interface.IEventObserver observer)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IEventGenerator_NoReply.Unsubscribe(Basic.Interface.IEventObserver observer)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
             };
             SendRequest(requestMessage);
         }

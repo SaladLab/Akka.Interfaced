@@ -23,9 +23,29 @@ namespace HelloWorld.Interface
         {
             return new Type[,]
             {
-                {typeof(SayHello_Invoke), typeof(SayHello_Return)},
                 {typeof(GetHelloCount_Invoke), typeof(GetHelloCount_Return)},
+                {typeof(SayHello_Invoke), typeof(SayHello_Return)},
             };
+        }
+
+        public class GetHelloCount_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType() { return typeof(IHelloWorld); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IHelloWorld)target).GetHelloCount();
+                return (IValueGetable)(new GetHelloCount_Return { v = __v });
+            }
+        }
+
+        public class GetHelloCount_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(IHelloWorld); }
+
+            public object Value { get { return v; } }
         }
 
         public class SayHello_Invoke : IInterfacedPayload, IAsyncInvokable
@@ -49,32 +69,12 @@ namespace HelloWorld.Interface
 
             public object Value { get { return v; } }
         }
-
-        public class GetHelloCount_Invoke : IInterfacedPayload, IAsyncInvokable
-        {
-            public Type GetInterfaceType() { return typeof(IHelloWorld); }
-
-            public async Task<IValueGetable> Invoke(object target)
-            {
-                var __v = await((IHelloWorld)target).GetHelloCount();
-                return (IValueGetable)(new GetHelloCount_Return { v = __v });
-            }
-        }
-
-        public class GetHelloCount_Return : IInterfacedPayload, IValueGetable
-        {
-            public System.Int32 v;
-
-            public Type GetInterfaceType() { return typeof(IHelloWorld); }
-
-            public object Value { get { return v; } }
-        }
     }
 
     public interface IHelloWorld_NoReply
     {
-        void SayHello(System.String name);
         void GetHelloCount();
+        void SayHello(System.String name);
     }
 
     public class HelloWorldRef : InterfacedActorRef, IHelloWorld, IHelloWorld_NoReply
@@ -104,15 +104,6 @@ namespace HelloWorld.Interface
             return new HelloWorldRef(Actor, RequestWaiter, timeout);
         }
 
-        public Task<System.String> SayHello(System.String name)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
-            };
-            return SendRequestAndReceive<System.String>(requestMessage);
-        }
-
         public Task<System.Int32> GetHelloCount()
         {
             var requestMessage = new RequestMessage
@@ -122,13 +113,13 @@ namespace HelloWorld.Interface
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
 
-        void IHelloWorld_NoReply.SayHello(System.String name)
+        public Task<System.String> SayHello(System.String name)
         {
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
             };
-            SendRequest(requestMessage);
+            return SendRequestAndReceive<System.String>(requestMessage);
         }
 
         void IHelloWorld_NoReply.GetHelloCount()
@@ -136,6 +127,15 @@ namespace HelloWorld.Interface
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new IHelloWorld_PayloadTable.GetHelloCount_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IHelloWorld_NoReply.SayHello(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }

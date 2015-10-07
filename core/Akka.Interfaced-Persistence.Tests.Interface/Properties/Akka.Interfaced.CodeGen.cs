@@ -24,9 +24,9 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             return new Type[,]
             {
                 {typeof(Clear_Invoke), null},
-                {typeof(Write_Invoke), null},
                 {typeof(FlushSnapshot_Invoke), null},
                 {typeof(GetDocument_Invoke), typeof(GetDocument_Return)},
+                {typeof(Write_Invoke), null},
             };
         }
 
@@ -37,19 +37,6 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             public async Task<IValueGetable> Invoke(object target)
             {
                 await ((INotepad)target).Clear();
-                return null;
-            }
-        }
-
-        public class Write_Invoke : IInterfacedPayload, IAsyncInvokable
-        {
-            public System.String message;
-
-            public Type GetInterfaceType() { return typeof(INotepad); }
-
-            public async Task<IValueGetable> Invoke(object target)
-            {
-                await ((INotepad)target).Write(message);
                 return null;
             }
         }
@@ -84,14 +71,27 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
 
             public object Value { get { return v; } }
         }
+
+        public class Write_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.String message;
+
+            public Type GetInterfaceType() { return typeof(INotepad); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((INotepad)target).Write(message);
+                return null;
+            }
+        }
     }
 
     public interface INotepad_NoReply
     {
         void Clear();
-        void Write(System.String message);
         void FlushSnapshot();
         void GetDocument();
+        void Write(System.String message);
     }
 
     public class NotepadRef : InterfacedActorRef, INotepad, INotepad_NoReply
@@ -130,15 +130,6 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task Write(System.String message)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new INotepad_PayloadTable.Write_Invoke { message = message }
-            };
-            return SendRequestAndWait(requestMessage);
-        }
-
         public Task FlushSnapshot()
         {
             var requestMessage = new RequestMessage
@@ -157,20 +148,20 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             return SendRequestAndReceive<System.Collections.Generic.IList<System.String>>(requestMessage);
         }
 
+        public Task Write(System.String message)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new INotepad_PayloadTable.Write_Invoke { message = message }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
         void INotepad_NoReply.Clear()
         {
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new INotepad_PayloadTable.Clear_Invoke {  }
-            };
-            SendRequest(requestMessage);
-        }
-
-        void INotepad_NoReply.Write(System.String message)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new INotepad_PayloadTable.Write_Invoke { message = message }
             };
             SendRequest(requestMessage);
         }
@@ -189,6 +180,15 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new INotepad_PayloadTable.GetDocument_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void INotepad_NoReply.Write(System.String message)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new INotepad_PayloadTable.Write_Invoke { message = message }
             };
             SendRequest(requestMessage);
         }

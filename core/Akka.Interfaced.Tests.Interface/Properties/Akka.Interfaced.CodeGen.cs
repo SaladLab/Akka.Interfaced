@@ -25,8 +25,8 @@ namespace Akka.Interfaced.Tests
             {
                 {typeof(Call_Invoke), null},
                 {typeof(CallWithParameter_Invoke), null},
-                {typeof(CallWithReturn_Invoke), typeof(CallWithReturn_Return)},
                 {typeof(CallWithParameterAndReturn_Invoke), typeof(CallWithParameterAndReturn_Return)},
+                {typeof(CallWithReturn_Invoke), typeof(CallWithReturn_Return)},
                 {typeof(ThrowException_Invoke), typeof(ThrowException_Return)},
             };
         }
@@ -55,26 +55,6 @@ namespace Akka.Interfaced.Tests
             }
         }
 
-        public class CallWithReturn_Invoke : IInterfacedPayload, IAsyncInvokable
-        {
-            public Type GetInterfaceType() { return typeof(IBasic); }
-
-            public async Task<IValueGetable> Invoke(object target)
-            {
-                var __v = await((IBasic)target).CallWithReturn();
-                return (IValueGetable)(new CallWithReturn_Return { v = __v });
-            }
-        }
-
-        public class CallWithReturn_Return : IInterfacedPayload, IValueGetable
-        {
-            public System.Int32 v;
-
-            public Type GetInterfaceType() { return typeof(IBasic); }
-
-            public object Value { get { return v; } }
-        }
-
         public class CallWithParameterAndReturn_Invoke : IInterfacedPayload, IAsyncInvokable
         {
             public System.Int32 value;
@@ -89,6 +69,26 @@ namespace Akka.Interfaced.Tests
         }
 
         public class CallWithParameterAndReturn_Return : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public object Value { get { return v; } }
+        }
+
+        public class CallWithReturn_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IBasic)target).CallWithReturn();
+                return (IValueGetable)(new CallWithReturn_Return { v = __v });
+            }
+        }
+
+        public class CallWithReturn_Return : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
 
@@ -124,8 +124,8 @@ namespace Akka.Interfaced.Tests
     {
         void Call();
         void CallWithParameter(System.Int32 value);
-        void CallWithReturn();
         void CallWithParameterAndReturn(System.Int32 value);
+        void CallWithReturn();
         void ThrowException(System.Boolean throwException);
     }
 
@@ -174,20 +174,20 @@ namespace Akka.Interfaced.Tests
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task<System.Int32> CallWithReturn()
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new IBasic_PayloadTable.CallWithReturn_Invoke {  }
-            };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
-        }
-
         public Task<System.Int32> CallWithParameterAndReturn(System.Int32 value)
         {
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new IBasic_PayloadTable.CallWithParameterAndReturn_Invoke { value = value }
+            };
+            return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        public Task<System.Int32> CallWithReturn()
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new IBasic_PayloadTable.CallWithReturn_Invoke {  }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -219,20 +219,20 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
 
-        void IBasic_NoReply.CallWithReturn()
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new IBasic_PayloadTable.CallWithReturn_Invoke {  }
-            };
-            SendRequest(requestMessage);
-        }
-
         void IBasic_NoReply.CallWithParameterAndReturn(System.Int32 value)
         {
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new IBasic_PayloadTable.CallWithParameterAndReturn_Invoke { value = value }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IBasic_NoReply.CallWithReturn()
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new IBasic_PayloadTable.CallWithReturn_Invoke {  }
             };
             SendRequest(requestMessage);
         }

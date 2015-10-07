@@ -26,9 +26,31 @@ namespace Protobuf.Interface
         {
             return new Type[,]
             {
-                {typeof(SayHello_Invoke), typeof(SayHello_Return)},
                 {typeof(GetHelloCount_Invoke), typeof(GetHelloCount_Return)},
+                {typeof(SayHello_Invoke), typeof(SayHello_Return)},
             };
+        }
+
+        [ProtoContract, TypeAlias]
+        public class GetHelloCount_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType() { return typeof(IHelloWorld); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IHelloWorld)target).GetHelloCount();
+                return (IValueGetable)(new GetHelloCount_Return { v = __v });
+            }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class GetHelloCount_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Int32 v;
+
+            public Type GetInterfaceType() { return typeof(IHelloWorld); }
+
+            public object Value { get { return v; } }
         }
 
         [ProtoContract, TypeAlias]
@@ -54,34 +76,12 @@ namespace Protobuf.Interface
 
             public object Value { get { return v; } }
         }
-
-        [ProtoContract, TypeAlias]
-        public class GetHelloCount_Invoke : IInterfacedPayload, IAsyncInvokable
-        {
-            public Type GetInterfaceType() { return typeof(IHelloWorld); }
-
-            public async Task<IValueGetable> Invoke(object target)
-            {
-                var __v = await((IHelloWorld)target).GetHelloCount();
-                return (IValueGetable)(new GetHelloCount_Return { v = __v });
-            }
-        }
-
-        [ProtoContract, TypeAlias]
-        public class GetHelloCount_Return : IInterfacedPayload, IValueGetable
-        {
-            [ProtoMember(1)] public System.Int32 v;
-
-            public Type GetInterfaceType() { return typeof(IHelloWorld); }
-
-            public object Value { get { return v; } }
-        }
     }
 
     public interface IHelloWorld_NoReply
     {
-        void SayHello(System.String name);
         void GetHelloCount();
+        void SayHello(System.String name);
     }
 
     [ProtoContract, TypeAlias]
@@ -123,15 +123,6 @@ namespace Protobuf.Interface
             return new HelloWorldRef(Actor, RequestWaiter, timeout);
         }
 
-        public Task<System.String> SayHello(System.String name)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
-            };
-            return SendRequestAndReceive<System.String>(requestMessage);
-        }
-
         public Task<System.Int32> GetHelloCount()
         {
             var requestMessage = new RequestMessage
@@ -141,13 +132,13 @@ namespace Protobuf.Interface
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
 
-        void IHelloWorld_NoReply.SayHello(System.String name)
+        public Task<System.String> SayHello(System.String name)
         {
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
             };
-            SendRequest(requestMessage);
+            return SendRequestAndReceive<System.String>(requestMessage);
         }
 
         void IHelloWorld_NoReply.GetHelloCount()
@@ -155,6 +146,15 @@ namespace Protobuf.Interface
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new IHelloWorld_PayloadTable.GetHelloCount_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IHelloWorld_NoReply.SayHello(System.String name)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }
@@ -176,10 +176,10 @@ namespace Protobuf.Interface
             {
                 {typeof(TestCall_Invoke), null},
                 {typeof(TestOptional_Invoke), typeof(TestOptional_Return)},
-                {typeof(TestTuple_Invoke), typeof(TestTuple_Return)},
                 {typeof(TestParams_Invoke), typeof(TestParams_Return)},
                 {typeof(TestPassClass_Invoke), typeof(TestPassClass_Return)},
                 {typeof(TestReturnClass_Invoke), typeof(TestReturnClass_Return)},
+                {typeof(TestTuple_Invoke), typeof(TestTuple_Return)},
             };
         }
 
@@ -213,30 +213,6 @@ namespace Protobuf.Interface
         public class TestOptional_Return : IInterfacedPayload, IValueGetable
         {
             [ProtoMember(1)] public System.Nullable<System.Int32> v;
-
-            public Type GetInterfaceType() { return typeof(IPedantic); }
-
-            public object Value { get { return v; } }
-        }
-
-        [ProtoContract, TypeAlias]
-        public class TestTuple_Invoke : IInterfacedPayload, IAsyncInvokable
-        {
-            [ProtoMember(1)] public System.Tuple<System.Int32, System.String> value;
-
-            public Type GetInterfaceType() { return typeof(IPedantic); }
-
-            public async Task<IValueGetable> Invoke(object target)
-            {
-                var __v = await((IPedantic)target).TestTuple(value);
-                return (IValueGetable)(new TestTuple_Return { v = (System.Tuple<System.Int32, System.String>)__v });
-            }
-        }
-
-        [ProtoContract, TypeAlias]
-        public class TestTuple_Return : IInterfacedPayload, IValueGetable
-        {
-            [ProtoMember(1)] public System.Tuple<System.Int32, System.String> v;
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
@@ -315,16 +291,40 @@ namespace Protobuf.Interface
 
             public object Value { get { return v; } }
         }
+
+        [ProtoContract, TypeAlias]
+        public class TestTuple_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            [ProtoMember(1)] public System.Tuple<System.Int32, System.String> value;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((IPedantic)target).TestTuple(value);
+                return (IValueGetable)(new TestTuple_Return { v = (System.Tuple<System.Int32, System.String>)__v });
+            }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class TestTuple_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public System.Tuple<System.Int32, System.String> v;
+
+            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public object Value { get { return v; } }
+        }
     }
 
     public interface IPedantic_NoReply
     {
         void TestCall();
         void TestOptional(System.Nullable<System.Int32> value);
-        void TestTuple(System.Tuple<System.Int32, System.String> value);
         void TestParams(params System.Int32[] values);
         void TestPassClass(Protobuf.Interface.TestParam param);
         void TestReturnClass(System.Int32 value, System.Int32 offset);
+        void TestTuple(System.Tuple<System.Int32, System.String> value);
     }
 
     [ProtoContract, TypeAlias]
@@ -384,15 +384,6 @@ namespace Protobuf.Interface
             return SendRequestAndReceive<System.Nullable<System.Int32>>(requestMessage);
         }
 
-        public Task<System.Tuple<System.Int32, System.String>> TestTuple(System.Tuple<System.Int32, System.String> value)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
-            };
-            return SendRequestAndReceive<System.Tuple<System.Int32, System.String>>(requestMessage);
-        }
-
         public Task<System.Int32[]> TestParams(params System.Int32[] values)
         {
             var requestMessage = new RequestMessage
@@ -420,6 +411,15 @@ namespace Protobuf.Interface
             return SendRequestAndReceive<Protobuf.Interface.TestResult>(requestMessage);
         }
 
+        public Task<System.Tuple<System.Int32, System.String>> TestTuple(System.Tuple<System.Int32, System.String> value)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+            };
+            return SendRequestAndReceive<System.Tuple<System.Int32, System.String>>(requestMessage);
+        }
+
         void IPedantic_NoReply.TestCall()
         {
             var requestMessage = new RequestMessage
@@ -434,15 +434,6 @@ namespace Protobuf.Interface
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = (System.Nullable<System.Int32>)value }
-            };
-            SendRequest(requestMessage);
-        }
-
-        void IPedantic_NoReply.TestTuple(System.Tuple<System.Int32, System.String> value)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
             };
             SendRequest(requestMessage);
         }
@@ -473,6 +464,15 @@ namespace Protobuf.Interface
             };
             SendRequest(requestMessage);
         }
+
+        void IPedantic_NoReply.TestTuple(System.Tuple<System.Int32, System.String> value)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+            };
+            SendRequest(requestMessage);
+        }
     }
 }
 
@@ -489,34 +489,10 @@ namespace Protobuf.Interface
         {
             return new Type[,]
             {
-                {typeof(GetPath_Invoke), typeof(GetPath_Return)},
                 {typeof(GetAddress_Invoke), typeof(GetAddress_Return)},
+                {typeof(GetPath_Invoke), typeof(GetPath_Return)},
                 {typeof(GetSelf_Invoke), typeof(GetSelf_Return)},
             };
-        }
-
-        [ProtoContract, TypeAlias]
-        public class GetPath_Invoke : IInterfacedPayload, IAsyncInvokable
-        {
-            [ProtoMember(1)] public Akka.Actor.ActorPath path;
-
-            public Type GetInterfaceType() { return typeof(ISurrogate); }
-
-            public async Task<IValueGetable> Invoke(object target)
-            {
-                var __v = await((ISurrogate)target).GetPath(path);
-                return (IValueGetable)(new GetPath_Return { v = __v });
-            }
-        }
-
-        [ProtoContract, TypeAlias]
-        public class GetPath_Return : IInterfacedPayload, IValueGetable
-        {
-            [ProtoMember(1)] public Akka.Actor.ActorPath v;
-
-            public Type GetInterfaceType() { return typeof(ISurrogate); }
-
-            public object Value { get { return v; } }
         }
 
         [ProtoContract, TypeAlias]
@@ -537,6 +513,30 @@ namespace Protobuf.Interface
         public class GetAddress_Return : IInterfacedPayload, IValueGetable
         {
             [ProtoMember(1)] public Akka.Actor.Address v;
+
+            public Type GetInterfaceType() { return typeof(ISurrogate); }
+
+            public object Value { get { return v; } }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class GetPath_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            [ProtoMember(1)] public Akka.Actor.ActorPath path;
+
+            public Type GetInterfaceType() { return typeof(ISurrogate); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                var __v = await((ISurrogate)target).GetPath(path);
+                return (IValueGetable)(new GetPath_Return { v = __v });
+            }
+        }
+
+        [ProtoContract, TypeAlias]
+        public class GetPath_Return : IInterfacedPayload, IValueGetable
+        {
+            [ProtoMember(1)] public Akka.Actor.ActorPath v;
 
             public Type GetInterfaceType() { return typeof(ISurrogate); }
 
@@ -568,8 +568,8 @@ namespace Protobuf.Interface
 
     public interface ISurrogate_NoReply
     {
-        void GetPath(Akka.Actor.ActorPath path);
         void GetAddress(Akka.Actor.Address address);
+        void GetPath(Akka.Actor.ActorPath path);
         void GetSelf();
     }
 
@@ -612,15 +612,6 @@ namespace Protobuf.Interface
             return new SurrogateRef(Actor, RequestWaiter, timeout);
         }
 
-        public Task<Akka.Actor.ActorPath> GetPath(Akka.Actor.ActorPath path)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new ISurrogate_PayloadTable.GetPath_Invoke { path = path }
-            };
-            return SendRequestAndReceive<Akka.Actor.ActorPath>(requestMessage);
-        }
-
         public Task<Akka.Actor.Address> GetAddress(Akka.Actor.Address address)
         {
             var requestMessage = new RequestMessage
@@ -628,6 +619,15 @@ namespace Protobuf.Interface
                 InvokePayload = new ISurrogate_PayloadTable.GetAddress_Invoke { address = address }
             };
             return SendRequestAndReceive<Akka.Actor.Address>(requestMessage);
+        }
+
+        public Task<Akka.Actor.ActorPath> GetPath(Akka.Actor.ActorPath path)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new ISurrogate_PayloadTable.GetPath_Invoke { path = path }
+            };
+            return SendRequestAndReceive<Akka.Actor.ActorPath>(requestMessage);
         }
 
         public Task<Akka.Actor.ActorRefBase> GetSelf()
@@ -639,20 +639,20 @@ namespace Protobuf.Interface
             return SendRequestAndReceive<Akka.Actor.ActorRefBase>(requestMessage);
         }
 
-        void ISurrogate_NoReply.GetPath(Akka.Actor.ActorPath path)
-        {
-            var requestMessage = new RequestMessage
-            {
-                InvokePayload = new ISurrogate_PayloadTable.GetPath_Invoke { path = path }
-            };
-            SendRequest(requestMessage);
-        }
-
         void ISurrogate_NoReply.GetAddress(Akka.Actor.Address address)
         {
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new ISurrogate_PayloadTable.GetAddress_Invoke { address = address }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISurrogate_NoReply.GetPath(Akka.Actor.ActorPath path)
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new ISurrogate_PayloadTable.GetPath_Invoke { path = path }
             };
             SendRequest(requestMessage);
         }
