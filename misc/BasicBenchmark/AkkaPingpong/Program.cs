@@ -14,7 +14,7 @@ namespace AkkaPingpong
         static void Main(string[] args)
         {
             DoLocalTest(1000, 1000);
-            // DoRemoteTest(100, 1000);
+            // DoRemoteTest(1000, 1000);
         }
 
         private static void DoLocalTest(int actorCount, int pingCount)
@@ -59,7 +59,6 @@ namespace AkkaPingpong
             }
         }
 
-        /*
         private static void DoRemoteTest(int actorCount, int pingCount)
         {
             // make clients and servers
@@ -70,7 +69,10 @@ namespace AkkaPingpong
             var servers = CreateRemoteServers(actorCount);
             var clients = CreateRemoteClients(actorCount);
 
-            var warmUpTasks = clients.Select(x => x.Start(1)).ToArray();
+            var warmUpTasks = clients.Select(x =>
+                x.Ask<ClientMessages.StartResponse>(
+                    new ClientMessages.StartRequest { Count = 1 })
+            ).ToArray();
             Task.WaitAll(warmUpTasks);
 
             t1.Stop();
@@ -81,7 +83,10 @@ namespace AkkaPingpong
             var t2 = new Stopwatch();
             t2.Start();
 
-            var pingTasks = clients.Select(x => x.Start(pingCount)).ToArray();
+            var pingTasks = clients.Select(x =>
+                x.Ask<ClientMessages.StartResponse>(
+                    new ClientMessages.StartRequest { Count = pingCount })
+            ).ToArray();
             Task.WaitAll(pingTasks);
 
             t2.Stop();
@@ -94,14 +99,6 @@ namespace AkkaPingpong
                 akka {  
                     actor {
                         provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
-                        serializers {
-                          proto = ""Akka.Interfaced.ProtobufSerializer.ProtobufSerializer, Akka.Interfaced-ProtobufSerializer""
-                        }
-                        serialization-bindings {
-                          ""Akka.Interfaced.NotificationMessage, Akka.Interfaced"" = proto
-                          ""Akka.Interfaced.RequestMessage, Akka.Interfaced"" = proto
-                          ""Akka.Interfaced.ResponseMessage, Akka.Interfaced"" = proto
-                        }
                     }
                     remote {
                         helios.tcp {
@@ -114,7 +111,6 @@ namespace AkkaPingpong
                 }");
 
             var system = ActorSystem.Create("ServerSystem", config);
-            DeadRequestProcessingActor.Install(system);
 
             var servers = new IActorRef[count];
             for (int i = 0; i < count; i++)
@@ -125,20 +121,12 @@ namespace AkkaPingpong
             return servers;
         }
 
-        private static ClientRef[] CreateRemoteClients(int count)
+        private static IActorRef[] CreateRemoteClients(int count)
         {
             var config = ConfigurationFactory.ParseString(@"
                 akka {  
                     actor {
                         provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
-                        serializers {
-                          proto = ""Akka.Interfaced.ProtobufSerializer.ProtobufSerializer, Akka.Interfaced-ProtobufSerializer""
-                        }
-                        serialization-bindings {
-                          ""Akka.Interfaced.NotificationMessage, Akka.Interfaced"" = proto
-                          ""Akka.Interfaced.RequestMessage, Akka.Interfaced"" = proto
-                          ""Akka.Interfaced.ResponseMessage, Akka.Interfaced"" = proto
-                        }
                     }
                     remote {
                         helios.tcp {
@@ -150,18 +138,16 @@ namespace AkkaPingpong
                 }");
 
             var system = ActorSystem.Create("ClientSystem", config);
-            DeadRequestProcessingActor.Install(system);
 
-            var clients = new ClientRef[count];
+            var clients = new IActorRef[count];
             for (int i = 0; i < count; i++)
             {
                 var serverPath = $"akka.tcp://ServerSystem@127.0.0.1:8081/user/Server_{i}";
                 var server = system.ActorSelection(serverPath).ResolveOne(TimeSpan.Zero).Result;
                 var client = system.ActorOf(Props.Create<ClientActor>(server), "Client_" + i);
-                clients[i] = new ClientRef(client);
+                clients[i] = client;
             }
             return clients;
         }
-        */
     }
 }
