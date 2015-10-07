@@ -5,9 +5,10 @@ using System.Linq;
 using Xunit;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Akka.Interfaced.Persistence;
 using Akka.Persistence;
 
-namespace Akka.Interfaced_Persistence.Tests
+namespace Akka.Interfaced.Persistence.Tests
 {
     public class NotepadClearEvent
     {
@@ -25,9 +26,16 @@ namespace Akka.Interfaced_Persistence.Tests
 
     public class TestNotepadActor : InterfacedPersistentActor<TestNotepadActor>, INotepad
     {
+        private List<string> _eventLog;
         private NotepadState _state;
 
-        public override string PersistenceId => "Notepad";
+        public override string PersistenceId { get; }
+
+        public TestNotepadActor(string id, List<string> eventLog)
+        {
+            PersistenceId = id;
+            _eventLog = eventLog;
+        }
 
         protected override Task OnPreStart()
         {
@@ -40,6 +48,8 @@ namespace Akka.Interfaced_Persistence.Tests
         [MessageHandler]
         private void OnRecover(SnapshotOffer snapshot)
         {
+            _eventLog.Add("OnRecover(SnapshotOffer)");
+
             var state = (NotepadState)snapshot.Snapshot;
             if (state != null)
                 _state = state;
@@ -48,16 +58,22 @@ namespace Akka.Interfaced_Persistence.Tests
         [MessageHandler]
         private void OnRecover(NotepadClearEvent message)
         {
+            _eventLog.Add("OnRecover(NotepadClearEvent)");
+
             _state.Document.Clear();
         }
 
         [MessageHandler]
         private void OnRecover(NotepadWriteEvent message)
         {
+            _eventLog.Add("OnRecover(NotepadWriteEvent)");
+
             _state.Document.Add(message.Message);
         }
 
         #endregion
+
+        #region INotepad
 
         async Task INotepad.Clear()
         {
@@ -67,8 +83,13 @@ namespace Akka.Interfaced_Persistence.Tests
 
         async Task INotepad.Write(string message)
         {
-            await PersistTaskAsync(new NotepadClearEvent());
+            await PersistTaskAsync(new NotepadWriteEvent { Message = message });
             _state.Document.Add(message);
+        }
+
+        async Task INotepad.FlushSnapshot()
+        {
+            await SaveSnapshotTaskAsync(_state);
         }
 
         Task<IList<string>> INotepad.GetDocument()
@@ -76,11 +97,6 @@ namespace Akka.Interfaced_Persistence.Tests
             return Task.FromResult((IList<string>)_state.Document);
         }
 
-        private Task PersistTaskAsync<TEvent>(TEvent @event)
-        {
-            var tcs = new TaskCompletionSource<bool>();
-            Persist(@event, _ => tcs.SetResult(true));
-            return tcs.Task;
-        }
+        #endregion
     }
 }

@@ -25,6 +25,7 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             {
                 {typeof(Clear_Invoke), null},
                 {typeof(Write_Invoke), null},
+                {typeof(FlushSnapshot_Invoke), null},
                 {typeof(GetDocument_Invoke), typeof(GetDocument_Return)},
             };
         }
@@ -49,6 +50,17 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             public async Task<IValueGetable> Invoke(object target)
             {
                 await ((INotepad)target).Write(message);
+                return null;
+            }
+        }
+
+        public class FlushSnapshot_Invoke : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType() { return typeof(INotepad); }
+
+            public async Task<IValueGetable> Invoke(object target)
+            {
+                await ((INotepad)target).FlushSnapshot();
                 return null;
             }
         }
@@ -78,6 +90,7 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
     {
         void Clear();
         void Write(System.String message);
+        void FlushSnapshot();
         void GetDocument();
     }
 
@@ -126,6 +139,15 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             return SendRequestAndWait(requestMessage);
         }
 
+        public Task FlushSnapshot()
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new INotepad_PayloadTable.FlushSnapshot_Invoke {  }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
         public Task<System.Collections.Generic.IList<System.String>> GetDocument()
         {
             var requestMessage = new RequestMessage
@@ -149,6 +171,15 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             var requestMessage = new RequestMessage
             {
                 InvokePayload = new INotepad_PayloadTable.Write_Invoke { message = message }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void INotepad_NoReply.FlushSnapshot()
+        {
+            var requestMessage = new RequestMessage
+            {
+                InvokePayload = new INotepad_PayloadTable.FlushSnapshot_Invoke {  }
             };
             SendRequest(requestMessage);
         }

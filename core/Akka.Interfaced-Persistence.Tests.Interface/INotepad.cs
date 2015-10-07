@@ -8,6 +8,7 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
     {
         Task Clear();
         Task Write(string message);
+        Task FlushSnapshot();
         Task<IList<string>> GetDocument();
     }
 }

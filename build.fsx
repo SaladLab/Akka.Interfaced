@@ -168,6 +168,7 @@ module Nuget =
         match project with
         | "Akka.Interfaced" -> [ "Akka.Interfaced-Base", release.NugetVersion ]
         | "Akka.Interfaced-Base" -> []
+        | "Akka.Interfaced-Persistence" -> [ "Akka.Interfaced", release.NugetVersion ]
         | "Akka.Interfaced-ProtobufSerializer" -> [ "Akka.Interfaced", release.NugetVersion ]
         | "Akka.Interfaced-SlimClient" -> [ "Akka.Interfaced-Base", release.NugetVersion ]
         | "Akka.Interfaced-SlimSocketBase" -> []

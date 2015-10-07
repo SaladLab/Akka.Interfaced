@@ -3,9 +3,10 @@ using Akka.Interfaced;
 using Akka.Persistence;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace Akka.Interfaced_Persistence
+namespace Akka.Interfaced.Persistence
 {
     public abstract class InterfacedPersistentActor<T> : UntypedPersistentActor, IWithUnboundedStash, IRequestWaiter, IFilterPerInstanceProvider
         where T : InterfacedPersistentActor<T>
@@ -34,6 +35,7 @@ namespace Akka.Interfaced_Persistence
         private InterfacedActorRequestWaiter _requestWaiter;
         private InterfacedActorObserverMap _observerMap;
         private InterfacedActorPerInstanceFilterList _perInstanceFilterList;
+        private Dictionary<long, TaskCompletionSource<SnapshotMetadata>> _saveSnapshotTcsMap;
 
         #endregion
 
@@ -65,6 +67,8 @@ namespace Akka.Interfaced_Persistence
                     t => OnTaskCompleted(false),
                     TaskContinuationOptions.ExecuteSynchronously);
             }
+
+            base.PreStart();
         }
 
         protected override void OnRecover(object message)
@@ -129,6 +133,9 @@ namespace Akka.Interfaced_Persistence
                 HandleMessageByHandler(message, messageHandler);
                 return;
             }
+
+            if (HandleSnapshotResultMessages(message))
+                return;
 
             OnReceiveUnhandled(message);
         }
@@ -275,6 +282,9 @@ namespace Akka.Interfaced_Persistence
                 return;
             }
 
+            if (HandleSnapshotResultMessages(message))
+                return;
+
             Stash.Stash();
         }
 
@@ -368,5 +378,67 @@ namespace Akka.Interfaced_Persistence
             return _perInstanceFilterList.Get(index);
         }
 
+        // Additional persistent features
+
+        protected Task PersistTaskAsync<TEvent>(TEvent @event)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            Persist(@event, _ => tcs.SetResult(true));
+            return tcs.Task;
+        }
+
+        protected Task Persist<TEvent>(IEnumerable<TEvent> events, Action<TEvent> handler)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            Persist(events, _ => tcs.SetResult(true));
+            return tcs.Task;
+        }
+
+        protected Task<SnapshotMetadata> SaveSnapshotTaskAsync(object snapshot)
+        {
+            if (_saveSnapshotTcsMap == null)
+                _saveSnapshotTcsMap = new Dictionary<long, TaskCompletionSource<SnapshotMetadata>>();
+
+            var metadata = new SnapshotMetadata(SnapshotterId, SnapshotSequenceNr);
+            if (_saveSnapshotTcsMap.ContainsKey(SnapshotSequenceNr))
+                return Task.FromResult(metadata);
+
+            var tcs = new TaskCompletionSource<SnapshotMetadata>();
+            _saveSnapshotTcsMap.Add(SnapshotSequenceNr, tcs);
+
+            SnapshotStore.Tell(new SaveSnapshot(metadata, snapshot), Self);
+            return tcs.Task;
+        }
+
+        protected bool HandleSnapshotResultMessages(object message)
+        {
+            var success = message as SaveSnapshotSuccess;
+            if (success != null)
+            {
+                var seq = success.Metadata.SequenceNr;
+                TaskCompletionSource<SnapshotMetadata> tcs;
+                if (_saveSnapshotTcsMap.TryGetValue(seq, out tcs))
+                {
+                    _saveSnapshotTcsMap.Remove(seq);
+                    tcs.SetResult(success.Metadata);
+                }
+                return true;
+            }
+
+            var failure = message as SaveSnapshotFailure;
+            if (failure != null)
+            {
+                var seq = failure.Metadata.SequenceNr;
+                TaskCompletionSource<SnapshotMetadata> tcs;
+                if (_saveSnapshotTcsMap.TryGetValue(seq, out tcs))
+                {
+                    _saveSnapshotTcsMap.Remove(seq);
+                    tcs.SetException(failure.Cause ?? new Exception("No Exception"));
+                }
+                return true;
+            }
+
+            return false;
+        }
     }
 }

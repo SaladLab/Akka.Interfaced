@@ -79,6 +79,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="CleanupLocalSnapshots.cs" />
     <Compile Include="TestNotepadActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestPersistentActor.cs" />
