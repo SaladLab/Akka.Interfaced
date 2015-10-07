@@ -5,7 +5,7 @@ namespace Akka.Interfaced
 {
     public class MessageDispatcher<T> where T : class
     {
-        private Dictionary<Type, MessageHandlerItem<T>> _handlerTable;
+        private readonly Dictionary<Type, MessageHandlerItem<T>> _handlerTable;
 
         public MessageDispatcher()
         {

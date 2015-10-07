@@ -5,7 +5,7 @@ namespace Akka.Interfaced
 {
     public class RequestDispatcher<T> where T : class
     {
-        private Dictionary<Type, RequestHandlerItem<T>> _handlerTable;
+        private readonly Dictionary<Type, RequestHandlerItem<T>> _handlerTable;
 
         public RequestDispatcher(Dictionary<Type, RequestHandlerItem<T>> handlerTable)
         {

@@ -5,7 +5,7 @@ namespace Akka.Interfaced
     internal class InterfacedActorObserverMap
     {
         private int _lastIssuedObserverId;
-        private Dictionary<int, IInterfacedObserver> _observerMap = new Dictionary<int, IInterfacedObserver>();
+        private readonly Dictionary<int, IInterfacedObserver> _observerMap = new Dictionary<int, IInterfacedObserver>();
 
         public int IssueId()
         {
