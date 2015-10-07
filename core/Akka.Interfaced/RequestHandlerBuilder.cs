@@ -67,11 +67,14 @@ namespace Akka.Interfaced
                     continue;
 
                 var interfaceMap = type.GetInterfaceMap(ifs);
+                var methodItems = interfaceMap.InterfaceMethods.Zip(interfaceMap.TargetMethods, Tuple.Create)
+                                              .OrderBy(p => p.Item1, new MethodInfoComparer())
+                                              .ToArray();
                 var payloadTypeTable = GetInterfacePayloadTypeTable(ifs);
 
-                for (var i = 0; i < interfaceMap.InterfaceMethods.Length; i++)
+                for (var i = 0; i < methodItems.Length; i++)
                 {
-                    var targetMethod = interfaceMap.TargetMethods[i];
+                    var targetMethod = methodItems[i].Item2;
                     var invokePayloadType = payloadTypeTable[i, 0];
                     var returnPayloadType = payloadTypeTable[i, 1];
 
@@ -111,7 +114,7 @@ namespace Akka.Interfaced
             foreach (var ifs in extendedInterfaces)
             {
                 var payloadTypeTable = GetInterfacePayloadTypeTable(ifs);
-                var interfaceMethods = ifs.GetMethods();
+                var interfaceMethods = ifs.GetMethods().OrderBy(m => m, new MethodInfoComparer()).ToArray();
 
                 for (var i = 0; i < interfaceMethods.Length; i++)
                 {

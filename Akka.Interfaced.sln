@@ -132,6 +132,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence", "core\Akka.Interfaced-Persistence\Akka.Interfaced-Persistence.csproj", "{6364051D-A683-4239-BBBE-88412A8F4E8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence.Tests.Interface", "core\Akka.Interfaced-Persistence.Tests.Interface\Akka.Interfaced-Persistence.Tests.Interface.csproj", "{1C89A43F-0B79-4711-813E-BE0AAE442547}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence.Tests", "core\Akka.Interfaced-Persistence.Tests\Akka.Interfaced-Persistence.Tests.csproj", "{168C08F8-5E3B-4803-9A91-60DC3B06272C}"
 EndProject

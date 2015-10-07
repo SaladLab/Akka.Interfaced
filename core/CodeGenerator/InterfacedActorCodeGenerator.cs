@@ -372,7 +372,7 @@ namespace CodeGen
             var methods = type.GetMethods();
             if (methods.Any(m => m.ReturnType.Name.StartsWith("Task") == false))
                 throw new Exception(string.Format("All methods of {0} should return Task or Task<T>", type.FullName));
-            return methods;
+            return methods.OrderBy(m => m, new MethodInfoComparer()).ToArray();
         }
 
         private Dictionary<MethodInfo, Tuple<string, string>> GetPayloadTypeNames(Type type, MethodInfo[] methods)
