@@ -71,7 +71,7 @@ namespace SlimHttp.Program.Server
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, "Actor not found");
+                return Request.CreateResponse(HttpStatusCode.NotFound, "Actor not found: " + e);
             }
 
             if (request.RequestId != 0)
