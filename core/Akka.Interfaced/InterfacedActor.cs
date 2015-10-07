@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 
@@ -32,11 +29,11 @@ namespace Akka.Interfaced
         #region Member Variables
 
         public IStash Stash { get; set; }
+        private int _activeReentrantCount;
         private MessageHandleContext _currentAtomicContext;
         private InterfacedActorRequestWaiter _requestWaiter;
         private InterfacedActorObserverMap _observerMap;
         private InterfacedActorPerInstanceFilterList _perInstanceFilterList;
-
         #endregion
 
         // Atomic async OnPreStart event (it will be called after PreStart)
@@ -57,15 +54,32 @@ namespace Akka.Interfaced
             if (PerInstanceFilterCreators.Count > 0)
                 _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, PerInstanceFilterCreators);
 
+            InvokeOnPreStart();
+        }
+
+        private void InvokeOnPreStart()
+        {
             var context = new MessageHandleContext { Self = Self, Sender = Sender };
             BecomeStacked(OnReceiveInAtomicTask);
             _currentAtomicContext = context;
 
             using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
             {
-                OnPreStart().ContinueWith(
-                    t => OnTaskCompleted(false),
-                    TaskContinuationOptions.ExecuteSynchronously);
+                OnPreStart().ContinueWith(t => OnTaskCompleted(false),
+                                          TaskContinuationOptions.ExecuteSynchronously);
+            }
+        }
+
+        private void InvokeOnPreStop()
+        {
+            var context = new MessageHandleContext { Self = Self };
+            BecomeStacked(OnReceiveInAtomicTask);
+            _currentAtomicContext = context;
+
+            using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
+            {
+                OnPreStop().ContinueWith(t => OnTaskCompleted(false, true),
+                                         TaskContinuationOptions.ExecuteSynchronously);
             }
         }
 
@@ -151,7 +165,11 @@ namespace Akka.Interfaced
                 // async handle
 
                 var context = new MessageHandleContext { Self = Self, Sender = Sender };
-                if (handlerItem.IsReentrant == false)
+                if (handlerItem.IsReentrant)
+                {
+                    _activeReentrantCount += 1;
+                }
+                else
                 {
                     BecomeStacked(OnReceiveInAtomicTask);
                     _currentAtomicContext = context;
@@ -160,12 +178,12 @@ namespace Akka.Interfaced
                 using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                 {
                     var requestId = request.RequestId;
-                    var IsReentrant = handlerItem.IsReentrant;
+                    var isReentrant = handlerItem.IsReentrant;
                     handlerItem.AsyncHandler((T)this, request, response =>
                     {
                         if (requestId != 0)
                             sender.Tell(response);
-                        OnTaskCompleted(IsReentrant);
+                        OnTaskCompleted(isReentrant);
                     });
                 }
             }
@@ -181,20 +199,22 @@ namespace Akka.Interfaced
 
         private void OnResponseMessage(ResponseMessage response)
         {
-            if (_requestWaiter != null)
-                _requestWaiter.OnResponseMessage(response);
+            _requestWaiter?.OnResponseMessage(response);
         }
 
         private void OnNotificationMessage(NotificationMessage notification)
         {
-            if (_observerMap != null)
-                _observerMap.Notify(notification);
+            _observerMap?.Notify(notification);
         }
 
         private void OnTaskRunMessage(TaskRunMessage taskRunMessage)
         {
             var context = new MessageHandleContext { Self = Self, Sender = Sender };
-            if (taskRunMessage.IsReentrant == false)
+            if (taskRunMessage.IsReentrant)
+            {
+                _activeReentrantCount += 1;
+            }
+            else
             {
                 BecomeStacked(OnReceiveInAtomicTask);
                 _currentAtomicContext = context;
@@ -206,19 +226,17 @@ namespace Akka.Interfaced
                               .ContinueWith(t => OnTaskCompleted(taskRunMessage.IsReentrant),
                                             TaskContinuationOptions.ExecuteSynchronously);
             }
-            return;
         }
 
         private void OnInterfacedPoisonPill()
         {
-            var context = new MessageHandleContext { Self = Self, Sender = Sender };
-            BecomeStacked(OnReceiveInAtomicTask);
-            _currentAtomicContext = context;
-
-            using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
+            if (_activeReentrantCount > 0)
             {
-                OnPreStop().ContinueWith(t => OnTaskCompleted(false, true),
-                                         TaskContinuationOptions.ExecuteSynchronously);
+                BecomeStacked(OnReceiveInWaitingForReentrantsFinished);
+            }
+            else
+            {
+                InvokeOnPreStop();
             }
         }
 
@@ -268,9 +286,41 @@ namespace Akka.Interfaced
             Stash.Stash();
         }
 
+        private void OnReceiveInWaitingForReentrantsFinished(object message)
+        {
+            var continuationMessage = message as TaskContinuationMessage;
+            if (continuationMessage != null)
+            {
+                using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(continuationMessage.Context)))
+                {
+                    continuationMessage.CallbackAction(continuationMessage.CallbackState);
+                }
+
+                if (_activeReentrantCount == 0)
+                {
+                    UnbecomeStacked();
+                    InvokeOnPreStop();
+                }
+                return;
+            }
+
+            var response = message as ResponseMessage;
+            if (response != null)
+            {
+                OnResponseMessage(response);
+                return;
+            }
+
+            Stash.Stash();
+        }
+
         private void OnTaskCompleted(bool isReentrant, bool stopOnCompleted = false)
         {
-            if (isReentrant == false)
+            if (isReentrant)
+            {
+                _activeReentrantCount -= 1;
+            }
+            else
             {
                 _currentAtomicContext = null;
                 UnbecomeStacked();
@@ -326,9 +376,7 @@ namespace Akka.Interfaced
 
         private InterfacedActorObserverMap EnsureObserverMap()
         {
-            if (_observerMap == null)
-                _observerMap = new InterfacedActorObserverMap();
-            return _observerMap;
+            return _observerMap ?? (_observerMap = new InterfacedActorObserverMap());
         }
 
         protected int IssueObserverId()
@@ -343,12 +391,12 @@ namespace Akka.Interfaced
 
         protected IInterfacedObserver GetObserver(int observerId)
         {
-            return _observerMap != null ? _observerMap.Get(observerId) : null;
+            return _observerMap?.Get(observerId);
         }
 
         protected bool RemoveObserver(int observerId)
         {
-            return _observerMap != null ? _observerMap.Remove(observerId) : false;
+            return _observerMap?.Remove(observerId) ?? false;
         }
 
         // PerInstance Filter related
