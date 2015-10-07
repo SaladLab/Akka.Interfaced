@@ -1,26 +1,8 @@
 ﻿# 해야 할 일
 
-## Code Generation
-  o ActorRef 를 그냥 Ref 로 변경
-
 ## Actor
-  - Reentrant 수행이 남아 있는 동안 OnPreStop 이 불리는 것 방지
-  - PersistentActor 에 붙이기 !
   - Observer Service 가 있어야 하네
     - CodeGeneration 때 Channel 이 ActorNotificationChannel 가 아니면 디지게 하는 처리가 필요하다!
-
-## Protocol
-  - default parameter 는 어떻게?
-  - Protobuf 같은건 어떻게 지원하도록?
-  - generic 은?
-
-## Actor Interface Binding
-  - Builder 클래스 분리
-  - Binding 할때 정렬하고 parameter 인자도 넣어서 overloading 커버
-
-## Injected Message Handling
-  - Timer 같은것이 Interfaced 와 같이 핸들링 할 수 있도록
-  - Cluster Event 같은 것도 잘 핸들링 되도록!
 
 ## StopMessage 의 문제
   - RoomDirectory 와 같이 Child Actor 를 관리하는 Actor 들은
@@ -58,13 +40,9 @@
     }
     ```
 
-    
 ## ETC
-  - Test Code 만들기
   - 주석좀
   - 코딩 컨벤션 붙여서 코드 정리! 으갸으갸
-  - Interfaced 와 Interfaced-SlimClient 의 중복 코드는 어떻게 할까?
-    - 베이스 라이브러리로 壺?하나?
   - 여러 프레임웍 지원하는 프로젝트 구조도 잡아보자.
     - 당장 .NET 3.5 와 2.0 지원을 넣어서 잘 정리해 보는게?
 	- 솔루션이 커졌는데 예제는 분리할까?
@@ -79,26 +57,9 @@
   - 서버쪽은 따로 분리할 수 있을 듯
     - 당장 급하지는 않는데 결국 해야 할 방향
 	- ClientSession, ClientGateway 와 UserActor, UserAuthenticator 를 잘 붙여보자.
-	
 
 # 아이디어
  
-## Actor Task
-  - ActorRef 가 Task 타입을 받는 것은 당연하지만 Actor 가 그러는건 좀 이상하다
-    이건 좀 hybrid 형태로 바꿔보자.
-      - IAsyncInvokable.Invoke 를 쉽게 구현했는데 그걸 할 수 없게 된다.
-      - HandlerBuilder 도 복잡해진다. prototype 이 2개가 되니.
-
-## Timer
-  - 타이머가 Interfaced 에 잘 녹아서 동작하는지 보자
-
-## Support 35 코드 nuget 으로 만들기
-  - Tuple
-  - Action
-  - TypeAlise
-
-## 슬슬 nuget 으로?
-
 ## Akka.net 에 .NET 4, 3.5 지원 얘기가 있다
   https://github.com/akkadotnet/akka.net/issues/1313
 
@@ -124,4 +85,3 @@
   - 현재 akka.net 1.0.4 에는 cluster sharding 이 없다.
   - 없어서 그냥 노드중 하나가 directory 서비스를 지원하도록 되어 있다. (SPOF)
   - 나중에 sharding 들어가면 거기에 잘 얹어 보자.
-
