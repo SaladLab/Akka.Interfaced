@@ -69,7 +69,7 @@ namespace Akka.Interfaced
             if (response.Exception != null)
                 tcs.SetException(response.Exception);
             else
-                tcs.SetResult(response.ReturnPayload != null ? response.ReturnPayload.Value : null);
+                tcs.SetResult(response.ReturnPayload?.Value);
         }
     }
 }

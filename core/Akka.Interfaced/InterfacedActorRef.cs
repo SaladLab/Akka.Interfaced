@@ -67,10 +67,7 @@ namespace Akka.Interfaced
                 else
                 {
                     var getable = response.ReturnPayload;
-                    if (getable != null)
-                        return getable.Value;
-                    else
-                        return null;
+                    return getable?.Value;
                 }
             });
         }
