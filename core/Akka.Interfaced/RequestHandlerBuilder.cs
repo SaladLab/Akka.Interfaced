@@ -455,6 +455,7 @@ namespace Akka.Interfaced
                         catch (Exception e)
                         {
                             // TODO: what if exception thrown ?
+                            Console.WriteLine(e);
                         }
                     }
                 }
@@ -506,6 +507,7 @@ namespace Akka.Interfaced
                         catch (Exception e)
                         {
                             // TODO: what if exception thrown ?
+                            Console.WriteLine(e);
                         }
                     }
                 }
