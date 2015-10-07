@@ -387,10 +387,10 @@ namespace Akka.Interfaced.Persistence
             return tcs.Task;
         }
 
-        protected Task Persist<TEvent>(IEnumerable<TEvent> events, Action<TEvent> handler)
+        protected Task PersistTaskAsync<TEvent>(IEnumerable<TEvent> events, Action<TEvent> handler)
         {
             var tcs = new TaskCompletionSource<bool>();
-            Persist(events, _ => tcs.SetResult(true));
+            Persist<TEvent>(events, _ => tcs.SetResult(true));
             return tcs.Task;
         }
 
