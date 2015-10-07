@@ -217,7 +217,7 @@ namespace Akka.Interfaced.Persistence
 
         private void OnResponseMessage(ResponseMessage response)
         {
-            _requestWaiter?.OnResponseMessage(response);
+            _requestWaiter?.OnResponseMessage(response, _currentAtomicContext);
         }
 
         private void OnNotificationMessage(NotificationMessage notification)

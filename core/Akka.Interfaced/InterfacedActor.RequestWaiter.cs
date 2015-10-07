@@ -57,7 +57,7 @@ namespace Akka.Interfaced
             return tcs.Task;
         }
 
-        public void OnResponseMessage(ResponseMessage response)
+        public void OnResponseMessage(ResponseMessage response, MessageHandleContext currentAtomicContext)
         {
             TaskCompletionSource<object> tcs;
             lock (_requestLock)
@@ -65,6 +65,11 @@ namespace Akka.Interfaced
                 if (_requestMap == null || _requestMap.TryGetValue(response.RequestId, out tcs) == false)
                     return;
             }
+
+            // Because OnResponseMessage is always called in a message loop of actor,
+            // it's safe to run post callback synchronously if possible.
+            // By this optimization one message hop can be removed.
+            ActorSynchronizationContext.EnableSynchronousPost(currentAtomicContext);
 
             if (response.Exception != null)
                 tcs.SetException(response.Exception);
