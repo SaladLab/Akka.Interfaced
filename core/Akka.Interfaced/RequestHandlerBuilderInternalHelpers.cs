@@ -203,13 +203,13 @@ namespace Akka.Interfaced
 
         private static async Task<IValueGetable> AfterTaskAsync(Task task)
         {
-            await task;
+            await task.ConfigureAwait(false);
             return null;
         }
 
         private static async Task<IValueGetable> AfterTaskValueAsync<TReturn>(Task<TReturn> task, Func<TReturn, IValueGetable> returnWrapper)
         {
-            var returnValue = await task;
+            var returnValue = await task.ConfigureAwait(false);
             return returnWrapper(returnValue);
         }
     }
