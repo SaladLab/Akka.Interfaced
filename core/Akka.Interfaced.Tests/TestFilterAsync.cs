@@ -24,16 +24,16 @@ namespace Akka.Interfaced.Tests
 
         async Task IPreHandleAsyncFilter.OnPreHandleAsync(PreHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_actorType.Name} Async.OnPreHandleAsync");
+            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPreHandleAsync");
             await Task.Yield();
-            FilterLogBoard.Log($"{_actorType.Name} Async.OnPreHandleAsync Done");
+            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPreHandleAsync Done");
         }
 
         async Task IPostHandleAsyncFilter.OnPostHandleAsync(PostHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_actorType.Name} Async.OnPostHandleAsync");
+            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPostHandleAsync");
             await Task.Yield();
-            FilterLogBoard.Log($"{_actorType.Name} Async.OnPostHandleAsync Done");
+            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPostHandleAsync Done");
         }
     }
 
@@ -43,20 +43,22 @@ namespace Akka.Interfaced.Tests
         [ExtendedHandler]
         void Atomic(int id)
         {
-            FilterLogBoard.Log($"TestFilterAsyncActor.Atomic {id}");
+            TestFilterAsync.LogBoard.Log($"TestFilterAsyncActor.Atomic {id}");
         }
 
         [ExtendedHandler, Reentrant]
         async Task Reentrant(int id)
         {
-            FilterLogBoard.Log($"TestFilterAsyncActor.Reentrant {id}");
+            TestFilterAsync.LogBoard.Log($"TestFilterAsyncActor.Reentrant {id}");
             await Task.Yield();
-            FilterLogBoard.Log($"TestFilterAsyncActor.Reentrant Done {id}");
+            TestFilterAsync.LogBoard.Log($"TestFilterAsyncActor.Reentrant Done {id}");
         }
     }
 
     public class TestFilterAsync : Akka.TestKit.Xunit2.TestKit
     {
+        public static FilterLogBoard LogBoard = new FilterLogBoard();
+
         [Fact]
         public async Task Test_SyncHandler_With_AsyncFilter_Work()
         {
@@ -73,7 +75,7 @@ namespace Akka.Interfaced.Tests
                     "TestFilterAsyncActor Async.OnPostHandleAsync",
                     "TestFilterAsyncActor Async.OnPostHandleAsync Done"
                 },
-                FilterLogBoard.GetAndClearLogs());
+                LogBoard.GetAndClearLogs());
         }
 
         [Fact]
@@ -93,7 +95,7 @@ namespace Akka.Interfaced.Tests
                     "TestFilterAsyncActor Async.OnPostHandleAsync",
                     "TestFilterAsyncActor Async.OnPostHandleAsync Done"
                 },
-                FilterLogBoard.GetAndClearLogs());
+                LogBoard.GetAndClearLogs());
         }
     }
 }

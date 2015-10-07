@@ -28,7 +28,7 @@ namespace Akka.Interfaced.Tests
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_actorType.Name} Authorize.OnPreHandle");
+            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} Authorize.OnPreHandle");
 
             var actor = (TestFilterPipelineActor)context.Actor;
             if (actor.Permission < 1)
@@ -62,12 +62,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_actorType.Name} FirstLog.OnPreHandle");
+            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPreHandle");
         }
 
         void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_actorType.Name} FirstLog.OnPostHandle");
+            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPostHandle");
         }
     }
 
@@ -90,12 +90,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_actorType.Name} LastLog.OnPreHandle");
+            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPreHandle");
         }
 
         void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_actorType.Name} LastLog.OnPostHandle");
+            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPostHandle");
         }
     }
 
@@ -113,7 +113,7 @@ namespace Akka.Interfaced.Tests
         [ExtendedHandler]
         void Atomic(int id)
         {
-            FilterLogBoard.Log($"TestFilterPipelineActor.Atomic {id}");
+            TestFilterPipeline.LogBoard.Log($"TestFilterPipelineActor.Atomic {id}");
             if (id == 0)
                 throw new ArgumentException("id");
         }
@@ -121,17 +121,19 @@ namespace Akka.Interfaced.Tests
         [ExtendedHandler, Reentrant]
         async Task Reentrant(int id)
         {
-            FilterLogBoard.Log($"TestFilterPipelineActor.Reentrant {id}");
+            TestFilterPipeline.LogBoard.Log($"TestFilterPipelineActor.Reentrant {id}");
             if (id == 0)
                 throw new ArgumentException("id");
 
             await Task.Yield();
-            FilterLogBoard.Log($"TestFilterPipelineActor.Reentrant Done {id}");
+            TestFilterPipeline.LogBoard.Log($"TestFilterPipelineActor.Reentrant Done {id}");
         }
     }
 
     public class TestFilterPipeline : Akka.TestKit.Xunit2.TestKit
     {
+        public static FilterLogBoard LogBoard = new FilterLogBoard();
+
         [Fact]
         public async Task Test_PreHandleFilter_Normal()
         {
@@ -149,7 +151,7 @@ namespace Akka.Interfaced.Tests
                     "TestFilterPipelineActor LastLog.OnPostHandle",
                     "TestFilterPipelineActor FirstLog.OnPostHandle",
                 },
-                FilterLogBoard.GetAndClearLogs());
+                LogBoard.GetAndClearLogs());
         }
 
         [Fact]
@@ -167,7 +169,7 @@ namespace Akka.Interfaced.Tests
                     "TestFilterPipelineActor LastLog.OnPostHandle",
                     "TestFilterPipelineActor FirstLog.OnPostHandle",
                 },
-                FilterLogBoard.GetAndClearLogs());
+                LogBoard.GetAndClearLogs());
         }
     }
 }

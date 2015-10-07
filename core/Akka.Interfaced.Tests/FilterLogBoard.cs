@@ -4,16 +4,16 @@ using System.Linq;
 
 namespace Akka.Interfaced.Tests
 {
-    public static class FilterLogBoard
+    public class FilterLogBoard
     {
-        private static ConcurrentQueue<string> _logs = new ConcurrentQueue<string>();
+        private ConcurrentQueue<string> _logs = new ConcurrentQueue<string>();
 
-        public static void Log(string log)
+        public void Log(string log)
         {
             _logs.Enqueue(log);
         }
 
-        public static List<string> GetAndClearLogs()
+        public List<string> GetAndClearLogs()
         {
             var logs = _logs;
             _logs = new ConcurrentQueue<string>();

@@ -38,12 +38,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
         void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
         }
     }
 
@@ -90,12 +90,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
         void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
         }
     }
 
@@ -135,7 +135,7 @@ namespace Akka.Interfaced.Tests
             if (name != null)
             {
                 _name = name;
-                FilterLogBoard.Log($"{_name}.Constructor");
+                TestFilterFactory.LogBoard.Log($"{_name}.Constructor");
             }
         }
 
@@ -143,12 +143,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
         void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
         }
     }
 
@@ -196,7 +196,7 @@ namespace Akka.Interfaced.Tests
             if (name != null)
             {
                 _name = name;
-                FilterLogBoard.Log($"{_name}.Constructor");
+                TestFilterFactory.LogBoard.Log($"{_name}.Constructor");
             }
         }
 
@@ -204,12 +204,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
         void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
         }
     }
 
@@ -257,7 +257,7 @@ namespace Akka.Interfaced.Tests
             if (name != null)
             {
                 _name = name;
-                FilterLogBoard.Log($"{_name}.Constructor");
+                TestFilterFactory.LogBoard.Log($"{_name}.Constructor");
             }
         }
 
@@ -265,12 +265,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
         void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
         {
-            FilterLogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
         }
     }
 
@@ -290,6 +290,8 @@ namespace Akka.Interfaced.Tests
 
     public class TestFilterFactory : Akka.TestKit.Xunit2.TestKit
     {
+        public static FilterLogBoard LogBoard = new FilterLogBoard();
+
         [Fact]
         public async Task Test_FilterPerClass_Work()
         {
@@ -303,7 +305,7 @@ namespace Akka.Interfaced.Tests
                     "TestFilterPerClassActor.OnPreHandle",
                     "TestFilterPerClassActor.OnPostHandle"
                 },
-                FilterLogBoard.GetAndClearLogs());
+                LogBoard.GetAndClearLogs());
         }
 
         [Fact]
@@ -319,7 +321,7 @@ namespace Akka.Interfaced.Tests
                     "TestFilterPerClassMethodActor.Call.OnPreHandle",
                     "TestFilterPerClassMethodActor.Call.OnPostHandle"
                 },
-                FilterLogBoard.GetAndClearLogs());
+                LogBoard.GetAndClearLogs());
         }
 
         [Fact]
@@ -339,7 +341,7 @@ namespace Akka.Interfaced.Tests
                     "TestFilterPerInstanceActor.OnPreHandle",
                     "TestFilterPerInstanceActor.OnPostHandle"
                 },
-                FilterLogBoard.GetAndClearLogs());
+                LogBoard.GetAndClearLogs());
         }
 
         [Fact]
@@ -363,7 +365,7 @@ namespace Akka.Interfaced.Tests
                     "TestFilterPerInstanceMethodActor.Reentrant.OnPreHandle",
                     "TestFilterPerInstanceMethodActor.Reentrant.OnPostHandle"
                 },
-                FilterLogBoard.GetAndClearLogs());
+                LogBoard.GetAndClearLogs());
         }
 
 
@@ -389,7 +391,7 @@ namespace Akka.Interfaced.Tests
                     "TestFilterPerInvokeActor.Reentrant.OnPreHandle",
                     "TestFilterPerInvokeActor.Reentrant.OnPostHandle"
                 },
-                FilterLogBoard.GetAndClearLogs());
+                LogBoard.GetAndClearLogs());
         }
     }
 }
