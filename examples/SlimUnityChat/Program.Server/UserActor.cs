@@ -130,7 +130,7 @@ namespace SlimUnityChat.Program.Server
 
             // TODO: not a good way.. is there a type-safe way?
             var targetUserMessaging = new UserMessasingRef(((UserRef)targetUser).Actor, null, null);
-            targetUserMessaging.Whisper(chatItem);
+            targetUserMessaging.WithNoReply().Whisper(chatItem);
         }
 
         Task IUserMessasing.Whisper(ChatItem chatItem)

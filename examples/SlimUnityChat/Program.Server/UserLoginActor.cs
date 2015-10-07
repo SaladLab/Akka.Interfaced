@@ -59,7 +59,7 @@ namespace SlimUnityChat.Program.Server
                     Props.Create<UserActor>(_clusterContext, _clientSession, id, observerId),
                     "user_" + id);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new ResultException(ResultCodeType.LoginFailedAlreadyConnected);
             }
@@ -76,7 +76,7 @@ namespace SlimUnityChat.Program.Server
                     registered = true;
                     break;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // TODO: Send Disconnect Message To Already Registered User.
                 }

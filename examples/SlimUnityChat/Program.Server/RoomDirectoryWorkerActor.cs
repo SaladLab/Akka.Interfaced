@@ -107,7 +107,7 @@ namespace SlimUnityChat.Program.Server
                 Context.Watch(roomActor);
                 _roomActorCount += 1;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Task.FromResult((IRoom)null);
             }
