@@ -6,6 +6,7 @@ namespace Akka.Interfaced
 {
     public interface IRequestWaiter
     {
-        Task<object> SendRequestAndReceive(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout);
+        Task SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout);
+        Task<TReturn> SendRequestAndReceive<TReturn>(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout);
     }
 }

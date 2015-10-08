@@ -335,13 +335,22 @@ namespace Akka.Interfaced
 
         // from IRequestWaiter
 
-        Task<object> IRequestWaiter.SendRequestAndReceive(IActorRef target, RequestMessage request,
-                                                          TimeSpan? timeout)
+        Task IRequestWaiter.SendRequestAndWait(
+            IActorRef target, RequestMessage request, TimeSpan? timeout)
         {
             if (_requestWaiter == null)
                 _requestWaiter = new InterfacedActorRequestWaiter();
 
-            return _requestWaiter.SendRequestAndReceive(target, request, Self, timeout);
+            return _requestWaiter.SendRequestAndWait(target, request, Self, timeout);
+        }
+
+        Task<TReturn> IRequestWaiter.SendRequestAndReceive<TReturn>(
+            IActorRef target, RequestMessage request, TimeSpan? timeout)
+        {
+            if (_requestWaiter == null)
+                _requestWaiter = new InterfacedActorRequestWaiter();
+
+            return _requestWaiter.SendRequestAndReceive<TReturn>(target, request, Self, timeout);
         }
 
         // async support

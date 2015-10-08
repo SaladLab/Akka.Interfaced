@@ -33,28 +33,32 @@ namespace Akka.Interfaced
 
         protected Task SendRequestAndWait(RequestMessage requestMessage)
         {
-            return RequestWaiter.SendRequestAndReceive(Actor, requestMessage, Timeout);
+            return RequestWaiter.SendRequestAndWait(Actor, requestMessage, Timeout);
         }
 
         protected Task<T> SendRequestAndReceive<T>(RequestMessage requestMessage)
         {
-            var task = RequestWaiter.SendRequestAndReceive(Actor, requestMessage, Timeout);
-            return task.ContinueWith(t =>
-            {
-                if (t.IsFaulted)
-                    throw t.Exception.Flatten().InnerExceptions.FirstOrDefault() ?? t.Exception;
-                else if (t.IsCanceled)
-                    throw new TaskCanceledException();
-                else
-                    return (T)t.Result;
-            }, TaskContinuationOptions.ExecuteSynchronously);
+            return RequestWaiter.SendRequestAndReceive<T>(Actor, requestMessage, Timeout);
         }
     }
 
     internal class DefaultRequestWaiter : IRequestWaiter
     {
-        Task<object> IRequestWaiter.SendRequestAndReceive(IActorRef target, RequestMessage requestMessage,
-                                                          TimeSpan? timeout)
+        Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+        {
+            requestMessage.RequestId = -1;
+            return target.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
+            {
+                var response = t.Result;
+                if (response.Exception != null)
+                {
+                    throw response.Exception;
+                }
+            });
+        }
+
+        Task<TReturn> IRequestWaiter.SendRequestAndReceive<TReturn>(
+            IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             requestMessage.RequestId = -1;
             return target.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
@@ -67,7 +71,7 @@ namespace Akka.Interfaced
                 else
                 {
                     var getable = response.ReturnPayload;
-                    return getable?.Value;
+                    return (TReturn)getable?.Value;
                 }
             });
         }

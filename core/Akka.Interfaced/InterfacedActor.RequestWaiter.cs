@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,30 +9,58 @@ namespace Akka.Interfaced
 {
     internal class InterfacedActorRequestWaiter
     {
-        private object _requestLock = new object();
         private int _lastRequestId;
-        private Dictionary<int, TaskCompletionSource<object>> _requestMap =
-            new Dictionary<int, TaskCompletionSource<object>>();
 
-        public Task<object> SendRequestAndReceive(IActorRef target, RequestMessage request, IActorRef sender,
-                                                  TimeSpan? timeout)
+        private struct ResponseWaitingItem
+        {
+            public Action<object, ResponseMessage> ResponseHandler;
+            public Action<object> CancelHandler;
+            public object TaskCompletionSource;
+        }
+
+        private readonly ConcurrentDictionary<int, ResponseWaitingItem> _responseWaitingItems =
+            new ConcurrentDictionary<int, ResponseWaitingItem>();
+
+        public Task SendRequestAndWait(
+            IActorRef target, RequestMessage request, IActorRef sender, TimeSpan? timeout)
+        {
+            return SendRequestAndReceive<object>(target, request, sender, timeout);
+        }
+
+        public Task<TReturn> SendRequestAndReceive<TReturn>(
+            IActorRef target, RequestMessage request, IActorRef sender, TimeSpan? timeout)
         {
             // Issue requestId and register it in table
 
+            var tcs = new TaskCompletionSource<TReturn>();
             int requestId;
-            TaskCompletionSource<object> tcs;
 
-            lock (_requestLock)
+            while (true)
             {
-                if (_requestMap == null)
-                    _requestMap = new Dictionary<int, TaskCompletionSource<object>>();
-
                 requestId = ++_lastRequestId;
                 if (requestId < 0)
-                    requestId = 1;
+                    requestId = _lastRequestId = 1;
 
-                tcs = new TaskCompletionSource<object>();
-                _requestMap[requestId] = tcs;
+                var added = _responseWaitingItems.TryAdd(requestId, new ResponseWaitingItem
+                {
+                    ResponseHandler = (taskCompletionSource, response) =>
+                    {
+                        var completionSource = ((TaskCompletionSource<TReturn>)taskCompletionSource);
+                        if (response.Exception != null)
+                            completionSource.SetException(response.Exception);
+                        else
+                            completionSource.SetResult((TReturn)response.ReturnPayload?.Value);
+                    },
+                    CancelHandler = (taskCompletionSource) =>
+                    {
+                        var completionSource = ((TaskCompletionSource<TReturn>)taskCompletionSource);
+                        completionSource.SetCanceled();
+                    },
+                    TaskCompletionSource = tcs
+                });
+
+                if (added)
+                    break;
             }
 
             // Set timeout
@@ -41,11 +70,11 @@ namespace Akka.Interfaced
                 var cancellationSource = new CancellationTokenSource();
                 cancellationSource.Token.Register(() =>
                 {
-                    lock (_requestLock)
+                    ResponseWaitingItem waitingItem;
+                    if (_responseWaitingItems.TryRemove(requestId, out waitingItem))
                     {
-                        _requestMap.Remove(requestId);
+                        waitingItem.CancelHandler(waitingItem.TaskCompletionSource);
                     }
-                    tcs.TrySetCanceled();
                 });
                 cancellationSource.CancelAfter(timeout.Value);
             }
@@ -59,22 +88,16 @@ namespace Akka.Interfaced
 
         public void OnResponseMessage(ResponseMessage response, MessageHandleContext currentAtomicContext)
         {
-            TaskCompletionSource<object> tcs;
-            lock (_requestLock)
-            {
-                if (_requestMap == null || _requestMap.TryGetValue(response.RequestId, out tcs) == false)
-                    return;
-            }
+            ResponseWaitingItem waitingItem;
+            if (_responseWaitingItems.TryRemove(response.RequestId, out waitingItem) == false)
+                return;
 
             // Because OnResponseMessage is always called in a message loop of actor,
             // it's safe to run post callback synchronously if possible.
             // By this optimization one message hop can be removed.
             ActorSynchronizationContext.EnableSynchronousPost(currentAtomicContext);
 
-            if (response.Exception != null)
-                tcs.SetException(response.Exception);
-            else
-                tcs.SetResult(response.ReturnPayload?.Value);
+            waitingItem.ResponseHandler(waitingItem.TaskCompletionSource, response);
         }
     }
 }
