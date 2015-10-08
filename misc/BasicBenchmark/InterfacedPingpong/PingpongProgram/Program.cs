@@ -15,8 +15,8 @@ namespace PingpongProgram
     {
         static void Main(string[] args)
         {
-            DoLocalTest(1000, 1000);
-            // DoRemoteTest(100, 1000);
+            // DoLocalTest(1000, 1000);
+            DoRemoteTest(100, 100);
         }
 
         private static void DoLocalTest(int actorCount, int pingCount)
@@ -53,7 +53,7 @@ namespace PingpongProgram
                 Task.WaitAll(pingTasks);
 
                 t2.Stop();
-                Console.WriteLine($"Ready: {t2.Elapsed}");
+                Console.WriteLine($"Test: {t2.Elapsed}");
             }
         }
 
@@ -82,7 +82,7 @@ namespace PingpongProgram
             Task.WaitAll(pingTasks);
 
             t2.Stop();
-            Console.WriteLine($"Ready: {t2.Elapsed}");
+            Console.WriteLine($"Test: {t2.Elapsed}");
         }
 
         private static IActorRef[] CreateRemoteServers(int count)

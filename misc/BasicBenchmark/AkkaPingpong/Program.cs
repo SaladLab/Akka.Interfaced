@@ -13,8 +13,8 @@ namespace AkkaPingpong
     {
         static void Main(string[] args)
         {
-            DoLocalTest(1000, 1000);
-            // DoRemoteTest(1000, 1000);
+            // DoLocalTest(1000, 1000);
+            DoRemoteTest(1000, 1000);
         }
 
         private static void DoLocalTest(int actorCount, int pingCount)
@@ -55,7 +55,7 @@ namespace AkkaPingpong
                 Task.WaitAll(pingTasks);
 
                 t2.Stop();
-                Console.WriteLine($"Ready: {t2.Elapsed}");
+                Console.WriteLine($"Test: {t2.Elapsed}");
             }
         }
 
@@ -90,7 +90,7 @@ namespace AkkaPingpong
             Task.WaitAll(pingTasks);
 
             t2.Stop();
-            Console.WriteLine($"Ready: {t2.Elapsed}");
+            Console.WriteLine($"Test: {t2.Elapsed}");
         }
 
         private static IActorRef[] CreateRemoteServers(int count)

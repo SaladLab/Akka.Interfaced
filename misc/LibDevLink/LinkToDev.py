@@ -32,8 +32,10 @@ def link(csproj):
 	
 
 def main():
-	link("../BasicBenchmark/InterfacedPingpong/PingpongProgram/PingpongProgram.csproj")
-	link("../BasicBenchmark/InterfacedPingpong/PingpongInterface/PingpongInterface.csproj")
+	# link("../BasicBenchmark/InterfacedPingpong/PingpongInterface/PingpongInterface.csproj")
+	# link("../BasicBenchmark/InterfacedPingpong/PingpongProgram/PingpongProgram.csproj")
+	link("../BasicBenchmark/SlimSocketPingpong/PingpongInterface/PingpongInterface.csproj")
+	link("../BasicBenchmark/SlimSocketPingpong/PingpongProgram/PingpongProgram.csproj")
 
 
 main()

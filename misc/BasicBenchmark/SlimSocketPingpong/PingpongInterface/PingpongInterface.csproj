@@ -5,7 +5,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F88CED35-6A64-422A-B6EC-071A0E4156D2}</ProjectGuid>
+    <ProjectGuid>{73C95BDC-2E90-48E4-B8C9-2A8819D05508}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PingpongInterface</RootNamespace>
@@ -39,11 +39,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Interfaced, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced.0.1.0.0-dev20151008\lib\net45\Akka.Interfaced.dll</HintPath>
+      <HintPath>D:\Project\GitHub\Akka.Interfaced\output\Akka.Interfaced\bin\Debug\Akka.Interfaced.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Interfaced-Base, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced-Base.0.1.0.0-dev20151008\lib\net45\Akka.Interfaced-Base.dll</HintPath>
+      <HintPath>D:\Project\GitHub\Akka.Interfaced\output\Akka.Interfaced\bin\Debug\Akka.Interfaced-Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NetLegacySupport.Action, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -76,7 +76,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IClient.cs" />
     <Compile Include="IServer.cs" />
     <Compile Include="Properties\Akka.Interfaced.CodeGen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

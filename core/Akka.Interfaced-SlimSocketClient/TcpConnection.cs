@@ -80,19 +80,15 @@ namespace Akka.Interfaced.SlimSocketClient
             try
             {
                 _client.EndConnect(ar);
-
                 _localEndPoint = _client.Client.LocalEndPoint;
                 _remoteEndPoint = _client.Client.RemoteEndPoint;
-                _logger.TraceFormat("Connected {0} with {1}", _remoteEndPoint, _localEndPoint);
+                _logger?.TraceFormat("Connected {0} with {1}", _remoteEndPoint, _localEndPoint);
             }
             catch (Exception e)
             {
                 _state = TcpState.Closed;
-
-                if (Closed != null)
-                    Closed(this, 0);
-
-                _logger.Trace(string.Format("Connect Failed {0}", _remoteEndPoint), e);
+                Closed?.Invoke(this, 0);
+                _logger?.TraceFormat("Connect Failed {0}", e, _remoteEndPoint);
                 return;
             }
 
@@ -110,7 +106,7 @@ namespace Akka.Interfaced.SlimSocketClient
 
         public void Close()
         {
-            _logger.TraceFormat("Closed From {0}", _remoteEndPoint);
+            _logger?.TraceFormat("Closed From {0}", _remoteEndPoint);
 
             if (_state == TcpState.Connected || _state == TcpState.Closing)
             {
@@ -190,7 +186,7 @@ namespace Akka.Interfaced.SlimSocketClient
                         length = (int)ms.Length;
                         if (length > _sendBuf.Length)
                         {
-                            _logger.ErrorFormat("ProcessSend got too large packet. Length={0}", length);
+                            _logger?.ErrorFormat("ProcessSend got too large packet. Length={0}", length);
                             Close();
                             return;
                         }
@@ -207,7 +203,7 @@ namespace Akka.Interfaced.SlimSocketClient
                     }
                     catch (Exception e)
                     {
-                        _logger.Trace("ProcessSend Exception", e);
+                        _logger?.Trace("ProcessSend Exception", e);
                         break;
                     }
                 }
@@ -222,7 +218,7 @@ namespace Akka.Interfaced.SlimSocketClient
             }
             catch (Exception e)
             {
-                _logger.Info("ProcessSendCallback Exception", e);
+                _logger?.Info("ProcessSendCallback Exception", e);
                 Close();
                 return;
             }
@@ -241,7 +237,7 @@ namespace Akka.Interfaced.SlimSocketClient
             }
             catch (Exception e)
             {
-                _logger.Info("ProcessRecv Exception", e);
+                _logger?.Info("ProcessRecv Exception", e);
                 Close();
             }
         }
@@ -253,7 +249,7 @@ namespace Akka.Interfaced.SlimSocketClient
                 int readed = _client.GetStream().EndRead(ar);
                 if (readed == 0)
                 {
-                    _logger.Info("ProcessRecvCallback readed == 0");
+                    _logger?.Info("ProcessRecvCallback readed == 0");
                     Close();
                     return;
                 }
@@ -261,7 +257,7 @@ namespace Akka.Interfaced.SlimSocketClient
             }
             catch (Exception e)
             {
-                _logger.Info("ProcessRecvCallback Exception", e);
+                _logger?.Info("ProcessRecvCallback Exception", e);
                 Close();
                 return;
             }
@@ -273,7 +269,7 @@ namespace Akka.Interfaced.SlimSocketClient
                     var length = _packetSerializer.PeekLength(ms);
                     if (length > _recvBuf.Length)
                     {
-                        _logger.ErrorFormat("ProcessRecvCallback got too large packet. Length={0}", length);
+                        _logger?.ErrorFormat("ProcessRecvCallback got too large packet. Length={0}", length);
                         Close();
                         return;
                     }
@@ -289,7 +285,7 @@ namespace Akka.Interfaced.SlimSocketClient
                     }
                     catch (Exception e)
                     {
-                        _logger.Error("Deserialize Error", e);
+                        _logger?.Error("Deserialize Error", e);
                         Close();
                         return;
                     }
