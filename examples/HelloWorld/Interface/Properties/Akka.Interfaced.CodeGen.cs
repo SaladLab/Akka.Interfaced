@@ -32,7 +32,7 @@ namespace HelloWorld.Interface
         {
             public Type GetInterfaceType() { return typeof(IHelloWorld); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IHelloWorld)target).GetHelloCount();
                 return (IValueGetable)(new GetHelloCount_Return { v = __v });
@@ -54,7 +54,7 @@ namespace HelloWorld.Interface
 
             public Type GetInterfaceType() { return typeof(IHelloWorld); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IHelloWorld)target).SayHello(name);
                 return (IValueGetable)(new SayHello_Return { v = __v });

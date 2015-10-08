@@ -35,7 +35,7 @@ namespace Akka.Interfaced.Tests
         {
             public Type GetInterfaceType() { return typeof(IBasic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IBasic)target).Call();
                 return null;
@@ -48,7 +48,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(IBasic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IBasic)target).CallWithParameter(value);
                 return null;
@@ -61,7 +61,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(IBasic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IBasic)target).CallWithParameterAndReturn(value);
                 return (IValueGetable)(new CallWithParameterAndReturn_Return { v = __v });
@@ -81,7 +81,7 @@ namespace Akka.Interfaced.Tests
         {
             public Type GetInterfaceType() { return typeof(IBasic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IBasic)target).CallWithReturn();
                 return (IValueGetable)(new CallWithReturn_Return { v = __v });
@@ -103,7 +103,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(IBasic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IBasic)target).ThrowException(throwException);
                 return (IValueGetable)(new ThrowException_Return { v = __v });
@@ -271,7 +271,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(IDummy); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IDummy)target).Call(param);
                 return (IValueGetable)(new Call_Return { v = __v });
@@ -366,7 +366,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(IOverloaded); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IOverloaded)target).Min(a, b);
                 return (IValueGetable)(new Min_Return { v = __v });
@@ -390,7 +390,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(IOverloaded); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IOverloaded)target).Min(a, b, c);
                 return (IValueGetable)(new Min_2_Return { v = __v });
@@ -412,7 +412,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(IOverloaded); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IOverloaded)target).Min(nums);
                 return (IValueGetable)(new Min_3_Return { v = __v });
@@ -544,7 +544,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(ISubject); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((ISubject)target).MakeEvent(eventName);
                 return null;
@@ -557,7 +557,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(ISubject); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((ISubject)target).Subscribe(observer);
                 return null;
@@ -570,7 +570,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(ISubject); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((ISubject)target).Unsubscribe(observer);
                 return null;
@@ -692,7 +692,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(IWorker); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IWorker)target).Atomic(id);
                 return null;
@@ -705,7 +705,7 @@ namespace Akka.Interfaced.Tests
 
             public Type GetInterfaceType() { return typeof(IWorker); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IWorker)target).Reentrant(id);
                 return null;

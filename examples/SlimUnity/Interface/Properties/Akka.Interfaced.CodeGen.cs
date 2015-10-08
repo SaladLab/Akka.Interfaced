@@ -40,7 +40,7 @@ namespace SlimUnity.Interface
 
             public Type GetInterfaceType() { return typeof(ICalculator); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((ICalculator)target).Concat(a, b);
                 return (IValueGetable)(new Concat_Return { v = __v });
@@ -65,7 +65,7 @@ namespace SlimUnity.Interface
 
             public Type GetInterfaceType() { return typeof(ICalculator); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((ICalculator)target).Sum(a, b);
                 return (IValueGetable)(new Sum_Return { v = __v });
@@ -89,7 +89,7 @@ namespace SlimUnity.Interface
 
             public Type GetInterfaceType() { return typeof(ICalculator); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((ICalculator)target).Sum(v);
                 return (IValueGetable)(new Sum_2_Return { v = __v });
@@ -232,7 +232,7 @@ namespace SlimUnity.Interface
         {
             public Type GetInterfaceType() { return typeof(ICounter); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((ICounter)target).GetCounter();
                 return (IValueGetable)(new GetCounter_Return { v = __v });
@@ -256,7 +256,7 @@ namespace SlimUnity.Interface
 
             public Type GetInterfaceType() { return typeof(ICounter); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((ICounter)target).IncCounter(delta);
                 return null;
@@ -374,7 +374,7 @@ namespace SlimUnity.Interface
         {
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IPedantic)target).TestCall();
                 return null;
@@ -388,7 +388,7 @@ namespace SlimUnity.Interface
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IPedantic)target).TestOptional(value);
                 return (IValueGetable)(new TestOptional_Return { v = (System.Nullable<System.Int32>)__v });
@@ -412,7 +412,7 @@ namespace SlimUnity.Interface
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IPedantic)target).TestParams(values);
                 return (IValueGetable)(new TestParams_Return { v = __v });
@@ -436,7 +436,7 @@ namespace SlimUnity.Interface
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IPedantic)target).TestPassClass(param);
                 return (IValueGetable)(new TestPassClass_Return { v = __v });
@@ -461,7 +461,7 @@ namespace SlimUnity.Interface
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IPedantic)target).TestReturnClass(value, offset);
                 return (IValueGetable)(new TestReturnClass_Return { v = __v });
@@ -485,7 +485,7 @@ namespace SlimUnity.Interface
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IPedantic)target).TestTuple(value);
                 return (IValueGetable)(new TestTuple_Return { v = (System.Tuple<System.Int32, System.String>)__v });

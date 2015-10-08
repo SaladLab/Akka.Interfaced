@@ -39,7 +39,7 @@ namespace SlimUnityChat.Interface
 
             public void SetTag(object value) { }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IOccupant)target).GetHistory();
                 return (IValueGetable)(new GetHistory_Return { v = (System.Collections.Generic.List<SlimUnityChat.Interface.ChatItem>)__v });
@@ -66,7 +66,7 @@ namespace SlimUnityChat.Interface
 
             public void SetTag(object value) { senderUserId = (System.String)value; }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IOccupant)target).Invite(targetUserId, senderUserId);
                 return null;
@@ -83,7 +83,7 @@ namespace SlimUnityChat.Interface
 
             public void SetTag(object value) { senderUserId = (System.String)value; }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IOccupant)target).Say(msg, senderUserId);
                 return null;
@@ -219,7 +219,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IRoom); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IRoom)target).Enter(userId, observer);
                 return (IValueGetable)(new Enter_Return { v = __v });
@@ -243,7 +243,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IRoom); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IRoom)target).Exit(userId);
                 return null;
@@ -360,7 +360,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IRoomDirectory); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IRoomDirectory)target).GetOrCreateRoom(name);
                 return (IValueGetable)(new GetOrCreateRoom_Return { v = (SlimUnityChat.Interface.RoomRef)__v });
@@ -382,7 +382,7 @@ namespace SlimUnityChat.Interface
         {
             public Type GetInterfaceType() { return typeof(IRoomDirectory); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IRoomDirectory)target).GetRoomList();
                 return (IValueGetable)(new GetRoomList_Return { v = (System.Collections.Generic.List<System.String>)__v });
@@ -406,7 +406,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IRoomDirectory); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IRoomDirectory)target).RemoveRoom(name);
                 return null;
@@ -541,7 +541,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IRoomDirectoryWorker); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IRoomDirectoryWorker)target).CreateRoom(name);
                 return (IValueGetable)(new CreateRoom_Return { v = (SlimUnityChat.Interface.RoomRef)__v });
@@ -565,7 +565,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IRoomDirectoryWorker); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IRoomDirectoryWorker)target).RemoveRoom(name);
                 return null;
@@ -685,7 +685,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IUser); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IUser)target).EnterRoom(name, observerId);
                 return (IValueGetable)(new EnterRoom_Return { v = (System.Tuple<System.Int32, SlimUnityChat.Interface.RoomInfo>)__v });
@@ -709,7 +709,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IUser); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IUser)target).ExitFromRoom(name);
                 return null;
@@ -721,7 +721,7 @@ namespace SlimUnityChat.Interface
         {
             public Type GetInterfaceType() { return typeof(IUser); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IUser)target).GetId();
                 return (IValueGetable)(new GetId_Return { v = __v });
@@ -743,7 +743,7 @@ namespace SlimUnityChat.Interface
         {
             public Type GetInterfaceType() { return typeof(IUser); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IUser)target).GetRoomList();
                 return (IValueGetable)(new GetRoomList_Return { v = (System.Collections.Generic.List<System.String>)__v });
@@ -768,7 +768,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IUser); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IUser)target).Whisper(targetUserId, message);
                 return null;
@@ -942,7 +942,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IUserDirectory); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IUserDirectory)target).GetUser(userId);
                 return (IValueGetable)(new GetUser_Return { v = (SlimUnityChat.Interface.UserRef)__v });
@@ -967,7 +967,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IUserDirectory); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IUserDirectory)target).RegisterUser(userId, user);
                 return null;
@@ -981,7 +981,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IUserDirectory); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IUserDirectory)target).UnregisterUser(userId);
                 return null;
@@ -1117,7 +1117,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IUserLogin); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IUserLogin)target).Login(id, password, observerId);
                 return (IValueGetable)(new Login_Return { v = __v });
@@ -1225,7 +1225,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IUserMessasing); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IUserMessasing)target).Invite(invitorUserId, roomName);
                 return null;
@@ -1239,7 +1239,7 @@ namespace SlimUnityChat.Interface
 
             public Type GetInterfaceType() { return typeof(IUserMessasing); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IUserMessasing)target).Whisper(chatItem);
                 return null;

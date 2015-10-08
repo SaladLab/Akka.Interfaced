@@ -34,7 +34,7 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
         {
             public Type GetInterfaceType() { return typeof(INotepad); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((INotepad)target).Clear();
                 return null;
@@ -45,7 +45,7 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
         {
             public Type GetInterfaceType() { return typeof(INotepad); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((INotepad)target).FlushSnapshot();
                 return null;
@@ -56,7 +56,7 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
         {
             public Type GetInterfaceType() { return typeof(INotepad); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((INotepad)target).GetDocument();
                 return (IValueGetable)(new GetDocument_Return { v = (System.Collections.Generic.IList<System.String>)__v });
@@ -78,7 +78,7 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
 
             public Type GetInterfaceType() { return typeof(INotepad); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((INotepad)target).Write(message);
                 return null;

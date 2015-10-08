@@ -36,7 +36,7 @@ namespace Protobuf.Interface
         {
             public Type GetInterfaceType() { return typeof(IHelloWorld); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IHelloWorld)target).GetHelloCount();
                 return (IValueGetable)(new GetHelloCount_Return { v = __v });
@@ -60,7 +60,7 @@ namespace Protobuf.Interface
 
             public Type GetInterfaceType() { return typeof(IHelloWorld); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IHelloWorld)target).SayHello(name);
                 return (IValueGetable)(new SayHello_Return { v = __v });
@@ -188,7 +188,7 @@ namespace Protobuf.Interface
         {
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 await ((IPedantic)target).TestCall();
                 return null;
@@ -202,7 +202,7 @@ namespace Protobuf.Interface
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IPedantic)target).TestOptional(value);
                 return (IValueGetable)(new TestOptional_Return { v = (System.Nullable<System.Int32>)__v });
@@ -226,7 +226,7 @@ namespace Protobuf.Interface
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IPedantic)target).TestParams(values);
                 return (IValueGetable)(new TestParams_Return { v = __v });
@@ -250,7 +250,7 @@ namespace Protobuf.Interface
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IPedantic)target).TestPassClass(param);
                 return (IValueGetable)(new TestPassClass_Return { v = __v });
@@ -275,7 +275,7 @@ namespace Protobuf.Interface
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IPedantic)target).TestReturnClass(value, offset);
                 return (IValueGetable)(new TestReturnClass_Return { v = __v });
@@ -299,7 +299,7 @@ namespace Protobuf.Interface
 
             public Type GetInterfaceType() { return typeof(IPedantic); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((IPedantic)target).TestTuple(value);
                 return (IValueGetable)(new TestTuple_Return { v = (System.Tuple<System.Int32, System.String>)__v });
@@ -502,7 +502,7 @@ namespace Protobuf.Interface
 
             public Type GetInterfaceType() { return typeof(ISurrogate); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((ISurrogate)target).GetAddress(address);
                 return (IValueGetable)(new GetAddress_Return { v = __v });
@@ -526,7 +526,7 @@ namespace Protobuf.Interface
 
             public Type GetInterfaceType() { return typeof(ISurrogate); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((ISurrogate)target).GetPath(path);
                 return (IValueGetable)(new GetPath_Return { v = __v });
@@ -548,7 +548,7 @@ namespace Protobuf.Interface
         {
             public Type GetInterfaceType() { return typeof(ISurrogate); }
 
-            public async Task<IValueGetable> Invoke(object target)
+            public async Task<IValueGetable> InvokeAsync(object target)
             {
                 var __v = await((ISurrogate)target).GetSelf();
                 return (IValueGetable)(new GetSelf_Return { v = __v });
