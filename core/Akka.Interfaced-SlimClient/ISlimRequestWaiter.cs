@@ -7,6 +7,6 @@ namespace Akka.Interfaced
     {
         void SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage);
         Task SendRequestAndWait(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout);
-        Task<T> SendRequestAndReceive<T>(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout);
+        Task<TReturn> SendRequestAndReceive<TReturn>(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout);
     }
 }

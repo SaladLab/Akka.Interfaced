@@ -26,9 +26,9 @@ namespace Akka.Interfaced
             return RequestWaiter.SendRequestAndWait(Actor, requestMessage, Timeout);
         }
 
-        protected Task<T> SendRequestAndReceive<T>(SlimRequestMessage requestMessage)
+        protected Task<TReturn> SendRequestAndReceive<TReturn>(SlimRequestMessage requestMessage)
         {
-            return RequestWaiter.SendRequestAndReceive<T>(Actor, requestMessage, Timeout);
+            return RequestWaiter.SendRequestAndReceive<TReturn>(Actor, requestMessage, Timeout);
         }
     }
 }
