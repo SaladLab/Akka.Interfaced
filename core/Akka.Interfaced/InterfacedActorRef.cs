@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
 
@@ -14,7 +13,7 @@ namespace Akka.Interfaced
         protected InterfacedActorRef(IActorRef actor)
         {
             Actor = actor;
-            RequestWaiter = DefaultRequestWaiter.Instance;
+            RequestWaiter = AkkaAskRequestWaiter.Instance;
         }
 
         protected InterfacedActorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null)
@@ -36,46 +35,9 @@ namespace Akka.Interfaced
             return RequestWaiter.SendRequestAndWait(Actor, requestMessage, Timeout);
         }
 
-        protected Task<T> SendRequestAndReceive<T>(RequestMessage requestMessage)
+        protected Task<TReturn> SendRequestAndReceive<TReturn>(RequestMessage requestMessage)
         {
-            return RequestWaiter.SendRequestAndReceive<T>(Actor, requestMessage, Timeout);
+            return RequestWaiter.SendRequestAndReceive<TReturn>(Actor, requestMessage, Timeout);
         }
-    }
-
-    internal class DefaultRequestWaiter : IRequestWaiter
-    {
-        Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
-        {
-            requestMessage.RequestId = -1;
-            return target.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
-            {
-                var response = t.Result;
-                if (response.Exception != null)
-                {
-                    throw response.Exception;
-                }
-            });
-        }
-
-        Task<TReturn> IRequestWaiter.SendRequestAndReceive<TReturn>(
-            IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
-        {
-            requestMessage.RequestId = -1;
-            return target.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
-            {
-                var response = t.Result;
-                if (response.Exception != null)
-                {
-                    throw response.Exception;
-                }
-                else
-                {
-                    var getable = response.ReturnPayload;
-                    return (TReturn)getable?.Value;
-                }
-            });
-        }
-
-        public static IRequestWaiter Instance = new DefaultRequestWaiter();
     }
 }

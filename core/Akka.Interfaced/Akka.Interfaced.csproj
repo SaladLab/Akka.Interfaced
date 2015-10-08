@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="ActorSynchronizationContext.cs" />
     <Compile Include="DeadRequestProcessingActor.cs" />
+    <Compile Include="AkkaAskRequestWaiter.cs" />
     <Compile Include="ExtendedHandlerAttribute.cs" />
     <Compile Include="IAsyncInvokable.cs" />
     <Compile Include="IFilter.cs" />
