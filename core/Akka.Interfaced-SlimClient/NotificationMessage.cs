@@ -1,6 +1,7 @@
 ﻿namespace Akka.Interfaced
 {
-    public class SlimNotificationMessage
+    // Observer event notification message
+    public class NotificationMessage
     {
         public int ObserverId;
         public IInvokable InvokePayload;

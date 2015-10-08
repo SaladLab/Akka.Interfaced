@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Akka.Interfaced;
 
-class SlimActorRef : ISlimActorRef
+class SlimActorRef : IActorRef
 {
     public int Id { get; set; }
 }

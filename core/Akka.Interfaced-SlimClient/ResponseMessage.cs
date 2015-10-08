@@ -2,7 +2,8 @@
 
 namespace Akka.Interfaced
 {
-    public class SlimResponseMessage
+    // Method invoke response message
+    public class ResponseMessage
     {
         public int RequestId;
         public IValueGetable ReturnPayload;

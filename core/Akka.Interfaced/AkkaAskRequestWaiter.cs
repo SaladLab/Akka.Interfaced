@@ -6,6 +6,11 @@ namespace Akka.Interfaced
 {
     internal class AkkaAskRequestWaiter : IRequestWaiter
     {
+        void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
+        {
+            target.Tell(requestMessage);
+        }
+
         Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             requestMessage.RequestId = -1;

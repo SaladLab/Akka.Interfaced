@@ -15,7 +15,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             [ProtoMember(1)] public System.String a;
             [ProtoMember(2)] public System.String b;
 
-            public Task<IValueGetable> Invoke(object target)
+            public Task<IValueGetable> InvokeAsync(object target)
             {
                 return Task.FromResult<IValueGetable>(null);
             }

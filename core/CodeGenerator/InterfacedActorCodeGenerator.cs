@@ -77,20 +77,14 @@ namespace CodeGen
                     sb.Append("\n");
 
                     if (Options.UseProtobuf)
-                        sb.AppendFormat("\t[ProtoContract, TypeAlias]\n");
+                        sb.Append("\t[ProtoContract, TypeAlias]\n");
 
-                    if (Options.UseSlimClient)
-                    {
-                        sb.AppendFormat("\tpublic class {0} : IInterfacedPayload\n", payloadTypeName.Item1);
-                    }
-                    else
-                    {
-                        sb.AppendFormat("\tpublic class {0} : IInterfacedPayload, {1}IAsyncInvokable\n",
-                            payloadTypeName.Item1,
-                            tagName != null ? "ITagOverridable, " : "");
-                    }
-
+                    sb.AppendFormat("\tpublic class {0} : IInterfacedPayload, {1}IAsyncInvokable\n",
+                        payloadTypeName.Item1,
+                        tagName != null ? "ITagOverridable, " : "");
                     sb.Append("\t{\n");
+
+                    // Parameters
                     var parameters = method.GetParameters();
                     for (var i = 0; i < parameters.Length; i++)
                     {
@@ -116,32 +110,45 @@ namespace CodeGen
                         sb.Append($"\t\t{attr}public {typeName} {parameter.Name}{defaultValueExpression};\n");
                     }
 
+                    // GetInterfaceType
+
                     if (parameters.Length > 0)
                         sb.AppendLine();
                     sb.Append($"\t\tpublic Type GetInterfaceType() {{ return typeof({type.Name}); }}\n");
 
-                    if (Options.UseSlimClient == false)
-                    {
-                        if (tagName != null)
-                        {
-                            sb.AppendLine();
-                            var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
-                            if (tagParameter != null)
-                            {
-                                var typeName = Utility.GetTransportTypeName(tagParameter.ParameterType);
-                                var setStatement = $"{tagName} = ({typeName})value;";
-                                sb.Append($"\t\tpublic void SetTag(object value) {{ {setStatement} }}\n");
-                            }
-                            else
-                            {
-                                sb.Append($"\t\tpublic void SetTag(object value) {{ }}\n");
-                            }
-                        }
+                    // SetTag
 
-                        var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
+                    if (tagName != null)
+                    {
                         sb.AppendLine();
-                        sb.AppendFormat("\t\tpublic async Task<IValueGetable> Invoke(object target)\n");
+                        var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
+                        if (tagParameter != null)
+                        {
+                            var typeName = Utility.GetTransportTypeName(tagParameter.ParameterType);
+                            var setStatement = $"{tagName} = ({typeName})value;";
+                            sb.Append($"\t\tpublic void SetTag(object value) {{ {setStatement} }}\n");
+                        }
+                        else
+                        {
+                            sb.Append($"\t\tpublic void SetTag(object value) {{ }}\n");
+                        }
+                    }
+
+                    // InvokeAsync
+
+                    sb.AppendLine();
+                    if (Options.UseSlimClient)
+                    {
+                        sb.Append("\t\tpublic Task<IValueGetable> InvokeAsync(object target)\n");
                         sb.Append("\t\t{\n");
+                        sb.AppendFormat("\t\t\treturn null;\n");
+                        sb.Append("\t\t}\n");
+                    }
+                    else
+                    {
+                        sb.Append("\t\tpublic async Task<IValueGetable> InvokeAsync(object target)\n");
+                        sb.Append("\t\t{\n");
+                        var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
                         if (returnType != null)
                         {
                             sb.AppendFormat("\t\t\tvar __v = await(({0})target).{1}({2});\n",
@@ -194,8 +201,6 @@ namespace CodeGen
             Type type, ICodeGenWriter writer,
             MethodInfo[] methods, Dictionary<MethodInfo, Tuple<string, string>> method2PayloadTypeNameMap)
         {
-            var slimPrefix = Options.UseSlimClient ? "Slim" : "";
-
             // NoReply Interface
             {
                 var sb = new StringBuilder();
@@ -222,50 +227,44 @@ namespace CodeGen
                 var noReplyInterfaceName = Utility.GetNoReplyInterfaceName(type);
                 var payloadTableClassName = Utility.GetPayloadTableClassName(type);
 
-                if (Options.UseSlimClient)
+                if (Options.UseProtobuf && Options.UseSlimClient == false)
+                    sb.AppendFormat("[ProtoContract, TypeAlias]\n");
+
+                sb.AppendFormat("public class {0} : InterfacedActorRef, {1}, {2}\n",
+                                refClassName, type.Name, noReplyInterfaceName);
+                sb.Append("{\n");
+
+                // Protobuf-net specialized
+
+                if (Options.UseProtobuf && Options.UseSlimClient == false)
                 {
-                    sb.AppendFormat("public class {0} : InterfacedSlimActorRef, {1}, {2}\n",
-                                    refClassName, type.Name, noReplyInterfaceName);
-                    sb.Append("{\n");
+                    sb.Append("\t[ProtoMember(1)] private ActorRefBase _actor\n");
+                    sb.Append("\t{\n");
+                    sb.Append("\t\tget { return (ActorRefBase)Actor; }\n");
+                    sb.Append("\t\tset { Actor = value; }\n");
+                    sb.Append("\t}\n");
+                    sb.Append("\n");
+                    sb.AppendFormat("\tprivate {0}()\n", refClassName);
+                    sb.AppendFormat("\t\t: base(null)\n");
+                    sb.Append("\t{\n");
+                    sb.Append("\t}\n");
+                    sb.Append("\n");
                 }
-                else
+
+                // Constructor
+
+                if (Options.UseSlimClient == false)
                 {
-                    if (Options.UseProtobuf)
-                        sb.AppendFormat("[ProtoContract, TypeAlias]\n");
-
-                    sb.AppendFormat("public class {0} : InterfacedActorRef, {1}, {2}\n",
-                                    refClassName, type.Name, noReplyInterfaceName);
-                    sb.Append("{\n");
-
-                    // Protobuf-net specialized
-
-                    if (Options.UseProtobuf)
-                    {
-                        sb.Append("\t[ProtoMember(1)] private ActorRefBase _actor\n");
-                        sb.Append("\t{\n");
-                        sb.Append("\t\tget { return (ActorRefBase)Actor; }\n");
-                        sb.Append("\t\tset { Actor = value; }\n");
-                        sb.Append("\t}\n");
-                        sb.Append("\n");
-                        sb.AppendFormat("\tprivate {0}()\n", refClassName);
-                        sb.AppendFormat("\t\t: base(null)\n");
-                        sb.Append("\t{\n");
-                        sb.Append("\t}\n");
-                        sb.Append("\n");
-                    }
-
-                    // Constructor
-
                     sb.AppendFormat("\tpublic {0}(IActorRef actor)\n", refClassName);
                     sb.AppendFormat("\t\t: base(actor)\n");
                     sb.Append("\t{\n");
                     sb.Append("\t}\n");
                     sb.Append("\n");
                 }
-                    
+
                 // Constructor (detailed one)
-                
-                sb.AppendFormat("\tpublic {0}(I{1}ActorRef actor, I{1}RequestWaiter requestWaiter, TimeSpan? timeout)\n", refClassName, slimPrefix);
+
+                sb.AppendFormat("\tpublic {0}(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)\n", refClassName);
                 sb.AppendFormat("\t\t: base(actor, requestWaiter, timeout)\n");
                 sb.Append("\t{\n");
                 sb.Append("\t}\n");
@@ -281,7 +280,7 @@ namespace CodeGen
                 // WithRequestWaiter
 
                 sb.Append("\n");
-                sb.AppendFormat("\tpublic {0} WithRequestWaiter(I{1}RequestWaiter requestWaiter)\n", refClassName, slimPrefix);
+                sb.AppendFormat("\tpublic {0} WithRequestWaiter(IRequestWaiter requestWaiter)\n", refClassName);
                 sb.Append("\t{\n");
                 sb.AppendFormat("\t\treturn new {0}(Actor, requestWaiter, Timeout);\n", refClassName);
                 sb.Append("\t}\n");
@@ -301,7 +300,6 @@ namespace CodeGen
                     var messageName = method2PayloadTypeNameMap[method];
                     var parameters = method.GetParameters();
 
-                    var parameterNames = string.Join(", ", parameters.Select(p => p.Name));
                     var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
                     var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + Utility.GetTransportTypeCasting(p.ParameterType) + p.Name));
                     var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
@@ -317,7 +315,7 @@ namespace CodeGen
 
                     sb.Append("\t{\n");
 
-                    sb.AppendFormat("\t\tvar requestMessage = new {0}RequestMessage\n", slimPrefix);
+                    sb.AppendFormat("\t\tvar requestMessage = new RequestMessage\n");
                     sb.Append("\t\t{\n");
                     sb.AppendFormat("\t\t\tInvokePayload = new {0}.{1} {{ {2} }}\n", payloadTableClassName, messageName.Item1, parameterInits);
                     sb.Append("\t\t};\n");
@@ -348,7 +346,7 @@ namespace CodeGen
 
                     sb.Append("\t{\n");
 
-                    sb.AppendFormat("\t\tvar requestMessage = new {0}RequestMessage\n", slimPrefix);
+                    sb.AppendFormat("\t\tvar requestMessage = new RequestMessage\n");
                     sb.Append("\t\t{\n");
                     sb.AppendFormat("\t\t\tInvokePayload = new {0}.{1} {{ {2} }}\n", payloadTableClassName, messageName.Item1, parameterInits);
                     sb.Append("\t\t};\n");

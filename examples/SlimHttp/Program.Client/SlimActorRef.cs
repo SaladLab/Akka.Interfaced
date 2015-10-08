@@ -6,7 +6,7 @@ using Akka.Interfaced;
 
 namespace SlimHttp.Program.Client
 {
-    class SlimActorRef : ISlimActorRef
+    class SlimActorRef : IActorRef
     {
         public string Id { get; set; }
     }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Akka.Actor;
 
 namespace Akka.Interfaced
 {
@@ -13,7 +12,7 @@ namespace Akka.Interfaced
         protected InterfacedActorRef(IActorRef actor)
         {
             Actor = actor;
-            RequestWaiter = AkkaAskRequestWaiter.Instance;
+            RequestWaiter = null;
         }
 
         protected InterfacedActorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null)

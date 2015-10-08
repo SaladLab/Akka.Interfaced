@@ -281,11 +281,11 @@ public class Communicator
 			*/
 			
             case PacketType.Response:
-                Action<SlimResponseMessage> handler;
+                Action<ResponseMessage> handler;
                 if (_requestResponseMap.TryGetValue(p.RequestId, out handler))
                 {
                     _requestResponseMap.Remove(p.RequestId);
-                    handler(new SlimResponseMessage
+                    handler(new ResponseMessage
                     {
                         RequestId = p.RequestId,
                         ReturnPayload = (IValueGetable)p.Message,
@@ -304,7 +304,7 @@ public class Communicator
         _closeTriggered = true;
     }
 
-    internal void SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage)
+    internal void SendRequest(IActorRef target, RequestMessage requestMessage)
     {
         // TODO: This request doesn't need reply, so it's better to remove reply processing
 
@@ -316,7 +316,7 @@ public class Communicator
         }, null);
     }
 
-    internal Task SendRequestAndWait(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
+    internal Task SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
     {
         var t = new SlimTask();
         t.Owner = _owner;
@@ -336,7 +336,7 @@ public class Communicator
         return t;
     }
 
-    internal Task<T> SendRequestAndReceive<T>(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
+    internal Task<T> SendRequestAndReceive<T>(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
     {
         var t = new SlimTask<T>();
         t.Owner = _owner;
@@ -358,9 +358,9 @@ public class Communicator
 
     private int _lastRequestId = 0;
     private List<Packet> _requestPackets = new List<Packet>();
-    private Dictionary<int, Action<SlimResponseMessage>> _requestResponseMap = new Dictionary<int, Action<SlimResponseMessage>>();
+    private Dictionary<int, Action<ResponseMessage>> _requestResponseMap = new Dictionary<int, Action<ResponseMessage>>();
 
-    private void SendRequestPacket(Packet packet, Action<SlimResponseMessage> completionHandler)
+    private void SendRequestPacket(Packet packet, Action<ResponseMessage> completionHandler)
     {
         packet.RequestId = ++_lastRequestId;
 

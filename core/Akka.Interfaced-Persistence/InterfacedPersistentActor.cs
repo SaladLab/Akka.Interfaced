@@ -356,6 +356,11 @@ namespace Akka.Interfaced.Persistence
 
         // from IRequestWaiter
 
+        void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
+        {
+            target.Tell(requestMessage);
+        }
+
         Task IRequestWaiter.SendRequestAndWait(
             IActorRef target, RequestMessage request, TimeSpan? timeout)
         {

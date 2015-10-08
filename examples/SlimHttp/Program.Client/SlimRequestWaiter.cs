@@ -13,7 +13,7 @@ using TypeAlias;
 
 namespace SlimHttp.Program.Client
 {
-    class SlimRequestWaiter : ISlimRequestWaiter
+    class SlimRequestWaiter : IRequestWaiter
     {
         public Uri Root { get; set; }
 
@@ -35,12 +35,12 @@ namespace SlimHttp.Program.Client
         private int _lastRequestId;
 
 #if NET20 || NET35
-        void ISlimRequestWaiter.SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage)
+        void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
         {
             SendRequest(target, requestMessage);
         }
 
-        Task ISlimRequestWaiter.SendRequestAndWait(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
+        Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             var httpWebRequest = SendRequest(target, requestMessage);
             var task = new SlimTask();
@@ -50,7 +50,7 @@ namespace SlimHttp.Program.Client
             return task;
         }
 
-        Task<T> ISlimRequestWaiter.SendRequestAndReceive<T>(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
+        Task<T> IRequestWaiter.SendRequestAndReceive<T>(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             var httpWebRequest = SendRequest(target, requestMessage);
             var task = new SlimTask<T>();
@@ -101,12 +101,12 @@ namespace SlimHttp.Program.Client
             }
         }
 #else
-        void ISlimRequestWaiter.SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage)
+        void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
         {
             SendRequest(target, requestMessage);
         }
 
-        async Task ISlimRequestWaiter.SendRequestAndWait(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
+        async Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             // Get result from stream
 
@@ -118,7 +118,7 @@ namespace SlimHttp.Program.Client
                 throw reply.Exception;
         }
 
-        async Task<T> ISlimRequestWaiter.SendRequestAndReceive<T>(ISlimActorRef target, SlimRequestMessage requestMessage, TimeSpan? timeout)
+        async Task<T> IRequestWaiter.SendRequestAndReceive<T>(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             // Get result from stream
 
@@ -133,7 +133,7 @@ namespace SlimHttp.Program.Client
         }
 #endif
 
-        private HttpWebRequest SendRequest(ISlimActorRef target, SlimRequestMessage requestMessage)
+        private HttpWebRequest SendRequest(IActorRef target, RequestMessage requestMessage)
         {
             var actorId = ((SlimActorRef)target).Id;
             var uri = new Uri(Root, "/actor/" + actorId);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Akka.Actor;
 
 namespace Akka.Interfaced
 {
