@@ -24,7 +24,6 @@ namespace CodeGen
 
             var methods = GetInvokableMethods(type);
             var method2PayloadTypeNameMap = GetPayloadTypeNames(type, methods);
-            var tagName = Utility.GetActorInterfaceTagName(type);
 
             // Generate all
 
@@ -44,25 +43,23 @@ namespace CodeGen
             var sb = new StringBuilder();
             var className = Utility.GetPayloadTableClassName(type);
 
-            if (Options.UseSlimClient == false)
-                sb.AppendFormat("[PayloadTableForInterfacedActor(typeof({0}))]\n", type.Name);
-
-            sb.AppendFormat("public static class {0}\n", className);
+            sb.Append($"[PayloadTableForInterfacedActor(typeof({type.Name}))]\n");
+            sb.Append($"public static class {className}\n");
             sb.Append("{\n");
 
             // generate GetPayloadTypes method
 
-            sb.AppendFormat("\tpublic static Type[,] GetPayloadTypes()\n");
+            sb.Append("\tpublic static Type[,] GetPayloadTypes()\n");
             sb.Append("\t{\n");
-            sb.AppendFormat("\t\treturn new Type[,]\n");
+            sb.Append("\t\treturn new Type[,]\n");
             sb.Append("\t\t{\n");
 
             foreach (var method in methods)
             {
                 var typeName = method2PayloadTypeNameMap[method];
                 sb.AppendFormat("\t\t\t{{{0}, {1}}},\n",
-                    string.Format("typeof({0})", typeName.Item1),
-                    typeName.Item2 != "" ? string.Format("typeof({0})", typeName.Item2) : "null");
+                                $"typeof({typeName.Item1})",
+                                typeName.Item2 != "" ? $"typeof({typeName.Item2})" : "null");
             }
 
             sb.Append("\t\t};\n");
@@ -105,10 +102,9 @@ namespace CodeGen
                         {
                             var defaultValueAttr =
                                 parameter.HasNonTrivialDefaultValue()
-                                    ? string.Format(", DefaultValue({0})",
-                                                    Utility.GetValueLiteral(parameter.DefaultValue))
+                                    ? $", DefaultValue({Utility.GetValueLiteral(parameter.DefaultValue)})"
                                     : "";
-                            attr = string.Format("[ProtoMember({0}){1}] ", i + 1, defaultValueAttr);
+                            attr = $"[ProtoMember({i + 1}){defaultValueAttr}] ";
 
                             if (parameter.HasNonTrivialDefaultValue())
                             {
@@ -116,14 +112,13 @@ namespace CodeGen
                             }
                         }
 
-                        sb.AppendFormat("\t\t{0}public {1} {2}{3};\n",
-                                        attr, Utility.GetTransportTypeName(parameter.ParameterType),
-                                        parameter.Name, defaultValueExpression);
+                        var typeName = Utility.GetTransportTypeName(parameter.ParameterType);
+                        sb.Append($"\t\t{attr}public {typeName} {parameter.Name}{defaultValueExpression};\n");
                     }
 
                     if (parameters.Length > 0)
                         sb.AppendLine();
-                    sb.AppendFormat("\t\tpublic Type GetInterfaceType() {{ return typeof({0}); }}\n", type.Name);
+                    sb.Append($"\t\tpublic Type GetInterfaceType() {{ return typeof({type.Name}); }}\n");
 
                     if (Options.UseSlimClient == false)
                     {
@@ -133,12 +128,13 @@ namespace CodeGen
                             var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
                             if (tagParameter != null)
                             {
-                                var setStatement = string.Format("{0} = ({1})value;", tagName, Utility.GetTransportTypeName(tagParameter.ParameterType));
-                                sb.AppendFormat("\t\tpublic void SetTag(object value) {{ {0} }}\n", setStatement);
+                                var typeName = Utility.GetTransportTypeName(tagParameter.ParameterType);
+                                var setStatement = $"{tagName} = ({typeName})value;";
+                                sb.Append($"\t\tpublic void SetTag(object value) {{ {setStatement} }}\n");
                             }
                             else
                             {
-                                sb.AppendFormat("\t\tpublic void SetTag(object value) {{ }}\n");
+                                sb.Append($"\t\tpublic void SetTag(object value) {{ }}\n");
                             }
                         }
 

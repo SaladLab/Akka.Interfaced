@@ -40,6 +40,7 @@
     <Compile Include="IInvokable.cs" />
     <Compile Include="ITagOverridable.cs" />
     <Compile Include="IValueGetable.cs" />
+    <Compile Include="PayloadTableAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TagOverridableAttribute.cs" />
   </ItemGroup>
