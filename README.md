@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/ttuin5f31sj341n3?svg=true)](https://ci.appveyor.com/project/veblush/akka-interfaced)
+
 ** This project is at an early development stage. **
 
 # Akka.Interfaced
