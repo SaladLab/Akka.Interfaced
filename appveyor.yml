@@ -6,3 +6,4 @@ before_build:
 build:
   project: Akka.Interfaced.sln
   verbosity: minimal
+test: off
