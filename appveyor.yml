@@ -3,4 +3,5 @@ configuration: Debug
 before_build:
 - cmd: nuget restore
 build:
+  project: Akka.Interfaced.sln
   verbosity: minimal
