@@ -5,25 +5,25 @@
     <!-- Using NuGet packages -->
     <When Condition="Exists('$(MSBuildThisFileDirectory)..\tools')">
       <PropertyGroup>
-        <CodeGenToolExeDir>$(MSBuildThisFileDirectory)..\tools</CodeGenToolExeDir>
+        <AkkaInterfacedCodeGenToolExeDir>$(MSBuildThisFileDirectory)..\tools</AkkaInterfacedCodeGenToolExeDir>
       </PropertyGroup>
     </When>
     <!-- Internal build within Akka.Interfaced solution -->
     <When Condition="Exists('$(MSBuildThisFileDirectory)..\CodeGenerator')">
       <PropertyGroup>
-        <CodeGenToolExeDir>$(MSBuildThisFileDirectory)..\..\output\CodeGenerator\bin\Debug</CodeGenToolExeDir>
+        <AkkaInterfacedCodeGenToolExeDir>$(MSBuildThisFileDirectory)..\..\output\CodeGenerator\bin\Debug</AkkaInterfacedCodeGenToolExeDir>
       </PropertyGroup>
     </When>
   </Choose>
   <Choose>
-    <When Condition="HasTrailingSlash('$(CodeGenToolExeDir)')">
+    <When Condition="HasTrailingSlash('$(AkkaInterfacedCodeGenToolExeDir)')">
       <PropertyGroup>
-        <CodeGenToolExe>$(CodeGenToolExeDir)CodeGenerator.exe</CodeGenToolExe>
+        <AkkaInterfacedCodeGenToolExe>$(AkkaInterfacedCodeGenToolExeDir)CodeGenerator.exe</AkkaInterfacedCodeGenToolExe>
       </PropertyGroup>
     </When>
     <Otherwise>
       <PropertyGroup>
-        <CodeGenToolExe>$(CodeGenToolExeDir)\CodeGenerator.exe</CodeGenToolExe>
+        <AkkaInterfacedCodeGenToolExe>$(AkkaInterfacedCodeGenToolExeDir)\CodeGenerator.exe</AkkaInterfacedCodeGenToolExe>
       </PropertyGroup>
     </Otherwise>
   </Choose>
@@ -35,16 +35,13 @@
           Inputs="@(Compile);@(ReferencePath)"
           Outputs="$(ProjectDir)$(IntermediateOutputPath)$(TargetName)$(TargetExt)">
     <Message Text="[AkkaInterfacedPreprocessing] - Project=$(ProjectName)" Importance="high"/>
-    <Message Text="[AkkaInterfacedPreprocessing] 
-- Using CodeGenToolExe location=$(CodeGenToolExe)
-" />
     <Touch Files="$(ProjectDir)Properties\Akka.Interfaced.CodeGen.cs"
       Condition="!Exists('$(ProjectDir)Properties\Akka.Interfaced.CodeGen.cs')"
       ForceTouch="true"
       AlwaysCreate="true"
       ContinueOnError="true" />
     <PropertyGroup>
-      <ArgsFile>$(IntermediateOutputPath)$(TargetName).CodeGen.Args.txt</ArgsFile>
+      <ArgsFile>$(IntermediateOutputPath)$(TargetName).Akka.Interfaced.CodeGen.Args.txt</ArgsFile>
       <SourceFiles>@(Compile->'%(Identity)', ';')</SourceFiles>
       <ReferenceFiles>@(ReferencePath->'%(Identity)', ';')</ReferenceFiles>
     </PropertyGroup>
@@ -57,7 +54,7 @@
     <WriteLinesToFile File="$(ArgsFile)" Lines="--target=$(AkkaInterfacedTarget)" Condition="$(AkkaInterfacedTarget) != ''"/>
     <WriteLinesToFile File="$(ArgsFile)" Lines="--slimclient=$(AkkaInterfacedSlimClient)" Condition="$(AkkaInterfacedSlimClient) != ''"/>
     <WriteLinesToFile File="$(ArgsFile)" Lines="--protobuf=$(AkkaInterfacedProtobuf)" Condition="$(AkkaInterfacedProtobuf) != ''"/>
-    <Exec Command='"$(CodeGenToolExe)" "@$(ArgsFile)"' />
+    <Exec Command='"$(AkkaInterfacedCodeGenToolExe)" "@$(ArgsFile)"' />
   </Target>
 
 </Project>
