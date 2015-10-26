@@ -90,8 +90,8 @@ namespace CodeGen
                     writer.AddUsing("System.ComponentModel");
                 }
 
-                var actorTypes = assembly.GetTypes().OrderBy(t => t.FullName).Where(t => Utility.IsActorInterface(t)).ToArray();
-                var observerTypes = assembly.GetTypes().OrderBy(t => t.FullName).Where(t => Utility.IsObserverInterface(t)).ToArray();
+                var actorTypes = GetTypesSafely(assembly).OrderBy(t => t.FullName).Where(t => Utility.IsActorInterface(t)).ToArray();
+                var observerTypes = GetTypesSafely(assembly).OrderBy(t => t.FullName).Where(t => Utility.IsObserverInterface(t)).ToArray();
 
                 var actorCodeGen = new InterfacedActorCodeGenerator() { Options = options };
                 foreach (var type in actorTypes)
@@ -125,6 +125,7 @@ namespace CodeGen
             }
             catch (ReflectionTypeLoadException ex)
             {
+                Console.WriteLine($"GetTypesSafely({assembly.GetName()}) got ReflectionTypeLoadException");
                 return ex.Types.Where(x => x != null);
             }
         }
