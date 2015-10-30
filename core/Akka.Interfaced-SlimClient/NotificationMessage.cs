@@ -4,6 +4,7 @@
     public class NotificationMessage
     {
         public int ObserverId;
+        public int NotificationId;
         public IInvokable InvokePayload;
     }
 }

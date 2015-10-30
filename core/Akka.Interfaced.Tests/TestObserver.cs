@@ -45,11 +45,12 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
+            var self = Self; // keep Self safely
             var id = IssueObserverId();
             AddObserver(id, this);
-            await _subject.Subscribe(new SubjectObserver(Self, id));
+            await _subject.Subscribe(new SubjectObserver(self, id));
             await _subject.MakeEvent("A");
-            await _subject.Unsubscribe(new SubjectObserver(Self, id));
+            await _subject.Unsubscribe(new SubjectObserver(self, id));
             await _subject.MakeEvent("B");
             RemoveObserver(1);
             return null;
@@ -68,9 +69,9 @@ namespace Akka.Interfaced.Tests
         {
             // Arrange
             var eventLog = new List<object>();
-            var subjectActor = ActorOfAsTestActorRef<SubjectActor>();
+            var subjectActor = ActorOfAsTestActorRef<SubjectActor>("SubjectActor");
             var subject = new SubjectRef(subjectActor);
-            var observerActor = ActorOfAsTestActorRef<TestObserverActor>(Props.Create<TestObserverActor>(subject, eventLog));
+            var observerActor = ActorOfAsTestActorRef<TestObserverActor>(Props.Create<TestObserverActor>(subject, eventLog), "TestObserverActor");
             var observer = new DummyRef(observerActor);
 
             // Act

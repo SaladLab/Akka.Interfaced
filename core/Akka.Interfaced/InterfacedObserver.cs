@@ -37,6 +37,8 @@ namespace Akka.Interfaced
     {
         public IActorRef Actor { get; }
 
+        private int _lastNotificationId;
+
         public ActorNotificationChannel(IActorRef actor)
         {
             Actor = actor;
@@ -44,6 +46,11 @@ namespace Akka.Interfaced
 
         public void Notify(NotificationMessage notificationMessage)
         {
+            var notificationId = ++_lastNotificationId;
+            if (notificationId < 0)
+                notificationId = _lastNotificationId = 1;
+
+            notificationMessage.NotificationId = notificationId;
             Actor.Tell(notificationMessage);
         }
 

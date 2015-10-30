@@ -56,10 +56,11 @@ namespace Akka.Interfaced.ProtobufSerializer
             {
                 using (var ms = new MemoryStream())
                 {
-                    // write code & requestId
+                    // write code, observerId and notificationId
 
                     ms.WriteByte((byte)MessageCode.Notification);
-                    ms.Write32BitEncodedInt(notificationMessage.ObserverId);
+                    ms.Write7BitEncodedInt(notificationMessage.ObserverId);
+                    ms.Write7BitEncodedInt(notificationMessage.NotificationId);
 
                     // write message
 
@@ -88,7 +89,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                     // write code & requestId
 
                     ms.WriteByte((byte)MessageCode.Request);
-                    ms.Write32BitEncodedInt(requestMessage.RequestId);
+                    ms.Write7BitEncodedInt(requestMessage.RequestId);
 
                     // write message
 
@@ -117,12 +118,12 @@ namespace Akka.Interfaced.ProtobufSerializer
                     if (responseMessage.Exception == null && responseMessage.ReturnPayload == null)
                     {
                         ms.WriteByte((byte)MessageCode.ReplyWithNothing);
-                        ms.Write32BitEncodedInt(responseMessage.RequestId);
+                        ms.Write7BitEncodedInt(responseMessage.RequestId);
                     }
                     else if (responseMessage.Exception != null)
                     {
                         ms.WriteByte((byte)MessageCode.ReplyWithException);
-                        ms.Write32BitEncodedInt(responseMessage.RequestId);
+                        ms.Write7BitEncodedInt(responseMessage.RequestId);
 
                         var exceptionType = responseMessage.Exception.GetType();
                         WriteType(ms, exceptionType);
@@ -132,7 +133,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                     else
                     {
                         ms.WriteByte((byte)MessageCode.ReplyWithResult);
-                        ms.Write32BitEncodedInt(responseMessage.RequestId);
+                        ms.Write7BitEncodedInt(responseMessage.RequestId);
 
                         // write result
 
@@ -167,7 +168,8 @@ namespace Akka.Interfaced.ProtobufSerializer
                         // read observerId
 
                         var notificationMessage = new NotificationMessage();
-                        notificationMessage.ObserverId = ms.Read32BitEncodedInt();
+                        notificationMessage.ObserverId = ms.Read7BitEncodedInt();
+                        notificationMessage.NotificationId = ms.Read7BitEncodedInt();
 
                         // read message
 
@@ -192,7 +194,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                         // read requestId
 
                         var requestMessage = new RequestMessage();
-                        requestMessage.RequestId = ms.Read32BitEncodedInt();
+                        requestMessage.RequestId = ms.Read7BitEncodedInt();
 
                         // read message
 
@@ -215,13 +217,13 @@ namespace Akka.Interfaced.ProtobufSerializer
                     case MessageCode.ReplyWithNothing:
                     {
                         var replyMessage = new ResponseMessage();
-                        replyMessage.RequestId = ms.Read32BitEncodedInt();
+                        replyMessage.RequestId = ms.Read7BitEncodedInt();
                         return replyMessage;
                     }
                     case MessageCode.ReplyWithException:
                     {
                         var replyMessage = new ResponseMessage();
-                        replyMessage.RequestId = ms.Read32BitEncodedInt();
+                        replyMessage.RequestId = ms.Read7BitEncodedInt();
 
                         var exceptionType = ReadType(ms);
                         replyMessage.Exception = (Exception)Activator.CreateInstance(exceptionType);
@@ -234,7 +236,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                         // read requestId
 
                         var replyMessage = new ResponseMessage();
-                        replyMessage.RequestId = ms.Read32BitEncodedInt();
+                        replyMessage.RequestId = ms.Read7BitEncodedInt();
 
                         // read result
 
