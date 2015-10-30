@@ -47,7 +47,7 @@ namespace Akka.Interfaced
         public void Notify(NotificationMessage notificationMessage)
         {
             var notificationId = ++_lastNotificationId;
-            if (notificationId < 0)
+            if (notificationId <= 0)
                 notificationId = _lastNotificationId = 1;
 
             notificationMessage.NotificationId = notificationId;
