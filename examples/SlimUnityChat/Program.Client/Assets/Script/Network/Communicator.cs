@@ -61,7 +61,6 @@ public class Communicator
     private ReconnectActionType _reconnectAction = ReconnectActionType.StopWhenFail;
 
     private readonly List<Packet> _recvSimplePackets = new List<Packet>();
-    private readonly List<Packet> _recvReplyPackets = new List<Packet>();
     private readonly Dictionary<int, IInterfacedObserver> _observerMap = new Dictionary<int, IInterfacedObserver>();
     private int _lastObserverId;
 
@@ -177,10 +176,6 @@ public class Communicator
         {
             _recvSimplePackets.Clear();
         }
-        lock (_recvReplyPackets)
-        {
-            _recvReplyPackets.Clear();
-        }
 
         CreateNewConnect();
     }
@@ -217,7 +212,8 @@ public class Communicator
                     continue;
                 }
 
-                var observerId = packet.RequestId;
+                var observerId = packet.ActorId;
+                var notificationId = packet.RequestId;
                 IInterfacedObserver observer;
                 if (_observerMap.TryGetValue(observerId, out observer))
                 {
@@ -278,7 +274,7 @@ public class Communicator
                 lock (_recvSimplePackets)
                     _recvSimplePackets.Add(p);
                 break;
-			
+
             case PacketType.Response:
                 Action<ResponseMessage> handler;
                 if (_requestResponseMap.TryGetValue(p.RequestId, out handler))
@@ -291,8 +287,6 @@ public class Communicator
                         Exception = p.Exception
                     });
                 }
-                //lock (_recvReplyPackets)
-                //    _recvReplyPackets.Add(p);
                 break;
         }
     }

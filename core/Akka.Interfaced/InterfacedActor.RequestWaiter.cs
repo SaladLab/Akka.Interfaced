@@ -38,7 +38,7 @@ namespace Akka.Interfaced
             while (true)
             {
                 requestId = ++_lastRequestId;
-                if (requestId < 0)
+                if (requestId <= 0)
                     requestId = _lastRequestId = 1;
 
                 var added = _responseWaitingItems.TryAdd(requestId, new ResponseWaitingItem
