@@ -21,6 +21,8 @@ namespace CodeGen
             var assemblyName = Path.GetRandomFileName();
             var syntaxTrees = sourcePaths.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
             var references = referencePaths.Select(file => MetadataReference.CreateFromFile(file)).ToArray();
+            var referenceMaps = referencePaths.Select(file => Assembly.LoadFile(file))
+                                              .ToDictionary(a => a.FullName, a => a);
 
             // TODO: how to handle defines option?
 
@@ -60,13 +62,8 @@ namespace CodeGen
                     var currentDomain = AppDomain.CurrentDomain;
                     var resolveHandler = new ResolveEventHandler((sender, args) =>
                     {
-                        var nameOnly = args.Name.Substring(0, args.Name.IndexOf(","));
-                        foreach (var path in referencePaths)
-                        {
-                            if (path.Contains(nameOnly))
-                                return Assembly.LoadFrom(path);
-                        }
-                        return null;
+                        Assembly assembly;
+                        return referenceMaps.TryGetValue(args.Name, out assembly) ? assembly : null;
                     });
 
                     if (_lastResolveHandler != null)
@@ -74,8 +71,7 @@ namespace CodeGen
                     currentDomain.AssemblyResolve += resolveHandler;
                     _lastResolveHandler = resolveHandler;
 
-                    var assembly = Assembly.Load(ms.ToArray());
-                    return assembly;
+                    return Assembly.Load(ms.ToArray());
                 }
             }
         }
