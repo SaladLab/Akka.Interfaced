@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Akka.Interfaced.ProtobufSerializer
 {
-    internal static class AutoSurrogate
+    public static class AutoSurrogate
     {
         public static void Register(RuntimeTypeModel typeModel)
         {

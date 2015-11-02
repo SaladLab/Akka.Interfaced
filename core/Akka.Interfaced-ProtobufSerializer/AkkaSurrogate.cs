@@ -5,9 +5,10 @@ using ProtoBuf.Meta;
 
 namespace Akka.Interfaced.ProtobufSerializer
 {
-    internal static class AkkaSurrogate
+    public static class AkkaSurrogate
     {
-        public static ActorSystem CurrentSystem { get; internal set; }
+        [ThreadStatic]
+        internal static ActorSystem CurrentSystem;
 
         [ProtoContract]
         public class ActorPath
