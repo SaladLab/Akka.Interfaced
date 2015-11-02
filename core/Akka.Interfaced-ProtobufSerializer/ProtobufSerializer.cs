@@ -23,7 +23,18 @@ namespace Akka.Interfaced.ProtobufSerializer
         {
             RuntimeTypeModel typeModel = RuntimeTypeModel.Create();
             AkkaSurrogate.Register(typeModel);
+            AutoSurrogate.Register(typeModel);
             return typeModel;
+        }
+
+        public TypeModel TypeModel
+        {
+            get { return _typeModel; }
+        }
+
+        public TypeAliasTable TypeAliasTable
+        {
+            get { return _typeTable; }
         }
 
         public override int Identifier

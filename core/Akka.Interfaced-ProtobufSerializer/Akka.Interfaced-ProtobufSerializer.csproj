@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AkkaSurrogate.cs" />
+    <Compile Include="AutoSurrogate.cs" />
     <Compile Include="ProtobufSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializeExtensions.cs" />

@@ -85,10 +85,11 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="SerializeAutoSurrogateTest.cs" />
     <Compile Include="SerializeBasicTest.cs" />
     <Compile Include="SerializeExceptionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SerializeSurrogateTest.cs" />
+    <Compile Include="SerializeAkkaSurrogateTest.cs" />
     <Compile Include="TestDefaultValue.cs" />
   </ItemGroup>
   <ItemGroup>
