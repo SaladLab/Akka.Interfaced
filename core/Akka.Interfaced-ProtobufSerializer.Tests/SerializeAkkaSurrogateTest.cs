@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Akka.Interfaced.ProtobufSerializer.Tests
 {
-    public class SerializeSurrogateTest
+    public class SerializeAkkaSurrogateTest
     {
         [ProtoContract, TypeAlias]
         public class PathReturnMessage : IValueGetable
