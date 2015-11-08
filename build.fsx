@@ -35,6 +35,7 @@ let decoratePackageVersion v =
         v
 
 let projects = ([
+    // Core Libraries
     {   emptyProject with
         Name="Akka.Interfaced";
         Folder="./core/Akka.Interfaced";
@@ -62,6 +63,31 @@ let projects = ([
         Name="Akka.Interfaced-SlimClient";
         Folder="./core/Akka.Interfaced-SlimClient";
         Dependencies=[("Akka.Interfaced-Base", "")];
+    };
+    // CodeGenerator-Templates
+    {   emptyProject with
+        Name="Akka.Interfaced-Templates";
+        Folder="./core/CodeGenerator-Templates";
+        Dependencies=[("Akka.Interfaced", "")];
+    };
+    {   emptyProject with
+        Name="Akka.Interfaced-Templates-Protobuf";
+        Folder="./core/CodeGenerator-Templates";
+        Dependencies=[("Akka.Interfaced", "");
+                      ("protobuf-net", "2.0.0.668");
+                      ("TypeAlias", "1.0.1");];
+    };
+    {   emptyProject with
+        Name="Akka.Interfaced-Templates-SlimClient";
+        Folder="./core/CodeGenerator-Templates";
+        Dependencies=[("Akka.Interfaced-SlimClient", "")];
+    };
+    {   emptyProject with
+        Name="Akka.Interfaced-Templates-SlimClient-Protobuf";
+        Folder="./core/CodeGenerator-Templates";
+        Dependencies=[("Akka.Interfaced-SlimClient", "");
+                      ("protobuf-net", "2.0.0.668");
+                      ("TypeAlias", "1.0.1");];
     };]
     |> List.map (fun p -> 
         let parsedReleases =
@@ -151,7 +177,7 @@ let createNugetPackages _ =
                 OutputPath = nugetDir
                 WorkingDir = workDir
                 Dependencies = dependencies project
-                SymbolPackage = NugetSymbolPackage.Nuspec
+                SymbolPackage = (if (project.Name.Contains("Templates")) then NugetSymbolPackage.None else NugetSymbolPackage.Nuspec)
                 Version = project.PackageVersion 
                 ReleaseNotes = (List.head project.Releases).Notes |> String.concat "\n"
             }) nugetFile
@@ -220,7 +246,7 @@ Target "Help" (fun _ ->
 "Build"
   ==> "Nuget"
 
-"Build"
-  ==> "CreateNuget"
+//"Build"
+//  ==> "CreateNuget"
   
 RunTargetOrDefault "Help"
