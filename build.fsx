@@ -15,13 +15,14 @@ let buildConfiguration = "Release"
 type Project = { 
     Name: string;
     Folder: string;
+    Template: bool;
     AssemblyVersion: string;
     PackageVersion: string;
     Releases: ReleaseNotes list;
     Dependencies: (string * string) list;
 }
 
-let emptyProject = { Name=""; Folder=""; AssemblyVersion="";
+let emptyProject = { Name=""; Folder=""; Template=false; AssemblyVersion="";
                      PackageVersion=""; Releases=[]; Dependencies=[] }
 
 let decoratePrerelease v =
@@ -68,11 +69,13 @@ let projects = ([
     {   emptyProject with
         Name="Akka.Interfaced-Templates";
         Folder="./core/CodeGenerator-Templates";
+        Template=true;
         Dependencies=[("Akka.Interfaced", "")];
     };
     {   emptyProject with
         Name="Akka.Interfaced-Templates-Protobuf";
         Folder="./core/CodeGenerator-Templates";
+        Template=true;
         Dependencies=[("Akka.Interfaced", "");
                       ("protobuf-net", "2.0.0.668");
                       ("TypeAlias", "1.0.1");];
@@ -80,11 +83,13 @@ let projects = ([
     {   emptyProject with
         Name="Akka.Interfaced-Templates-SlimClient";
         Folder="./core/CodeGenerator-Templates";
+        Template=true;
         Dependencies=[("Akka.Interfaced-SlimClient", "")];
     };
     {   emptyProject with
         Name="Akka.Interfaced-Templates-SlimClient-Protobuf";
         Folder="./core/CodeGenerator-Templates";
+        Template=true;
         Dependencies=[("Akka.Interfaced-SlimClient", "");
                       ("protobuf-net", "2.0.0.668");
                       ("TypeAlias", "1.0.1");];
@@ -123,6 +128,7 @@ Target "Clean" (fun _ ->
 
 Target "AssemblyInfo" (fun _ ->
     projects
+    |> List.filter (fun p -> not p.Template)
     |> List.iter (fun p -> 
         CreateCSharpAssemblyInfo (p.Folder @@ "Properties" @@ "AssemblyInfoGenerated.cs")
           [ Attribute.Version p.AssemblyVersion
@@ -195,7 +201,7 @@ let publishNugetPackages _ =
                 PublishUrl = getBuildParamOrDefault "nugetpublishurl" ""
                 Version = project.PackageVersion })
 
-        if hasBuildParam "nugetpublishurl" then (
+        if not project.Template && hasBuildParam "nugetpublishurl" then (
             // current FAKE doesn't support publishing symbol package with NuGetPublish.
             // To workaround thid limitation, let's tweak Version to cheat nuget read symbol package
             NuGetPublish (fun p -> 
