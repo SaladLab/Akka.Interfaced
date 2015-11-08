@@ -60,18 +60,16 @@
       <Link>PayloadTableAttribute.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\Properties\AssemblyInfo.cs">
-      <Link>AssemblyInfo.cs</Link>
+      <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\Properties\AssemblyInfoGenerated.cs">
       <Link>Properties\AssemblyInfoGenerated.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\TagOverridableAttribute.cs">
-      <Link>Properties\TagOverridableAttribute.cs</Link>
+      <Link>TagOverridableAttribute.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

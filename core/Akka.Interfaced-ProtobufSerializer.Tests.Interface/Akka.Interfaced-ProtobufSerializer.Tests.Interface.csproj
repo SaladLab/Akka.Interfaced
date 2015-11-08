@@ -15,8 +15,6 @@
     <AssemblyName>Akka.Interfaced-ProtobufSerializer.Tests.Interface</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>..\..\output\$(AssemblyName)\obj\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\output\$(AssemblyName)\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

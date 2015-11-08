@@ -11,7 +11,7 @@
     <!-- Internal build within Akka.Interfaced solution -->
     <When Condition="Exists('$(MSBuildThisFileDirectory)..\CodeGenerator')">
       <PropertyGroup>
-        <AkkaInterfacedCodeGenToolExeDir>$(MSBuildThisFileDirectory)..\..\output\CodeGenerator\bin\Debug</AkkaInterfacedCodeGenToolExeDir>
+        <AkkaInterfacedCodeGenToolExeDir>$(MSBuildThisFileDirectory)..\CodeGenerator\bin\$(ConfigurationName)</AkkaInterfacedCodeGenToolExeDir>
       </PropertyGroup>
     </When>
   </Choose>
