@@ -246,7 +246,7 @@ Target "Help" (fun _ ->
 "Build"
   ==> "Nuget"
 
-//"Build"
-//  ==> "CreateNuget"
+"Build"
+  ==> "CreateNuget"
   
 RunTargetOrDefault "Help"

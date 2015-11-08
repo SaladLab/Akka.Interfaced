@@ -3,11 +3,8 @@
 pushd %~dp0
 
 tools\nuget\NuGet.exe update -self
-
-tools\nuget\NuGet.exe install FAKE -ConfigFile tools\nuget\Nuget.Config -OutputDirectory packages -ExcludeVersion -Version 4.4.0
-
-REM tools\nuget\NuGet.exe install xunit.runner.console -ConfigFile tools\nuget\Nuget.Config -OutputDirectory packages\FAKE -ExcludeVersion -Version 2.0.0
-REM tools\nuget\NuGet.exe install nunit.runners -ConfigFile tools\nuget\Nuget.Config -OutputDirectory packages\FAKE -ExcludeVersion -Version 2.6.4
+tools\nuget\NuGet.exe install FAKE -ConfigFile tools\nuget\Nuget.Config -OutputDirectory packages -ExcludeVersion -Version 4.7.3
+tools\nuget\NuGet.exe install xunit.runner.console -ConfigFile tools\nuget\Nuget.Config -OutputDirectory packages\FAKE -ExcludeVersion -Version 2.0.0
 
 if not exist packages\SourceLink.Fake\tools\SourceLink.fsx (
   tools\nuget\nuget.exe install SourceLink.Fake -ConfigFile tools\nuget\Nuget.Config -OutputDirectory packages -ExcludeVersion
