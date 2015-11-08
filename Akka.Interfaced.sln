@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced", "core\Akk
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{1A90348B-9EF5-475B-83D8-9D4F385BA8B5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example-Basic", "Example-Basic", "{747611CE-C738-45D6-B3B3-58FAF056C251}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample-Basic", "Sample-Basic", "{747611CE-C738-45D6-B3B3-58FAF056C251}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.Tests", "core\Akka.Interfaced.Tests\Akka.Interfaced.Tests.csproj", "{2E3DF5C2-8A38-4A03-86D7-8D463C917E47}"
 EndProject
@@ -15,59 +15,59 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-SlimClient"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGenerator", "core\CodeGenerator\CodeGenerator.csproj", "{C44CF322-7993-4451-A2F6-028C4ABCFD17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basic.Interface", "examples\Basic\Interface\Basic.Interface.csproj", "{4EC63109-6CCC-4113-B072-6517D935FFFA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basic.Interface", "samples\Basic\Interface\Basic.Interface.csproj", "{4EC63109-6CCC-4113-B072-6517D935FFFA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basic.Program", "examples\Basic\Program\Basic.Program.csproj", "{3E04D2BF-DE54-4608-9E5D-98596F943AE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basic.Program", "samples\Basic\Program\Basic.Program.csproj", "{3E04D2BF-DE54-4608-9E5D-98596F943AE2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example-SlimHttp", "Example-SlimHttp", "{02565A03-B570-401D-8796-F84DE193F194}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample-SlimHttp", "Sample-SlimHttp", "{02565A03-B570-401D-8796-F84DE193F194}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Server", "examples\SlimHttp\Interface\SlimHttp.Interface.Server.csproj", "{CD2F7E1F-6D1F-462A-92D5-5B07E8FD4533}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Server", "samples\SlimHttp\Interface\SlimHttp.Interface.Server.csproj", "{CD2F7E1F-6D1F-462A-92D5-5B07E8FD4533}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Client", "examples\SlimHttp\Program.Client\SlimHttp.Program.Client.csproj", "{DB3F97C2-577A-4799-BA6B-31CA14F47CAD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Client", "samples\SlimHttp\Program.Client\SlimHttp.Program.Client.csproj", "{DB3F97C2-577A-4799-BA6B-31CA14F47CAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Server", "examples\SlimHttp\Program.Server\SlimHttp.Program.Server.csproj", "{808DAED7-50DB-45A5-AB16-F5C2008DCABA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Server", "samples\SlimHttp\Program.Server\SlimHttp.Program.Server.csproj", "{808DAED7-50DB-45A5-AB16-F5C2008DCABA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer", "core\Akka.Interfaced-ProtobufSerializer\Akka.Interfaced-ProtobufSerializer.csproj", "{F9DC88B2-839B-4A5A-A2A9-88C21EF71A86}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer.Tests", "core\Akka.Interfaced-ProtobufSerializer.Tests\Akka.Interfaced-ProtobufSerializer.Tests.csproj", "{12876829-9868-4455-A699-0114839020EB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example-HelloWorld", "Example-HelloWorld", "{940B10A8-87B6-440E-A793-73AE47C68EA5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample-HelloWorld", "Sample-HelloWorld", "{940B10A8-87B6-440E-A793-73AE47C68EA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld.Interface", "examples\HelloWorld\Interface\HelloWorld.Interface.csproj", "{A9644A39-B361-4675-9CF6-7F24DFC840E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld.Interface", "samples\HelloWorld\Interface\HelloWorld.Interface.csproj", "{A9644A39-B361-4675-9CF6-7F24DFC840E6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld.Program", "examples\HelloWorld\Program\HelloWorld.Program.csproj", "{DEF6B954-981A-4B94-BED5-539D37A86B4E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld.Program", "samples\HelloWorld\Program\HelloWorld.Program.csproj", "{DEF6B954-981A-4B94-BED5-539D37A86B4E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example-Protobuf", "Example-Protobuf", "{68FB30CB-4812-4893-8CA1-D53C08AD06D7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample-Protobuf", "Sample-Protobuf", "{68FB30CB-4812-4893-8CA1-D53C08AD06D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protobuf.Interface", "examples\Protobuf\Interface\Protobuf.Interface.csproj", "{846AD717-C4AD-459E-9524-84125454685A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protobuf.Interface", "samples\Protobuf\Interface\Protobuf.Interface.csproj", "{846AD717-C4AD-459E-9524-84125454685A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protobuf.Program", "examples\Protobuf\Program\Protobuf.Program.csproj", "{5131F342-51E7-481A-A4F7-984A2C70397A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protobuf.Program", "samples\Protobuf\Program\Protobuf.Program.csproj", "{5131F342-51E7-481A-A4F7-984A2C70397A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Client", "examples\SlimHttp\Interface\SlimHttp.Interface.Client.csproj", "{70C1E43F-F4D0-42E1-915A-2701D162C050}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Client", "samples\SlimHttp\Interface\SlimHttp.Interface.Client.csproj", "{70C1E43F-F4D0-42E1-915A-2701D162C050}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-SlimClient.Net35", "core\Akka.Interfaced-SlimClient\Akka.Interfaced-SlimClient.Net35.csproj", "{9A8A9276-9061-4896-97C6-DB4B1ED08994}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Client.Net35", "examples\SlimHttp\Interface\SlimHttp.Interface.Client.Net35.csproj", "{63D15731-5E68-4799-93D6-64092E6988B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Client.Net35", "samples\SlimHttp\Interface\SlimHttp.Interface.Client.Net35.csproj", "{63D15731-5E68-4799-93D6-64092E6988B1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Client.Net35", "examples\SlimHttp\Program.Client\SlimHttp.Program.Client.Net35.csproj", "{75584615-FD8B-4746-8379-7CFF2D7E745B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Client.Net35", "samples\SlimHttp\Program.Client\SlimHttp.Program.Client.Net35.csproj", "{75584615-FD8B-4746-8379-7CFF2D7E745B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{902CC4E5-A632-4462-B6D0-6EC5A63B9855}"
 	ProjectSection(SolutionItems) = preProject
