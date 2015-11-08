@@ -7,3 +7,8 @@ build:
   project: Akka.Interfaced.sln
   verbosity: minimal
 test: off
+environment:
+  NUGETKEY:
+    secure: z2fJQckgBQJ7IKfjOyrZYPM2+xDj4xYuqaUDBG7MrJs+b1bNc0vzYMTxpF6Sb1mA
+after_deploy:
+- cmd: build.cmd nuget nugetkey=%NUGETKEY% nugetpublishurl=https://www.myget.org/F/saladbowlcreative/api/v2/package nugetprerelease=%APPVEYOR_BUILD_NUMBER%
