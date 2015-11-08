@@ -4,20 +4,19 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C3A4D803-AAB9-4B8E-B575-4E06B7CF61FB}</ProjectGuid>
+    <ProjectGuid>{9BAE7AB1-4508-45D0-91D4-9B12EEE53CD3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Akka.Interfaced</RootNamespace>
-    <AssemblyName>Akka.Interfaced-Base.Net35</AssemblyName>
+    <AssemblyName>Akka.Interfaced-Base</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>..\..\output\$(AssemblyName)\obj\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\output\$(AssemblyName)\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,23 +24,53 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IInterfacedActor.cs" />
-    <Compile Include="IInterfacedObserver.cs" />
-    <Compile Include="IInterfacedPayload.cs" />
-    <Compile Include="IInvokable.cs" />
-    <Compile Include="ITagOverridable.cs" />
-    <Compile Include="IValueGetable.cs" />
-    <Compile Include="PayloadTableAttribute.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TagOverridableAttribute.cs" />
+    <Compile Include="..\Akka.Interfaced-Base\IInterfacedActor.cs">
+      <Link>IInterfacedActor.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\IInterfacedObserver.cs">
+      <Link>IInterfacedObserver.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\IInterfacedPayload.cs">
+      <Link>IInterfacedPayload.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\IInvokable.cs">
+      <Link>IInvokable.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\ITagOverridable.cs">
+      <Link>ITagOverridable.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\IValueGetable.cs">
+      <Link>IValueGetable.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\PayloadTableAttribute.cs">
+      <Link>PayloadTableAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\Properties\AssemblyInfo.cs">
+      <Link>AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\Properties\AssemblyInfoGenerated.cs">
+      <Link>Properties\AssemblyInfoGenerated.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\TagOverridableAttribute.cs">
+      <Link>Properties\TagOverridableAttribute.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

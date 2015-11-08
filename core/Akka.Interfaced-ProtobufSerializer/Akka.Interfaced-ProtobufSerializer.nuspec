@@ -4,15 +4,15 @@
     <id>@project@</id>
     <title>@project@@title@</title>
     <version>@build.number@</version>
-    <authors>@authors@</authors>
-    <owners>@authors@</owners>
+    <authors>Esun Kim</authors>
+    <owners>Esun Kim</owners>
     <description>Akka.Interfaced</description>
     <licenseUrl>https://raw.githubusercontent.com/SaladbowlCreative/Akka.Interfaced/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/SaladbowlCreative/Akka.Interfaced</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>@releaseNotes@</releaseNotes>
-    <copyright>@copyright@</copyright>
-    <tags>@tags@</tags>
+    <copyright>Copyright © 2015 Saladbowl Creative</copyright>
+    <tags>akka interfaced protobuf serializer</tags>
     @dependencies@
     @references@
   </metadata>

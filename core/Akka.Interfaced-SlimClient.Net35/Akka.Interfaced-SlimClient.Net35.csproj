@@ -1,23 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9A8A9276-9061-4896-97C6-DB4B1ED08994}</ProjectGuid>
+    <ProjectGuid>{43DE773D-3E00-48ED-93FE-A0EDA5C105FB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Akka.Interfaced</RootNamespace>
-    <AssemblyName>Akka.Interfaced-SlimClient.Net35</AssemblyName>
+    <RootNamespace>Akka.Interfaced_SlimClient</RootNamespace>
+    <AssemblyName>Akka.Interfaced-SlimClient</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>..\..\output\$(AssemblyName)\obj\</BaseIntermediateOutputPath>
-    <OutputPath>..\..\output\$(AssemblyName)\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,6 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -38,21 +38,45 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IActorRef.cs" />
-    <Compile Include="IAsyncInvokable.cs" />
-    <Compile Include="InterfacedActorRef.cs" />
-    <Compile Include="IRequestWaiter.cs" />
-    <Compile Include="NotificationMessage.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestMessage.cs" />
-    <Compile Include="ResponseMessage.cs" />
-    <Compile Include="Task.cs" />
+    <Compile Include="..\Akka.Interfaced-SlimClient\IActorRef.cs">
+      <Link>IActorRef.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-SlimClient\IAsyncInvokable.cs">
+      <Link>IAsyncInvokable.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-SlimClient\InterfacedActorRef.cs">
+      <Link>InterfacedActorRef.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-SlimClient\IRequestWaiter.cs">
+      <Link>IRequestWaiter.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-SlimClient\NotificationMessage.cs">
+      <Link>NotificationMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-SlimClient\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-SlimClient\Properties\AssemblyInfoGenerated.cs">
+      <Link>Properties\AssemblyInfoGenerated.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-SlimClient\RequestMessage.cs">
+      <Link>RequestMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-SlimClient\ResponseMessage.cs">
+      <Link>ResponseMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-SlimClient\Task.cs">
+      <Link>Task.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Akka.Interfaced-Base\Akka.Interfaced-Base.Net35.csproj">
-      <Project>{c3a4d803-aab9-4b8e-b575-4e06b7cf61fb}</Project>
+    <ProjectReference Include="..\Akka.Interfaced-Base.Net35\Akka.Interfaced-Base.Net35.csproj">
+      <Project>{9bae7ab1-4508-45d0-91d4-9b12eee53cd3}</Project>
       <Name>Akka.Interfaced-Base.Net35</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

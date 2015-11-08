@@ -66,12 +66,12 @@
     <Compile Include="SlimTask.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\core\Akka.Interfaced-Base\Akka.Interfaced-Base.Net35.csproj">
-      <Project>{c3a4d803-aab9-4b8e-b575-4e06b7cf61fb}</Project>
+    <ProjectReference Include="..\..\..\core\Akka.Interfaced-Base.Net35\Akka.Interfaced-Base.Net35.csproj">
+      <Project>{9bae7ab1-4508-45d0-91d4-9b12eee53cd3}</Project>
       <Name>Akka.Interfaced-Base.Net35</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\core\Akka.Interfaced-SlimClient\Akka.Interfaced-SlimClient.Net35.csproj">
-      <Project>{9a8a9276-9061-4896-97c6-db4b1ed08994}</Project>
+    <ProjectReference Include="..\..\..\core\Akka.Interfaced-SlimClient.Net35\Akka.Interfaced-SlimClient.Net35.csproj">
+      <Project>{43de773d-3e00-48ed-93fe-a0eda5c105fb}</Project>
       <Name>Akka.Interfaced-SlimClient.Net35</Name>
     </ProjectReference>
     <ProjectReference Include="..\Interface\SlimHttp.Interface.Client.Net35.csproj">
