@@ -23,6 +23,6 @@
     <file src="..\..\..\..\core\CodeGenerator\bin\Release\*.exe" target="tools" />
     <file src="..\..\..\..\core\CodeGenerator\bin\Release\*.dll" target="tools" />
     <file src="..\..\..\..\core\CodeGenerator\bin\Release\*.config" target="tools" />
-    <file src="..\..\..\..\core\CodeGenerator-Templates\EmptyFile.cs" target="content\Properties\Akka.Interfaced.CodeGen.cs" />
+    <file src="..\..\..\..\core\CodeGenerator-Templates\EmptyFile.cs" target="content\Properties\Akka.Interfaced.CodeGen.Slim.cs" />
   </files>
 </package>
