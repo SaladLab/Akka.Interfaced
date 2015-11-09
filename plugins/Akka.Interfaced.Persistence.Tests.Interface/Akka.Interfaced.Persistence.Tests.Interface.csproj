@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Akka.Interfaced.Persistence.Tests.Interface</RootNamespace>
-    <AssemblyName>Akka.Interfaced-Persistence.Tests.Interface</AssemblyName>
+    <AssemblyName>Akka.Interfaced.Persistence.Tests.Interface</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -54,11 +54,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">
+    <ProjectReference Include="..\..\core\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">
       <Project>{c0d22336-c49e-4245-b39d-0b3083c28205}</Project>
       <Name>Akka.Interfaced-Base</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Akka.Interfaced\Akka.Interfaced.csproj">
+    <ProjectReference Include="..\..\core\Akka.Interfaced\Akka.Interfaced.csproj">
       <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>
       <Name>Akka.Interfaced</Name>
     </ProjectReference>

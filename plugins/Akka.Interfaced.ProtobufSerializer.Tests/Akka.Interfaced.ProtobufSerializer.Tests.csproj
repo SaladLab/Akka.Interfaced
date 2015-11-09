@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Akka.Interfaced.ProtobufSerializer.Tests</RootNamespace>
-    <AssemblyName>Akka.Interfaced-ProtobufSerializer.Tests</AssemblyName>
+    <AssemblyName>Akka.Interfaced.ProtobufSerializer.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -96,19 +96,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">
+    <ProjectReference Include="..\..\core\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">
       <Project>{c0d22336-c49e-4245-b39d-0b3083c28205}</Project>
       <Name>Akka.Interfaced-Base</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Akka.Interfaced-ProtobufSerializer.Tests.Interface\Akka.Interfaced-ProtobufSerializer.Tests.Interface.csproj">
+    <ProjectReference Include="..\Akka.Interfaced.ProtobufSerializer.Tests.Interface\Akka.Interfaced.ProtobufSerializer.Tests.Interface.csproj">
       <Project>{03b70640-bf43-466e-b893-4762433b5334}</Project>
-      <Name>Akka.Interfaced-ProtobufSerializer.Tests.Interface</Name>
+      <Name>Akka.Interfaced.ProtobufSerializer.Tests.Interface</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Akka.Interfaced-ProtobufSerializer\Akka.Interfaced-ProtobufSerializer.csproj">
+    <ProjectReference Include="..\Akka.Interfaced.ProtobufSerializer\Akka.Interfaced.ProtobufSerializer.csproj">
       <Project>{f9dc88b2-839b-4a5a-a2a9-88c21ef71a86}</Project>
-      <Name>Akka.Interfaced-ProtobufSerializer</Name>
+      <Name>Akka.Interfaced.ProtobufSerializer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Akka.Interfaced\Akka.Interfaced.csproj">
+    <ProjectReference Include="..\..\core\Akka.Interfaced\Akka.Interfaced.csproj">
       <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>
       <Name>Akka.Interfaced</Name>
     </ProjectReference>

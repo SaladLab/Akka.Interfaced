@@ -33,9 +33,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Client", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Server", "samples\SlimHttp\Program.Server\SlimHttp.Program.Server.csproj", "{808DAED7-50DB-45A5-AB16-F5C2008DCABA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer", "plugins\Akka.Interfaced-ProtobufSerializer\Akka.Interfaced-ProtobufSerializer.csproj", "{F9DC88B2-839B-4A5A-A2A9-88C21EF71A86}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.ProtobufSerializer", "plugins\Akka.Interfaced.ProtobufSerializer\Akka.Interfaced.ProtobufSerializer.csproj", "{F9DC88B2-839B-4A5A-A2A9-88C21EF71A86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer.Tests", "plugins\Akka.Interfaced-ProtobufSerializer.Tests\Akka.Interfaced-ProtobufSerializer.Tests.csproj", "{12876829-9868-4455-A699-0114839020EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.ProtobufSerializer.Tests", "plugins\Akka.Interfaced.ProtobufSerializer.Tests\Akka.Interfaced.ProtobufSerializer.Tests.csproj", "{12876829-9868-4455-A699-0114839020EB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample-HelloWorld", "Sample-HelloWorld", "{940B10A8-87B6-440E-A793-73AE47C68EA5}"
 EndProject
@@ -80,23 +80,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.Tests.Inter
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer.Tests.Interface", "plugins\Akka.Interfaced-ProtobufSerializer.Tests.Interface\Akka.Interfaced-ProtobufSerializer.Tests.Interface.csproj", "{03B70640-BF43-466E-B893-4762433B5334}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.ProtobufSerializer.Tests.Interface", "plugins\Akka.Interfaced.ProtobufSerializer.Tests.Interface\Akka.Interfaced.ProtobufSerializer.Tests.Interface.csproj", "{03B70640-BF43-466E-B893-4762433B5334}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence", "plugins\Akka.Interfaced-Persistence\Akka.Interfaced-Persistence.csproj", "{6364051D-A683-4239-BBBE-88412A8F4E8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.Persistence", "plugins\Akka.Interfaced.Persistence\Akka.Interfaced.Persistence.csproj", "{6364051D-A683-4239-BBBE-88412A8F4E8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence.Tests.Interface", "plugins\Akka.Interfaced-Persistence.Tests.Interface\Akka.Interfaced-Persistence.Tests.Interface.csproj", "{1C89A43F-0B79-4711-813E-BE0AAE442547}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.Persistence.Tests.Interface", "plugins\Akka.Interfaced.Persistence.Tests.Interface\Akka.Interfaced.Persistence.Tests.Interface.csproj", "{1C89A43F-0B79-4711-813E-BE0AAE442547}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence.Tests", "plugins\Akka.Interfaced-Persistence.Tests\Akka.Interfaced-Persistence.Tests.csproj", "{168C08F8-5E3B-4803-9A91-60DC3B06272C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.Persistence.Tests", "plugins\Akka.Interfaced.Persistence.Tests\Akka.Interfaced.Persistence.Tests.csproj", "{168C08F8-5E3B-4803-9A91-60DC3B06272C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Base.Net35", "core\Akka.Interfaced-Base.Net35\Akka.Interfaced-Base.Net35.csproj", "{9BAE7AB1-4508-45D0-91D4-9B12EEE53CD3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-SlimClient.Net35", "core\Akka.Interfaced-SlimClient.Net35\Akka.Interfaced-SlimClient.Net35.csproj", "{43DE773D-3E00-48ED-93FE-A0EDA5C105FB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{558DE237-AC05-41A5-AA45-2084614D95D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -402,8 +404,8 @@ Global
 		{CD2F7E1F-6D1F-462A-92D5-5B07E8FD4533} = {02565A03-B570-401D-8796-F84DE193F194}
 		{DB3F97C2-577A-4799-BA6B-31CA14F47CAD} = {02565A03-B570-401D-8796-F84DE193F194}
 		{808DAED7-50DB-45A5-AB16-F5C2008DCABA} = {02565A03-B570-401D-8796-F84DE193F194}
-		{F9DC88B2-839B-4A5A-A2A9-88C21EF71A86} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
-		{12876829-9868-4455-A699-0114839020EB} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
+		{F9DC88B2-839B-4A5A-A2A9-88C21EF71A86} = {558DE237-AC05-41A5-AA45-2084614D95D3}
+		{12876829-9868-4455-A699-0114839020EB} = {558DE237-AC05-41A5-AA45-2084614D95D3}
 		{A9644A39-B361-4675-9CF6-7F24DFC840E6} = {940B10A8-87B6-440E-A793-73AE47C68EA5}
 		{DEF6B954-981A-4B94-BED5-539D37A86B4E} = {940B10A8-87B6-440E-A793-73AE47C68EA5}
 		{846AD717-C4AD-459E-9524-84125454685A} = {68FB30CB-4812-4893-8CA1-D53C08AD06D7}
@@ -413,10 +415,10 @@ Global
 		{75584615-FD8B-4746-8379-7CFF2D7E745B} = {02565A03-B570-401D-8796-F84DE193F194}
 		{C0D22336-C49E-4245-B39D-0B3083C28205} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
 		{C3C9C547-BDBB-47CA-80BC-F97D2E7B884C} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
-		{03B70640-BF43-466E-B893-4762433B5334} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
-		{6364051D-A683-4239-BBBE-88412A8F4E8B} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
-		{1C89A43F-0B79-4711-813E-BE0AAE442547} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
-		{168C08F8-5E3B-4803-9A91-60DC3B06272C} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
+		{03B70640-BF43-466E-B893-4762433B5334} = {558DE237-AC05-41A5-AA45-2084614D95D3}
+		{6364051D-A683-4239-BBBE-88412A8F4E8B} = {558DE237-AC05-41A5-AA45-2084614D95D3}
+		{1C89A43F-0B79-4711-813E-BE0AAE442547} = {558DE237-AC05-41A5-AA45-2084614D95D3}
+		{168C08F8-5E3B-4803-9A91-60DC3B06272C} = {558DE237-AC05-41A5-AA45-2084614D95D3}
 		{9BAE7AB1-4508-45D0-91D4-9B12EEE53CD3} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
 		{43DE773D-3E00-48ED-93FE-A0EDA5C105FB} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
 	EndGlobalSection

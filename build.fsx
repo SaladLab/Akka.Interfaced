@@ -48,32 +48,19 @@ let projects = ([
         Folder="./core/Akka.Interfaced-Base";
     };
     {   emptyProject with
-        Name="Akka.Interfaced-Persistence";
-        Folder="./core/Akka.Interfaced-Persistence";
-        Dependencies=[("Akka.Interfaced", "");
-                      ("Akka.Persistence", "1.0.4.12-beta")];
-    };
-    {   emptyProject with
-        Name="Akka.Interfaced-ProtobufSerializer";
-        Folder="./core/Akka.Interfaced-ProtobufSerializer";
-        Dependencies=[("Akka.Interfaced", "");
-                      ("protobuf-net", "2.0.0.668");
-                      ("TypeAlias", "1.0.1");];
-    };
-    {   emptyProject with
         Name="Akka.Interfaced-SlimClient";
         Folder="./core/Akka.Interfaced-SlimClient";
         Dependencies=[("Akka.Interfaced-Base", "")];
     };
     // CodeGenerator-Templates
     {   emptyProject with
-        Name="Akka.Interfaced-Templates";
+        Name="Akka.Interfaced.Templates";
         Folder="./core/CodeGenerator-Templates";
         Template=true;
         Dependencies=[("Akka.Interfaced", "")];
     };
     {   emptyProject with
-        Name="Akka.Interfaced-Templates-Protobuf";
+        Name="Akka.Interfaced.Templates-Protobuf";
         Folder="./core/CodeGenerator-Templates";
         Template=true;
         Dependencies=[("Akka.Interfaced", "");
@@ -81,16 +68,30 @@ let projects = ([
                       ("TypeAlias", "1.0.1");];
     };
     {   emptyProject with
-        Name="Akka.Interfaced-Templates-SlimClient";
+        Name="Akka.Interfaced-SlimClient.Templates";
         Folder="./core/CodeGenerator-Templates";
         Template=true;
         Dependencies=[("Akka.Interfaced-SlimClient", "")];
     };
     {   emptyProject with
-        Name="Akka.Interfaced-Templates-SlimClient-Protobuf";
+        Name="Akka.Interfaced-SlimClient.Templates-Protobuf";
         Folder="./core/CodeGenerator-Templates";
         Template=true;
         Dependencies=[("Akka.Interfaced-SlimClient", "");
+                      ("protobuf-net", "2.0.0.668");
+                      ("TypeAlias", "1.0.1");];
+    };
+    // Plugins
+    {   emptyProject with
+        Name="Akka.Interfaced.Persistence";
+        Folder="./plugins/Akka.Interfaced.Persistence";
+        Dependencies=[("Akka.Interfaced", "");
+                      ("Akka.Persistence", "1.0.4.12-beta")];
+    };
+    {   emptyProject with
+        Name="Akka.Interfaced.ProtobufSerializer";
+        Folder="./plugins/Akka.Interfaced.ProtobufSerializer";
+        Dependencies=[("Akka.Interfaced", "");
                       ("protobuf-net", "2.0.0.668");
                       ("TypeAlias", "1.0.1");];
     };]

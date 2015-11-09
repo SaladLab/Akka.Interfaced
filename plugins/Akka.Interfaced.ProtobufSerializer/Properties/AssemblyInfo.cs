@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Akka.Interfaced-ProtobufSerializer")]
+[assembly: AssemblyTitle("Akka.Interfaced.ProtobufSerializer")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Saladbowl Creative")]
-[assembly: AssemblyProduct("Akka.Interfaced-ProtobufSerializer")]
+[assembly: AssemblyProduct("Akka.Interfaced.ProtobufSerializer")]
 [assembly: AssemblyCopyright("Copyright © Saladbowl Creative 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -48,8 +48,6 @@
     <Reference Include="Helios">
       <HintPath>..\..\..\packages\Helios.1.4.1\lib\net45\Helios.dll</HintPath>
     </Reference>
-    
-    
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -60,7 +58,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HelloWorldActor.cs" />
@@ -78,9 +75,9 @@
       <Project>{c0d22336-c49e-4245-b39d-0b3083c28205}</Project>
       <Name>Akka.Interfaced-Base</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\core\Akka.Interfaced-ProtobufSerializer\Akka.Interfaced-ProtobufSerializer.csproj">
+    <ProjectReference Include="..\..\..\plugins\Akka.Interfaced.ProtobufSerializer\Akka.Interfaced.ProtobufSerializer.csproj">
       <Project>{f9dc88b2-839b-4a5a-a2a9-88c21ef71a86}</Project>
-      <Name>Akka.Interfaced-ProtobufSerializer</Name>
+      <Name>Akka.Interfaced.ProtobufSerializer</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\core\Akka.Interfaced\Akka.Interfaced.csproj">
       <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>

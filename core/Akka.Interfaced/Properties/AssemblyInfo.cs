@@ -24,7 +24,7 @@ using System.Security;
 [assembly: Guid("5930bb18-32d9-4d38-b574-6b9f8f9449ed")]
 
 // Friends
-[assembly: InternalsVisibleTo("Akka.Interfaced-Persistence")]
+[assembly: InternalsVisibleTo("Akka.Interfaced.Persistence")]
 
 /*
 // http://stackoverflow.com/questions/5053032/performance-of-compiled-to-delegate-expression

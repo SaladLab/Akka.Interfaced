@@ -31,7 +31,7 @@ namespace Protobuf.Program
                   actor {
                     provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
                     serializers {
-                      proto = ""Akka.Interfaced.ProtobufSerializer.ProtobufSerializer, Akka.Interfaced-ProtobufSerializer""
+                      proto = ""Akka.Interfaced.ProtobufSerializer.ProtobufSerializer, Akka.Interfaced.ProtobufSerializer""
                     }
                     serialization-bindings {
                       ""Akka.Interfaced.NotificationMessage, Akka.Interfaced"" = proto

@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Akka.Interfaced.Persistence.Tests</RootNamespace>
-    <AssemblyName>Akka.Interfaced-Persistence.Tests</AssemblyName>
+    <AssemblyName>Akka.Interfaced.Persistence.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -88,19 +88,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">
+    <ProjectReference Include="..\..\core\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">
       <Project>{c0d22336-c49e-4245-b39d-0b3083c28205}</Project>
       <Name>Akka.Interfaced-Base</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Akka.Interfaced-Persistence.Tests.Interface\Akka.Interfaced-Persistence.Tests.Interface.csproj">
+    <ProjectReference Include="..\Akka.Interfaced.Persistence.Tests.Interface\Akka.Interfaced.Persistence.Tests.Interface.csproj">
       <Project>{1c89a43f-0b79-4711-813e-be0aae442547}</Project>
-      <Name>Akka.Interfaced-Persistence.Tests.Interface</Name>
+      <Name>Akka.Interfaced.Persistence.Tests.Interface</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Akka.Interfaced-Persistence\Akka.Interfaced-Persistence.csproj">
+    <ProjectReference Include="..\Akka.Interfaced.Persistence\Akka.Interfaced.Persistence.csproj">
       <Project>{6364051d-a683-4239-bbbe-88412a8f4e8b}</Project>
-      <Name>Akka.Interfaced-Persistence</Name>
+      <Name>Akka.Interfaced.Persistence</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Akka.Interfaced\Akka.Interfaced.csproj">
+    <ProjectReference Include="..\..\core\Akka.Interfaced\Akka.Interfaced.csproj">
       <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>
       <Name>Akka.Interfaced</Name>
     </ProjectReference>
