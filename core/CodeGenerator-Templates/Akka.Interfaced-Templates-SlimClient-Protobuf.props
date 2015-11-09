@@ -4,4 +4,20 @@
     <AkkaInterfacedSlimClient>1</AkkaInterfacedSlimClient>
     <AkkaInterfacedProtobuf>1</AkkaInterfacedProtobuf>
   </PropertyGroup>
+  
+  <!-- Work out the path to protobuf-net precompile -->
+  <Choose>
+    <!-- Using NuGet packages -->
+    <When Condition="Exists('$(MSBuildThisFileDirectory)..\tools')">
+      <PropertyGroup>
+        <ProtobufNetPrecompileExe>$(MSBuildThisFileDirectory)..\tools\protobuf-net\precompile.exe</ProtobufNetPrecompileExe>
+      </PropertyGroup>
+    </When>
+    <!-- Internal build within Akka.Interfaced solution -->
+    <When Condition="Exists('$(MSBuildThisFileDirectory)..\CodeGenerator-Templates')">
+      <PropertyGroup>
+        <ProtobufNetPrecompileExe>$(MSBuildThisFileDirectory)..\CodeGenerator-Templates\protobuf-net\precompile.exe</ProtobufNetPrecompileExe>
+      </PropertyGroup>
+    </When>
+  </Choose>  
 </Project>
