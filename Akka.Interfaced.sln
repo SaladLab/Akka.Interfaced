@@ -33,9 +33,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Client", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Server", "samples\SlimHttp\Program.Server\SlimHttp.Program.Server.csproj", "{808DAED7-50DB-45A5-AB16-F5C2008DCABA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer", "core\Akka.Interfaced-ProtobufSerializer\Akka.Interfaced-ProtobufSerializer.csproj", "{F9DC88B2-839B-4A5A-A2A9-88C21EF71A86}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer", "plugins\Akka.Interfaced-ProtobufSerializer\Akka.Interfaced-ProtobufSerializer.csproj", "{F9DC88B2-839B-4A5A-A2A9-88C21EF71A86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer.Tests", "core\Akka.Interfaced-ProtobufSerializer.Tests\Akka.Interfaced-ProtobufSerializer.Tests.csproj", "{12876829-9868-4455-A699-0114839020EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer.Tests", "plugins\Akka.Interfaced-ProtobufSerializer.Tests\Akka.Interfaced-ProtobufSerializer.Tests.csproj", "{12876829-9868-4455-A699-0114839020EB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample-HelloWorld", "Sample-HelloWorld", "{940B10A8-87B6-440E-A793-73AE47C68EA5}"
 EndProject
@@ -80,19 +80,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.Tests.Inter
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer.Tests.Interface", "core\Akka.Interfaced-ProtobufSerializer.Tests.Interface\Akka.Interfaced-ProtobufSerializer.Tests.Interface.csproj", "{03B70640-BF43-466E-B893-4762433B5334}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-ProtobufSerializer.Tests.Interface", "plugins\Akka.Interfaced-ProtobufSerializer.Tests.Interface\Akka.Interfaced-ProtobufSerializer.Tests.Interface.csproj", "{03B70640-BF43-466E-B893-4762433B5334}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence", "core\Akka.Interfaced-Persistence\Akka.Interfaced-Persistence.csproj", "{6364051D-A683-4239-BBBE-88412A8F4E8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence", "plugins\Akka.Interfaced-Persistence\Akka.Interfaced-Persistence.csproj", "{6364051D-A683-4239-BBBE-88412A8F4E8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence.Tests.Interface", "core\Akka.Interfaced-Persistence.Tests.Interface\Akka.Interfaced-Persistence.Tests.Interface.csproj", "{1C89A43F-0B79-4711-813E-BE0AAE442547}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence.Tests.Interface", "plugins\Akka.Interfaced-Persistence.Tests.Interface\Akka.Interfaced-Persistence.Tests.Interface.csproj", "{1C89A43F-0B79-4711-813E-BE0AAE442547}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence.Tests", "core\Akka.Interfaced-Persistence.Tests\Akka.Interfaced-Persistence.Tests.csproj", "{168C08F8-5E3B-4803-9A91-60DC3B06272C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Persistence.Tests", "plugins\Akka.Interfaced-Persistence.Tests\Akka.Interfaced-Persistence.Tests.csproj", "{168C08F8-5E3B-4803-9A91-60DC3B06272C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-Base.Net35", "core\Akka.Interfaced-Base.Net35\Akka.Interfaced-Base.Net35.csproj", "{9BAE7AB1-4508-45D0-91D4-9B12EEE53CD3}"
 EndProject
