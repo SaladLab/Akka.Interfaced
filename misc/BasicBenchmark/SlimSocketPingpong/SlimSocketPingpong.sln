@@ -5,7 +5,11 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingpongInterface", "PingpongInterface\PingpongInterface.csproj", "{73C95BDC-2E90-48E4-B8C9-2A8819D05508}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingpongProgram", "PingpongProgram\PingpongProgram.csproj", "{E408A9DD-9D39-4541-9FCF-5CFE535DF4E9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingpongInterface.SlimClient", "PingpongInterface.SlimClient\PingpongInterface.SlimClient.csproj", "{9A5D7147-2850-4754-B749-4DA225D8B7EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingpongProgram.Server", "PingpongProgram.Server\PingpongProgram.Server.csproj", "{B1428A2C-6133-43DF-84B4-AF34F3C980D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingpongProgram.Client", "PingpongProgram.Client\PingpongProgram.Client.csproj", "{159FA780-42AA-495B-906A-4B879E836294}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +21,18 @@ Global
 		{73C95BDC-2E90-48E4-B8C9-2A8819D05508}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73C95BDC-2E90-48E4-B8C9-2A8819D05508}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73C95BDC-2E90-48E4-B8C9-2A8819D05508}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E408A9DD-9D39-4541-9FCF-5CFE535DF4E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E408A9DD-9D39-4541-9FCF-5CFE535DF4E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E408A9DD-9D39-4541-9FCF-5CFE535DF4E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E408A9DD-9D39-4541-9FCF-5CFE535DF4E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A5D7147-2850-4754-B749-4DA225D8B7EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A5D7147-2850-4754-B749-4DA225D8B7EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A5D7147-2850-4754-B749-4DA225D8B7EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A5D7147-2850-4754-B749-4DA225D8B7EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1428A2C-6133-43DF-84B4-AF34F3C980D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1428A2C-6133-43DF-84B4-AF34F3C980D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1428A2C-6133-43DF-84B4-AF34F3C980D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1428A2C-6133-43DF-84B4-AF34F3C980D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{159FA780-42AA-495B-906A-4B879E836294}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{159FA780-42AA-495B-906A-4B879E836294}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{159FA780-42AA-495B-906A-4B879E836294}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{159FA780-42AA-495B-906A-4B879E836294}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

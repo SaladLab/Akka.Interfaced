@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E408A9DD-9D39-4541-9FCF-5CFE535DF4E9}</ProjectGuid>
+    <ProjectGuid>{B1428A2C-6133-43DF-84B4-AF34F3C980D4}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PingpongProgram</RootNamespace>
-    <AssemblyName>PingpongProgram</AssemblyName>
+    <RootNamespace>PingpongProgram.Server</RootNamespace>
+    <AssemblyName>PingpongProgram.Server</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -37,32 +37,32 @@
       <HintPath>..\packages\Akka.1.0.4\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Interfaced, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced.0.1.0.0-dev20151008\lib\net45\Akka.Interfaced.dll</HintPath>
+    <Reference Include="Akka.Interfaced, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced.0.2.0-build0026\lib\net45\Akka.Interfaced.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Interfaced-Base, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced-Base.0.1.0.0-dev20151008\lib\net45\Akka.Interfaced-Base.dll</HintPath>
+    <Reference Include="Akka.Interfaced-Base, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced-Base.0.2.0-build0026\lib\net45\Akka.Interfaced-Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Interfaced-ProtobufSerializer, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced-ProtobufSerializer.0.1.0.0-dev20151008\lib\net45\Akka.Interfaced-ProtobufSerializer.dll</HintPath>
+    <Reference Include="Akka.Interfaced.SlimSocket.Base, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced.SlimSocket.Base.0.2.0-build0008\lib\net45\Akka.Interfaced.SlimSocket.Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Interfaced-SlimSocketBase, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced-SlimSocketBase.0.1.0.0-dev20151008\lib\net45\Akka.Interfaced-SlimSocketBase.dll</HintPath>
+    <Reference Include="Akka.Interfaced.SlimSocket.Server, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced.SlimSocket.Server.0.2.0-build0008\lib\net45\Akka.Interfaced.SlimSocket.Server.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Interfaced-SlimSocketClient, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced-SlimSocketClient.0.1.0.0-dev20151008\lib\net45\Akka.Interfaced-SlimSocketClient.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Akka.Interfaced-SlimSocketServer, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced-SlimSocketServer.0.1.0.0-dev20151008\lib\net45\Akka.Interfaced-SlimSocketServer.dll</HintPath>
+    <Reference Include="Common.Logging, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.3.3.0\lib\net40\Common.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Common.Logging.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>..\packages\Common.Logging.Core.3.3.0\lib\net40\Common.Logging.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.NLog41, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.NLog41.3.3.0\lib\net40\Common.Logging.NLog41.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NetLegacySupport.Action, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -75,6 +75,10 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NLog, Version=4.1.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.1.0\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
@@ -95,14 +99,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientWorker.cs" />
-    <Compile Include="ClientLib\SlimActorRef.cs" />
-    <Compile Include="ClientLib\SlimRequestWaiter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerActor.cs" />
-    <Compile Include="ServerLib\ClientGateway.cs" />
-    <Compile Include="ServerLib\ClientSession.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -114,7 +113,6 @@
       <Name>PingpongInterface</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

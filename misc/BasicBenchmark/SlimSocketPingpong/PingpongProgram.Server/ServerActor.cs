@@ -1,7 +1,5 @@
 ﻿#define USE_EXTENDED_INTERFACE
 
-using System;
-using System.Threading.Tasks;
 using Akka.Interfaced;
 using PingpongInterface;
 

@@ -1,22 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Akka.Interfaced-Templates.0.2.0-build0026\build\Akka.Interfaced-Templates.props" Condition="Exists('..\packages\Akka.Interfaced-Templates.0.2.0-build0026\build\Akka.Interfaced-Templates.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F88CED35-6A64-422A-B6EC-071A0E4156D2}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{159FA780-42AA-495B-906A-4B879E836294}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PingpongInterface</RootNamespace>
-    <AssemblyName>PingpongInterface</AssemblyName>
+    <RootNamespace>PingpongProgram.Client</RootNamespace>
+    <AssemblyName>PingpongProgram.Client</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AkkaInterfacedProtobuf>1</AkkaInterfacedProtobuf>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -26,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,16 +33,32 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.0.4.12, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.1.0.4\lib\net45\Akka.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Akka.Interfaced, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced.0.2.0-build0026\lib\net45\Akka.Interfaced.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Akka.Interfaced-Base, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Akka.Interfaced-Base.0.2.0-build0026\lib\net45\Akka.Interfaced-Base.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.Interfaced-SlimClient, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced-SlimClient.0.2.0-build0026\lib\net45\Akka.Interfaced-SlimClient.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.Interfaced.SlimSocket.Base, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced.SlimSocket.Base.0.2.0-build0008\lib\net45\Akka.Interfaced.SlimSocket.Base.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.Interfaced.SlimSocket.Client, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced.SlimSocket.Client.0.2.0-build0008\lib\net45\Akka.Interfaced.SlimSocket.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.3.3.0\lib\net40\Common.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.Core.3.3.0\lib\net40\Common.Logging.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.NLog41, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.NLog41.3.3.0\lib\net40\Common.Logging.NLog41.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NetLegacySupport.Action, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -54,8 +69,12 @@
       <HintPath>..\packages\NetLegacySupport.ConcurrentDictionary.1.0.2\lib\net40\NetLegacySupport.ConcurrentDictionary.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="NetLegacySupport.Tuple, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetLegacySupport.Tuple.1.0.2\lib\net40\NetLegacySupport.Tuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NLog, Version=4.1.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.1.0\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
@@ -76,25 +95,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IClient.cs" />
-    <Compile Include="IServer.cs" />
-    <Compile Include="Properties\Akka.Interfaced.CodeGen.cs" />
+    <Compile Include="ClientWorker.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PingpongInterface.SlimClient\PingpongInterface.SlimClient.csproj">
+      <Project>{9a5d7147-2850-4754-b749-4da225d8b7eb}</Project>
+      <Name>PingpongInterface.SlimClient</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Akka.Interfaced-Templates.0.2.0-build0026\build\Akka.Interfaced-Templates.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Akka.Interfaced-Templates.0.2.0-build0026\build\Akka.Interfaced-Templates.props'))" />
-    <Error Condition="!Exists('..\packages\Akka.Interfaced-Templates.0.2.0-build0026\build\Akka.Interfaced-Templates.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Akka.Interfaced-Templates.0.2.0-build0026\build\Akka.Interfaced-Templates.targets'))" />
-  </Target>
-  <Import Project="..\packages\Akka.Interfaced-Templates.0.2.0-build0026\build\Akka.Interfaced-Templates.targets" Condition="Exists('..\packages\Akka.Interfaced-Templates.0.2.0-build0026\build\Akka.Interfaced-Templates.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

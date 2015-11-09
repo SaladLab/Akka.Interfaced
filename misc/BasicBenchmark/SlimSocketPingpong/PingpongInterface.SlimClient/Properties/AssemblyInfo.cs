@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("PingpongInterface")]
+[assembly: AssemblyTitle("PingpongInterface.SlimClient")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PingpongInterface")]
+[assembly: AssemblyProduct("PingpongInterface.SlimClient")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
-[assembly: Guid("73c95bdc-2e90-48e4-b8c9-2a8819d05508")]
+[assembly: Guid("9a5d7147-2850-4754-b749-4da225d8b7eb")]
 
 // Version information for an assembly consists of the following four values:
 //
