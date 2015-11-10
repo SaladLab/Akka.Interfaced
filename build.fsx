@@ -40,8 +40,8 @@ let projects = ([
     {   emptyProject with
         Name="Akka.Interfaced";
         Folder="./core/Akka.Interfaced";
-        Dependencies=[("Akka", "1.0.4");
-                      ("Akka.Interfaced-Base", "")];
+        Dependencies=[("Akka.Interfaced-Base", "");
+                      ("Akka", "1.0.4")];
     };
     {   emptyProject with
         Name="Akka.Interfaced-Base";
@@ -82,6 +82,13 @@ let projects = ([
                       ("TypeAlias", "1.0.1");];
     };
     // Plugins
+    {   emptyProject with
+        Name="Akka.Interfaced.LogFilter";
+        Folder="./plugins/Akka.Interfaced.LogFilter";
+        Dependencies=[("Akka.Interfaced", "");
+                      ("Akka", "1.0.4");
+                      ("Newtonsoft.Json", "7.0.1");];
+    };
     {   emptyProject with
         Name="Akka.Interfaced.Persistence";
         Folder="./plugins/Akka.Interfaced.Persistence";
