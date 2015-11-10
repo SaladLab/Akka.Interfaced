@@ -4,6 +4,8 @@ using System.Reflection;
 
 namespace Akka.Interfaced.LogFilter
 {
+    // LogProxyBuilder build LogProxy class that send log message to (untyped) log target.
+    // It uses reflection to support various log libraries (like NLog, log4net, ...) 
     internal static class LogProxyBuilder
     {
         public static LogProxy Build(Type targetType, string loggerName, string logLevel)
@@ -57,12 +59,18 @@ namespace Akka.Interfaced.LogFilter
         {
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
+            // Find property whose signature is "bool Is{logLevel}Enabled"
+
             var isEnabledPi = loggerType.GetProperties(bindingFlags).FirstOrDefault(
                 p => p.Name == $"Is{logLevel}Enabled");
 
             if (isEnabledPi == null)
+            {
                 throw new InvalidOperationException(
                     $"Cannot find Is{logLevel}Enabled property from {loggerType.FullName}");
+            }
+
+            // Find method whose signature is "void {logLevel}(string/object message)"
 
             var logMi = loggerType.GetMethods(bindingFlags).FirstOrDefault(
                 m => m.Name == logLevel &&
@@ -70,8 +78,18 @@ namespace Akka.Interfaced.LogFilter
                      m.GetParameters()[0].ParameterType == typeof(string));
 
             if (logMi == null)
-                throw new InvalidOperationException(
-                    $"Cannot find {logLevel} method from {loggerType.FullName}");
+            {
+                logMi = loggerType.GetMethods(bindingFlags).FirstOrDefault(
+                    m => m.Name == logLevel &&
+                         m.GetParameters().Length == 1 &&
+                         m.GetParameters()[0].ParameterType == typeof(object));
+
+                if (logMi == null)
+                {
+                    throw new InvalidOperationException(
+                            $"Cannot find {logLevel} method from {loggerType.FullName}");
+                }
+            }
 
             return new LogProxy.Template
             {
