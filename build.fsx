@@ -205,18 +205,7 @@ let createNugetPackages _ =
 let publishNugetPackages _ =
     projects
     |> List.iter (fun project -> 
-        NuGetPublish (fun p -> 
-            {p with
-                Project = project.Name
-                OutputPath = nugetDir
-                WorkingDir = nugetDir
-                AccessKey = getBuildParamOrDefault "nugetkey" ""
-                PublishUrl = getBuildParamOrDefault "nugetpublishurl" ""
-                Version = project.PackageVersion })
-
-        if not project.Template && hasBuildParam "nugetpublishurl" then (
-            // current FAKE doesn't support publishing symbol package with NuGetPublish.
-            // To workaround thid limitation, let's tweak Version to cheat nuget read symbol package
+        try
             NuGetPublish (fun p -> 
                 {p with
                     Project = project.Name
@@ -224,7 +213,21 @@ let publishNugetPackages _ =
                     WorkingDir = nugetDir
                     AccessKey = getBuildParamOrDefault "nugetkey" ""
                     PublishUrl = getBuildParamOrDefault "nugetpublishurl" ""
-                    Version = project.PackageVersion + ".symbols" })
+                    Version = project.PackageVersion })
+        with e -> if getBuildParam "forcepublish" = "" then raise e; ()
+        if not project.Template && hasBuildParam "nugetpublishurl" then (
+            // current FAKE doesn't support publishing symbol package with NuGetPublish.
+            // To workaround thid limitation, let's tweak Version to cheat nuget read symbol package
+            try
+                NuGetPublish (fun p -> 
+                    {p with
+                        Project = project.Name
+                        OutputPath = nugetDir
+                        WorkingDir = nugetDir
+                        AccessKey = getBuildParamOrDefault "nugetkey" ""
+                        PublishUrl = getBuildParamOrDefault "nugetpublishurl" ""
+                        Version = project.PackageVersion + ".symbols" })
+            with e -> if getBuildParam "forcepublish" = "" then raise e; ()
         )
     )
 
@@ -250,7 +253,7 @@ Target "Help" (fun _ ->
       " * CreateNuget  Create nuget packages"
       "                [nugetprerelease={VERSION_PRERELEASE}] "
       " * PublishNuget Publish nugets packages"
-      "                [nugetkey={API_KEY}] [nugetpublishurl={PUBLISH_URL}]"
+      "                [nugetkey={API_KEY}] [nugetpublishurl={PUBLISH_URL}] [forcepublish=1]"
       ""]
 )
 

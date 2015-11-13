@@ -112,6 +112,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.TestKit", "plugins\Akka.Interfaced.TestKit\Akka.Interfaced.TestKit.csproj", "{96EBC938-B31C-464F-AEC5-DD5CC219ACE8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.TestKit.Tests.Interface", "plugins\Akka.Interfaced.TestKit.Tests.Interface\Akka.Interfaced.TestKit.Tests.Interface.csproj", "{DCE29943-0C20-4E76-9F1D-06DBE0FAAABD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.TestKit.Tests", "plugins\Akka.Interfaced.TestKit.Tests\Akka.Interfaced.TestKit.Tests.csproj", "{06941AF5-A974-4B4F-9594-49C888E4ED64}"
 EndProject
