@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActorBoundSession.cs" />
+    <Compile Include="ActorBoundSessionMessage.cs" />
     <Compile Include="ActorSynchronizationContext.cs" />
     <Compile Include="DeadRequestProcessingActor.cs" />
     <Compile Include="AkkaAskRequestWaiter.cs" />
