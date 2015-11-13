@@ -76,7 +76,7 @@ namespace Akka.Interfaced
             }
         }
 
-        private int BindActor(IActorRef actor, Type interfaceType, object tagValue = null)
+        protected int BindActor(IActorRef actor, Type interfaceType, object tagValue = null)
         {
             lock (_boundActorLock)
             {
@@ -112,7 +112,7 @@ namespace Akka.Interfaced
             }
         }
 
-        private void UnbindActor(IActorRef actor)
+        protected void UnbindActor(IActorRef actor)
         {
             lock (_boundActorLock)
             {
@@ -125,7 +125,7 @@ namespace Akka.Interfaced
             }
         }
 
-        private void UnbindActor(int actorId)
+        protected void UnbindActor(int actorId)
         {
             lock (_boundActorLock)
             {
