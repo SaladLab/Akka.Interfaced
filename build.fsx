@@ -101,6 +101,11 @@ let projects = ([
         Dependencies=[("Akka.Interfaced", "");
                       ("protobuf-net", "2.0.0.668");
                       ("TypeAlias", "1.0.1");];
+    };
+    {   emptyProject with
+        Name="Akka.Interfaced.TestKit";
+        Folder="./plugins/Akka.Interfaced.TestKit";
+        Dependencies=[("Akka.Interfaced", "");];
     };]
     |> List.map (fun p -> 
         let parsedReleases =
