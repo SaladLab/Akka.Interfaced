@@ -39,7 +39,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             var obj2 = (ResponseMessage)serializer.FromBinary(bytes, null);
             Assert.Equal(obj.Exception.GetType(), obj2.Exception.GetType());
 
-            var exception2 = (TestException)obj.Exception;
+            var exception2 = (TestException)obj2.Exception;
             Assert.Equal(exception.ErrorCode, exception2.ErrorCode);
             Assert.Equal(exception.ErrorDetail, exception2.ErrorDetail);
         }

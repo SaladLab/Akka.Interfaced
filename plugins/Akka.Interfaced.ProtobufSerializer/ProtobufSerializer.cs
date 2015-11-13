@@ -239,8 +239,8 @@ namespace Akka.Interfaced.ProtobufSerializer
                         var exceptionType = ReadType(ms);
                         replyMessage.Exception = (Exception)Activator.CreateInstance(exceptionType);
                         if (_typeModel.CanSerialize(exceptionType))
-                            _typeModel.Serialize(ms, replyMessage.Exception);
-                        return replyMessage;
+                            _typeModel.Deserialize(ms, replyMessage.Exception, exceptionType);
+                            return replyMessage;
                     }
                     case MessageCode.ReplyWithResult:
                     {
