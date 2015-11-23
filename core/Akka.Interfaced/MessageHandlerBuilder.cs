@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Akka.Interfaced
 {
@@ -34,6 +35,9 @@ namespace Akka.Interfaced
                 }
                 else
                 {
+                    if (method.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+                        throw new InvalidOperationException($"Async void handler is not supported. ({type.FullName}.{method.Name})");
+
                     var item = new MessageHandlerItem<T>
                     {
                         Handler = MessageHandlerFuncBuilder.Build<T>(method)

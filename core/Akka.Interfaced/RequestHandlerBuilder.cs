@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Akka.Interfaced
 {
@@ -174,6 +175,9 @@ namespace Akka.Interfaced
                     }
                     else
                     {
+                        if (targetMethod.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+                            throw new InvalidOperationException($"Async void handler is not supported. ({type.FullName}.{targetMethod.Name})");
+
                         // sync handler
 
                         var handler = BuildHandler(
