@@ -94,7 +94,7 @@ namespace Akka.Interfaced
 
             // Because OnResponseMessage is always called in a message loop of actor,
             // it's safe to run post callback synchronously if possible.
-            // By this optimization one message hop can be removed.
+            // This optimization remove one message hop.
             ActorSynchronizationContext.EnableSynchronousPost(currentAtomicContext);
 
             waitingItem.ResponseHandler(waitingItem.TaskCompletionSource, response);

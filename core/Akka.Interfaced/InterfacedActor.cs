@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 
@@ -34,7 +35,17 @@ namespace Akka.Interfaced
         private InterfacedActorRequestWaiter _requestWaiter;
         private InterfacedActorObserverMap _observerMap;
         private InterfacedActorPerInstanceFilterList _perInstanceFilterList;
+
         #endregion
+
+        protected new IActorRef Sender
+        {
+            get
+            {
+                var context = ActorSynchronizationContext.GetCurrentContext();
+                return context != null ? context.Sender : base.Sender;
+            }
+        }
 
         // Atomic async OnPreStart event (it will be called after PreStart)
         protected virtual Task OnPreStart()
@@ -139,7 +150,7 @@ namespace Akka.Interfaced
 
         private void OnRequestMessage(RequestMessage request)
         {
-            var sender = Sender;
+            var sender = base.Sender;
 
             var handlerItem = RequestDispatcher.GetHandler(request.InvokePayload.GetType());
             if (handlerItem == null)
@@ -164,7 +175,7 @@ namespace Akka.Interfaced
             {
                 // async handle
 
-                var context = new MessageHandleContext { Self = Self, Sender = Sender };
+                var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
                 if (handlerItem.IsReentrant)
                 {
                     _activeReentrantCount += 1;
@@ -209,7 +220,7 @@ namespace Akka.Interfaced
 
         private void OnTaskRunMessage(TaskRunMessage taskRunMessage)
         {
-            var context = new MessageHandleContext { Self = Self, Sender = Sender };
+            var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
             if (taskRunMessage.IsReentrant)
             {
                 _activeReentrantCount += 1;
@@ -244,8 +255,12 @@ namespace Akka.Interfaced
         {
             if (handlerItem.AsyncHandler != null)
             {
-                var context = new MessageHandleContext { Self = Self, Sender = Sender };
-                if (handlerItem.IsReentrant == false)
+                var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+                if (handlerItem.IsReentrant)
+                {
+                    _activeReentrantCount += 1;
+                }
+                else
                 {
                     BecomeStacked(OnReceiveInAtomicTask);
                     _currentAtomicContext = context;
@@ -333,6 +348,7 @@ namespace Akka.Interfaced
             }
         }
 
+        
         // from IRequestWaiter
 
         void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)

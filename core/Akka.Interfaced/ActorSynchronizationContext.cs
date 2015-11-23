@@ -29,16 +29,28 @@ namespace Akka.Interfaced
             if (s_synchronousPostEnabled)
             {
                 s_synchronousPostEnabled = false;
+
                 if (s_currentAtomicContext == null)
                 {
-                    d(state);
+                    using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(_context)))
+                    {
+                        d(state);
+                    }
                     return;
                 }
+
                 if (s_currentAtomicContext == _context)
                 {
                     s_currentAtomicContext = null;
-                    d(state);
+                    using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(_context)))
+                    {
+                        d(state);
+                    }
                     return;
+                }
+                else
+                {
+                    s_currentAtomicContext = null;
                 }
             }
 
@@ -69,6 +81,14 @@ namespace Akka.Interfaced
         {
             s_synchronousPostEnabled = true;
             s_currentAtomicContext = currentAtomicContext;
+        }
+
+        // Helper
+
+        public static MessageHandleContext GetCurrentContext()
+        {
+            var contex = Current as ActorSynchronizationContext;
+            return contex?._context;
         }
     }
 }

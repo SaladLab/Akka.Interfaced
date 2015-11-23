@@ -38,6 +38,15 @@ namespace Akka.Interfaced.Persistence
 
         #endregion
 
+        protected new IActorRef Sender
+        {
+            get
+            {
+                var context = ActorSynchronizationContext.GetCurrentContext();
+                return context != null ? context.Sender : base.Sender;
+            }
+        }
+
         // Atomic async OnPreStart event (it will be called after PreStart)
         protected virtual Task OnPreStart()
         {
@@ -62,7 +71,7 @@ namespace Akka.Interfaced.Persistence
 
         private void InvokeOnPreStart()
         {
-            var context = new MessageHandleContext { Self = Self, Sender = Sender };
+            var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
             BecomeStacked(OnReceiveInAtomicTask);
             _currentAtomicContext = context;
 
@@ -157,7 +166,7 @@ namespace Akka.Interfaced.Persistence
 
         private void OnRequestMessage(RequestMessage request)
         {
-            var sender = Sender;
+            var sender = base.Sender;
 
             var handlerItem = RequestDispatcher.GetHandler(request.InvokePayload.GetType());
             if (handlerItem == null)
@@ -182,7 +191,7 @@ namespace Akka.Interfaced.Persistence
             {
                 // async handle
 
-                var context = new MessageHandleContext { Self = Self, Sender = Sender };
+                var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
                 if (handlerItem.IsReentrant)
                 {
                     _activeReentrantCount += 1;
@@ -227,7 +236,7 @@ namespace Akka.Interfaced.Persistence
 
         private void OnTaskRunMessage(TaskRunMessage taskRunMessage)
         {
-            var context = new MessageHandleContext { Self = Self, Sender = Sender };
+            var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
             if (taskRunMessage.IsReentrant)
             {
                 _activeReentrantCount += 1;
@@ -262,8 +271,12 @@ namespace Akka.Interfaced.Persistence
         {
             if (handlerItem.AsyncHandler != null)
             {
-                var context = new MessageHandleContext { Self = Self, Sender = Sender };
-                if (handlerItem.IsReentrant == false)
+                var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+                if (handlerItem.IsReentrant)
+                {
+                    _activeReentrantCount += 1;
+                }
+                else
                 {
                     BecomeStacked(OnReceiveInAtomicTask);
                     _currentAtomicContext = context;
