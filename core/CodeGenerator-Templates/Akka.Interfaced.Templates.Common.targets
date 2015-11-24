@@ -30,7 +30,7 @@
 
   <!-- Code Generation Task -->
   <Target Name="AkkaInterfacedPreprocessing"
-          AfterTargets="BeforeCompile;ResolveReferences"
+          AfterTargets="BeforeCompile;TrackableDataPreprocessing"
           BeforeTargets="CoreCompile"
           Inputs="@(Compile);@(ReferencePath)"
           Outputs="$(ProjectDir)$(IntermediateOutputPath)$(TargetName)$(TargetExt)">
