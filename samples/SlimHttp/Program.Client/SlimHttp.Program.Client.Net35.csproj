@@ -40,7 +40,7 @@
       <HintPath>..\..\..\packages\NetLegacySupport.ConcurrentDictionary.1.1.0\lib\net35\NetLegacySupport.ConcurrentDictionary.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetLegacySupport.Tuple, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NetLegacySupport.Tuple, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\NetLegacySupport.Tuple.1.1.0\lib\net35\NetLegacySupport.Tuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
