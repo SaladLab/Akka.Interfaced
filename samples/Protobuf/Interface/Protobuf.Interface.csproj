@@ -38,12 +38,12 @@
       <HintPath>..\..\..\packages\Akka.1.0.5\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetLegacySupport.Action, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NetLegacySupport.Action.1.0.3\lib\net40\NetLegacySupport.Action.dll</HintPath>
+    <Reference Include="NetLegacySupport.Action, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NetLegacySupport.Action.1.1.0\lib\net40\NetLegacySupport.Action.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetLegacySupport.ConcurrentDictionary, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NetLegacySupport.ConcurrentDictionary.1.0.2\lib\net40\NetLegacySupport.ConcurrentDictionary.dll</HintPath>
+    <Reference Include="NetLegacySupport.ConcurrentDictionary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NetLegacySupport.ConcurrentDictionary.1.1.0\lib\net40\NetLegacySupport.ConcurrentDictionary.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -59,8 +59,8 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TypeAlias, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\TypeAlias.1.0.1\lib\net40\TypeAlias.dll</HintPath>
+    <Reference Include="TypeAlias, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\TypeAlias.1.1.1\lib\net40\TypeAlias.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

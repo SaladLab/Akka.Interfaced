@@ -35,8 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NetLegacySupport.Tuple, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NetLegacySupport.Tuple.1.0.2\lib\net35\NetLegacySupport.Tuple.dll</HintPath>
+    <Reference Include="NetLegacySupport.Tuple, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NetLegacySupport.Tuple.1.1.0\lib\net35\NetLegacySupport.Tuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
