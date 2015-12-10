@@ -65,7 +65,7 @@ let projects = ([
         Template=true;
         Dependencies=[("Akka.Interfaced", "");
                       ("protobuf-net", "2.0.0.668");
-                      ("TypeAlias", "1.0.1");];
+                      ("TypeAlias", "1.1.1");];
     };
     {   emptyProject with
         Name="Akka.Interfaced-SlimClient.Templates";
@@ -79,7 +79,7 @@ let projects = ([
         Template=true;
         Dependencies=[("Akka.Interfaced-SlimClient", "");
                       ("protobuf-net", "2.0.0.668");
-                      ("TypeAlias", "1.0.1");];
+                      ("TypeAlias", "1.1.1");];
     };
     // Plugins
     {   emptyProject with
