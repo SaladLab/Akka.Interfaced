@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basic.Program", "samples\Ba
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample-SlimHttp", "Sample-SlimHttp", "{02565A03-B570-401D-8796-F84DE193F194}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Server", "samples\SlimHttp\Interface\SlimHttp.Interface.Server.csproj", "{CD2F7E1F-6D1F-462A-92D5-5B07E8FD4533}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Server", "samples\SlimHttp\Interface.Server\SlimHttp.Interface.Server.csproj", "{CD2F7E1F-6D1F-462A-92D5-5B07E8FD4533}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
@@ -55,17 +55,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protobuf.Interface", "sampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protobuf.Program", "samples\Protobuf\Program\Protobuf.Program.csproj", "{5131F342-51E7-481A-A4F7-984A2C70397A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Client", "samples\SlimHttp\Interface\SlimHttp.Interface.Client.csproj", "{70C1E43F-F4D0-42E1-915A-2701D162C050}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Client", "samples\SlimHttp\Interface.Client\SlimHttp.Interface.Client.csproj", "{70C1E43F-F4D0-42E1-915A-2701D162C050}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Client.Net35", "samples\SlimHttp\Interface\SlimHttp.Interface.Client.Net35.csproj", "{63D15731-5E68-4799-93D6-64092E6988B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Interface.Client.Net35", "samples\SlimHttp\Interface.Client.Net35\SlimHttp.Interface.Client.Net35.csproj", "{63D15731-5E68-4799-93D6-64092E6988B1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Client.Net35", "samples\SlimHttp\Program.Client\SlimHttp.Program.Client.Net35.csproj", "{75584615-FD8B-4746-8379-7CFF2D7E745B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimHttp.Program.Client.Net35", "samples\SlimHttp\Program.Client.Net35\SlimHttp.Program.Client.Net35.csproj", "{75584615-FD8B-4746-8379-7CFF2D7E745B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{902CC4E5-A632-4462-B6D0-6EC5A63B9855}"
 	ProjectSection(SolutionItems) = preProject
