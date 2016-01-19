@@ -21,9 +21,7 @@ namespace CodeGen
             var referenceMaps = referencePaths.Select(file => Assembly.LoadFile(file))
                                               .ToDictionary(a => a.FullName, a => a);
 
-            // TODO: how to handle defines option?
-
-            CSharpCompilation compilation = CSharpCompilation.Create(
+            var compilation = CSharpCompilation.Create(
                 assemblyName,
                 syntaxTrees: syntaxTrees,
                 references: references,
