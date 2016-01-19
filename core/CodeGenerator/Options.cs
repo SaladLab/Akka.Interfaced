@@ -21,7 +21,7 @@ namespace CodeGen
         [Option('r', "reference", Separator = ';', HelpText = "Input reference files for building sources.")]
         public IEnumerable<string> References { get; set; }
 
-        [Option('d', "define", HelpText = "Defines name as a symbol which is used in compiling.")]
+        [Option('d', "define", Separator = ';', HelpText = "Defines name as a symbol which is used in compiling.")]
         public IEnumerable<string> Defines { get; set; }
 
         [Option('t', "target", HelpText = "Filename of a generated code.")]

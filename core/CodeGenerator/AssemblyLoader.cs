@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Akka.Interfaced;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeGen
 {
@@ -19,7 +15,8 @@ namespace CodeGen
         public static Assembly BuildAndLoad(string[] sourcePaths, string[] referencePaths, string[] defines)
         {
             var assemblyName = Path.GetRandomFileName();
-            var syntaxTrees = sourcePaths.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
+            var parseOption = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse, SourceCodeKind.Regular, defines);
+            var syntaxTrees = sourcePaths.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), parseOption, file)).ToArray();
             var references = referencePaths.Select(file => MetadataReference.CreateFromFile(file)).ToArray();
             var referenceMaps = referencePaths.Select(file => Assembly.LoadFile(file))
                                               .ToDictionary(a => a.FullName, a => a);
