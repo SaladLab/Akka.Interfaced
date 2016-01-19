@@ -11,8 +11,8 @@
     <AssemblyName>SlimHttp.Program.Client.Net35</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>.\obj\$(AssemblyName)\</BaseIntermediateOutputPath>
-    <OutputPath>.\bin\$(AssemblyName)\$(Configuration)\</OutputPath>
+    <BaseIntermediateOutputPath>.\obj\</BaseIntermediateOutputPath>
+    <OutputPath>.\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
