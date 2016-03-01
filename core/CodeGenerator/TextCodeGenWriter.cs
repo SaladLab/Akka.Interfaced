@@ -110,7 +110,7 @@ namespace CodeGen
 // ------------------------------------------------------------------------------
                 ".Trim();
             var src = comment + "\n\n" + _header.ToString() + "\n" + _body.ToString();
-            return src.Replace("\r", "");
+            return src.Replace("\r", "").Replace("\n", Environment.NewLine);
         }
     }
 }
