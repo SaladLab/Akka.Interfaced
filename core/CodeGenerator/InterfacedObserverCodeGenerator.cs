@@ -18,7 +18,9 @@ namespace CodeGen
             Console.WriteLine("GenerateCode: " + type.FullName);
 
             writer.PushRegion(type.FullName);
-            writer.PushNamespace(type.Namespace);
+
+            if (string.IsNullOrEmpty(type.Namespace) == false)
+                writer.PushNamespace(type.Namespace);
 
             // Collect Method and make message name for each one
 
@@ -30,7 +32,9 @@ namespace CodeGen
             GeneratePayloadCode(type, writer, methods, method2PayloadTypeNameMap);
             GenerateObserverCode(type, writer, methods, method2PayloadTypeNameMap);
 
-            writer.PopNamespace();
+            if (string.IsNullOrEmpty(type.Namespace) == false)
+                writer.PopNamespace();
+
             writer.PopRegion();
         }
 
