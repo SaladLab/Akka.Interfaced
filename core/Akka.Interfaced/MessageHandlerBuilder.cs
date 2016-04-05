@@ -6,7 +6,8 @@ using System.Runtime.CompilerServices;
 
 namespace Akka.Interfaced
 {
-    public class MessageHandlerBuilder<T> where T : class
+    public class MessageHandlerBuilder<T>
+        where T : class
     {
         private Dictionary<Type, MessageHandlerItem<T>> _table;
 

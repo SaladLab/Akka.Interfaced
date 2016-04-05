@@ -5,7 +5,7 @@ using System.Reflection;
 namespace Akka.Interfaced.LogFilter
 {
     // LogProxyBuilder build LogProxy class that send log message to (untyped) log target.
-    // It uses reflection to support various log libraries (like NLog, log4net, ...) 
+    // It uses reflection to support various log libraries (like NLog, log4net, ...)
     internal static class LogProxyBuilder
     {
         public static LogProxy Build(Type targetType, string loggerName, string logLevel)

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
-using Akka.Interfaced;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Akka.Interfaced.LogFilter

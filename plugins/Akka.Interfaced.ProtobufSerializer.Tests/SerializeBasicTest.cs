@@ -5,6 +5,8 @@ using ProtoBuf;
 using TypeAlias;
 using Xunit;
 
+#pragma warning disable SA1307 // Accessible fields must begin with upper-case letter
+
 namespace Akka.Interfaced.ProtobufSerializer.Tests
 {
     public class SerializeBasicTest
@@ -12,8 +14,10 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         [ProtoContract, TypeAlias]
         public class TestInvokableMessage : IAsyncInvokable
         {
-            [ProtoMember(1)] public System.String a;
-            [ProtoMember(2)] public System.String b;
+            [ProtoMember(1)]
+            public string a;
+            [ProtoMember(2)]
+            public string b;
 
             public Task<IValueGetable> InvokeAsync(object target)
             {
@@ -24,7 +28,8 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         [ProtoContract, TypeAlias]
         public class TestReturnMessage : IValueGetable
         {
-            [ProtoMember(1)] public System.String v;
+            [ProtoMember(1)]
+            public string v;
 
             public object Value
             {
@@ -35,7 +40,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         [ProtoContract, TypeAlias]
         public class TestNotificationMessage : IInvokable
         {
-            [ProtoMember(1)] public System.String a;
+            [ProtoMember(1)] public string a;
 
             public void Invoke(object target)
             {

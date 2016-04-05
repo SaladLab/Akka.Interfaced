@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Reflection;
-using Akka.Actor;
-using ProtoBuf.Meta;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using ProtoBuf.Meta;
 
 namespace Akka.Interfaced.ProtobufSerializer
 {

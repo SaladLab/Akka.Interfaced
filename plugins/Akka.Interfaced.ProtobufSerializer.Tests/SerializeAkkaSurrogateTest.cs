@@ -3,6 +3,8 @@ using ProtoBuf;
 using TypeAlias;
 using Xunit;
 
+#pragma warning disable SA1307 // Accessible fields must begin with upper-case letter
+
 namespace Akka.Interfaced.ProtobufSerializer.Tests
 {
     public class SerializeAkkaSurrogateTest

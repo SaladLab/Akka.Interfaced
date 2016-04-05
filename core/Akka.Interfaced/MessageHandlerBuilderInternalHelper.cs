@@ -7,7 +7,7 @@ namespace Akka.Interfaced
     // Helper for creating delegates
     // http://blogs.msmvps.com/jonskeet/2008/08/09/making-reflection-fly-and-exploring-delegates/
 
-    // Convert 
+    // Convert
     //    void T.Method(object)
     // -> MessageHandler<T>
     internal static class MessageHandlerFuncBuilder
@@ -39,7 +39,7 @@ namespace Akka.Interfaced
         }
     }
 
-    // Convert 
+    // Convert
     //    Task T.Method(object)
     // -> MessageAsyncHandler<T>
     internal static class MessageHandlerAsyncBuilder

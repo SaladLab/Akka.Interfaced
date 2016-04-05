@@ -1,11 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
-using Xunit;
-using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Reflection;
 using Akka.Actor;
+using Xunit;
 
 namespace Akka.Interfaced.Tests
 {
@@ -107,11 +104,10 @@ namespace Akka.Interfaced.Tests
         public TestFilterPipelineActor(int permission)
         {
             Permission = permission;
-
         }
 
         [ExtendedHandler]
-        void Atomic(int id)
+        private void Atomic(int id)
         {
             TestFilterPipeline.LogBoard.Log($"TestFilterPipelineActor.Atomic {id}");
             if (id == 0)
@@ -119,7 +115,7 @@ namespace Akka.Interfaced.Tests
         }
 
         [ExtendedHandler, Reentrant]
-        async Task Reentrant(int id)
+        private async Task Reentrant(int id)
         {
             TestFilterPipeline.LogBoard.Log($"TestFilterPipelineActor.Reentrant {id}");
             if (id == 0)

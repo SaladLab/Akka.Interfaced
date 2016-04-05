@@ -9,7 +9,7 @@ using Akka.Interfaced;
 
 namespace CodeGen
 {
-    class InterfacedActorCodeGenerator
+    public class InterfacedActorCodeGenerator
     {
         public Options Options { get; set; }
 

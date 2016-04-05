@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Akka.Actor;
 using Xunit;
-using System;
-using System.Linq;
 
 namespace Akka.Interfaced.Tests
 {
@@ -67,8 +67,10 @@ namespace Akka.Interfaced.Tests
             var t1 = w.Reentrant(1);
             var t2 = w.Reentrant(2);
             await Task.WhenAll(t1, t2);
-            Assert.Equal(new List<int> { 1, 1, 2, 2, 3, 3 },
-                         workLog.Select(t => t.Item2));
+            Assert.Equal(new List<int> { 1, 2, 3 },
+                         workLog.Where(t => t.Item1 == 1).Select(t => t.Item2));
+            Assert.Equal(new List<int> { 1, 2, 3 },
+                         workLog.Where(t => t.Item1 == 1).Select(t => t.Item2));
         }
 
         [Fact]

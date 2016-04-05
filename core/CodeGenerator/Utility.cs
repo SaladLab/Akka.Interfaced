@@ -12,7 +12,7 @@ namespace CodeGen
         {
             if (type.IsGenericType)
             {
-                var genericParams = String.Join(", ", type.GenericTypeArguments.Select(t => GetTypeName(t)));
+                var genericParams = string.Join(", ", type.GenericTypeArguments.Select(t => GetTypeName(t)));
                 var delimiterPos = type.Name.IndexOf('`');
                 return type.Namespace + "." + type.Name.Substring(0, delimiterPos) + "<" + genericParams + ">";
             }

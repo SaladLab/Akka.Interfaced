@@ -5,6 +5,7 @@
   <PropertyGroup>
     <AkkaInterfacedSlimClient>1</AkkaInterfacedSlimClient>
     <AkkaInterfacedTarget>.\Properties\Akka.Interfaced.CodeGen.Slim.Net35.cs</AkkaInterfacedTarget>
+    <CodeAnalysisRuleSet>..\..\..\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -33,6 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NetLegacySupport.Tuple, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -73,6 +75,11 @@
       <Project>{43de773d-3e00-48ed-93fe-a0eda5c105fb}</Project>
       <Name>Akka.Interfaced-SlimClient.Net35</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.Common.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\Akka.Interfaced.Templates.Common.targets')" />

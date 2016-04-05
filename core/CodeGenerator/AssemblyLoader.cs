@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace CodeGen
 {
-    static class AssemblyLoader
+    public static class AssemblyLoader
     {
         private static ResolveEventHandler _lastResolveHandler;
 

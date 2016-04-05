@@ -1,12 +1,12 @@
-﻿using Akka.Interfaced;
-using Akka.Interfaced.Persistence.Tests.Interface;
-using System;
+﻿using System;
 using System.Linq;
-using Xunit;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Akka.Interfaced;
+using Akka.Interfaced.Persistence.Tests.Interface;
 using Akka.Interfaced.Persistence;
 using Akka.Persistence;
+using Xunit;
 
 namespace Akka.Interfaced.Persistence.Tests
 {

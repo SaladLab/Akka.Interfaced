@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
-using System;
 
 namespace Akka.Interfaced.Tests
 {
@@ -41,13 +41,13 @@ namespace Akka.Interfaced.Tests
     public class TestFilterAsyncActor : InterfacedActor<TestFilterAsyncActor>, IExtendedInterface<IWorker>
     {
         [ExtendedHandler]
-        void Atomic(int id)
+        private void Atomic(int id)
         {
             TestFilterAsync.LogBoard.Log($"TestFilterAsyncActor.Atomic {id}");
         }
 
         [ExtendedHandler, Reentrant]
-        async Task Reentrant(int id)
+        private async Task Reentrant(int id)
         {
             TestFilterAsync.LogBoard.Log($"TestFilterAsyncActor.Reentrant {id}");
             await Task.Yield();

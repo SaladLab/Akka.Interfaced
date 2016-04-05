@@ -1,14 +1,10 @@
 version: 0.2.0.{build}
 os: Visual Studio 2015
-configuration: Debug
-before_build:
-- cmd: nuget restore
-build:
-  project: Akka.Interfaced.sln
-  verbosity: minimal
-test: off
 environment:
   NUGETKEY:
     secure: z2fJQckgBQJ7IKfjOyrZYPM2+xDj4xYuqaUDBG7MrJs+b1bNc0vzYMTxpF6Sb1mA
-deploy_script:
-- cmd: build.cmd nuget nugetkey=%NUGETKEY% nugetpublishurl=https://www.myget.org/F/saladbowlcreative/api/v2/package nugetprerelease=%APPVEYOR_BUILD_NUMBER%
+  COVERALLSKEY:
+    secure: NVOa6tJEKECboQZXKhfK0JTE6xoxROELIRFzTfBxrlFCPukBhwblgWnQC+eYtd21
+test: off
+build_script:
+- cmd: build.cmd ci nugetkey=%NUGETKEY% nugetpublishurl=https://www.myget.org/F/saladlab/api/v2/package nugetprerelease=%APPVEYOR_BUILD_NUMBER% coverallskey=%COVERALLSKEY%

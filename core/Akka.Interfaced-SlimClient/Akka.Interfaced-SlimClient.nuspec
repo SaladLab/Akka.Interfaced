@@ -11,7 +11,7 @@
     <projectUrl>https://github.com/SaladbowlCreative/Akka.Interfaced</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>@releaseNotes@</releaseNotes>
-    <copyright>Copyright © 2015 Saladbowl Creative</copyright>
+    <copyright>Copyright © 2016 SaladLab</copyright>
     <tags>akka interfaced slimclient</tags>
     @dependencies@
     @references@

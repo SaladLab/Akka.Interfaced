@@ -11,9 +11,9 @@ using Protobuf.Interface;
 
 namespace Protobuf.Program
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             // force interface assembly to be loaded before creating ProtobufSerializer
 
@@ -52,7 +52,7 @@ namespace Protobuf.Program
             TestHelloWorld(serverSystem, clientSystem).Wait();
             TestSurrogate(serverSystem, clientSystem).Wait();
             TestPedantic(serverSystem, clientSystem).Wait();
-            
+
             Console.WriteLine("\nEnter to quit.");
             Console.ReadLine();
         }
@@ -92,7 +92,7 @@ namespace Protobuf.Program
             {
                 Console.WriteLine("!EXCEPTION! " + e.GetType().Name + " " + e.Message);
             }
-            
+
             Console.WriteLine(await helloWorld.GetHelloCount());
         }
 

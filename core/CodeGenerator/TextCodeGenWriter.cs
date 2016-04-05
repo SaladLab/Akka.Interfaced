@@ -14,7 +14,7 @@ namespace CodeGen
 
         private string IndentStr
         {
-            get { return String.Concat(Enumerable.Repeat("    ", _indent)); }
+            get { return string.Concat(Enumerable.Repeat("    ", _indent)); }
         }
 
         private void SetNewLineNeeded(bool value)

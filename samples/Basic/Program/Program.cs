@@ -1,29 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Management.Instrumentation;
-using System.Text;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Interfaced;
-using Akka.Event;
 using Basic.Interface;
 
 namespace Basic.Program
 {
-    class Program
+    internal class Program
     {
-        private static ActorSystem System;
+        private static ActorSystem s_system;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            System = ActorSystem.Create("MySystem");
+            s_system = ActorSystem.Create("MySystem");
 
-            DeadRequestProcessingActor.Install(System);
+            DeadRequestProcessingActor.Install(s_system);
 
             if (true)
             {
-                var actor = System.ActorOf<TestActor>();
+                var actor = s_system.ActorOf<TestActor>();
                 TestCalculator(actor).Wait();
                 TestCounter(actor).Wait();
                 TestWorker(actor).Wait();
@@ -31,8 +26,8 @@ namespace Basic.Program
 
             if (true)
             {
-                var actor = System.ActorOf<TestActor>();
-                var actorAnother = System.ActorOf<TestCounterActor>();
+                var actor = s_system.ActorOf<TestActor>();
+                var actorAnother = s_system.ActorOf<TestCounterActor>();
                 TestCounter(actor).Wait();
                 TestCounter(actorAnother).Wait();
             }
@@ -71,14 +66,14 @@ namespace Basic.Program
             Console.ReadLine();
         }
 
-        static async Task TestCalculator(IActorRef actor)
+        private static async Task TestCalculator(IActorRef actor)
         {
             var c = new CalculatorRef(actor);
             Console.WriteLine(await c.Concat("Hello", "World"));
             Console.WriteLine(await c.Sum(1, 2));
         }
 
-        static async Task TestCounter(IActorRef actor)
+        private static async Task TestCounter(IActorRef actor)
         {
             var c = new CounterRef(actor);
             c.WithNoReply().IncCounter(1);
@@ -87,7 +82,7 @@ namespace Basic.Program
             Console.WriteLine(await c.GetCounter());
         }
 
-        static async Task TestWorker(IActorRef actor)
+        private static async Task TestWorker(IActorRef actor)
         {
             var w = new WorkerRef(actor);
 
@@ -108,10 +103,10 @@ namespace Basic.Program
                 w.Reentrant("C"));
         }
 
-        static async Task TestProxyCounter()
+        private static async Task TestProxyCounter()
         {
-            var counter = System.ActorOf<TestCounterActor>();
-            var proxy = System.ActorOf(Props.Create<TestProxyCounterActor>(counter));
+            var counter = s_system.ActorOf<TestCounterActor>();
+            var proxy = s_system.ActorOf(Props.Create<TestProxyCounterActor>(counter));
 
             try
             {
@@ -127,9 +122,9 @@ namespace Basic.Program
             }
         }
 
-        static async Task TestOverloaded()
+        private static async Task TestOverloaded()
         {
-            var overloaded = System.ActorOf<TestOverloadedActor>();
+            var overloaded = s_system.ActorOf<TestOverloadedActor>();
 
             var o = new OverloadedRef(overloaded);
             Console.WriteLine("Min = {0}", await o.Min(2, 1));
@@ -137,9 +132,9 @@ namespace Basic.Program
             Console.WriteLine("Min = {0}", await o.Min(9, 8, 7, 6));
         }
 
-        static async Task TestException()
+        private static async Task TestException()
         {
-            var actor = System.ActorOf<TestExceptionActor>();
+            var actor = s_system.ActorOf<TestExceptionActor>();
             var c = new CounterRef(actor);
 
             try
@@ -174,11 +169,11 @@ namespace Basic.Program
             }
         }
 
-        static async Task TestExtendedInterface()
+        private static async Task TestExtendedInterface()
         {
             Console.WriteLine("***** TestExtendedInterface *****");
 
-            var actor = System.ActorOf<TestExtendedActor>();
+            var actor = s_system.ActorOf<TestExtendedActor>();
             var c = new CounterRef(actor);
             c.WithNoReply().IncCounter(1);
             c.WithNoReply().IncCounter(2);
@@ -210,12 +205,12 @@ namespace Basic.Program
             }
         }
 
-        static async Task TestEvent()
+        private static async Task TestEvent()
         {
-            var actor = System.ActorOf<TestEventGenerator>();
+            var actor = s_system.ActorOf<TestEventGenerator>();
             var g = new EventGeneratorRef(actor);
 
-            var channel = new RawNotificationChannel<IEventObserver> {Observer = new RawEventObserver()};
+            var channel = new RawNotificationChannel<IEventObserver> { Observer = new RawEventObserver() };
             var observer = new EventObserver(channel, 1);
             await g.Subscribe(observer);
             await g.Buy("Apple", 100);
@@ -225,9 +220,9 @@ namespace Basic.Program
             // var x = CreateObserver<TestEventGenerator>();
         }
 
-        static async Task TestStartStopEvent()
+        private static async Task TestStartStopEvent()
         {
-            var actor = System.ActorOf<TestStartStopEvent>();
+            var actor = s_system.ActorOf<TestStartStopEvent>();
             var w = new WorkerRef(actor);
             Console.WriteLine(w.Actor.Path);
             w.WithNoReply().Atomic("1");

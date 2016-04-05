@@ -45,18 +45,18 @@
   - 코딩 컨벤션 붙여서 코드 정리! 으갸으갸
   - 여러 프레임웍 지원하는 프로젝트 구조도 잡아보자.
     - 당장 .NET 3.5 와 2.0 지원을 넣어서 잘 정리해 보는게?
-	- 솔루션이 커졌는데 예제는 분리할까?
+    - 솔루션이 커졌는데 예제는 분리할까?
       local nuget 이 가능하면 굳이 core 랑 example 이 같이 있을 필요는 없다
 
 ## SlimUnity
   - 일단 Communicator!
     - 이거 대충 돌아만 가도록 만들어 뒀는데 requirement 정리해서 잘 구현하자.
-	- 먼저 접속 유지 기능
-	- RequestId 로 연결 재개 하는 것도?
-	- 세션 쪽도 고민해보고
+    - 먼저 접속 유지 기능
+    - RequestId 로 연결 재개 하는 것도?
+    - 세션 쪽도 고민해보고
   - 서버쪽은 따로 분리할 수 있을 듯
     - 당장 급하지는 않는데 결국 해야 할 방향
-	- ClientSession, ClientGateway 와 UserActor, UserAuthenticator 를 잘 붙여보자.
+    - ClientSession, ClientGateway 와 UserActor, UserAuthenticator 를 잘 붙여보자.
 
 # 아이디어
  
@@ -75,11 +75,11 @@
 ## Serializer
   - protobuf-net 이 가지는 한계
     - polymorphism 을 지원하지 않는 거
-	- surrogate 가 딱 그 타입만 지원하는 거 (상속 관계를 지원하지 않음)
+    - surrogate 가 딱 그 타입만 지원하는 거 (상속 관계를 지원하지 않음)
   - 지금은 어떻게든 꾸역꾸역 버티고 있는데 이거 금방 바닥난다.
   - 예를 들어 rpc 인자 ICounter 타입을 메시지 클래스에서는 CounterRef 로 바꿔 보내느데
     이런건 함수 매개변수로만 가능하고 클래스로 한번 wrapping 하면 그냥 오류난다.
-	polymorphism 혹은 상속 지원 surrogate 가 있어야 해결 가능
+    polymorphism 혹은 상속 지원 surrogate 가 있어야 해결 가능
 
 ## cluster sharding 
   - 현재 akka.net 1.0.4 에는 cluster sharding 이 없다.

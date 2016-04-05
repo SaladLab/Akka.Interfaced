@@ -5,9 +5,9 @@ using HelloWorld.Interface;
 
 namespace HelloWorld.Program
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var system = ActorSystem.Create("MySystem");
             DeadRequestProcessingActor.Install(system);

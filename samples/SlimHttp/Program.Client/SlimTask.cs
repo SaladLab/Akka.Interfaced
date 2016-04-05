@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Net;
-using Akka.Interfaced;
 using System.Threading;
 using System.Threading.Tasks;
+using Akka.Interfaced;
 
 #if NET20 || NET35
 
 namespace SlimHttp.Program.Client
 {
-    class SlimTask : Task
+    internal class SlimTask : Task
     {
         private Exception _exception;
 
@@ -50,7 +50,7 @@ namespace SlimHttp.Program.Client
         }
     }
 
-    class SlimTask<TResult> : SlimTask, Task<TResult>
+    internal class SlimTask<TResult> : SlimTask, Task<TResult>
     {
         private TResult _result;
 
@@ -80,7 +80,7 @@ namespace SlimHttp.Program.Client
         }
     }
 
-    static class SlimTaskExtension
+    internal static class SlimTaskExtension
     {
         public static void Wait(this Task task)
         {

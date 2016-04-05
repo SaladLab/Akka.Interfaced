@@ -348,7 +348,6 @@ namespace Akka.Interfaced
             }
         }
 
-        
         // from IRequestWaiter
 
         void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)

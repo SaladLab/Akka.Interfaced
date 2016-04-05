@@ -35,7 +35,8 @@ namespace Akka.Interfaced.ProtobufSerializer
 
                 stream.WriteByte(b);
                 value = high;
-            } while (value != 0);
+            }
+            while (value != 0);
         }
 
         public static int Read7BitEncodedInt(this Stream stream)

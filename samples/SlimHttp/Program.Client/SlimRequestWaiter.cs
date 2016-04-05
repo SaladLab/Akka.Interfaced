@@ -13,7 +13,7 @@ using TypeAlias;
 
 namespace SlimHttp.Program.Client
 {
-    class SlimRequestWaiter : IRequestWaiter
+    internal class SlimRequestWaiter : IRequestWaiter
     {
         public Uri Root { get; set; }
 

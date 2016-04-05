@@ -110,8 +110,10 @@ namespace Akka.Interfaced.TestKit
             {
                 var msg = (IInterfacedPayload)requestMessage.InvokePayload;
                 if (msg == null || msg.GetInterfaceType() != a.InterfaceType)
+                {
                     throw new InvalidOperationException("Wrong interface type! " +
                                                         $"(Id={actorId}, Interface={a.InterfaceType})");
+                }
             }
 
             return a;

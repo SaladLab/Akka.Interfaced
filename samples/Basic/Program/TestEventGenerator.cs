@@ -10,7 +10,7 @@ namespace Basic.Program
     public class TestEventGenerator : InterfacedActor<TestEventGenerator>, IEventGenerator
     {
         private HashSet<IEventObserver> _observers = new HashSet<IEventObserver>();
-            
+
         Task IEventGenerator.Subscribe(IEventObserver observer)
         {
             _observers.Add(observer);

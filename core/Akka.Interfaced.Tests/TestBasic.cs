@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Akka.Actor;
 using Xunit;
-using System;
 
 namespace Akka.Interfaced.Tests
 {
@@ -10,7 +10,10 @@ namespace Akka.Interfaced.Tests
     {
         private List<object> _blackhole;
 
-        public BasicActor() : this(null) { }
+        public BasicActor()
+            : this(null)
+        {
+        }
 
         public BasicActor(List<object> blackhole)
         {

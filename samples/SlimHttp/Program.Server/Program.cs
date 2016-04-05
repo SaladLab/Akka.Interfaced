@@ -11,12 +11,12 @@ using SlimHttp.Interface;
 
 namespace SlimHttp.Program.Server
 {
-    class Program
+    internal class Program
     {
         public static ActorSystem System { get; private set; }
-        private static HttpSelfHostServer HttpServer;
+        private static HttpSelfHostServer s_httpServer;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             System = ActorSystem.Create("MySystem");
 
@@ -27,23 +27,23 @@ namespace SlimHttp.Program.Server
             var pedantic = System.ActorOf<PedanticActor>("pedantic");
 
             StartAsync().Wait();
-            
+
             Console.WriteLine("Enter to quit");
             Console.ReadLine();
 
             StopAsync().Wait();
         }
 
-        static async Task StartAsync()
+        private static async Task StartAsync()
         {
             var serviceUri = "http://localhost:9000";
             var httpConfig = new HttpSelfHostConfiguration(serviceUri);
             httpConfig.MapHttpAttributeRoutes();
 
-            HttpServer = new HttpSelfHostServer(httpConfig);
+            s_httpServer = new HttpSelfHostServer(httpConfig);
             try
             {
-                await HttpServer.OpenAsync();
+                await s_httpServer.OpenAsync();
             }
             catch (System.ServiceModel.AddressAccessDeniedException e)
             {
@@ -55,12 +55,12 @@ namespace SlimHttp.Program.Server
             }
         }
 
-        static async Task StopAsync()
+        private static async Task StopAsync()
         {
-            if (HttpServer != null)
+            if (s_httpServer != null)
             {
-                await HttpServer.CloseAsync();
-                HttpServer = null;
+                await s_httpServer.CloseAsync();
+                s_httpServer = null;
             }
         }
     }

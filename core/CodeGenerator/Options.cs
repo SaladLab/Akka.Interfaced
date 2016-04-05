@@ -10,7 +10,7 @@ using CommandLine;
 
 namespace CodeGen
 {
-    class Options
+    public class Options
     {
         [Option('p', "path", HelpText = "Base path for processing sources, references and target.")]
         public string Path { get; set; }

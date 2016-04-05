@@ -8,17 +8,17 @@ using SlimHttp.Interface;
 
 namespace SlimHttp.Program.Client
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            var requestWaiter = new SlimRequestWaiter {Root = new Uri("http://localhost:9000")};
+            var requestWaiter = new SlimRequestWaiter { Root = new Uri("http://localhost:9000") };
 
             // Calculator
 
             Console.WriteLine("\n*** Calculator ***");
 
-            var calculatorActor = new SlimActorRef() {Id = "calculator"};
+            var calculatorActor = new SlimActorRef() { Id = "calculator" };
             var calculator = new CalculatorRef(calculatorActor, requestWaiter, null);
 
             PrintResult(calculator.Concat("Hello", "World"));
@@ -36,7 +36,7 @@ namespace SlimHttp.Program.Client
             counter.IncCounter(2);
             counter.IncCounter(3);
             PrintResult(counter.GetCounter());
-            
+
             // Pedantic
 
             Console.WriteLine("\n*** Pedantic ***");
@@ -53,7 +53,7 @@ namespace SlimHttp.Program.Client
             PrintResult(pedantic.TestReturnClass(1, 2));
         }
 
-        static void PrintResult<TResult>(Task<TResult> task)
+        private static void PrintResult<TResult>(Task<TResult> task)
         {
             try
             {

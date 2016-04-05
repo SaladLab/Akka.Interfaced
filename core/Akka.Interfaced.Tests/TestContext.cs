@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Akka.Actor;
 using Xunit;
-using System;
-using System.Linq;
 
 namespace Akka.Interfaced.Tests
 {
@@ -35,7 +33,7 @@ namespace Akka.Interfaced.Tests
     public class TestContextMessageActor : InterfacedActor<TestContextMessageActor>
     {
         [MessageHandler]
-        async Task OnMessage(List<IUntypedActorContext> list)
+        private async Task OnMessage(List<IUntypedActorContext> list)
         {
             list.Add(Context);
             await Task.Yield();
@@ -47,7 +45,7 @@ namespace Akka.Interfaced.Tests
     public class TestContextMessageReentrantActor : InterfacedActor<TestContextMessageReentrantActor>
     {
         [MessageHandler, Reentrant]
-        async Task OnMessage(List<IUntypedActorContext> list)
+        private async Task OnMessage(List<IUntypedActorContext> list)
         {
             list.Add(Context);
             await Task.Yield();

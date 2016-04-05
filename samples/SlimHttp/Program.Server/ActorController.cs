@@ -61,7 +61,7 @@ namespace SlimHttp.Program.Server
                     HttpStatusCode.BadRequest,
                     e.ToString());
             }
-           
+
             // Try to send message to actor
 
             IActorRef actor;
@@ -116,7 +116,7 @@ namespace SlimHttp.Program.Server
             }
             else
             {
-                actor.Tell(new RequestMessage {InvokePayload = message});
+                actor.Tell(new RequestMessage { InvokePayload = message });
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
         }

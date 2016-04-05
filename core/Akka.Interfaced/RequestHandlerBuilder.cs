@@ -5,9 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+#pragma warning disable SA1130 // Use lambda syntax
+
 namespace Akka.Interfaced
 {
-    public class RequestHandlerBuilder<T> where T : class
+    public class RequestHandlerBuilder<T>
+        where T : class
     {
         private Dictionary<Type, RequestHandlerItem<T>> _table;
 
@@ -222,7 +225,7 @@ namespace Akka.Interfaced
                         var factory = (IFilterPerClassFactory)filterFactory;
                         factory.Setup(type);
                         var filter = factory.CreateInstance();
-                        filterItem = new FilterItem(filterFactory, filter, (_, __) => filter);
+                        filterItem = new FilterItem(filterFactory, filter, (_, x) => filter);
                         _perClassFilterItemTable.Add(factoryType, filterItem);
                     }
                 }
@@ -231,7 +234,7 @@ namespace Akka.Interfaced
                     var factory = (IFilterPerClassMethodFactory)filterFactory;
                     factory.Setup(type, method);
                     var filter = factory.CreateInstance();
-                    filterItem = new FilterItem(filterFactory, filter, (_, __) => filter);
+                    filterItem = new FilterItem(filterFactory, filter, (_, x) => filter);
                 }
                 else if (filterFactory is IFilterPerInstanceFactory)
                 {
@@ -244,7 +247,7 @@ namespace Akka.Interfaced
                         var arrayIndex = _perInstanceFilterCreators.Count;
                         _perInstanceFilterCreators.Add(a => factory.CreateInstance(a));
                         filterItem = new FilterItem(filterFactory, filter,
-                                                    (provider, __) => provider.GetFilter(arrayIndex));
+                                                    (provider, _) => provider.GetFilter(arrayIndex));
                         _perClassFilterItemTable.Add(factoryType, filterItem);
                     }
                 }
@@ -256,7 +259,7 @@ namespace Akka.Interfaced
                     var arrayIndex = _perInstanceFilterCreators.Count;
                     _perInstanceFilterCreators.Add(a => factory.CreateInstance(a));
                     filterItem = new FilterItem(filterFactory, filter,
-                                                (provider, __) => provider.GetFilter(arrayIndex));
+                                                (provider, _) => provider.GetFilter(arrayIndex));
                 }
                 else if (filterFactory is IFilterPerInvokeFactory)
                 {
@@ -296,7 +299,7 @@ namespace Akka.Interfaced
             var preHandleFilterAccessors = preHandleFilterItems.Select(i => i.Accessor).ToArray();
             var postHandleFilterAccessors = postHandleFilterItems.Select(i => i.Accessor).ToArray();
 
-            return delegate (T self, RequestMessage request, Action<ResponseMessage> onCompleted)
+            return delegate(T self, RequestMessage request, Action<ResponseMessage> onCompleted)
             {
                 ResponseMessage response = null;
 
@@ -400,7 +403,7 @@ namespace Akka.Interfaced
 
         private static RequestAsyncHandler<T> BuildAsyncHandler(
             Type invokePayloadType, Type returnPayloadType, MethodInfo method,
-            IList<FilterItem> preHandleFilterItems, IList<FilterItem> postHandleFilterItems) 
+            IList<FilterItem> preHandleFilterItems, IList<FilterItem> postHandleFilterItems)
         {
             var isAsyncMethod = method.ReturnType.Name.StartsWith("Task");
             var handler = isAsyncMethod

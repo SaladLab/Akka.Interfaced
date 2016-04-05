@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Akka.Actor;
 using Xunit;
-using System;
 
 namespace Akka.Interfaced.Tests
 {

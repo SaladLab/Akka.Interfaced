@@ -1,5 +1,4 @@
-﻿using Akka.Interfaced;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Akka.Interfaced.Persistence.Tests.Interface

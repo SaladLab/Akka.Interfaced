@@ -1,8 +1,8 @@
-﻿using Akka.Actor;
-using Akka.Persistence;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Akka.Actor;
+using Akka.Persistence;
 
 namespace Akka.Interfaced.Persistence
 {

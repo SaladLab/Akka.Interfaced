@@ -1,8 +1,9 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/ttuin5f31sj341n3?svg=true)](https://ci.appveyor.com/project/veblush/akka-interfaced)
-
-** This project is at an early development stage. **
-
 # Akka.Interfaced
+
+[![NuGet Status](http://img.shields.io/nuget/v/Akka.Interfaced.svg?style=flat)](https://www.nuget.org/packages/Akka.Interfaced/)
+[![Build status](https://ci.appveyor.com/api/projects/status/ttuin5f31sj341n3?svg=true)](https://ci.appveyor.com/project/veblush/akka-interfaced)
+[![Coverage Status](https://coveralls.io/repos/github/SaladLab/Akka.Interfaced/badge.svg?branch=master)](https://coveralls.io/github/SaladLab/Akka.Interfaced?branch=master)
+[![Coverity Status](https://scan.coverity.com/projects/8460/badge.svg?flat=1)](https://scan.coverity.com/projects/saladlab-akka-interfaced)
 
 Akka.Interfaced provides the interfaced way for actor messaging in Akka.NET
 

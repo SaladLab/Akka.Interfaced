@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using Akka.Actor;
 using Xunit;
-using System;
 
 namespace Akka.Interfaced.Tests
 {
     public class SubjectActor : InterfacedActor<SubjectActor>, ISubject
     {
         private List<ISubjectObserver> _observers = new List<ISubjectObserver>();
-            
+
         async Task ISubject.MakeEvent(string eventName)
         {
             await Task.Delay(10);

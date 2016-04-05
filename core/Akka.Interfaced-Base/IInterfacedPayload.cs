@@ -8,7 +8,7 @@ namespace Akka.Interfaced
     public interface IInterfacedPayload
     {
         /// <summary>
-        ///   Return owner interface type 
+        ///   Return owner interface type
         /// </summary>
         /// <returns>
         ///   Owner interface type

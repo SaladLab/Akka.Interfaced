@@ -1,12 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using System.Collections.Generic;
-using Xunit;
-using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Akka.Interfaced.Tests
-{ 
+{
     // FilterPerClass
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
@@ -367,7 +367,6 @@ namespace Akka.Interfaced.Tests
                 },
                 LogBoard.GetAndClearLogs());
         }
-
 
         [Fact]
         public async Task Test_FilterPerInvoke_Work()

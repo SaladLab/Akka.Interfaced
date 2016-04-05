@@ -1,7 +1,7 @@
 ﻿namespace Akka.Interfaced
 {
     /// <summary>
-    ///   Provides a mechanism for returning value. 
+    ///   Provides a mechanism for returning value.
     /// </summary>
     /// <remarks>
     ///   Reasons to use IValueGetable instead of plain T
@@ -11,7 +11,7 @@
     public interface IValueGetable
     {
         /// <summary>
-        ///   Return value 
+        ///   Return value
         /// </summary>
         object Value { get; }
     }

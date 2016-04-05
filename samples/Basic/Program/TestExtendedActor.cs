@@ -10,13 +10,13 @@ namespace Basic.Program
         private List<int> _values = new List<int>();
 
         [ExtendedHandler]
-        void IncCounter(int delta)
+        private void IncCounter(int delta)
         {
             _values.Add(delta);
         }
 
         [ExtendedHandler]
-        int GetCounter()
+        private int GetCounter()
         {
             return _values.Sum();
         }

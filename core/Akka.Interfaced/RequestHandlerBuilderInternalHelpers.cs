@@ -8,7 +8,7 @@ using Microsoft.Win32;
 
 namespace Akka.Interfaced
 {
-    // Convert 
+    // Convert
     //    [void|TReturn] T.Method(...)
     // -> Func<T, object, IValueGetable>
     internal static class RequestHandlerFuncBuilder
@@ -37,7 +37,8 @@ namespace Akka.Interfaced
         }
 
         private static Func<TTarget, object, IValueGetable>
-            BuildHelper<TTarget, TInvokePayload>(MethodInfo method) where TTarget : class
+            BuildHelper<TTarget, TInvokePayload>(MethodInfo method)
+            where TTarget : class
         {
             // IValueGetable Handler(TTarget instance, object invokePayload)
             // {
@@ -61,7 +62,8 @@ namespace Akka.Interfaced
         }
 
         private static Func<TTarget, object, IValueGetable>
-            BuildHelperWithReturn<TTarget, TInvokePayload, TReturn, TReturnPayload>(MethodInfo method) where TTarget : class
+            BuildHelperWithReturn<TTarget, TInvokePayload, TReturn, TReturnPayload>(MethodInfo method)
+            where TTarget : class
         {
             // IValueGetable Handler(TTarget instance, object invokePayload)
             // {
@@ -69,7 +71,7 @@ namespace Akka.Interfaced
             //      var returnValue = method(instance, invoke.a, invoke.b, ...);
             //      var returnPayload = new TReturnPayload();
             //      returnPayload.v = returnValue;
-            //      return (IValueGetable)returnPayload;  
+            //      return (IValueGetable)returnPayload;
             // }
 
             var instance = Expression.Parameter(typeof(TTarget), "instance");
@@ -96,7 +98,7 @@ namespace Akka.Interfaced
         }
     }
 
-    // Convert 
+    // Convert
     //    [Task|Task<TReturn>] T.Method(...)
     // -> Func<T, object, Task<IValueGetable>>
     internal static class RequestHandlerAsyncBuilder
@@ -133,7 +135,8 @@ namespace Akka.Interfaced
         }
 
         private static Func<TTarget, object, Task<IValueGetable>>
-            BuildHelper<TTarget, TInvokePayload>(MethodInfo method) where TTarget : class
+            BuildHelper<TTarget, TInvokePayload>(MethodInfo method)
+            where TTarget : class
         {
             // async Task<IValueGetable> Handler(TTarget instance, object invokePayload)
             // {
@@ -158,7 +161,8 @@ namespace Akka.Interfaced
         }
 
         private static Func<TTarget, object, Task<IValueGetable>>
-            BuildHelperWithReturn<TTarget, TInvokePayload, TReturn, TReturnPayload>(MethodInfo method) where TTarget : class
+            BuildHelperWithReturn<TTarget, TInvokePayload, TReturn, TReturnPayload>(MethodInfo method)
+            where TTarget : class
         {
             var afterTaskValueAsync = _afterTaskValueAsyncMethodInfo.MakeGenericMethod(typeof(TReturn));
 
@@ -168,7 +172,7 @@ namespace Akka.Interfaced
             //      var returnValue = await method(instance, invoke.a, invoke.b, ...);
             //      var returnPayload = new TReturnPayload();
             //      returnPayload.v = returnValue;
-            //      return (IValueGetable)returnPayload;  
+            //      return (IValueGetable)returnPayload;
             // }
 
             var instance = Expression.Parameter(typeof(TTarget), "instance");
@@ -186,7 +190,7 @@ namespace Akka.Interfaced
                     Expression.Assign(returnPayload, Expression.New(typeof(TReturnPayload).GetConstructor(Type.EmptyTypes))),
                     Expression.Assign(
                         Expression.Field(returnPayload, "v"),
-                        returnPayloadValueType != typeof(TReturn) 
+                        returnPayloadValueType != typeof(TReturn)
                             ? Expression.Convert(returnValue, returnPayloadValueType)
                             : (Expression)returnValue),
                     returnPayload),
@@ -214,7 +218,7 @@ namespace Akka.Interfaced
         }
     }
 
-    // Convert 
+    // Convert
     //    [void|TReturn] T.Method(...)
     // -> Func<T, object, Task<IValueGetable>>
     internal static class RequestHandlerSyncToAsyncBuilder
@@ -251,7 +255,8 @@ namespace Akka.Interfaced
         }
 
         private static Func<TTarget, object, Task<IValueGetable>>
-            BuildHelper<TTarget, TInvokePayload>(MethodInfo method) where TTarget : class
+            BuildHelper<TTarget, TInvokePayload>(MethodInfo method)
+            where TTarget : class
         {
             // Task<IValueGetable> Handler(TTarget instance, object invokePayload)
             // {
@@ -263,7 +268,7 @@ namespace Akka.Interfaced
             //      }
             //      catch (Exception e)
             //      {
-            //          return Task.FromException<IValueGetable>(e);   
+            //          return Task.FromException<IValueGetable>(e);
             //      }
             // }
 
@@ -289,7 +294,8 @@ namespace Akka.Interfaced
         }
 
         private static Func<TTarget, object, Task<IValueGetable>>
-            BuildHelperWithReturn<TTarget, TInvokePayload, TReturn, TReturnPayload>(MethodInfo method) where TTarget : class
+            BuildHelperWithReturn<TTarget, TInvokePayload, TReturn, TReturnPayload>(MethodInfo method)
+            where TTarget : class
         {
             // Task<IValueGetable> Handler(TTarget instance, object invokePayload)
             // {
@@ -303,7 +309,7 @@ namespace Akka.Interfaced
             //      }
             //      catch (Exception e)
             //      {
-            //          return Task.FromException<IValueGetable>(e);   
+            //          return Task.FromException<IValueGetable>(e);
             //      }
             // }
 

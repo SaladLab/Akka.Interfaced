@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+#pragma warning disable SA1302 // Interface names must begin with I
+#pragma warning disable SA1403 // File may only contain a single namespace
+
 namespace Akka.Interfaced
 {
     // Same with original TaskStatus

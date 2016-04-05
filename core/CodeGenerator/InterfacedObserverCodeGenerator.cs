@@ -9,7 +9,7 @@ using Akka.Interfaced;
 
 namespace CodeGen
 {
-    class InterfacedObserverCodeGenerator
+    public class InterfacedObserverCodeGenerator
     {
         public Options Options { get; set; }
 
@@ -161,7 +161,7 @@ namespace CodeGen
 
                 sb.Append("\t{\n");
 
-                sb.AppendFormat("\t\tvar payload = new {0}.{1} {{ {2} }};\n", 
+                sb.AppendFormat("\t\tvar payload = new {0}.{1} {{ {2} }};\n",
                                 payloadTableClassName, messageName, parameterInits);
                 sb.AppendFormat("\t\tNotify(payload);\n");
                 sb.Append("\t}\n");

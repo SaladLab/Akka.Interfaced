@@ -1,11 +1,9 @@
-﻿using Akka.Interfaced.Persistence.Tests.Interface;
-using System;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Akka.Actor;
-using Akka.Interfaced;
+using Akka.Interfaced.Persistence.Tests.Interface;
 using Xunit;
-using System.Collections.Generic;
 
 namespace Akka.Interfaced.Persistence.Tests
 {
@@ -14,7 +12,7 @@ namespace Akka.Interfaced.Persistence.Tests
         internal readonly CleanupLocalSnapshots Clean;
 
         public TestPersistentActor()
-            : base (@"akka.persistence.snapshot-store.local.dir = ""temp_snapshots""")
+            : base(@"akka.persistence.snapshot-store.local.dir = ""temp_snapshots""")
         {
             Clean = new CleanupLocalSnapshots(this);
             Clean.Initialize();
