@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Akka.Interfaced.Persistence")]
+[assembly: AssemblyTitle("Akka.Interfaced.Persistence.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SaladLab")]
-[assembly: AssemblyProduct("Akka.Interfaced.Persistence")]
+[assembly: AssemblyProduct("Akka.Interfaced.Persistence.Tests")]
 [assembly: AssemblyCopyright("Copyright © 2016 SaladLab")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("c0d22336-c49e-4245-b39d-0b3083c28205")]
+[assembly: Guid("91ea29b0-8de7-49fb-bbfb-7a73f28987f4")]
 
 // Version information for an assembly consists of the following four values:
 //

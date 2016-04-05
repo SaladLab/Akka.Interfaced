@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Akka.Interfaced_ProtobufSerializer.Tests")]
+[assembly: AssemblyTitle("Akka.Interfaced.ProtobufSerializer.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SaladLab")]
-[assembly: AssemblyProduct("Akka.Interfaced_ProtobufSerializer.Tests")]
+[assembly: AssemblyProduct("Akka.Interfaced.ProtobufSerializer.Tests")]
 [assembly: AssemblyCopyright("Copyright © 2016 SaladLab")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9abbd6a9-5f95-442a-88db-3fc1ebf374a7")]
+[assembly: Guid("63708bdc-9285-4f67-a1d8-237a5d77abdd")]
 
 // Version information for an assembly consists of the following four values:
 //

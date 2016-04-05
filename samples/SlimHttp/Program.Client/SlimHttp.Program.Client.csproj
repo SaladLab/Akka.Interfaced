@@ -49,10 +49,6 @@
       <HintPath>..\..\..\packages\NetLegacySupport.Tuple.1.1.0\lib\net40\NetLegacySupport.Tuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TypeAlias, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\TypeAlias.1.1.1\lib\net40\TypeAlias.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -62,6 +58,10 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="TypeAlias, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\TypeAlias.1.1.2\lib\net40\TypeAlias.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
