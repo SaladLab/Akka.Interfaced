@@ -149,13 +149,13 @@ namespace CodeGen
                                 var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
                                 if (returnType != null)
                                 {
-                                    w._($"var __v = await (({type.Name})target).{method.Name}({parameterNames});");
-                                    w._($"return (IValueGetable)(new {payloadTypeName.Item2} {{ v = {Utility.GetTransportTypeCasting(returnType)}__v }});");
+                                    w._($"var __v = await (({type.Name})target).{method.Name}({parameterNames});",
+                                        $"return (IValueGetable)(new {payloadTypeName.Item2} {{ v = {Utility.GetTransportTypeCasting(returnType)}__v }});");
                                 }
                                 else
                                 {
-                                    w._($"await (({type.Name})target).{method.Name}({parameterNames});");
-                                    w._($"return null;");
+                                    w._($"await (({type.Name})target).{method.Name}({parameterNames});",
+                                        $"return null;");
                                 }
                             }
                         }
@@ -214,8 +214,8 @@ namespace CodeGen
                 {
                     using (w.B("[ProtoMember(1)] private ActorRefBase _actor"))
                     {
-                        w._("get { return (ActorRefBase)Actor; }");
-                        w._("set { Actor = value; }");
+                        w._("get { return (ActorRefBase)Actor; }",
+                            "set { Actor = value; }");
                     }
 
                     using (w.B($"private {refClassName}() : base(null)"))

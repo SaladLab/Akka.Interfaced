@@ -97,14 +97,14 @@ namespace CodeGen
                 {
                     using (w.B("[ProtoMember(1)] private ActorRefBase _actor"))
                     {
-                        w._("get { return Channel != null ? (ActorRefBase)(((ActorNotificationChannel)Channel).Actor) : null; }");
-                        w._("set { Channel = new ActorNotificationChannel(value); }");
+                        w._("get { return Channel != null ? (ActorRefBase)(((ActorNotificationChannel)Channel).Actor) : null; }",
+                            "set { Channel = new ActorNotificationChannel(value); }");
                     }
 
                     using (w.B("[ProtoMember(2)] private int _observerId"))
                     {
-                        w._("get { return ObserverId; }");
-                        w._("set { ObserverId = value; }");
+                        w._("get { return ObserverId; }",
+                            "set { ObserverId = value; }");
                     }
 
                     using (w.B($"private {className}() : base(null, 0)"))
@@ -141,8 +141,8 @@ namespace CodeGen
 
                     using (w.B($"public void {method.Name}({parameterTypeNames})"))
                     {
-                        w._($"var payload = new {payloadTableClassName}.{messageName} {{ {parameterInits} }};");
-                        w._($"Notify(payload);");
+                        w._($"var payload = new {payloadTableClassName}.{messageName} {{ {parameterInits} }};",
+                            $"Notify(payload);");
                     }
                 }
             }
