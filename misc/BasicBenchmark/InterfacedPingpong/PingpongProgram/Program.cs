@@ -16,7 +16,7 @@ namespace PingpongProgram
         static void Main(string[] args)
         {
             // DoLocalTest(1000, 1000);
-            DoRemoteTest(100, 100);
+            DoRemoteTest(1000, 1000);
         }
 
         private static void DoLocalTest(int actorCount, int pingCount)
@@ -88,7 +88,7 @@ namespace PingpongProgram
         private static IActorRef[] CreateRemoteServers(int count)
         {
             var config = ConfigurationFactory.ParseString(@"
-                akka {  
+                akka {
                     actor {
                         provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
                         serializers {
@@ -125,7 +125,7 @@ namespace PingpongProgram
         private static ClientRef[] CreateRemoteClients(int count)
         {
             var config = ConfigurationFactory.ParseString(@"
-                akka {  
+                akka {
                     actor {
                         provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
                         serializers {

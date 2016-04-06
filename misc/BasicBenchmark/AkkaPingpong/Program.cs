@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Configuration;
@@ -96,7 +95,7 @@ namespace AkkaPingpong
         private static IActorRef[] CreateRemoteServers(int count)
         {
             var config = ConfigurationFactory.ParseString(@"
-                akka {  
+                akka {
                     actor {
                         provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
                     }
@@ -124,7 +123,7 @@ namespace AkkaPingpong
         private static IActorRef[] CreateRemoteClients(int count)
         {
             var config = ConfigurationFactory.ParseString(@"
-                akka {  
+                akka {
                     actor {
                         provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
                     }

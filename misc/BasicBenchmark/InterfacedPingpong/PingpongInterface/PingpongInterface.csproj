@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0-build0033\build\Akka.Interfaced.Templates-Protobuf.props" Condition="Exists('..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0-build0033\build\Akka.Interfaced.Templates-Protobuf.props')" />
+  <Import Project="..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0\build\Akka.Interfaced.Templates-Protobuf.props" Condition="Exists('..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0\build\Akka.Interfaced.Templates-Protobuf.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -36,28 +36,28 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.0.4.12, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.1.0.4\lib\net45\Akka.dll</HintPath>
+    <Reference Include="Akka, Version=1.0.6.16, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.1.0.6\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Interfaced, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced.0.2.0-build0033\lib\net45\Akka.Interfaced.dll</HintPath>
+    <Reference Include="Akka.Interfaced, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced.0.2.0\lib\net45\Akka.Interfaced.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Interfaced-Base, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced-Base.0.2.0-build0033\lib\net45\Akka.Interfaced-Base.dll</HintPath>
+    <Reference Include="Akka.Interfaced-Base, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced-Base.0.2.0\lib\net45\Akka.Interfaced-Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetLegacySupport.Action, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetLegacySupport.Action.1.0.3\lib\net40\NetLegacySupport.Action.dll</HintPath>
+    <Reference Include="NetLegacySupport.Action, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetLegacySupport.Action.1.1.0\lib\net40\NetLegacySupport.Action.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetLegacySupport.ConcurrentDictionary, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetLegacySupport.ConcurrentDictionary.1.0.2\lib\net40\NetLegacySupport.ConcurrentDictionary.dll</HintPath>
+    <Reference Include="NetLegacySupport.ConcurrentDictionary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetLegacySupport.ConcurrentDictionary.1.1.0\lib\net40\NetLegacySupport.ConcurrentDictionary.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
@@ -72,8 +72,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="TypeAlias, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TypeAlias.1.0.1\lib\net40\TypeAlias.dll</HintPath>
+    <Reference Include="TypeAlias, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TypeAlias.1.1.2\lib\net40\TypeAlias.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -84,6 +84,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -93,10 +94,10 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0-build0033\build\Akka.Interfaced.Templates-Protobuf.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0-build0033\build\Akka.Interfaced.Templates-Protobuf.props'))" />
-    <Error Condition="!Exists('..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0-build0033\build\Akka.Interfaced.Templates-Protobuf.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0-build0033\build\Akka.Interfaced.Templates-Protobuf.targets'))" />
+    <Error Condition="!Exists('..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0\build\Akka.Interfaced.Templates-Protobuf.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0\build\Akka.Interfaced.Templates-Protobuf.props'))" />
+    <Error Condition="!Exists('..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0\build\Akka.Interfaced.Templates-Protobuf.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0\build\Akka.Interfaced.Templates-Protobuf.targets'))" />
   </Target>
-  <Import Project="..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0-build0033\build\Akka.Interfaced.Templates-Protobuf.targets" Condition="Exists('..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0-build0033\build\Akka.Interfaced.Templates-Protobuf.targets')" />
+  <Import Project="..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0\build\Akka.Interfaced.Templates-Protobuf.targets" Condition="Exists('..\packages\Akka.Interfaced.Templates-Protobuf.0.2.0\build\Akka.Interfaced.Templates-Protobuf.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
