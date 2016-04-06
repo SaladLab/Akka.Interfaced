@@ -17,7 +17,7 @@ namespace PingpongProgram.Client
     {
         private static void Main(string[] args)
         {
-            DoRemoteTest(100, 100);
+            DoRemoteTest(1000, 1000);
         }
 
         private static void DoRemoteTest(int actorCount, int pingCount)

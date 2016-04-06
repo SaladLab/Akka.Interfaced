@@ -35,48 +35,48 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka.Interfaced-Base, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced-Base.0.2.0-build0026\lib\net45\Akka.Interfaced-Base.dll</HintPath>
+    <Reference Include="Akka.Interfaced-Base, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced-Base.0.2.0\lib\net45\Akka.Interfaced-Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Interfaced-SlimClient, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced-SlimClient.0.2.0-build0026\lib\net45\Akka.Interfaced-SlimClient.dll</HintPath>
+    <Reference Include="Akka.Interfaced-SlimClient, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced-SlimClient.0.2.0\lib\net45\Akka.Interfaced-SlimClient.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Interfaced.SlimSocket.Base, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced.SlimSocket.Base.0.2.0-build0008\lib\net45\Akka.Interfaced.SlimSocket.Base.dll</HintPath>
+    <Reference Include="Akka.Interfaced.SlimSocket.Base, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Akka.Interfaced.SlimSocket.Base.0.2.0\lib\net45\Akka.Interfaced.SlimSocket.Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Interfaced.SlimSocket.Client, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.Interfaced.SlimSocket.Client.0.2.0-build0008\lib\net45\Akka.Interfaced.SlimSocket.Client.dll</HintPath>
+      <HintPath>..\packages\Akka.Interfaced.SlimSocket.Client.0.2.0\lib\net45\Akka.Interfaced.SlimSocket.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Common.Logging, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Common.Logging.3.3.0\lib\net40\Common.Logging.dll</HintPath>
+    <Reference Include="Common.Logging, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.3.3.1\lib\net40\Common.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Common.Logging.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Common.Logging.Core.3.3.0\lib\net40\Common.Logging.Core.dll</HintPath>
+    <Reference Include="Common.Logging.Core, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.Core.3.3.1\lib\net40\Common.Logging.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Common.Logging.NLog41, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Common.Logging.NLog41.3.3.0\lib\net40\Common.Logging.NLog41.dll</HintPath>
+    <Reference Include="Common.Logging.NLog41, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.NLog41.3.3.1\lib\net40\Common.Logging.NLog41.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetLegacySupport.Action, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetLegacySupport.Action.1.0.3\lib\net40\NetLegacySupport.Action.dll</HintPath>
+    <Reference Include="NetLegacySupport.Action, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetLegacySupport.Action.1.1.0\lib\net40\NetLegacySupport.Action.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetLegacySupport.ConcurrentDictionary, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetLegacySupport.ConcurrentDictionary.1.0.2\lib\net40\NetLegacySupport.ConcurrentDictionary.dll</HintPath>
+    <Reference Include="NetLegacySupport.ConcurrentDictionary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetLegacySupport.ConcurrentDictionary.1.1.0\lib\net40\NetLegacySupport.ConcurrentDictionary.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetLegacySupport.Tuple, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetLegacySupport.Tuple.1.0.2\lib\net40\NetLegacySupport.Tuple.dll</HintPath>
+    <Reference Include="NetLegacySupport.Tuple, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetLegacySupport.Tuple.1.1.0\lib\net40\NetLegacySupport.Tuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NLog, Version=4.1.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.1.0\lib\net45\NLog.dll</HintPath>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.1.2\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
@@ -91,8 +91,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="TypeAlias, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TypeAlias.1.0.1\lib\net40\TypeAlias.dll</HintPath>
+    <Reference Include="TypeAlias, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TypeAlias.1.1.2\lib\net40\TypeAlias.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
