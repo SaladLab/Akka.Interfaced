@@ -36,6 +36,10 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CodeWriter, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CodeWriter.0.3.0\lib\net45\CodeWriter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="CommandLine, Version=2.0.275.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <HintPath>..\..\packages\CommandLineParser.2.0.275-beta\lib\net45\CommandLine.dll</HintPath>
       <Private>True</Private>
@@ -60,13 +64,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyLoader.cs" />
-    <Compile Include="ICodeGenWriter.cs" />
     <Compile Include="InterfacedActorCodeGenerator.cs" />
     <Compile Include="InterfacedObserverCodeGenerator.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextCodeGenWriter.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>

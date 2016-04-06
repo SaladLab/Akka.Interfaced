@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using Akka.Interfaced;
+using CodeWriter;
 
 namespace CodeGen
 {
@@ -13,14 +11,16 @@ namespace CodeGen
     {
         public Options Options { get; set; }
 
-        public void GenerateCode(Type type, ICodeGenWriter writer)
+        public void GenerateCode(Type type, CodeWriter.CodeWriter w)
         {
             Console.WriteLine("GenerateCode: " + type.FullName);
 
-            writer.PushRegion(type.FullName);
+            w._($"#region {type.FullName}");
+            w._();
 
-            if (string.IsNullOrEmpty(type.Namespace) == false)
-                writer.PushNamespace(type.Namespace);
+            var namespaceHandle = (string.IsNullOrEmpty(type.Namespace) == false)
+                ? w.B($"namespace {type.Namespace}")
+                : null;
 
             // Collect Method and make message name for each one
 
@@ -29,146 +29,123 @@ namespace CodeGen
 
             // Generate all
 
-            GeneratePayloadCode(type, writer, methods, method2PayloadTypeNameMap);
-            GenerateObserverCode(type, writer, methods, method2PayloadTypeNameMap);
+            GeneratePayloadCode(type, w, methods, method2PayloadTypeNameMap);
+            GenerateObserverCode(type, w, methods, method2PayloadTypeNameMap);
 
-            if (string.IsNullOrEmpty(type.Namespace) == false)
-                writer.PopNamespace();
+            namespaceHandle?.Dispose();
 
-            writer.PopRegion();
+            w._();
+            w._($"#endregion");
         }
 
         private void GeneratePayloadCode(
-            Type type, ICodeGenWriter writer,
+            Type type, CodeWriter.CodeWriter w,
             MethodInfo[] methods, Dictionary<MethodInfo, string> method2PayloadTypeNameMap)
         {
-            var sb = new StringBuilder();
             var className = Utility.GetPayloadTableClassName(type);
 
-            sb.AppendFormat("public static class {0}\n", className);
-            sb.Append("{\n");
-
-            foreach (var method in methods)
+            using (w.B($"public static class {className}"))
             {
-                var payloadTypeName = method2PayloadTypeNameMap[method];
-
-                // Invoke payload
+                foreach (var method in methods)
                 {
-                    if (method != methods[0])
-                        sb.Append("\n");
+                    var payloadTypeName = method2PayloadTypeNameMap[method];
 
-                    if (Options.UseProtobuf)
-                        sb.AppendFormat("\t[ProtoContract, TypeAlias]\n");
-
-                    sb.AppendFormat("\tpublic class {0} : IInvokable\n", payloadTypeName);
-                    sb.Append("\t{\n");
-                    var parameters = method.GetParameters();
-                    for (var i = 0; i < parameters.Length; i++)
+                    // Invoke payload
                     {
-                        var parameter = parameters[i];
-                        var attr = (Options.UseProtobuf) ? string.Format("[ProtoMember({0})] ", i + 1) : "";
-                        sb.AppendFormat("\t\t{0}public {1} {2};\n", attr, Utility.GetTypeName(parameter.ParameterType), parameter.Name);
+                        if (Options.UseProtobuf)
+                            w._("[ProtoContract, TypeAlias]");
+
+                        using (w.B($"public class {payloadTypeName} : IInvokable"))
+                        {
+                            var parameters = method.GetParameters();
+                            for (var i = 0; i < parameters.Length; i++)
+                            {
+                                var parameter = parameters[i];
+                                var attr = (Options.UseProtobuf) ? string.Format("[ProtoMember({0})] ", i + 1) : "";
+                                w._($"{attr}public {Utility.GetTypeName(parameter.ParameterType)} {parameter.Name};");
+                            }
+
+                            var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
+                            using (w.B("public void Invoke(object target)"))
+                            {
+                                w._($"(({type.Name})target).{method.Name}({parameterNames});");
+                            }
+                        }
                     }
-
-                    var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
-                    if (string.IsNullOrEmpty(parameterNames) == false)
-                        sb.AppendLine();
-
-                    sb.AppendFormat("\t\tpublic void Invoke(object target)\n");
-                    sb.Append("\t\t{\n");
-                    sb.AppendFormat("\t\t\t(({0})target).{1}({2});\n", type.Name, method.Name, parameterNames);
-                    sb.Append("\t\t}\n");
-                    sb.Append("\t}\n");
                 }
             }
-
-            sb.Append("}");
-
-            writer.AddCode(sb.ToString());
         }
 
         private void GenerateObserverCode(
-            Type type, ICodeGenWriter writer,
+            Type type, CodeWriter.CodeWriter w,
             MethodInfo[] methods, Dictionary<MethodInfo, string> method2PayloadTypeNameMap)
         {
             if (Options.UseSlimClient)
                 return;
 
-            var sb = new StringBuilder();
             var className = Utility.GetObserverClassName(type);
             var payloadTableClassName = Utility.GetPayloadTableClassName(type);
 
             if (Options.UseProtobuf)
-                sb.AppendFormat("[ProtoContract, TypeAlias]\n");
+                w._("[ProtoContract, TypeAlias]");
 
-            sb.AppendFormat("public class {0} : InterfacedObserver, {1}\n", className, type.Name);
-            sb.Append("{\n");
-
-            // Protobuf-net specialized
-
-            if (Options.UseProtobuf)
+            using (w.B($"public class {className} : InterfacedObserver, {type.Name}"))
             {
-                sb.Append("\t[ProtoMember(1)] private ActorRefBase _actor\n");
-                sb.Append("\t{\n");
-                sb.Append("\t\tget { return Channel != null ? (ActorRefBase)(((ActorNotificationChannel)Channel).Actor) : null; }\n");
-                sb.Append("\t\tset { Channel = new ActorNotificationChannel(value); }\n");
-                sb.Append("\t}\n");
-                sb.Append("\n");
-                sb.Append("\t[ProtoMember(2)] private int _observerId\n");
-                sb.Append("\t{\n");
-                sb.Append("\t\tget { return ObserverId; }\n");
-                sb.Append("\t\tset { ObserverId = value; }\n");
-                sb.Append("\t}\n");
-                sb.Append("\n");
-                sb.AppendFormat("\tprivate {0}()\n", className);
-                sb.AppendFormat("\t\t: base(null, 0)\n");
-                sb.Append("\t{\n");
-                sb.Append("\t}\n");
-                sb.Append("\n");
+                // Protobuf-net specialized
+
+                if (Options.UseProtobuf)
+                {
+                    using (w.B("[ProtoMember(1)] private ActorRefBase _actor"))
+                    {
+                        w._("get { return Channel != null ? (ActorRefBase)(((ActorNotificationChannel)Channel).Actor) : null; }");
+                        w._("set { Channel = new ActorNotificationChannel(value); }");
+                    }
+
+                    using (w.B("[ProtoMember(2)] private int _observerId"))
+                    {
+                        w._("get { return ObserverId; }");
+                        w._("set { ObserverId = value; }");
+                    }
+
+                    using (w.B($"private {className}() : base(null, 0)"))
+                    {
+                    }
+                }
+
+                // Constructor (IActorRef)
+
+                using (w.B($"public {className}(IActorRef target, int observerId)",
+                           $": base(new ActorNotificationChannel(target), observerId)"))
+                {
+                }
+
+                // Constructor (INotificationChannel)
+
+                using (w.B($"public {className}(INotificationChannel channel, int observerId)",
+                           $": base(channel, observerId)"))
+                {
+                }
+
+                // Observer method messages
+
+                foreach (var method in methods)
+                {
+                    var messageName = method2PayloadTypeNameMap[method];
+                    var parameters = method.GetParameters();
+
+                    var parameterNames = string.Join(", ", parameters.Select(p => p.Name));
+                    var parameterTypeNames = string.Join(", ", parameters.Select(p => (p.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") + Utility.GetTypeName(p.ParameterType) + " " + p.Name));
+                    var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + p.Name));
+
+                    // Request Methods
+
+                    using (w.B($"public void {method.Name}({parameterTypeNames})"))
+                    {
+                        w._($"var payload = new {payloadTableClassName}.{messageName} {{ {parameterInits} }};");
+                        w._($"Notify(payload);");
+                    }
+                }
             }
-
-            // Constructor (IActorRef)
-
-            sb.AppendFormat("\tpublic {0}(IActorRef target, int observerId)\n", className);
-            sb.AppendFormat("\t\t: base(new ActorNotificationChannel(target), observerId)\n");
-            sb.Append("\t{\n");
-            sb.Append("\t}\n");
-
-            // Constructor (INotificationChannel)
-
-            sb.Append("\n");
-            sb.AppendFormat("\tpublic {0}(INotificationChannel channel, int observerId)\n", className);
-            sb.AppendFormat("\t\t: base(channel, observerId)\n");
-            sb.Append("\t{\n");
-            sb.Append("\t}\n");
-
-            // Observer method messages
-
-            foreach (var method in methods)
-            {
-                var messageName = method2PayloadTypeNameMap[method];
-                var parameters = method.GetParameters();
-
-                var parameterNames = string.Join(", ", parameters.Select(p => p.Name));
-                var parameterTypeNames = string.Join(", ", parameters.Select(p => (p.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") + Utility.GetTypeName(p.ParameterType) + " " + p.Name));
-                var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + p.Name));
-
-                // Request Methods
-
-                sb.Append("\n");
-
-                sb.AppendFormat("\tpublic void {0}({1})\n", method.Name, parameterTypeNames);
-
-                sb.Append("\t{\n");
-
-                sb.AppendFormat("\t\tvar payload = new {0}.{1} {{ {2} }};\n",
-                                payloadTableClassName, messageName, parameterInits);
-                sb.AppendFormat("\t\tNotify(payload);\n");
-                sb.Append("\t}\n");
-            }
-
-            sb.Append("}");
-            writer.AddCode(sb.ToString());
         }
 
         private MethodInfo[] GetEventMethods(Type type)

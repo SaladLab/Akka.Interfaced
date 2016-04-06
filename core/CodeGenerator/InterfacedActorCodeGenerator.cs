@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Akka.Interfaced;
+using CodeWriter;
 
 namespace CodeGen
 {
@@ -13,14 +12,16 @@ namespace CodeGen
     {
         public Options Options { get; set; }
 
-        public void GenerateCode(Type type, ICodeGenWriter writer)
+        public void GenerateCode(Type type, CodeWriter.CodeWriter w)
         {
             Console.WriteLine("GenerateCode: " + type.FullName);
 
-            writer.PushRegion(type.FullName);
+            w._($"#region {type.FullName}");
+            w._();
 
-            if (string.IsNullOrEmpty(type.Namespace) == false)
-                writer.PushNamespace(type.Namespace);
+            var namespaceHandle = (string.IsNullOrEmpty(type.Namespace) == false)
+                ? w.B($"namespace {type.Namespace}")
+                : null;
 
             // Collect all methods and make payload type name for each one
 
@@ -29,17 +30,17 @@ namespace CodeGen
 
             // Generate all
 
-            GeneratePayloadCode(type, writer, methods, method2PayloadTypeNameMap);
-            GenerateRefCode(type, writer, methods, method2PayloadTypeNameMap);
+            GeneratePayloadCode(type, w, methods, method2PayloadTypeNameMap);
+            GenerateRefCode(type, w, methods, method2PayloadTypeNameMap);
 
-            if (string.IsNullOrEmpty(type.Namespace) == false)
-                writer.PopNamespace();
+            namespaceHandle?.Dispose();
 
-            writer.PopRegion();
+            w._();
+            w._($"#endregion");
         }
 
         private void GeneratePayloadCode(
-            Type type, ICodeGenWriter writer,
+            Type type, CodeWriter.CodeWriter w,
             MethodInfo[] methods, Dictionary<MethodInfo, Tuple<string, string>> method2PayloadTypeNameMap)
         {
             var tagName = Utility.GetActorInterfaceTagName(type);
@@ -47,255 +48,216 @@ namespace CodeGen
             var sb = new StringBuilder();
             var className = Utility.GetPayloadTableClassName(type);
 
-            sb.Append($"[PayloadTableForInterfacedActor(typeof({type.Name}))]\n");
-            sb.Append($"public static class {className}\n");
-            sb.Append("{\n");
-
-            // generate GetPayloadTypes method
-
-            sb.Append("\tpublic static Type[,] GetPayloadTypes()\n");
-            sb.Append("\t{\n");
-            sb.Append("\t\treturn new Type[,]\n");
-            sb.Append("\t\t{\n");
-
-            foreach (var method in methods)
+            w._($"[PayloadTableForInterfacedActor(typeof({type.Name}))]");
+            using (w.B($"public static class {className}"))
             {
-                var typeName = method2PayloadTypeNameMap[method];
-                sb.AppendFormat("\t\t\t{{{0}, {1}}},\n",
-                                $"typeof({typeName.Item1})",
-                                typeName.Item2 != "" ? $"typeof({typeName.Item2})" : "null");
-            }
+                // generate GetPayloadTypes method
 
-            sb.Append("\t\t};\n");
-            sb.Append("\t}\n");
-
-            // generate payload classes for all methods
-
-            foreach (var method in methods)
-            {
-                var payloadTypeName = method2PayloadTypeNameMap[method];
-                var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
-
-                // Invoke payload
+                using (w.B("public static Type[,] GetPayloadTypes()"))
                 {
-                    sb.Append("\n");
+                    using (w.i("return new Type[,] {", "};"))
+                    {
+                        foreach (var method in methods)
+                        {
+                            var typeName = method2PayloadTypeNameMap[method];
+                            var returnType = typeName.Item2 != "" ? $"typeof({typeName.Item2})" : "null";
+                            w._($"{{ typeof({typeName.Item1}), {returnType} }},");
+                        }
+                    }
+                }
+
+                // generate payload classes for all methods
+
+                foreach (var method in methods)
+                {
+                    var payloadTypeName = method2PayloadTypeNameMap[method];
+                    var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
+
+                    // Invoke payload
 
                     if (Options.UseProtobuf)
-                        sb.Append("\t[ProtoContract, TypeAlias]\n");
+                        w._("[ProtoContract, TypeAlias]");
 
-                    sb.AppendFormat("\tpublic class {0} : IInterfacedPayload, {1}IAsyncInvokable\n",
-                        payloadTypeName.Item1,
-                        tagName != null ? "ITagOverridable, " : "");
-                    sb.Append("\t{\n");
-
-                    // Parameters
-                    var parameters = method.GetParameters();
-                    for (var i = 0; i < parameters.Length; i++)
+                    var tagOverridable = tagName != null ? "ITagOverridable, " : "";
+                    using (w.B($"public class {payloadTypeName.Item1}",
+                               $": IInterfacedPayload, {tagOverridable}IAsyncInvokable"))
                     {
-                        var parameter = parameters[i];
-
-                        var attr = "";
-                        var defaultValueExpression = "";
-                        if (Options.UseProtobuf)
+                        // Parameters
+                        var parameters = method.GetParameters();
+                        for (var i = 0; i < parameters.Length; i++)
                         {
-                            var defaultValueAttr =
-                                parameter.HasNonTrivialDefaultValue()
-                                    ? $", DefaultValue({Utility.GetValueLiteral(parameter.DefaultValue)})"
-                                    : "";
-                            attr = $"[ProtoMember({i + 1}){defaultValueAttr}] ";
+                            var parameter = parameters[i];
 
-                            if (parameter.HasNonTrivialDefaultValue())
+                            var attr = "";
+                            var defaultValueExpression = "";
+                            if (Options.UseProtobuf)
                             {
-                                defaultValueExpression = " = " + Utility.GetValueLiteral(parameter.DefaultValue);
+                                var defaultValueAttr =
+                                    parameter.HasNonTrivialDefaultValue()
+                                        ? $", DefaultValue({Utility.GetValueLiteral(parameter.DefaultValue)})"
+                                        : "";
+                                attr = $"[ProtoMember({i + 1}){defaultValueAttr}] ";
+
+                                if (parameter.HasNonTrivialDefaultValue())
+                                {
+                                    defaultValueExpression = " = " + Utility.GetValueLiteral(parameter.DefaultValue);
+                                }
+                            }
+
+                            var typeName = Utility.GetTransportTypeName(parameter.ParameterType);
+                            w._($"{attr}public {typeName} {parameter.Name}{defaultValueExpression};");
+                        }
+
+                        // GetInterfaceType
+
+                        if (parameters.Length > 0)
+                            sb.AppendLine();
+                        w._($"public Type GetInterfaceType() {{ return typeof({type.Name}); }}");
+
+                        // SetTag
+
+                        if (tagName != null)
+                        {
+                            sb.AppendLine();
+                            var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
+                            if (tagParameter != null)
+                            {
+                                var typeName = Utility.GetTransportTypeName(tagParameter.ParameterType);
+                                var setStatement = $"{tagName} = ({typeName})value;";
+                                w._($"public void SetTag(object value) {{ {setStatement} }}");
+                            }
+                            else
+                            {
+                                w._($"public void SetTag(object value) {{ }}");
                             }
                         }
 
-                        var typeName = Utility.GetTransportTypeName(parameter.ParameterType);
-                        sb.Append($"\t\t{attr}public {typeName} {parameter.Name}{defaultValueExpression};\n");
-                    }
+                        // InvokeAsync
 
-                    // GetInterfaceType
-
-                    if (parameters.Length > 0)
                         sb.AppendLine();
-                    sb.Append($"\t\tpublic Type GetInterfaceType() {{ return typeof({type.Name}); }}\n");
-
-                    // SetTag
-
-                    if (tagName != null)
-                    {
-                        sb.AppendLine();
-                        var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
-                        if (tagParameter != null)
+                        if (Options.UseSlimClient)
                         {
-                            var typeName = Utility.GetTransportTypeName(tagParameter.ParameterType);
-                            var setStatement = $"{tagName} = ({typeName})value;";
-                            sb.Append($"\t\tpublic void SetTag(object value) {{ {setStatement} }}\n");
+                            using (w.B("public Task<IValueGetable> InvokeAsync(object target)"))
+                            {
+                                w._("return null;");
+                            }
                         }
                         else
                         {
-                            sb.Append($"\t\tpublic void SetTag(object value) {{ }}\n");
+                            using (w.B("public async Task<IValueGetable> InvokeAsync(object target)"))
+                            {
+                                var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
+                                if (returnType != null)
+                                {
+                                    w._($"var __v = await (({type.Name})target).{method.Name}({parameterNames});");
+                                    w._($"return (IValueGetable)(new {payloadTypeName.Item2} {{ v = {Utility.GetTransportTypeCasting(returnType)}__v }});");
+                                }
+                                else
+                                {
+                                    w._($"await (({type.Name})target).{method.Name}({parameterNames});");
+                                    w._($"return null;");
+                                }
+                            }
                         }
                     }
 
-                    // InvokeAsync
+                    // Return payload
 
-                    sb.AppendLine();
-                    if (Options.UseSlimClient)
+                    if (returnType != null)
                     {
-                        sb.Append("\t\tpublic Task<IValueGetable> InvokeAsync(object target)\n");
-                        sb.Append("\t\t{\n");
-                        sb.AppendFormat("\t\t\treturn null;\n");
-                        sb.Append("\t\t}\n");
-                    }
-                    else
-                    {
-                        sb.Append("\t\tpublic async Task<IValueGetable> InvokeAsync(object target)\n");
-                        sb.Append("\t\t{\n");
-                        var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
-                        if (returnType != null)
+                        if (Options.UseProtobuf)
+                            w._("[ProtoContract, TypeAlias]");
+
+                        using (w.B($"public class {payloadTypeName.Item2}",
+                                   $": IInterfacedPayload, IValueGetable"))
                         {
-                            sb.AppendFormat("\t\t\tvar __v = await(({0})target).{1}({2});\n",
-                                type.Name, method.Name, parameterNames);
-                            sb.AppendFormat("\t\t\treturn (IValueGetable)(new {0} {{ v = {1}__v }});\n",
-                                payloadTypeName.Item2, Utility.GetTransportTypeCasting(returnType));
+                            var attr = (Options.UseProtobuf) ? "[ProtoMember(1)] " : "";
+                            w._($"{attr}public {Utility.GetTransportTypeName(returnType)} v;",
+                                $"public Type GetInterfaceType() {{ return typeof({type.Name}); }}",
+                                $"public object Value {{ get {{ return v; }} }}");
                         }
-                        else
-                        {
-                            sb.AppendFormat("\t\t\tawait (({0})target).{1}({2});\n", type.Name, method.Name, parameterNames);
-                            sb.AppendFormat("\t\t\treturn null;\n");
-                        }
-                        sb.Append("\t\t}\n");
                     }
-
-                    sb.Append("\t}\n");
-                }
-
-                // Return payload
-
-                if (returnType != null)
-                {
-                    sb.Append("\n");
-
-                    if (Options.UseProtobuf)
-                        sb.AppendFormat("\t[ProtoContract, TypeAlias]\n");
-
-                    sb.AppendFormat("\tpublic class {0} : IInterfacedPayload, IValueGetable\n", payloadTypeName.Item2);
-                    sb.Append("\t{\n");
-
-                    var attr = (Options.UseProtobuf) ? "[ProtoMember(1)] " : "";
-                    sb.AppendFormat("\t\t{0}public {1} v;\n", attr, Utility.GetTransportTypeName(returnType));
-
-                    sb.AppendLine();
-                    sb.AppendFormat("\t\tpublic Type GetInterfaceType() {{ return typeof({0}); }}\n", type.Name);
-
-                    sb.Append("\n");
-                    sb.AppendFormat("\t\tpublic object Value {{ get {{ return v; }} }}\n");
-
-                    sb.Append("\t}\n");
                 }
             }
-
-            sb.Append("}");
-
-            writer.AddCode(sb.ToString());
         }
 
         private void GenerateRefCode(
-            Type type, ICodeGenWriter writer,
+            Type type, CodeWriter.CodeWriter w,
             MethodInfo[] methods, Dictionary<MethodInfo, Tuple<string, string>> method2PayloadTypeNameMap)
         {
             // NoReply Interface
+
+            using (w.B($"public interface {Utility.GetNoReplyInterfaceName(type)}"))
             {
-                var sb = new StringBuilder();
-                var interfaceName = Utility.GetNoReplyInterfaceName(type);
-
-                sb.AppendFormat("public interface {0}\n", interfaceName);
-                sb.Append("{\n");
-
                 foreach (var method in methods)
                 {
                     var parameters = method.GetParameters();
                     var paramStr = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
-                    sb.AppendFormat("\tvoid {0}({1});\n", method.Name, paramStr);
+                    w._($"void {method.Name}({paramStr});");
                 }
-
-                sb.Append("}");
-                writer.AddCode(sb.ToString());
             }
 
             // ActorRef
+
+            var refClassName = Utility.GetActorRefClassName(type);
+            var noReplyInterfaceName = Utility.GetNoReplyInterfaceName(type);
+            var payloadTableClassName = Utility.GetPayloadTableClassName(type);
+
+            if (Options.UseProtobuf && Options.UseSlimClient == false)
+                w._("[ProtoContract, TypeAlias]");
+
+            using (w.B($"public class {refClassName} : InterfacedActorRef, {type.Name}, {noReplyInterfaceName}"))
             {
-                var sb = new StringBuilder();
-                var refClassName = Utility.GetActorRefClassName(type);
-                var noReplyInterfaceName = Utility.GetNoReplyInterfaceName(type);
-                var payloadTableClassName = Utility.GetPayloadTableClassName(type);
-
-                if (Options.UseProtobuf && Options.UseSlimClient == false)
-                    sb.AppendFormat("[ProtoContract, TypeAlias]\n");
-
-                sb.AppendFormat("public class {0} : InterfacedActorRef, {1}, {2}\n",
-                                refClassName, type.Name, noReplyInterfaceName);
-                sb.Append("{\n");
-
                 // Protobuf-net specialized
 
                 if (Options.UseProtobuf && Options.UseSlimClient == false)
                 {
-                    sb.Append("\t[ProtoMember(1)] private ActorRefBase _actor\n");
-                    sb.Append("\t{\n");
-                    sb.Append("\t\tget { return (ActorRefBase)Actor; }\n");
-                    sb.Append("\t\tset { Actor = value; }\n");
-                    sb.Append("\t}\n");
-                    sb.Append("\n");
-                    sb.AppendFormat("\tprivate {0}()\n", refClassName);
-                    sb.AppendFormat("\t\t: base(null)\n");
-                    sb.Append("\t{\n");
-                    sb.Append("\t}\n");
-                    sb.Append("\n");
+                    using (w.B("[ProtoMember(1)] private ActorRefBase _actor"))
+                    {
+                        w._("get { return (ActorRefBase)Actor; }");
+                        w._("set { Actor = value; }");
+                    }
+
+                    using (w.B($"private {refClassName}() : base(null)"))
+                    {
+                    }
                 }
 
                 // Constructor
 
                 if (Options.UseSlimClient == false)
                 {
-                    sb.AppendFormat("\tpublic {0}(IActorRef actor)\n", refClassName);
-                    sb.AppendFormat("\t\t: base(actor)\n");
-                    sb.Append("\t{\n");
-                    sb.Append("\t}\n");
-                    sb.Append("\n");
+                    using (w.B($"public {refClassName}(IActorRef actor) : base(actor)"))
+                    {
+                    }
                 }
 
                 // Constructor (detailed one)
 
-                sb.AppendFormat("\tpublic {0}(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout)\n", refClassName);
-                sb.AppendFormat("\t\t: base(actor, requestWaiter, timeout)\n");
-                sb.Append("\t{\n");
-                sb.Append("\t}\n");
+                using (w.B($"public {refClassName}(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)"))
+                {
+                }
 
                 // WithNoReply
 
-                sb.Append("\n");
-                sb.AppendFormat("\tpublic {0} WithNoReply()\n", noReplyInterfaceName);
-                sb.Append("\t{\n");
-                sb.AppendFormat("\t\treturn this;\n");
-                sb.Append("\t}\n");
+                using (w.B($"public {noReplyInterfaceName} WithNoReply()"))
+                {
+                    w._("return this;");
+                }
 
                 // WithRequestWaiter
 
-                sb.Append("\n");
-                sb.AppendFormat("\tpublic {0} WithRequestWaiter(IRequestWaiter requestWaiter)\n", refClassName);
-                sb.Append("\t{\n");
-                sb.AppendFormat("\t\treturn new {0}(Actor, requestWaiter, Timeout);\n", refClassName);
-                sb.Append("\t}\n");
+                using (w.B($"public {refClassName} WithRequestWaiter(IRequestWaiter requestWaiter)"))
+                {
+                    w._($"return new {refClassName}(Actor, requestWaiter, Timeout);");
+                }
 
                 // WithTimeout
 
-                sb.Append("\n");
-                sb.AppendFormat("\tpublic {0} WithTimeout(TimeSpan? timeout)\n", refClassName);
-                sb.Append("\t{\n");
-                sb.AppendFormat("\t\treturn new {0}(Actor, RequestWaiter, timeout);\n", refClassName);
-                sb.Append("\t}\n");
+                using (w.B($"public {refClassName} WithTimeout(TimeSpan? timeout)"))
+                {
+                    w._($"return new {refClassName}(Actor, RequestWaiter, timeout);");
+                }
 
                 // IInterface message methods
 
@@ -310,26 +272,22 @@ namespace CodeGen
 
                     // Request Methods
 
-                    sb.Append("\n");
+                    var prototype = (returnType != null)
+                        ? $"public Task<{Utility.GetTypeName(returnType)}> {method.Name}({parameterTypeNames})"
+                        : $"public Task {method.Name}({parameterTypeNames})";
 
-                    if (returnType != null)
-                        sb.AppendFormat("\tpublic Task<{0}> {1}({2})\n", Utility.GetTypeName(returnType), method.Name, parameterTypeNames);
-                    else
-                        sb.AppendFormat("\tpublic Task {0}({1})\n", method.Name, parameterTypeNames);
+                    using (w.B(prototype))
+                    {
+                        using (w.i("var requestMessage = new RequestMessage {", "};"))
+                        {
+                            w._($"InvokePayload = new {payloadTableClassName}.{messageName.Item1} {{ {parameterInits} }}");
+                        }
 
-                    sb.Append("\t{\n");
-
-                    sb.AppendFormat("\t\tvar requestMessage = new RequestMessage\n");
-                    sb.Append("\t\t{\n");
-                    sb.AppendFormat("\t\t\tInvokePayload = new {0}.{1} {{ {2} }}\n", payloadTableClassName, messageName.Item1, parameterInits);
-                    sb.Append("\t\t};\n");
-
-                    if (returnType != null)
-                        sb.AppendFormat("\t\treturn SendRequestAndReceive<{0}>(requestMessage);\n", Utility.GetTypeName(returnType));
-                    else
-                        sb.AppendFormat("\t\treturn SendRequestAndWait(requestMessage);\n");
-
-                    sb.Append("\t}\n");
+                        if (returnType != null)
+                            w._($"return SendRequestAndReceive<{Utility.GetTypeName(returnType)}>(requestMessage);");
+                        else
+                            w._($"return SendRequestAndWait(requestMessage);");
+                    }
                 }
 
                 // IInterface_NoReply message methods
@@ -344,24 +302,15 @@ namespace CodeGen
 
                     // Request Methods
 
-                    sb.Append("\n");
-                    sb.AppendFormat("\tvoid {0}.{1}({2})\n",
-                                    noReplyInterfaceName, method.Name, parameterTypeNames);
-
-                    sb.Append("\t{\n");
-
-                    sb.AppendFormat("\t\tvar requestMessage = new RequestMessage\n");
-                    sb.Append("\t\t{\n");
-                    sb.AppendFormat("\t\t\tInvokePayload = new {0}.{1} {{ {2} }}\n", payloadTableClassName, messageName.Item1, parameterInits);
-                    sb.Append("\t\t};\n");
-
-                    sb.AppendFormat("\t\tSendRequest(requestMessage);\n");
-
-                    sb.Append("\t}\n");
+                    using (w.B($"void {noReplyInterfaceName}.{method.Name}({parameterTypeNames})"))
+                    {
+                        using (w.i("var requestMessage = new RequestMessage {", "};"))
+                        {
+                            w._($"InvokePayload = new {payloadTableClassName}.{messageName.Item1} {{ {parameterInits} }}");
+                        }
+                        w._("SendRequest(requestMessage);");
+                    }
                 }
-
-                sb.Append("}");
-                writer.AddCode(sb.ToString());
             }
         }
 
