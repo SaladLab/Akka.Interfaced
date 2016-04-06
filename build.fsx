@@ -52,6 +52,7 @@ let solution =
                                     ("Newtonsoft.Json", "") ] }
           { emptyProject with Name = "Akka.Interfaced.Persistence"
                               Folder = "./plugins/Akka.Interfaced.Persistence"
+                              PackagePrerelease = "beta"
                               Dependencies = 
                                   [ ("Akka.Interfaced", "")
                                     ("Akka.Persistence", "") ] }

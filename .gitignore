@@ -31,6 +31,9 @@ artifacts/
 *.vsp
 *.vspx
 
+# Visual Studio Code
+.vscode
+
 # Click-Once directory
 [Pp]ublish/
 
