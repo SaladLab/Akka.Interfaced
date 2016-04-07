@@ -7,8 +7,8 @@
     <authors>Esun Kim</authors>
     <owners>Esun Kim</owners>
     <description>Akka.Interfaced.Templates-Protobuf</description>
-    <licenseUrl>https://raw.githubusercontent.com/SaladbowlCreative/Akka.Interfaced/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/SaladbowlCreative/Akka.Interfaced</projectUrl>
+    <licenseUrl>https://raw.githubusercontent.com/SaladLab/Akka.Interfaced/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/SaladLab/Akka.Interfaced</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>@releaseNotes@</releaseNotes>
     <copyright>Copyright © 2016 SaladLab</copyright>
