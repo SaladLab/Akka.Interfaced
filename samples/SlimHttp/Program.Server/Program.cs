@@ -7,7 +7,6 @@ using System.Web.Http;
 using System.Web.Http.SelfHost;
 using Akka.Actor;
 using Akka.Interfaced;
-using SlimHttp.Interface;
 
 namespace SlimHttp.Program.Server
 {

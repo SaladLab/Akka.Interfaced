@@ -31,12 +31,14 @@ namespace Protobuf.Program
                   actor {
                     provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
                     serializers {
+                      wire = ""Akka.Serialization.WireSerializer, Akka.Serialization.Wire""
                       proto = ""Akka.Interfaced.ProtobufSerializer.ProtobufSerializer, Akka.Interfaced.ProtobufSerializer""
                     }
                     serialization-bindings {
                       ""Akka.Interfaced.NotificationMessage, Akka.Interfaced"" = proto
                       ""Akka.Interfaced.RequestMessage, Akka.Interfaced"" = proto
                       ""Akka.Interfaced.ResponseMessage, Akka.Interfaced"" = proto
+                      ""System.Object"" = wire
                     }
                   }
                   remote {
