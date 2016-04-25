@@ -1,4 +1,4 @@
-version: 0.2.0.{build}
+version: 0.2.1.{build}
 os: Visual Studio 2015
 environment:
   NUGETKEY:
@@ -8,3 +8,8 @@ environment:
 test: off
 build_script:
 - cmd: build.cmd ci nugetkey=%NUGETKEY% nugetpublishurl=https://www.myget.org/F/saladlab/api/v2/package nugetprerelease=%APPVEYOR_BUILD_NUMBER% coverallskey=%COVERALLSKEY%
+artifacts:
+  - path: './bin/nuget/*.nupkg'
+    name: NugetPackage
+cache:
+- packages -> **\packages.config

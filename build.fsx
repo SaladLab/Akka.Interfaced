@@ -31,7 +31,7 @@ let solution =
                               Dependencies = 
                                   [ ("Akka.Interfaced", "")
                                     ("protobuf-net", "2.0.0.668")
-                                    ("TypeAlias", "1.1.1") ] }
+                                    ("TypeAlias", "1.1.2") ] }
           { emptyProject with Name = "Akka.Interfaced-SlimClient.Templates"
                               Folder = "./core/CodeGenerator-Templates"
                               Template = true
@@ -42,7 +42,7 @@ let solution =
                               Dependencies = 
                                   [ ("Akka.Interfaced-SlimClient", "")
                                     ("protobuf-net", "2.0.0.668")
-                                    ("TypeAlias", "1.1.1") ] }
+                                    ("TypeAlias", "1.1.2") ] }
           { // Plugins
             emptyProject with Name = "Akka.Interfaced.LogFilter"
                               Folder = "./plugins/Akka.Interfaced.LogFilter"
@@ -83,15 +83,13 @@ Target "Cover" <| fun _ ->
 
 Target "Coverity" <| fun _ -> coveritySolution solution "SaladLab/Akka.Interfaced"
 
-Target "Nuget" <| fun _ ->
-    createNugetPackages solution
-    publishNugetPackages solution
+Target "PackNuget" <| fun _ -> createNugetPackages solution
 
-Target "CreateNuget" <| fun _ ->
-    createNugetPackages solution
+Target "Pack" <| fun _ -> ()
 
-Target "PublishNuget" <| fun _ ->
-    publishNugetPackages solution
+Target "PublishNuget" <| fun _ -> publishNugetPackages solution
+
+Target "Publish" <| fun _ -> ()
 
 Target "CI" <| fun _ -> ()
 
@@ -104,13 +102,17 @@ Target "Help" <| fun _ ->
   ==> "Build"
   ==> "Test"
 
-"Build" ==> "Nuget"
-"Build" ==> "CreateNuget"
 "Build" ==> "Cover"
 "Restore" ==> "Coverity"
 
+let isPublishOnly = getBuildParam "publishonly"
+
+"Build" ==> "PackNuget" =?> ("PublishNuget", isPublishOnly = "")
+"PackNuget" ==> "Pack"
+"PublishNuget" ==> "Publish"
+
 "Test" ==> "CI"
 "Cover" ==> "CI"
-"Nuget" ==> "CI"
+"Publish" ==> "CI"
 
 RunTargetOrDefault "Help"
