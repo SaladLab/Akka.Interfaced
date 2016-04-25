@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
@@ -97,6 +98,11 @@ namespace Akka.Interfaced.Tests
     public class TestFilterOrder : Akka.TestKit.Xunit2.TestKit
     {
         public static FilterLogBoard LogBoard = new FilterLogBoard();
+
+        public TestFilterOrder(ITestOutputHelper output)
+            : base(output: output)
+        {
+        }
 
         [Fact]
         public async Task Test_FilterOrder_Work()

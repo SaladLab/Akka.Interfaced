@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Akka.Actor;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
@@ -62,6 +63,11 @@ namespace Akka.Interfaced.Tests
 
     public class TestMessageDispatchPlain : Akka.TestKit.Xunit2.TestKit
     {
+        public TestMessageDispatchPlain(ITestOutputHelper output)
+            : base(output: output)
+        {
+        }
+
         [Fact]
         public async Task Test_can_handle_plain_message()
         {

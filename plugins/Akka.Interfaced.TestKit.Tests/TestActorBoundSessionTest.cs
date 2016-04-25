@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Akka.Actor;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.TestKit.Tests
 {
@@ -15,6 +16,11 @@ namespace Akka.Interfaced.TestKit.Tests
                     context.ActorOf(Props.Create(() => new UserLoginActor(context.Self))),
                     typeof(IUserLogin))
             };
+        }
+
+        public TestActorBoundSessionTest(ITestOutputHelper output)
+            : base(output: output)
+        {
         }
 
         [Fact]

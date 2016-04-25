@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Akka.Actor;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
@@ -129,6 +130,11 @@ namespace Akka.Interfaced.Tests
     public class TestFilterPipeline : Akka.TestKit.Xunit2.TestKit
     {
         public static FilterLogBoard LogBoard = new FilterLogBoard();
+
+        public TestFilterPipeline(ITestOutputHelper output)
+            : base(output: output)
+        {
+        }
 
         [Fact]
         public async Task Test_PreHandleFilter_Normal()

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
@@ -38,6 +39,11 @@ namespace Akka.Interfaced.Tests
 
     public class TestWorkOrder : Akka.TestKit.Xunit2.TestKit
     {
+        public TestWorkOrder(ITestOutputHelper output)
+            : base(output: output)
+        {
+        }
+
         [Fact]
         public async Task Test_AtomicHandler()
         {

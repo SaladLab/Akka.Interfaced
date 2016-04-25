@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Akka.Actor;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
@@ -122,6 +123,11 @@ namespace Akka.Interfaced.Tests
             return Tuple.Create(new BasicRef(actor), eventLog);
         }
 
+        public TestMessageDispatchRequestExtended(ITestOutputHelper output)
+            : base(output: output)
+        {
+        }
+
         [Fact]
         public async Task Test_can_handle_call()
         {
@@ -198,6 +204,11 @@ namespace Akka.Interfaced.Tests
             var actor = ActorOfAsTestActorRef<TestMessageDispatchRequestExtendedActor2>(
                 Props.Create<TestMessageDispatchRequestExtendedActor2>(eventLog));
             return Tuple.Create(new BasicRef(actor), eventLog);
+        }
+
+        public TestMessageDispatchRequestExtended2(ITestOutputHelper output)
+            : base(output: output)
+        {
         }
 
         [Fact]

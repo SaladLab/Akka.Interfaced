@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
@@ -58,6 +59,11 @@ namespace Akka.Interfaced.Tests
     public class TestFilterAsync : Akka.TestKit.Xunit2.TestKit
     {
         public static FilterLogBoard LogBoard = new FilterLogBoard();
+
+        public TestFilterAsync(ITestOutputHelper output)
+            : base(output: output)
+        {
+        }
 
         [Fact]
         public async Task Test_SyncHandler_With_AsyncFilter_Work()

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
@@ -20,6 +21,11 @@ namespace Akka.Interfaced.Tests
 
     public class TestRef : Akka.TestKit.Xunit2.TestKit
     {
+        public TestRef(ITestOutputHelper output)
+            : base(output: output)
+        {
+        }
+
         [Fact]
         public void Test_WithNoReply()
         {

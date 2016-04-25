@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 using Akka.Actor;
 
 namespace Akka.Interfaced.LogFilter.Tests
@@ -22,6 +23,11 @@ namespace Akka.Interfaced.LogFilter.Tests
         private IList<string> GetLogs()
         {
             return GetLogger().Logs;
+        }
+
+        public LogFilterTest(ITestOutputHelper output)
+            : base(output: output)
+        {
         }
 
         [Fact]

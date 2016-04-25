@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Akka.Actor;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
@@ -63,6 +64,11 @@ namespace Akka.Interfaced.Tests
 
     public class TestObserver : Akka.TestKit.Xunit2.TestKit
     {
+        public TestObserver(ITestOutputHelper output)
+            : base(output: output)
+        {
+        }
+
         [Fact]
         public async Task Test_BasicActor_ThrowException_NoThrow()
         {

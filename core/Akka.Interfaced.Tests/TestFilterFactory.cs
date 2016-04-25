@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
@@ -291,6 +292,11 @@ namespace Akka.Interfaced.Tests
     public class TestFilterFactory : Akka.TestKit.Xunit2.TestKit
     {
         public static FilterLogBoard LogBoard = new FilterLogBoard();
+
+        public TestFilterFactory(ITestOutputHelper output)
+            : base(output: output)
+        {
+        }
 
         [Fact]
         public async Task Test_FilterPerClass_Work()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Akka.Actor;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
@@ -56,6 +57,11 @@ namespace Akka.Interfaced.Tests
 
     public class TestContext : Akka.TestKit.Xunit2.TestKit
     {
+        public TestContext(ITestOutputHelper output)
+            : base(output: output)
+        {
+        }
+
         [Fact]
         public async Task Test_KeepContext_In_AsyncMethod()
         {
