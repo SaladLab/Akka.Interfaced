@@ -11,5 +11,7 @@ build_script:
 artifacts:
   - path: './bin/nuget/*.nupkg'
     name: NugetPackage
+  - path: './bin/unity/*.unitypackage'
+    name: UnityPackage
 cache:
 - packages -> **\packages.config
