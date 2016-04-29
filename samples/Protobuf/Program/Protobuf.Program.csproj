@@ -35,12 +35,12 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.0.7.18, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Akka.1.0.7\lib\net45\Akka.dll</HintPath>
+    <Reference Include="Akka, Version=1.0.8.24, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Akka.1.0.8\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Remote, Version=1.0.7.18, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Akka.Remote.1.0.7\lib\net45\Akka.Remote.dll</HintPath>
+    <Reference Include="Akka.Remote, Version=1.0.8.24, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Akka.Remote.1.0.8\lib\net45\Akka.Remote.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Serialization.Wire, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
