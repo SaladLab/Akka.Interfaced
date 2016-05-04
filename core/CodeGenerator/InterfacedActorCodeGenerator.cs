@@ -137,24 +137,24 @@ namespace CodeGen
                         sb.AppendLine();
                         if (Options.UseSlimClient)
                         {
-                            using (w.B("public Task<IValueGetable> InvokeAsync(object target)"))
+                            using (w.B("public Task<IValueGetable> InvokeAsync(object __target)"))
                             {
                                 w._("return null;");
                             }
                         }
                         else
                         {
-                            using (w.B("public async Task<IValueGetable> InvokeAsync(object target)"))
+                            using (w.B("public async Task<IValueGetable> InvokeAsync(object __target)"))
                             {
                                 var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
                                 if (returnType != null)
                                 {
-                                    w._($"var __v = await (({type.Name})target).{method.Name}({parameterNames});",
+                                    w._($"var __v = await (({type.Name})__target).{method.Name}({parameterNames});",
                                         $"return (IValueGetable)(new {payloadTypeName.Item2} {{ v = {Utility.GetTransportTypeCasting(returnType)}__v }});");
                                 }
                                 else
                                 {
-                                    w._($"await (({type.Name})target).{method.Name}({parameterNames});",
+                                    w._($"await (({type.Name})__target).{method.Name}({parameterNames});",
                                         $"return null;");
                                 }
                             }

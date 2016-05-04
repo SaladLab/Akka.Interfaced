@@ -66,9 +66,9 @@ namespace CodeGen
                             }
 
                             var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
-                            using (w.B("public void Invoke(object target)"))
+                            using (w.B("public void Invoke(object __target)"))
                             {
-                                w._($"(({type.Name})target).{method.Name}({parameterNames});");
+                                w._($"(({type.Name})__target).{method.Name}({parameterNames});");
                             }
                         }
                     }
