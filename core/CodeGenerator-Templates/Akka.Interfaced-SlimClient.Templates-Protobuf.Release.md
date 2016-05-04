@@ -1,3 +1,7 @@
+## 0.2.3 (Released 2016/05/04)
+
+* Rename a target argument of Whatever_Invoke.InvokeAsync.
+
 ## 0.2.1 (Released 2016/04/25)
 
 * Update Akka.NET 1.0.7

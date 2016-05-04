@@ -1,3 +1,7 @@
+## 0.2.3 (Released 2016/05/04)
+
+* Cleanup TestObserver
+
 ## 0.2.2 (Released 2016/05/03)
 
 * Update Akka.NET 1.0.8
