@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Xunit;
@@ -71,12 +72,14 @@ namespace Akka.Interfaced.TestKit.Tests
                 Props.Create(() => new TestActorBoundSession(CreateInitialActor)));
 
             var userLogin = new UserLoginRef(null, actorBoundSession.UnderlyingActor.GetRequestWaiter(1), null);
+            var events = new List<IInvokable>();
             var observer = actorBoundSession.UnderlyingActor.AddTestObserver();
+            observer.Notified += e => events.Add(e);
             var userActorId = await userLogin.Login("test", "test", observer.Id);
             var user = new UserRef(null, actorBoundSession.UnderlyingActor.GetRequestWaiter(userActorId), null);
 
             await user.Say("Hello");
-            Assert.Equal("Hello", ((IUserObserver_PayloadTable.Say_Invoke)observer.Events[0]).message);
+            Assert.Equal("Hello", ((IUserObserver_PayloadTable.Say_Invoke)events[0]).message);
         }
     }
 }

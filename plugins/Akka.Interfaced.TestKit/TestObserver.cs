@@ -1,16 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace Akka.Interfaced.TestKit
 {
     public class TestObserver : IInterfacedObserver
     {
         public int Id { get; }
-        public List<IInvokable> Events { get; }
+        public event Action<IInvokable> Notified;
 
         public TestObserver(int id)
         {
             Id = id;
-            Events = new List<IInvokable>();
+        }
+
+        public void Notify(IInvokable e)
+        {
+            Notified?.Invoke(e);
         }
     }
 }

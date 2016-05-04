@@ -37,6 +37,11 @@ namespace Akka.Interfaced.TestKit
             }
         }
 
+        public IActorRef GetBoundActorRef(int id)
+        {
+            return GetBoundActor(id)?.Actor;
+        }
+
         public IRequestWaiter GetRequestWaiter(int actorId)
         {
             return new RequestWaiter(this, actorId);
@@ -86,7 +91,7 @@ namespace Akka.Interfaced.TestKit
 
             var testObserver = observer as TestObserver;
             if (testObserver != null)
-                testObserver.Events.Add(message.InvokePayload);
+                testObserver.Notify(message.InvokePayload);
             else
                 message.InvokePayload.Invoke(observer);
         }
