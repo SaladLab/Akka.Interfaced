@@ -31,9 +31,9 @@ namespace Akka.Interfaced.TestKit.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType() { return typeof(IUser); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IUser)target).GetId();
+                var __v = await ((IUser)__target).GetId();
                 return (IValueGetable)(new GetId_Return { v = __v });
             }
         }
@@ -51,9 +51,9 @@ namespace Akka.Interfaced.TestKit.Tests
         {
             public System.String message;
             public Type GetInterfaceType() { return typeof(IUser); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((IUser)target).Say(message);
+                await ((IUser)__target).Say(message);
                 return null;
             }
         }
@@ -146,9 +146,9 @@ namespace Akka.Interfaced.TestKit.Tests
             public System.String password;
             public System.Int32 observerId;
             public Type GetInterfaceType() { return typeof(IUserLogin); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IUserLogin)target).Login(id, password, observerId);
+                var __v = await ((IUserLogin)__target).Login(id, password, observerId);
                 return (IValueGetable)(new Login_Return { v = __v });
             }
         }
@@ -220,9 +220,9 @@ namespace Akka.Interfaced.TestKit.Tests
         public class Say_Invoke : IInvokable
         {
             public System.String message;
-            public void Invoke(object target)
+            public void Invoke(object __target)
             {
-                ((IUserObserver)target).Say(message);
+                ((IUserObserver)__target).Say(message);
             }
         }
     }

@@ -34,9 +34,9 @@ namespace Akka.Interfaced.LogFilter.Tests
         {
             public System.String value;
             public Type GetInterfaceType() { return typeof(ITest); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((ITest)target).Call(value);
+                await ((ITest)__target).Call(value);
                 return null;
             }
         }
@@ -46,9 +46,9 @@ namespace Akka.Interfaced.LogFilter.Tests
         {
             public Akka.Interfaced.LogFilter.Tests.TestRef test;
             public Type GetInterfaceType() { return typeof(ITest); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((ITest)target).CallWithActor(test);
+                await ((ITest)__target).CallWithActor(test);
                 return null;
             }
         }
@@ -57,9 +57,9 @@ namespace Akka.Interfaced.LogFilter.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType() { return typeof(ITest); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((ITest)target).GetHelloCount();
+                var __v = await ((ITest)__target).GetHelloCount();
                 return (IValueGetable)(new GetHelloCount_Return { v = __v });
             }
         }
@@ -77,9 +77,9 @@ namespace Akka.Interfaced.LogFilter.Tests
         {
             public System.String name;
             public Type GetInterfaceType() { return typeof(ITest); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((ITest)target).SayHello(name);
+                var __v = await ((ITest)__target).SayHello(name);
                 return (IValueGetable)(new SayHello_Return { v = __v });
             }
         }

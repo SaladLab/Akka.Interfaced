@@ -33,9 +33,9 @@ namespace Basic.Interface
             public System.String a;
             public System.String b;
             public Type GetInterfaceType() { return typeof(ICalculator); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((ICalculator)target).Concat(a, b);
+                var __v = await ((ICalculator)__target).Concat(a, b);
                 return (IValueGetable)(new Concat_Return { v = __v });
             }
         }
@@ -54,9 +54,9 @@ namespace Basic.Interface
             public System.Int32 a;
             public System.Int32 b;
             public Type GetInterfaceType() { return typeof(ICalculator); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((ICalculator)target).Sum(a, b);
+                var __v = await ((ICalculator)__target).Sum(a, b);
                 return (IValueGetable)(new Sum_Return { v = __v });
             }
         }
@@ -155,9 +155,9 @@ namespace Basic.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType() { return typeof(ICounter); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((ICounter)target).GetCounter();
+                var __v = await ((ICounter)__target).GetCounter();
                 return (IValueGetable)(new GetCounter_Return { v = __v });
             }
         }
@@ -175,9 +175,9 @@ namespace Basic.Interface
         {
             public System.Int32 delta;
             public Type GetInterfaceType() { return typeof(ICounter); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((ICounter)target).IncCounter(delta);
+                await ((ICounter)__target).IncCounter(delta);
                 return null;
             }
         }
@@ -272,9 +272,9 @@ namespace Basic.Interface
             public System.String name;
             public System.Int32 price;
             public Type GetInterfaceType() { return typeof(IEventGenerator); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((IEventGenerator)target).Buy(name, price);
+                await ((IEventGenerator)__target).Buy(name, price);
                 return null;
             }
         }
@@ -285,9 +285,9 @@ namespace Basic.Interface
             public System.String name;
             public System.Int32 price;
             public Type GetInterfaceType() { return typeof(IEventGenerator); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((IEventGenerator)target).Sell(name, price);
+                await ((IEventGenerator)__target).Sell(name, price);
                 return null;
             }
         }
@@ -297,9 +297,9 @@ namespace Basic.Interface
         {
             public Basic.Interface.EventObserver observer;
             public Type GetInterfaceType() { return typeof(IEventGenerator); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((IEventGenerator)target).Subscribe(observer);
+                await ((IEventGenerator)__target).Subscribe(observer);
                 return null;
             }
         }
@@ -309,9 +309,9 @@ namespace Basic.Interface
         {
             public Basic.Interface.EventObserver observer;
             public Type GetInterfaceType() { return typeof(IEventGenerator); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((IEventGenerator)target).Unsubscribe(observer);
+                await ((IEventGenerator)__target).Unsubscribe(observer);
                 return null;
             }
         }
@@ -439,9 +439,9 @@ namespace Basic.Interface
             public System.Int32 a;
             public System.Int32 b;
             public Type GetInterfaceType() { return typeof(IOverloaded); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IOverloaded)target).Min(a, b);
+                var __v = await ((IOverloaded)__target).Min(a, b);
                 return (IValueGetable)(new Min_Return { v = __v });
             }
         }
@@ -461,9 +461,9 @@ namespace Basic.Interface
             public System.Int32 b;
             public System.Int32 c;
             public Type GetInterfaceType() { return typeof(IOverloaded); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IOverloaded)target).Min(a, b, c);
+                var __v = await ((IOverloaded)__target).Min(a, b, c);
                 return (IValueGetable)(new Min_2_Return { v = __v });
             }
         }
@@ -481,9 +481,9 @@ namespace Basic.Interface
         {
             public System.Int32[] nums;
             public Type GetInterfaceType() { return typeof(IOverloaded); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IOverloaded)target).Min(nums);
+                var __v = await ((IOverloaded)__target).Min(nums);
                 return (IValueGetable)(new Min_3_Return { v = __v });
             }
         }
@@ -600,9 +600,9 @@ namespace Basic.Interface
         {
             public System.String name;
             public Type GetInterfaceType() { return typeof(IWorker); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((IWorker)target).Atomic(name);
+                await ((IWorker)__target).Atomic(name);
                 return null;
             }
         }
@@ -612,9 +612,9 @@ namespace Basic.Interface
         {
             public System.String name;
             public Type GetInterfaceType() { return typeof(IWorker); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((IWorker)target).Reentrant(name);
+                await ((IWorker)__target).Reentrant(name);
                 return null;
             }
         }
@@ -696,9 +696,9 @@ namespace Basic.Interface
         {
             public System.String name;
             public System.Int32 price;
-            public void Invoke(object target)
+            public void Invoke(object __target)
             {
-                ((IEventObserver)target).OnBuy(name, price);
+                ((IEventObserver)__target).OnBuy(name, price);
             }
         }
 
@@ -706,9 +706,9 @@ namespace Basic.Interface
         {
             public System.String name;
             public System.Int32 price;
-            public void Invoke(object target)
+            public void Invoke(object __target)
             {
-                ((IEventObserver)target).OnSell(name, price);
+                ((IEventObserver)__target).OnSell(name, price);
             }
         }
     }

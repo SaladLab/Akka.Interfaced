@@ -33,9 +33,9 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType() { return typeof(INotepad); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((INotepad)target).Clear();
+                await ((INotepad)__target).Clear();
                 return null;
             }
         }
@@ -44,9 +44,9 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType() { return typeof(INotepad); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((INotepad)target).FlushSnapshot();
+                await ((INotepad)__target).FlushSnapshot();
                 return null;
             }
         }
@@ -55,9 +55,9 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType() { return typeof(INotepad); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((INotepad)target).GetDocument();
+                var __v = await ((INotepad)__target).GetDocument();
                 return (IValueGetable)(new GetDocument_Return { v = (System.Collections.Generic.IList<System.String>)__v });
             }
         }
@@ -75,9 +75,9 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
         {
             public System.String message;
             public Type GetInterfaceType() { return typeof(INotepad); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((INotepad)target).Write(message);
+                await ((INotepad)__target).Write(message);
                 return null;
             }
         }

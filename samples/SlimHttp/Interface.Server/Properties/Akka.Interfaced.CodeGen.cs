@@ -33,9 +33,9 @@ namespace SlimHttp.Interface
             public System.String a;
             public System.String b;
             public Type GetInterfaceType() { return typeof(ICalculator); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((ICalculator)target).Concat(a, b);
+                var __v = await ((ICalculator)__target).Concat(a, b);
                 return (IValueGetable)(new Concat_Return { v = __v });
             }
         }
@@ -54,9 +54,9 @@ namespace SlimHttp.Interface
             public System.Int32 a;
             public System.Int32 b;
             public Type GetInterfaceType() { return typeof(ICalculator); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((ICalculator)target).Sum(a, b);
+                var __v = await ((ICalculator)__target).Sum(a, b);
                 return (IValueGetable)(new Sum_Return { v = __v });
             }
         }
@@ -155,9 +155,9 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType() { return typeof(ICounter); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((ICounter)target).GetCounter();
+                var __v = await ((ICounter)__target).GetCounter();
                 return (IValueGetable)(new GetCounter_Return { v = __v });
             }
         }
@@ -175,9 +175,9 @@ namespace SlimHttp.Interface
         {
             public System.Int32 delta;
             public Type GetInterfaceType() { return typeof(ICounter); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((ICounter)target).IncCounter(delta);
+                await ((ICounter)__target).IncCounter(delta);
                 return null;
             }
         }
@@ -272,9 +272,9 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                await ((IPedantic)target).TestCall();
+                await ((IPedantic)__target).TestCall();
                 return null;
             }
         }
@@ -284,9 +284,9 @@ namespace SlimHttp.Interface
         {
             public System.Nullable<System.Int32> value;
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IPedantic)target).TestOptional(value);
+                var __v = await ((IPedantic)__target).TestOptional(value);
                 return (IValueGetable)(new TestOptional_Return { v = (System.Nullable<System.Int32>)__v });
             }
         }
@@ -304,9 +304,9 @@ namespace SlimHttp.Interface
         {
             public System.Int32[] values;
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IPedantic)target).TestParams(values);
+                var __v = await ((IPedantic)__target).TestParams(values);
                 return (IValueGetable)(new TestParams_Return { v = __v });
             }
         }
@@ -324,9 +324,9 @@ namespace SlimHttp.Interface
         {
             public SlimHttp.Interface.TestParam param;
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IPedantic)target).TestPassClass(param);
+                var __v = await ((IPedantic)__target).TestPassClass(param);
                 return (IValueGetable)(new TestPassClass_Return { v = __v });
             }
         }
@@ -345,9 +345,9 @@ namespace SlimHttp.Interface
             public System.Int32 value;
             public System.Int32 offset;
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IPedantic)target).TestReturnClass(value, offset);
+                var __v = await ((IPedantic)__target).TestReturnClass(value, offset);
                 return (IValueGetable)(new TestReturnClass_Return { v = __v });
             }
         }
@@ -365,9 +365,9 @@ namespace SlimHttp.Interface
         {
             public System.Tuple<System.Int32, System.String> value;
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public async Task<IValueGetable> InvokeAsync(object target)
+            public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IPedantic)target).TestTuple(value);
+                var __v = await ((IPedantic)__target).TestTuple(value);
                 return (IValueGetable)(new TestTuple_Return { v = (System.Tuple<System.Int32, System.String>)__v });
             }
         }

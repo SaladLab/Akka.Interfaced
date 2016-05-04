@@ -32,7 +32,7 @@ namespace SlimHttp.Interface
             public System.String a;
             public System.String b;
             public Type GetInterfaceType() { return typeof(ICalculator); }
-            public Task<IValueGetable> InvokeAsync(object target)
+            public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
             }
@@ -52,7 +52,7 @@ namespace SlimHttp.Interface
             public System.Int32 a;
             public System.Int32 b;
             public Type GetInterfaceType() { return typeof(ICalculator); }
-            public Task<IValueGetable> InvokeAsync(object target)
+            public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
             }
@@ -148,7 +148,7 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType() { return typeof(ICounter); }
-            public Task<IValueGetable> InvokeAsync(object target)
+            public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
             }
@@ -167,7 +167,7 @@ namespace SlimHttp.Interface
         {
             public System.Int32 delta;
             public Type GetInterfaceType() { return typeof(ICounter); }
-            public Task<IValueGetable> InvokeAsync(object target)
+            public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
             }
@@ -259,7 +259,7 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public Task<IValueGetable> InvokeAsync(object target)
+            public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
             }
@@ -270,7 +270,7 @@ namespace SlimHttp.Interface
         {
             public System.Nullable<System.Int32> value;
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public Task<IValueGetable> InvokeAsync(object target)
+            public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
             }
@@ -289,7 +289,7 @@ namespace SlimHttp.Interface
         {
             public System.Int32[] values;
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public Task<IValueGetable> InvokeAsync(object target)
+            public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
             }
@@ -308,7 +308,7 @@ namespace SlimHttp.Interface
         {
             public SlimHttp.Interface.TestParam param;
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public Task<IValueGetable> InvokeAsync(object target)
+            public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
             }
@@ -328,7 +328,7 @@ namespace SlimHttp.Interface
             public System.Int32 value;
             public System.Int32 offset;
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public Task<IValueGetable> InvokeAsync(object target)
+            public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
             }
@@ -347,7 +347,7 @@ namespace SlimHttp.Interface
         {
             public System.Tuple<System.Int32, System.String> value;
             public Type GetInterfaceType() { return typeof(IPedantic); }
-            public Task<IValueGetable> InvokeAsync(object target)
+            public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
             }
