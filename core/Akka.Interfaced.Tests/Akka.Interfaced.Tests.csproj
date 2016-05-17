@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FilterLogBoard.cs" />
+    <Compile Include="NotificationFilterFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestBasic.cs" />
     <Compile Include="TestContext.cs" />
@@ -93,7 +94,7 @@
     <Compile Include="TestMessageDispatch.Plain.cs" />
     <Compile Include="TestMessageDispatch.Request.cs" />
     <Compile Include="TestMessageDispatch.RequestExtended.cs" />
-    <Compile Include="TestObserver.cs" />
+    <Compile Include="Observer.cs" />
     <Compile Include="TestPoisonPill.cs" />
     <Compile Include="TestRef.cs" />
     <Compile Include="TestStartStopEvent.cs" />
