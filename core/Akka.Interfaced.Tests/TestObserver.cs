@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using Akka.Actor;
 using Xunit;
@@ -34,9 +35,9 @@ namespace Akka.Interfaced.Tests
     public class TestObserverActor : InterfacedActor<TestObserverActor>, IDummy, ISubjectObserver
     {
         private SubjectRef _subject;
-        private List<object> _eventLog;
+        private List<string> _eventLog;
 
-        public TestObserverActor(SubjectRef subject, List<object> eventLog)
+        public TestObserverActor(SubjectRef subject, List<string> eventLog)
         {
             _subject = subject.WithRequestWaiter(this);
             _eventLog = eventLog;
@@ -62,9 +63,9 @@ namespace Akka.Interfaced.Tests
     public class TestObserverExtendedActor : InterfacedActor<TestObserverExtendedActor>, IDummy, IExtendedInterface<ISubjectObserver>
     {
         private SubjectRef _subject;
-        private List<object> _eventLog;
+        private List<string> _eventLog;
 
-        public TestObserverExtendedActor(SubjectRef subject, List<object> eventLog)
+        public TestObserverExtendedActor(SubjectRef subject, List<string> eventLog)
         {
             _subject = subject.WithRequestWaiter(this);
             _eventLog = eventLog;
@@ -91,9 +92,9 @@ namespace Akka.Interfaced.Tests
     public class TestObserverExtendedAsyncActor : InterfacedActor<TestObserverExtendedAsyncActor>, IDummy, IExtendedInterface<ISubjectObserver>
     {
         private SubjectRef _subject;
-        private List<object> _eventLog;
+        private List<string> _eventLog;
 
-        public TestObserverExtendedAsyncActor(SubjectRef subject, List<object> eventLog)
+        public TestObserverExtendedAsyncActor(SubjectRef subject, List<string> eventLog)
         {
             _subject = subject.WithRequestWaiter(this);
             _eventLog = eventLog;
@@ -122,9 +123,9 @@ namespace Akka.Interfaced.Tests
     public class TestObserverExtendedAsyncReentrantActor : InterfacedActor<TestObserverExtendedAsyncReentrantActor>, IDummy, IExtendedInterface<ISubjectObserver>
     {
         private SubjectRef _subject;
-        private List<object> _eventLog;
+        private List<string> _eventLog;
 
-        public TestObserverExtendedAsyncReentrantActor(SubjectRef subject, List<object> eventLog)
+        public TestObserverExtendedAsyncReentrantActor(SubjectRef subject, List<string> eventLog)
         {
             _subject = subject.WithRequestWaiter(this);
             _eventLog = eventLog;
@@ -161,7 +162,7 @@ namespace Akka.Interfaced.Tests
         public async Task Test_BasicActor_ObserveSubject()
         {
             // Arrange
-            var eventLog = new List<object>();
+            var eventLog = new List<string>();
             var subjectActor = ActorOfAsTestActorRef<SubjectActor>("SubjectActor");
             var subject = new SubjectRef(subjectActor);
             var observerActor = ActorOfAsTestActorRef<TestObserverActor>(
@@ -172,14 +173,14 @@ namespace Akka.Interfaced.Tests
             await observer.Call(null);
 
             // Assert
-            Assert.Equal(new List<object> { "A" }, eventLog);
+            Assert.Equal(new[] { "A" }, eventLog);
         }
 
         [Fact]
         public async Task Test_ExtendedActor_ObserveSubject()
         {
             // Arrange
-            var eventLog = new List<object>();
+            var eventLog = new List<string>();
             var subjectActor = ActorOfAsTestActorRef<SubjectActor>("SubjectActor");
             var subject = new SubjectRef(subjectActor);
             var observerActor = ActorOfAsTestActorRef<TestObserverExtendedActor>(
@@ -190,14 +191,14 @@ namespace Akka.Interfaced.Tests
             await observer.Call(null);
 
             // Assert
-            Assert.Equal(new List<object> { "A" }, eventLog);
+            Assert.Equal(new[] { "A" }, eventLog);
         }
 
         [Fact]
         public async Task Test_ExtendedAsyncActor_ObserveSubject()
         {
             // Arrange
-            var eventLog = new List<object>();
+            var eventLog = new List<string>();
             var subjectActor = ActorOfAsTestActorRef<SubjectActor>("SubjectActor");
             var subject = new SubjectRef(subjectActor);
             var observerActor = ActorOfAsTestActorRef<TestObserverExtendedAsyncActor>(
@@ -208,14 +209,14 @@ namespace Akka.Interfaced.Tests
             await observer.Call(null);
 
             // Assert
-            Assert.Equal(new List<object> { "A:1", "A:2", "B:1", "B:2" }, eventLog);
+            Assert.Equal(new[] { "A:1", "A:2", "B:1", "B:2" }, eventLog);
         }
 
         [Fact]
         public async Task Test_ExtendedAsyncReentrantActor_ObserveSubject()
         {
             // Arrange
-            var eventLog = new List<object>();
+            var eventLog = new List<string>();
             var subjectActor = ActorOfAsTestActorRef<SubjectActor>("SubjectActor");
             var subject = new SubjectRef(subjectActor);
             var observerActor = ActorOfAsTestActorRef<TestObserverExtendedAsyncReentrantActor>(
@@ -227,7 +228,8 @@ namespace Akka.Interfaced.Tests
             await Task.Delay(200);
 
             // Assert
-            Assert.Equal(new List<object> { "A:1", "B:1", "A:2", "B:2" }, eventLog);
+            Assert.Equal(new[] { "A:1", "A:2" }, eventLog.Where(x => x.StartsWith("A")));
+            Assert.Equal(new[] { "B:1", "B:2" }, eventLog.Where(x => x.StartsWith("B")));
         }
     }
 }
