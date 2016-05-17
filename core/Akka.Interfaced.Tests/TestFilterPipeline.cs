@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 namespace Akka.Interfaced.Tests
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterAuthorizeAttribute : Attribute, IFilterPerClassFactory, IPreHandleFilter
+    public sealed class TestFilterAuthorizeAttribute : Attribute, IFilterPerClassFactory, IPreRequestFilter
     {
         private Type _actorType;
 
@@ -24,7 +24,7 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 1;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             TestFilterPipeline.LogBoard.Log($"{_actorType.Name} Authorize.OnPreHandle");
 
@@ -42,7 +42,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterFirstLogAttribute : Attribute, IFilterPerClassFactory, IPreHandleFilter, IPostHandleFilter
+    public sealed class TestFilterFirstLogAttribute : Attribute, IFilterPerClassFactory, IPreRequestFilter, IPostRequestFilter
     {
         private Type _actorType;
 
@@ -58,19 +58,19 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 0;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             TestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPreHandle");
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             TestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPostHandle");
         }
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterLastLogAttribute : Attribute, IFilterPerClassFactory, IPreHandleFilter, IPostHandleFilter
+    public sealed class TestFilterLastLogAttribute : Attribute, IFilterPerClassFactory, IPreRequestFilter, IPostRequestFilter
     {
         private Type _actorType;
 
@@ -86,12 +86,12 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 2;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             TestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPreHandle");
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             TestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPostHandle");
         }

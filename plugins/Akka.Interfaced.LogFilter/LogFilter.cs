@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Akka.Interfaced.LogFilter
 {
-    internal class LogFilter : IPreHandleFilter, IPostHandleFilter
+    internal class LogFilter : IPreRequestFilter, IPostRequestFilter
     {
         private static readonly JsonSerializerSettings _settings;
         private readonly int _filterOrder;
@@ -36,7 +36,7 @@ namespace Akka.Interfaced.LogFilter
 
         int IFilter.Order => _filterOrder;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             if (_logProxy.IsEnabled(context.Actor) == false)
                 return;
@@ -46,7 +46,7 @@ namespace Akka.Interfaced.LogFilter
                         $"#{context.Request.RequestId} -> {_methodShortName} {invokeJson}");
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             if (_logProxy.IsEnabled(context.Actor) == false)
                 return;

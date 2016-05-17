@@ -23,7 +23,7 @@ namespace Basic.Program
         }
     }
 
-    public sealed class LogFilter : IPreHandleFilter, IPostHandleFilter
+    public sealed class LogFilter : IPreRequestFilter, IPostRequestFilter
     {
         private readonly string _methodName;
         private Stopwatch _watch;
@@ -35,7 +35,7 @@ namespace Basic.Program
 
         int IFilter.Order => 0;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             _watch = new Stopwatch();
             _watch.Start();
@@ -45,7 +45,7 @@ namespace Basic.Program
                               context.Request.RequestId, _methodName, invokeJson);
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             _watch.Stop();
             var elapsed = _watch.ElapsedMilliseconds;
@@ -85,7 +85,7 @@ namespace Basic.Program
         }
     }
 
-    public sealed class SimpleLogFilter : IPreHandleFilter, IPostHandleFilter
+    public sealed class SimpleLogFilter : IPreRequestFilter, IPostRequestFilter
     {
         private readonly string _typeName;
         private int _handleCount;
@@ -97,13 +97,13 @@ namespace Basic.Program
 
         int IFilter.Order => -1;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             _handleCount += 1;
             Console.WriteLine("@{0} : OnPreHandle #{1}", _typeName, _handleCount);
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             Console.WriteLine("@{0} : OnPostHandle", _typeName);
         }

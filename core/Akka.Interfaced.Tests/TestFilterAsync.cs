@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 namespace Akka.Interfaced.Tests
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterAsyncAttribute : Attribute, IFilterPerClassFactory, IPreHandleAsyncFilter, IPostHandleAsyncFilter
+    public sealed class TestFilterAsyncAttribute : Attribute, IFilterPerClassFactory, IPreRequestAsyncFilter, IPostRequestAsyncFilter
     {
         private Type _actorType;
 
@@ -23,14 +23,14 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 0;
 
-        async Task IPreHandleAsyncFilter.OnPreHandleAsync(PreHandleFilterContext context)
+        async Task IPreRequestAsyncFilter.OnPreRequestAsync(PreRequestFilterContext context)
         {
             TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPreHandleAsync");
             await Task.Yield();
             TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPreHandleAsync Done");
         }
 
-        async Task IPostHandleAsyncFilter.OnPostHandleAsync(PostHandleFilterContext context)
+        async Task IPostRequestAsyncFilter.OnPostRequestAsync(PostRequestFilterContext context)
         {
             TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPostHandleAsync");
             await Task.Yield();

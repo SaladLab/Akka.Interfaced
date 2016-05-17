@@ -22,12 +22,12 @@ namespace Akka.Interfaced
                 Accessor = accessor;
 
                 Order = referenceFilter.Order;
-                IsAsync = referenceFilter is IPreHandleAsyncFilter ||
-                          referenceFilter is IPostHandleAsyncFilter;
-                IsPreHandleFilter = referenceFilter is IPreHandleFilter ||
-                                    referenceFilter is IPreHandleAsyncFilter;
-                IsPostHandleFilter = referenceFilter is IPostHandleFilter ||
-                                     referenceFilter is IPostHandleAsyncFilter;
+                IsAsync = referenceFilter is IPreRequestAsyncFilter ||
+                          referenceFilter is IPostRequestAsyncFilter;
+                IsPreHandleFilter = referenceFilter is IPreRequestFilter ||
+                                    referenceFilter is IPreRequestAsyncFilter;
+                IsPostHandleFilter = referenceFilter is IPostRequestFilter ||
+                                     referenceFilter is IPostRequestAsyncFilter;
                 IsPerInstance = factory is IFilterPerInstanceFactory ||
                                 factory is IFilterPerInstanceMethodFactory;
                 IsPerInvoke = factory is IFilterPerInvokeFactory;
@@ -335,7 +335,7 @@ namespace Akka.Interfaced
 
                 if (preHandleFilterItems.Count > 0)
                 {
-                    var context = new PreHandleFilterContext
+                    var context = new PreRequestFilterContext
                     {
                         Actor = self,
                         Request = request
@@ -345,7 +345,7 @@ namespace Akka.Interfaced
                         try
                         {
                             var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
-                            ((IPreHandleFilter)filter).OnPreHandle(context);
+                            ((IPreRequestFilter)filter).OnPreRequest(context);
                             if (context.Response != null)
                             {
                                 response = context.Response;
@@ -387,7 +387,7 @@ namespace Akka.Interfaced
 
                 if (postHandleFilterItems.Count > 0)
                 {
-                    var context = new PostHandleFilterContext
+                    var context = new PostRequestFilterContext
                     {
                         Actor = self,
                         Request = request,
@@ -398,7 +398,7 @@ namespace Akka.Interfaced
                         try
                         {
                             var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
-                            ((IPostHandleFilter)filter).OnPostHandle(context);
+                            ((IPostRequestFilter)filter).OnPostRequest(context);
                         }
                         catch (Exception e)
                         {
@@ -454,7 +454,7 @@ namespace Akka.Interfaced
 
                 if (preHandleFilterItems.Count > 0)
                 {
-                    var context = new PreHandleFilterContext
+                    var context = new PreRequestFilterContext
                     {
                         Actor = self,
                         Request = request
@@ -464,11 +464,11 @@ namespace Akka.Interfaced
                         try
                         {
                             var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
-                            var preHandleFilter = filter as IPreHandleFilter;
+                            var preHandleFilter = filter as IPreRequestFilter;
                             if (preHandleFilter != null)
-                                preHandleFilter.OnPreHandle(context);
+                                preHandleFilter.OnPreRequest(context);
                             else
-                                await ((IPreHandleAsyncFilter)filter).OnPreHandleAsync(context);
+                                await ((IPreRequestAsyncFilter)filter).OnPreRequestAsync(context);
 
                             if (context.Response != null)
                             {
@@ -511,7 +511,7 @@ namespace Akka.Interfaced
 
                 if (postHandleFilterItems.Count > 0)
                 {
-                    var context = new PostHandleFilterContext
+                    var context = new PostRequestFilterContext
                     {
                         Actor = self,
                         Request = request,
@@ -522,11 +522,11 @@ namespace Akka.Interfaced
                         try
                         {
                             var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
-                            var postHandleFilter = filter as IPostHandleFilter;
+                            var postHandleFilter = filter as IPostRequestFilter;
                             if (postHandleFilter != null)
-                                postHandleFilter.OnPostHandle(context);
+                                postHandleFilter.OnPostRequest(context);
                             else
-                                await ((IPostHandleAsyncFilter)filter).OnPostHandleAsync(context);
+                                await ((IPostRequestAsyncFilter)filter).OnPostRequestAsync(context);
                         }
                         catch (Exception e)
                         {

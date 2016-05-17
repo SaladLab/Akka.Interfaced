@@ -21,12 +21,12 @@ namespace Akka.Interfaced
                 Accessor = accessor;
 
                 Order = referenceFilter.Order;
-                IsAsync = referenceFilter is IPreHandleAsyncFilter ||
-                          referenceFilter is IPostHandleAsyncFilter;
-                IsPreHandleFilter = referenceFilter is IPreHandleFilter ||
-                                    referenceFilter is IPreHandleAsyncFilter;
-                IsPostHandleFilter = referenceFilter is IPostHandleFilter ||
-                                     referenceFilter is IPostHandleAsyncFilter;
+                IsAsync = referenceFilter is IPreRequestAsyncFilter ||
+                          referenceFilter is IPostRequestAsyncFilter;
+                IsPreHandleFilter = referenceFilter is IPreRequestFilter ||
+                                    referenceFilter is IPreRequestAsyncFilter;
+                IsPostHandleFilter = referenceFilter is IPostRequestFilter ||
+                                     referenceFilter is IPostRequestAsyncFilter;
                 IsPerInstance = factory is IFilterPerInstanceFactory ||
                                 factory is IFilterPerInstanceMethodFactory;
                 IsPerInvoke = factory is IFilterPerInvokeFactory;

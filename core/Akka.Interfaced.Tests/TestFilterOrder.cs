@@ -24,7 +24,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestFilterFirstFilter : IPreHandleFilter, IPostHandleFilter
+    public class TestFilterFirstFilter : IPreRequestFilter, IPostRequestFilter
     {
         private readonly string _name;
 
@@ -35,12 +35,12 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 1;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             TestFilterOrder.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             TestFilterOrder.LogBoard.Log($"{_name}.OnPostHandle");
         }
@@ -64,7 +64,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestFilterSecondFilter : IPreHandleFilter, IPostHandleFilter
+    public class TestFilterSecondFilter : IPreRequestFilter, IPostRequestFilter
     {
         private readonly string _name;
 
@@ -75,12 +75,12 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 2;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             TestFilterOrder.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             TestFilterOrder.LogBoard.Log($"{_name}.OnPostHandle");
         }

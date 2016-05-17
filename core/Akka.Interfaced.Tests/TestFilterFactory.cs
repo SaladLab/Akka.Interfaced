@@ -26,7 +26,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestFilterPerClassFilter : IPreHandleFilter, IPostHandleFilter
+    public class TestFilterPerClassFilter : IPreRequestFilter, IPostRequestFilter
     {
         private readonly string _name;
 
@@ -37,12 +37,12 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 0;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
         }
@@ -78,7 +78,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestFilterPerClassMethodFilter : IPreHandleFilter, IPostHandleFilter
+    public class TestFilterPerClassMethodFilter : IPreRequestFilter, IPostRequestFilter
     {
         private readonly string _name;
 
@@ -89,12 +89,12 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 0;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
         }
@@ -127,7 +127,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestFilterPerInstanceFilter : IPreHandleFilter, IPostHandleFilter
+    public class TestFilterPerInstanceFilter : IPreRequestFilter, IPostRequestFilter
     {
         private string _name;
 
@@ -142,12 +142,12 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 0;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
         }
@@ -188,7 +188,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestFilterPerInstanceMethodFilter : IPreHandleFilter, IPostHandleFilter
+    public class TestFilterPerInstanceMethodFilter : IPreRequestFilter, IPostRequestFilter
     {
         private string _name;
 
@@ -203,12 +203,12 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 0;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
         }
@@ -249,7 +249,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestFilterPerInvokeFilter : IPreHandleFilter, IPostHandleFilter
+    public class TestFilterPerInvokeFilter : IPreRequestFilter, IPostRequestFilter
     {
         private string _name;
 
@@ -264,12 +264,12 @@ namespace Akka.Interfaced.Tests
 
         int IFilter.Order => 0;
 
-        void IPreHandleFilter.OnPreHandle(PreHandleFilterContext context)
+        void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
         }
 
-        void IPostHandleFilter.OnPostHandle(PostHandleFilterContext context)
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
             TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
         }
