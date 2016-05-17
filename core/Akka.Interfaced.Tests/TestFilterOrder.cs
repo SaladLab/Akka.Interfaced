@@ -37,12 +37,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterOrder.LogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterOrder.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterOrder.LogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterOrder.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
@@ -77,12 +77,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterOrder.LogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterOrder.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterOrder.LogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterOrder.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
@@ -114,10 +114,10 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterOrderActor_1.OnPreHandle",
-                    "TestFilterOrderActor_2.OnPreHandle",
-                    "TestFilterOrderActor_2.OnPostHandle",
-                    "TestFilterOrderActor_1.OnPostHandle"
+                    "TestFilterOrderActor_1.OnPreRequest",
+                    "TestFilterOrderActor_2.OnPreRequest",
+                    "TestFilterOrderActor_2.OnPostRequest",
+                    "TestFilterOrderActor_1.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }

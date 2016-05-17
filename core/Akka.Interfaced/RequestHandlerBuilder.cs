@@ -16,7 +16,7 @@ namespace Akka.Interfaced
 
         private class FilterItem
         {
-            public FilterItem(IFilterFactory factory, IFilter referenceFilter, FilterAccessor accessor, int filterPerInvokeIndex = -1)
+            public FilterItem(IFilterFactory factory, IFilter referenceFilter, FilterAccessor accessor, int filterPerRequestIndex = -1)
             {
                 Factory = factory;
                 Accessor = accessor;
@@ -24,25 +24,25 @@ namespace Akka.Interfaced
                 Order = referenceFilter.Order;
                 IsAsync = referenceFilter is IPreRequestAsyncFilter ||
                           referenceFilter is IPostRequestAsyncFilter;
-                IsPreHandleFilter = referenceFilter is IPreRequestFilter ||
-                                    referenceFilter is IPreRequestAsyncFilter;
-                IsPostHandleFilter = referenceFilter is IPostRequestFilter ||
-                                     referenceFilter is IPostRequestAsyncFilter;
+                IsPreFilter = referenceFilter is IPreRequestFilter ||
+                              referenceFilter is IPreRequestAsyncFilter;
+                IsPostFilter = referenceFilter is IPostRequestFilter ||
+                               referenceFilter is IPostRequestAsyncFilter;
                 IsPerInstance = factory is IFilterPerInstanceFactory ||
                                 factory is IFilterPerInstanceMethodFactory;
-                IsPerInvoke = factory is IFilterPerInvokeFactory;
-                FilterPerInvokeIndex = FilterPerInvokeIndex;
+                IsPerRequest = factory is IFilterPerRequestFactory;
+                FilterPerRequestIndex = FilterPerRequestIndex;
             }
 
             public IFilterFactory Factory { get; }
             public FilterAccessor Accessor { get; }
             public int Order { get; }
             public bool IsAsync { get; }
-            public bool IsPreHandleFilter { get; }
-            public bool IsPostHandleFilter { get; }
+            public bool IsPreFilter { get; }
+            public bool IsPostFilter { get; }
             public bool IsPerInstance { get; }
-            public bool IsPerInvoke { get; }
-            public int FilterPerInvokeIndex { get; }
+            public bool IsPerRequest { get; }
+            public int FilterPerRequestIndex { get; }
         }
 
         private Dictionary<Type, FilterItem> _perClassFilterItemTable;
@@ -83,12 +83,12 @@ namespace Akka.Interfaced
                     var returnPayloadType = payloadTypeTable[i, 1];
 
                     var filters = CreateFilters(type, targetMethod);
-                    var preHandleFilterItems = filters.Item1;
-                    var postHandleFilterItems = filters.Item2;
+                    var preFilterItems = filters.Item1;
+                    var postFilterItems = filters.Item2;
 
                     var asyncHandler = BuildAsyncHandler(
                         invokePayloadType, returnPayloadType, targetMethod,
-                        preHandleFilterItems, postHandleFilterItems);
+                        preFilterItems, postFilterItems);
 
                     _table.Add(invokePayloadType, new RequestHandlerItem<T>
                     {
@@ -170,18 +170,18 @@ namespace Akka.Interfaced
 
                     var isAsyncMethod = targetMethod.ReturnType.Name.StartsWith("Task");
                     var filters = CreateFilters(type, targetMethod);
-                    var preHandleFilterItems = filters.Item1;
-                    var postHandleFilterItems = filters.Item2;
+                    var preFilterItems = filters.Item1;
+                    var postFilterItems = filters.Item2;
 
                     if (isAsyncMethod ||
-                        preHandleFilterItems.Any(f => f.IsAsync) ||
-                        postHandleFilterItems.Any(f => f.IsAsync))
+                        preFilterItems.Any(f => f.IsAsync) ||
+                        postFilterItems.Any(f => f.IsAsync))
                     {
                         // async handler
 
                         var asyncHandler = BuildAsyncHandler(
                             invokePayloadType, returnPayloadType, targetMethod,
-                            preHandleFilterItems, postHandleFilterItems);
+                            preFilterItems, postFilterItems);
 
                         _table.Add(invokePayloadType, new RequestHandlerItem<T>
                         {
@@ -199,7 +199,7 @@ namespace Akka.Interfaced
 
                         var handler = BuildHandler(
                             invokePayloadType, returnPayloadType, targetMethod,
-                            preHandleFilterItems, postHandleFilterItems);
+                            preFilterItems, postFilterItems);
 
                         _table.Add(invokePayloadType, new RequestHandlerItem<T>
                         {
@@ -221,10 +221,10 @@ namespace Akka.Interfaced
 
         private Tuple<List<FilterItem>, List<FilterItem>> CreateFilters(Type type, MethodInfo method)
         {
-            var preHandleFilterItems = new List<FilterItem>();
-            var postHandleFilterItems = new List<FilterItem>();
+            var preFilterItems = new List<FilterItem>();
+            var postFilterItems = new List<FilterItem>();
 
-            var filterPerInvokeIndex = 0;
+            var filterPerRequestIndex = 0;
             var filterFactories = type.GetCustomAttributes().Concat(method.GetCustomAttributes()).OfType<IFilterFactory>();
             foreach (var filterFactory in filterFactories)
             {
@@ -275,43 +275,43 @@ namespace Akka.Interfaced
                     filterItem = new FilterItem(filterFactory, filter,
                                                 (provider, _) => provider.GetFilter(arrayIndex));
                 }
-                else if (filterFactory is IFilterPerInvokeFactory)
+                else if (filterFactory is IFilterPerRequestFactory)
                 {
-                    var factory = ((IFilterPerInvokeFactory)filterFactory);
+                    var factory = ((IFilterPerRequestFactory)filterFactory);
                     factory.Setup(type, method);
                     var filter = factory.CreateInstance(null, null);
-                    var arrayIndex = filterPerInvokeIndex++;
+                    var arrayIndex = filterPerRequestIndex++;
                     filterItem = new FilterItem(filterFactory, filter,
-                                                (_, filters) => filters[arrayIndex], filterPerInvokeIndex);
+                                                (_, filters) => filters[arrayIndex], filterPerRequestIndex);
                 }
 
                 // classify filter and add it to list
                 // beware that a filter can be added to both pre and post handle filter list.
 
-                if (filterItem.IsPreHandleFilter)
-                    preHandleFilterItems.Add(filterItem);
+                if (filterItem.IsPreFilter)
+                    preFilterItems.Add(filterItem);
 
-                if (filterItem.IsPostHandleFilter)
-                    postHandleFilterItems.Add(filterItem);
+                if (filterItem.IsPostFilter)
+                    postFilterItems.Add(filterItem);
             }
 
-            return Tuple.Create(preHandleFilterItems.OrderBy(f => f.Order).ToList(),
-                                postHandleFilterItems.OrderByDescending(f => f.Order).ToList());
+            return Tuple.Create(preFilterItems.OrderBy(f => f.Order).ToList(),
+                                postFilterItems.OrderByDescending(f => f.Order).ToList());
         }
 
         private static RequestHandler<T> BuildHandler(
             Type invokePayloadType, Type returnPayloadType, MethodInfo method,
-            IList<FilterItem> preHandleFilterItems, IList<FilterItem> postHandleFilterItems)
+            IList<FilterItem> preFilterItems, IList<FilterItem> postFilterItems)
         {
             var handler = RequestHandlerFuncBuilder.Build<T>(
                 invokePayloadType, returnPayloadType, method);
 
-            var allFilters = preHandleFilterItems.Concat(postHandleFilterItems).ToList();
+            var allFilters = preFilterItems.Concat(postFilterItems).ToList();
             var perInstanceFilterExists = allFilters.Any(i => i.IsPerInstance);
-            var perInvokeFilterFactories = allFilters.Where(i => i.IsPerInvoke).GroupBy(i => i.FilterPerInvokeIndex)
-                                                     .OrderBy(g => g.Key).Select(g => (IFilterPerInvokeFactory)g.Last().Factory).ToArray();
-            var preHandleFilterAccessors = preHandleFilterItems.Select(i => i.Accessor).ToArray();
-            var postHandleFilterAccessors = postHandleFilterItems.Select(i => i.Accessor).ToArray();
+            var perRequestFilterFactories = allFilters.Where(i => i.IsPerRequest).GroupBy(i => i.FilterPerRequestIndex)
+                                                     .OrderBy(g => g.Key).Select(g => (IFilterPerRequestFactory)g.Last().Factory).ToArray();
+            var preFilterAccessors = preFilterItems.Select(i => i.Accessor).ToArray();
+            var postFilterAccessors = postFilterItems.Select(i => i.Accessor).ToArray();
 
             return delegate(T self, RequestMessage request, Action<ResponseMessage> onCompleted)
             {
@@ -319,32 +319,32 @@ namespace Akka.Interfaced
 
                 var filterPerInstanceProvider = perInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
-                // Create perInvoke filters
+                // Create perRequest filters
 
-                IFilter[] filterPerInvokes = null;
-                if (perInvokeFilterFactories.Length > 0)
+                IFilter[] filterPerRequests = null;
+                if (perRequestFilterFactories.Length > 0)
                 {
-                    filterPerInvokes = new IFilter[perInvokeFilterFactories.Length];
-                    for (var i = 0; i < perInvokeFilterFactories.Length; i++)
+                    filterPerRequests = new IFilter[perRequestFilterFactories.Length];
+                    for (var i = 0; i < perRequestFilterFactories.Length; i++)
                     {
-                        filterPerInvokes[i] = perInvokeFilterFactories[i].CreateInstance(self, request);
+                        filterPerRequests[i] = perRequestFilterFactories[i].CreateInstance(self, request);
                     }
                 }
 
                 // Call PreHandleFilters
 
-                if (preHandleFilterItems.Count > 0)
+                if (preFilterItems.Count > 0)
                 {
                     var context = new PreRequestFilterContext
                     {
                         Actor = self,
                         Request = request
                     };
-                    foreach (var filterAccessor in preHandleFilterAccessors)
+                    foreach (var filterAccessor in preFilterAccessors)
                     {
                         try
                         {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
+                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
                             ((IPreRequestFilter)filter).OnPreRequest(context);
                             if (context.Response != null)
                             {
@@ -385,7 +385,7 @@ namespace Akka.Interfaced
 
                 // Call PostHandleFilters
 
-                if (postHandleFilterItems.Count > 0)
+                if (postFilterItems.Count > 0)
                 {
                     var context = new PostRequestFilterContext
                     {
@@ -393,11 +393,11 @@ namespace Akka.Interfaced
                         Request = request,
                         Response = response
                     };
-                    foreach (var filterAccessor in postHandleFilterAccessors)
+                    foreach (var filterAccessor in postFilterAccessors)
                     {
                         try
                         {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
+                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
                             ((IPostRequestFilter)filter).OnPostRequest(context);
                         }
                         catch (Exception e)
@@ -417,19 +417,19 @@ namespace Akka.Interfaced
 
         private static RequestAsyncHandler<T> BuildAsyncHandler(
             Type invokePayloadType, Type returnPayloadType, MethodInfo method,
-            IList<FilterItem> preHandleFilterItems, IList<FilterItem> postHandleFilterItems)
+            IList<FilterItem> preFilterItems, IList<FilterItem> postFilterItems)
         {
             var isAsyncMethod = method.ReturnType.Name.StartsWith("Task");
             var handler = isAsyncMethod
                 ? RequestHandlerAsyncBuilder.Build<T>(invokePayloadType, returnPayloadType, method)
                 : RequestHandlerSyncToAsyncBuilder.Build<T>(invokePayloadType, returnPayloadType, method);
 
-            var allFilters = preHandleFilterItems.Concat(postHandleFilterItems).ToList();
+            var allFilters = preFilterItems.Concat(postFilterItems).ToList();
             var perInstanceFilterExists = allFilters.Any(i => i.IsPerInstance);
-            var perInvokeFilterFactories = allFilters.Where(i => i.IsPerInvoke).GroupBy(i => i.FilterPerInvokeIndex)
-                                                     .OrderBy(g => g.Key).Select(g => (IFilterPerInvokeFactory)g.Last().Factory).ToArray();
-            var preHandleFilterAccessors = preHandleFilterItems.Select(i => i.Accessor).ToArray();
-            var postHandleFilterAccessors = postHandleFilterItems.Select(i => i.Accessor).ToArray();
+            var perRequestFilterFactories = allFilters.Where(i => i.IsPerRequest).GroupBy(i => i.FilterPerRequestIndex)
+                                                     .OrderBy(g => g.Key).Select(g => (IFilterPerRequestFactory)g.Last().Factory).ToArray();
+            var preFilterAccessors = preFilterItems.Select(i => i.Accessor).ToArray();
+            var postFilterAccessors = postFilterItems.Select(i => i.Accessor).ToArray();
 
             // TODO: Optimize this function when without async filter
             return async delegate(T self, RequestMessage request, Action<ResponseMessage> onCompleted)
@@ -438,35 +438,35 @@ namespace Akka.Interfaced
 
                 var filterPerInstanceProvider = perInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
-                // Create perInvoke filters
+                // Create perRequest filters
 
-                IFilter[] filterPerInvokes = null;
-                if (perInvokeFilterFactories.Length > 0)
+                IFilter[] filterPerRequests = null;
+                if (perRequestFilterFactories.Length > 0)
                 {
-                    filterPerInvokes = new IFilter[perInvokeFilterFactories.Length];
-                    for (var i = 0; i < perInvokeFilterFactories.Length; i++)
+                    filterPerRequests = new IFilter[perRequestFilterFactories.Length];
+                    for (var i = 0; i < perRequestFilterFactories.Length; i++)
                     {
-                        filterPerInvokes[i] = perInvokeFilterFactories[i].CreateInstance(self, request);
+                        filterPerRequests[i] = perRequestFilterFactories[i].CreateInstance(self, request);
                     }
                 }
 
                 // Call PreHandleFilters
 
-                if (preHandleFilterItems.Count > 0)
+                if (preFilterItems.Count > 0)
                 {
                     var context = new PreRequestFilterContext
                     {
                         Actor = self,
                         Request = request
                     };
-                    foreach (var filterAccessor in preHandleFilterAccessors)
+                    foreach (var filterAccessor in preFilterAccessors)
                     {
                         try
                         {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
-                            var preHandleFilter = filter as IPreRequestFilter;
-                            if (preHandleFilter != null)
-                                preHandleFilter.OnPreRequest(context);
+                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
+                            var preFilter = filter as IPreRequestFilter;
+                            if (preFilter != null)
+                                preFilter.OnPreRequest(context);
                             else
                                 await ((IPreRequestAsyncFilter)filter).OnPreRequestAsync(context);
 
@@ -509,7 +509,7 @@ namespace Akka.Interfaced
 
                 // Call PostHandleFilters
 
-                if (postHandleFilterItems.Count > 0)
+                if (postFilterItems.Count > 0)
                 {
                     var context = new PostRequestFilterContext
                     {
@@ -517,14 +517,14 @@ namespace Akka.Interfaced
                         Request = request,
                         Response = response
                     };
-                    foreach (var filterAccessor in postHandleFilterAccessors)
+                    foreach (var filterAccessor in postFilterAccessors)
                     {
                         try
                         {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
-                            var postHandleFilter = filter as IPostRequestFilter;
-                            if (postHandleFilter != null)
-                                postHandleFilter.OnPostRequest(context);
+                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
+                            var postFilter = filter as IPostRequestFilter;
+                            if (postFilter != null)
+                                postFilter.OnPostRequest(context);
                             else
                                 await ((IPostRequestAsyncFilter)filter).OnPostRequestAsync(context);
                         }

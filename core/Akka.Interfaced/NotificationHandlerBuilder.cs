@@ -15,33 +15,33 @@ namespace Akka.Interfaced
 
         private class FilterItem
         {
-            public FilterItem(IFilterFactory factory, IFilter referenceFilter, FilterAccessor accessor, int filterPerInvokeIndex = -1)
+            public FilterItem(IFilterFactory factory, IFilter referenceFilter, FilterAccessor accessor, int filterPerNotificationIndex = -1)
             {
                 Factory = factory;
                 Accessor = accessor;
 
                 Order = referenceFilter.Order;
-                IsAsync = referenceFilter is IPreRequestAsyncFilter ||
-                          referenceFilter is IPostRequestAsyncFilter;
-                IsPreHandleFilter = referenceFilter is IPreRequestFilter ||
-                                    referenceFilter is IPreRequestAsyncFilter;
-                IsPostHandleFilter = referenceFilter is IPostRequestFilter ||
-                                     referenceFilter is IPostRequestAsyncFilter;
+                IsAsync = referenceFilter is IPreNotificationAsyncFilter ||
+                          referenceFilter is IPostNotificationAsyncFilter;
+                IsPreFilter = referenceFilter is IPreNotificationFilter ||
+                              referenceFilter is IPreNotificationAsyncFilter;
+                IsPostFilter = referenceFilter is IPostNotificationFilter ||
+                               referenceFilter is IPostNotificationAsyncFilter;
                 IsPerInstance = factory is IFilterPerInstanceFactory ||
                                 factory is IFilterPerInstanceMethodFactory;
-                IsPerInvoke = factory is IFilterPerInvokeFactory;
-                FilterPerInvokeIndex = FilterPerInvokeIndex;
+                IsPerNotification = factory is IFilterPerNotificationFactory;
+                FilterPerNotificationIndex = filterPerNotificationIndex;
             }
 
             public IFilterFactory Factory { get; }
             public FilterAccessor Accessor { get; }
             public int Order { get; }
             public bool IsAsync { get; }
-            public bool IsPreHandleFilter { get; }
-            public bool IsPostHandleFilter { get; }
+            public bool IsPreFilter { get; }
+            public bool IsPostFilter { get; }
             public bool IsPerInstance { get; }
-            public bool IsPerInvoke { get; }
-            public int FilterPerInvokeIndex { get; }
+            public bool IsPerNotification { get; }
+            public int FilterPerNotificationIndex { get; }
         }
 
         private Dictionary<Type, FilterItem> _perClassFilterItemTable;
@@ -80,31 +80,43 @@ namespace Akka.Interfaced
                     var targetMethod = methodItems[i].Item2;
                     var invokePayloadType = payloadTypeTable[i];
 
+                    // build handler
+
                     var filters = CreateFilters(type, targetMethod);
-                    var preHandleFilterItems = filters.Item1;
-                    var postHandleFilterItems = filters.Item2;
+                    var preFilterItems = filters.Item1;
+                    var postFilterItems = filters.Item2;
 
-                    /*
-                    var asyncHandler = BuildAsyncHandler(
-                        invokePayloadType, targetMethod,
-                        preHandleFilterItems, postHandleFilterItems);
-
-                    _table.Add(invokePayloadType, new NotificationHandlerItem<T>
+                    if (preFilterItems.Any(f => f.IsAsync) ||
+                        postFilterItems.Any(f => f.IsAsync))
                     {
-                        InterfaceType = ifs,
-                        IsReentrant = IsReentrantMethod(targetMethod),
-                        AsyncHandler = asyncHandler
-                    });
-                    */
+                        // async handler
 
-                    _table.Add(invokePayloadType, new NotificationHandlerItem<T>
+                        var asyncHandler = BuildAsyncHandler(
+                                invokePayloadType, targetMethod,
+                                preFilterItems, postFilterItems);
+
+                        _table.Add(invokePayloadType, new NotificationHandlerItem<T>
+                        {
+                            InterfaceType = ifs,
+                            IsReentrant = IsReentrantMethod(targetMethod),
+                            AsyncHandler = asyncHandler
+                        });
+                    }
+                    else
                     {
-                        InterfaceType = ifs,
-                        IsReentrant = IsReentrantMethod(targetMethod),
-                        Handler = BuildHandler(
+                        // sync handler
+
+                        var handler = BuildHandler(
                             invokePayloadType, targetMethod,
-                            preHandleFilterItems, postHandleFilterItems)
-                    });
+                            preFilterItems, postFilterItems);
+
+                        _table.Add(invokePayloadType, new NotificationHandlerItem<T>
+                        {
+                            InterfaceType = ifs,
+                            IsReentrant = false,
+                            Handler = handler
+                        });
+                    }
                 }
             }
         }
@@ -178,18 +190,18 @@ namespace Akka.Interfaced
 
                     var isAsyncMethod = targetMethod.ReturnType.Name.StartsWith("Task");
                     var filters = CreateFilters(type, targetMethod);
-                    var preHandleFilterItems = filters.Item1;
-                    var postHandleFilterItems = filters.Item2;
+                    var preFilterItems = filters.Item1;
+                    var postFilterItems = filters.Item2;
 
                     if (isAsyncMethod ||
-                        preHandleFilterItems.Any(f => f.IsAsync) ||
-                        postHandleFilterItems.Any(f => f.IsAsync))
+                        preFilterItems.Any(f => f.IsAsync) ||
+                        postFilterItems.Any(f => f.IsAsync))
                     {
                         // async handler
 
                         var asyncHandler = BuildAsyncHandler(
                             invokePayloadType, targetMethod,
-                            preHandleFilterItems, postHandleFilterItems);
+                            preFilterItems, postFilterItems);
 
                         _table.Add(invokePayloadType, new NotificationHandlerItem<T>
                         {
@@ -207,7 +219,7 @@ namespace Akka.Interfaced
 
                         var handler = BuildHandler(
                             invokePayloadType, targetMethod,
-                            preHandleFilterItems, postHandleFilterItems);
+                            preFilterItems, postFilterItems);
 
                         _table.Add(invokePayloadType, new NotificationHandlerItem<T>
                         {
@@ -218,21 +230,14 @@ namespace Akka.Interfaced
                     }
                 }
             }
-
-            //if (targetMethods.Any())
-            //{
-            //    throw new InvalidOperationException(
-            //        $"{typeof(T).FullName} has dangling handlers.\n" +
-            //        string.Join("\n", targetMethods.Select(x => x.Item1.Name)));
-            //}
         }
 
         private Tuple<List<FilterItem>, List<FilterItem>> CreateFilters(Type type, MethodInfo method)
         {
-            var preHandleFilterItems = new List<FilterItem>();
-            var postHandleFilterItems = new List<FilterItem>();
+            var preFilterItems = new List<FilterItem>();
+            var postFilterItems = new List<FilterItem>();
 
-            var filterPerInvokeIndex = 0;
+            var filterPerRequestIndex = 0;
             var filterFactories = type.GetCustomAttributes().Concat(method.GetCustomAttributes()).OfType<IFilterFactory>();
             foreach (var filterFactory in filterFactories)
             {
@@ -283,43 +288,43 @@ namespace Akka.Interfaced
                     filterItem = new FilterItem(filterFactory, filter,
                                                 (provider, _) => provider.GetFilter(arrayIndex));
                 }
-                else if (filterFactory is IFilterPerInvokeFactory)
+                else if (filterFactory is IFilterPerNotificationFactory)
                 {
-                    var factory = ((IFilterPerInvokeFactory)filterFactory);
+                    var factory = ((IFilterPerNotificationFactory)filterFactory);
                     factory.Setup(type, method);
                     var filter = factory.CreateInstance(null, null);
-                    var arrayIndex = filterPerInvokeIndex++;
+                    var arrayIndex = filterPerRequestIndex++;
                     filterItem = new FilterItem(filterFactory, filter,
-                                                (_, filters) => filters[arrayIndex], filterPerInvokeIndex);
+                                                (_, filters) => filters[arrayIndex], filterPerRequestIndex);
                 }
 
                 // classify filter and add it to list
                 // beware that a filter can be added to both pre and post handle filter list.
 
-                if (filterItem.IsPreHandleFilter)
-                    preHandleFilterItems.Add(filterItem);
+                if (filterItem.IsPreFilter)
+                    preFilterItems.Add(filterItem);
 
-                if (filterItem.IsPostHandleFilter)
-                    postHandleFilterItems.Add(filterItem);
+                if (filterItem.IsPostFilter)
+                    postFilterItems.Add(filterItem);
             }
 
-            return Tuple.Create(preHandleFilterItems.OrderBy(f => f.Order).ToList(),
-                                postHandleFilterItems.OrderByDescending(f => f.Order).ToList());
+            return Tuple.Create(preFilterItems.OrderBy(f => f.Order).ToList(),
+                                postFilterItems.OrderByDescending(f => f.Order).ToList());
         }
 
         private static NotificationHandler<T> BuildHandler(
             Type invokePayloadType, MethodInfo method,
-            IList<FilterItem> preHandleFilterItems, IList<FilterItem> postHandleFilterItems)
+            IList<FilterItem> preFilterItems, IList<FilterItem> postFilterItems)
         {
             var handler = RequestHandlerFuncBuilder.Build<T>(
                 invokePayloadType, null, method);
 
-            var allFilters = preHandleFilterItems.Concat(postHandleFilterItems).ToList();
+            var allFilters = preFilterItems.Concat(postFilterItems).ToList();
             var perInstanceFilterExists = allFilters.Any(i => i.IsPerInstance);
-            var perInvokeFilterFactories = allFilters.Where(i => i.IsPerInvoke).GroupBy(i => i.FilterPerInvokeIndex)
-                                                     .OrderBy(g => g.Key).Select(g => (IFilterPerInvokeFactory)g.Last().Factory).ToArray();
-            var preHandleFilterAccessors = preHandleFilterItems.Select(i => i.Accessor).ToArray();
-            var postHandleFilterAccessors = postHandleFilterItems.Select(i => i.Accessor).ToArray();
+            var perNotificationFilterFactories = allFilters.Where(i => i.IsPerNotification).GroupBy(i => i.FilterPerNotificationIndex)
+                                                           .OrderBy(g => g.Key).Select(g => (IFilterPerNotificationFactory)g.Last().Factory).ToArray();
+            var preFilterAccessors = preFilterItems.Select(i => i.Accessor).ToArray();
+            var postFilterAccessors = postFilterItems.Select(i => i.Accessor).ToArray();
 
             return delegate(T self, NotificationMessage notification)
             {
@@ -327,42 +332,34 @@ namespace Akka.Interfaced
 
                 var filterPerInstanceProvider = perInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
-                // Create perInvoke filters
+                // Create perRequest filters
 
-                IFilter[] filterPerInvokes = null;
+                IFilter[] filterPerRequests = null;
 
-                /*
-                if (perInvokeFilterFactories.Length > 0)
+                if (perNotificationFilterFactories.Length > 0)
                 {
-                    filterPerInvokes = new IFilter[perInvokeFilterFactories.Length];
-                    for (var i = 0; i < perInvokeFilterFactories.Length; i++)
+                    filterPerRequests = new IFilter[perNotificationFilterFactories.Length];
+                    for (var i = 0; i < perNotificationFilterFactories.Length; i++)
                     {
-                        filterPerInvokes[i] = perInvokeFilterFactories[i].CreateInstance(self, notification);
+                        filterPerRequests[i] = perNotificationFilterFactories[i].CreateInstance(self, notification);
                     }
                 }
-                ?*/
 
                 // Call PreHandleFilters
 
-                /*
-                if (preHandleFilterItems.Count > 0)
+                if (preFilterItems.Count > 0)
                 {
-                    var context = new PreHandleFilterContext
+                    var context = new PreNotificationFilterContext
                     {
                         Actor = self,
-                        Notification = message
+                        Notification = notification
                     };
-                    foreach (var filterAccessor in preHandleFilterAccessors)
+                    foreach (var filterAccessor in preFilterAccessors)
                     {
                         try
                         {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
-                            ((IPreHandleFilter)filter).OnPreHandle(context);
-                            if (context.Response != null)
-                            {
-                                response = context.Response;
-                                break;
-                            }
+                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
+                            ((IPreNotificationFilter)filter).OnPreNotification(context);
                         }
                         catch (Exception e)
                         {
@@ -371,7 +368,6 @@ namespace Akka.Interfaced
                         }
                     }
                 }
-                */
 
                 // Call Handler
 
@@ -389,21 +385,19 @@ namespace Akka.Interfaced
 
                 // Call PostHandleFilters
 
-                /*
-                if (postHandleFilterItems.Count > 0)
+                if (postFilterItems.Count > 0)
                 {
-                    var context = new PostHandleFilterContext
+                    var context = new PostNotificationFilterContext
                     {
                         Actor = self,
-                        Notification = request,
-                        Response = response
+                        Notification = notification
                     };
-                    foreach (var filterAccessor in postHandleFilterAccessors)
+                    foreach (var filterAccessor in postFilterAccessors)
                     {
                         try
                         {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
-                            ((IPostHandleFilter)filter).OnPostHandle(context);
+                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
+                            ((IPostNotificationFilter)filter).OnPostNotification(context);
                         }
                         catch (Exception e)
                         {
@@ -412,25 +406,24 @@ namespace Akka.Interfaced
                         }
                     }
                 }
-                */
             };
         }
 
         private static NotificationAsyncHandler<T> BuildAsyncHandler(
             Type invokePayloadType, MethodInfo method,
-            IList<FilterItem> preHandleFilterItems, IList<FilterItem> postHandleFilterItems)
+            IList<FilterItem> preFilterItems, IList<FilterItem> postFilterItems)
         {
             var isAsyncMethod = method.ReturnType.Name.StartsWith("Task");
             var handler = isAsyncMethod
                 ? RequestHandlerAsyncBuilder.Build<T>(invokePayloadType, null, method)
                 : RequestHandlerSyncToAsyncBuilder.Build<T>(invokePayloadType, null, method);
 
-            var allFilters = preHandleFilterItems.Concat(postHandleFilterItems).ToList();
+            var allFilters = preFilterItems.Concat(postFilterItems).ToList();
             var perInstanceFilterExists = allFilters.Any(i => i.IsPerInstance);
-            var perInvokeFilterFactories = allFilters.Where(i => i.IsPerInvoke).GroupBy(i => i.FilterPerInvokeIndex)
-                                                     .OrderBy(g => g.Key).Select(g => (IFilterPerInvokeFactory)g.Last().Factory).ToArray();
-            var preHandleFilterAccessors = preHandleFilterItems.Select(i => i.Accessor).ToArray();
-            var postHandleFilterAccessors = postHandleFilterItems.Select(i => i.Accessor).ToArray();
+            var perNotificationFilterFactories = allFilters.Where(i => i.IsPerNotification).GroupBy(i => i.FilterPerNotificationIndex)
+                                                           .OrderBy(g => g.Key).Select(g => (IFilterPerNotificationFactory)g.Last().Factory).ToArray();
+            var preFilterAccessors = preFilterItems.Select(i => i.Accessor).ToArray();
+            var postFilterAccessors = postFilterItems.Select(i => i.Accessor).ToArray();
 
             // TODO: Optimize this function when without async filter
             return async delegate(T self, NotificationMessage notification)
@@ -439,46 +432,37 @@ namespace Akka.Interfaced
 
                 var filterPerInstanceProvider = perInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
-                // Create perInvoke filters
+                // Create perRequest filters
 
-                IFilter[] filterPerInvokes = null;
-                /*
-                if (perInvokeFilterFactories.Length > 0)
+                IFilter[] filterPerRequests = null;
+                if (perNotificationFilterFactories.Length > 0)
                 {
-                    filterPerInvokes = new IFilter[perInvokeFilterFactories.Length];
-                    for (var i = 0; i < perInvokeFilterFactories.Length; i++)
+                    filterPerRequests = new IFilter[perNotificationFilterFactories.Length];
+                    for (var i = 0; i < perNotificationFilterFactories.Length; i++)
                     {
-                        filterPerInvokes[i] = perInvokeFilterFactories[i].CreateInstance(self, request);
+                        filterPerRequests[i] = perNotificationFilterFactories[i].CreateInstance(self, notification);
                     }
                 }
-                */
 
                 // Call PreHandleFilters
 
-                /*
-                if (preHandleFilterItems.Count > 0)
+                if (preFilterItems.Count > 0)
                 {
-                    var context = new PreHandleFilterContext
+                    var context = new PreNotificationFilterContext
                     {
                         Actor = self,
-                        Notification = request
+                        Notification = notification
                     };
-                    foreach (var filterAccessor in preHandleFilterAccessors)
+                    foreach (var filterAccessor in preFilterAccessors)
                     {
                         try
                         {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
-                            var preHandleFilter = filter as IPreHandleFilter;
-                            if (preHandleFilter != null)
-                                preHandleFilter.OnPreHandle(context);
+                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
+                            var preFilter = filter as IPreNotificationFilter;
+                            if (preFilter != null)
+                                preFilter.OnPreNotification(context);
                             else
-                                await ((IPreHandleAsyncFilter)filter).OnPreHandleAsync(context);
-
-                            if (context.Response != null)
-                            {
-                                response = context.Response;
-                                break;
-                            }
+                                await ((IPreNotificationAsyncFilter)filter).OnPreNotificationAsync(context);
                         }
                         catch (Exception e)
                         {
@@ -487,7 +471,6 @@ namespace Akka.Interfaced
                         }
                     }
                 }
-                */
 
                 // Call Handler
 
@@ -505,25 +488,23 @@ namespace Akka.Interfaced
 
                 // Call PostHandleFilters
 
-                /*
-                if (postHandleFilterItems.Count > 0)
+                if (postFilterItems.Count > 0)
                 {
-                    var context = new PostHandleFilterContext
+                    var context = new PostNotificationFilterContext
                     {
                         Actor = self,
-                        Notification = request,
-                        Response = response
+                        Notification = notification,
                     };
-                    foreach (var filterAccessor in postHandleFilterAccessors)
+                    foreach (var filterAccessor in postFilterAccessors)
                     {
                         try
                         {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerInvokes);
-                            var postHandleFilter = filter as IPostHandleFilter;
-                            if (postHandleFilter != null)
-                                postHandleFilter.OnPostHandle(context);
+                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
+                            var postFilter = filter as IPostNotificationFilter;
+                            if (postFilter != null)
+                                postFilter.OnPostNotification(context);
                             else
-                                await ((IPostHandleAsyncFilter)filter).OnPostHandleAsync(context);
+                                await ((IPostNotificationAsyncFilter)filter).OnPostNotificationAsync(context);
                         }
                         catch (Exception e)
                         {
@@ -532,7 +513,6 @@ namespace Akka.Interfaced
                         }
                     }
                 }
-                */
             };
         }
 

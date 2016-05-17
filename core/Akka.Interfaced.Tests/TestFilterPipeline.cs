@@ -26,7 +26,7 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} Authorize.OnPreHandle");
+            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} Authorize.OnPreRequest");
 
             var actor = (TestFilterPipelineActor)context.Actor;
             if (actor.Permission < 1)
@@ -60,12 +60,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPreHandle");
+            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPostHandle");
+            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPostRequest");
         }
     }
 
@@ -88,12 +88,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPreHandle");
+            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPostHandle");
+            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPostRequest");
         }
     }
 
@@ -146,12 +146,12 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPipelineActor FirstLog.OnPreHandle",
-                    "TestFilterPipelineActor Authorize.OnPreHandle",
-                    "TestFilterPipelineActor LastLog.OnPreHandle",
+                    "TestFilterPipelineActor FirstLog.OnPreRequest",
+                    "TestFilterPipelineActor Authorize.OnPreRequest",
+                    "TestFilterPipelineActor LastLog.OnPreRequest",
                     "TestFilterPipelineActor.Atomic 1",
-                    "TestFilterPipelineActor LastLog.OnPostHandle",
-                    "TestFilterPipelineActor FirstLog.OnPostHandle",
+                    "TestFilterPipelineActor LastLog.OnPostRequest",
+                    "TestFilterPipelineActor FirstLog.OnPostRequest",
                 },
                 LogBoard.GetAndClearLogs());
         }
@@ -166,10 +166,10 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPipelineActor FirstLog.OnPreHandle",
-                    "TestFilterPipelineActor Authorize.OnPreHandle",
-                    "TestFilterPipelineActor LastLog.OnPostHandle",
-                    "TestFilterPipelineActor FirstLog.OnPostHandle",
+                    "TestFilterPipelineActor FirstLog.OnPreRequest",
+                    "TestFilterPipelineActor Authorize.OnPreRequest",
+                    "TestFilterPipelineActor LastLog.OnPostRequest",
+                    "TestFilterPipelineActor FirstLog.OnPostRequest",
                 },
                 LogBoard.GetAndClearLogs());
         }

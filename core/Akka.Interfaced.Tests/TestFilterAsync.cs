@@ -25,16 +25,16 @@ namespace Akka.Interfaced.Tests
 
         async Task IPreRequestAsyncFilter.OnPreRequestAsync(PreRequestFilterContext context)
         {
-            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPreHandleAsync");
+            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPreRequestAsync");
             await Task.Yield();
-            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPreHandleAsync Done");
+            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPreRequestAsync Done");
         }
 
         async Task IPostRequestAsyncFilter.OnPostRequestAsync(PostRequestFilterContext context)
         {
-            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPostHandleAsync");
+            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPostRequestAsync");
             await Task.Yield();
-            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPostHandleAsync Done");
+            TestFilterAsync.LogBoard.Log($"{_actorType.Name} Async.OnPostRequestAsync Done");
         }
     }
 
@@ -75,11 +75,11 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterAsyncActor Async.OnPreHandleAsync",
-                    "TestFilterAsyncActor Async.OnPreHandleAsync Done",
+                    "TestFilterAsyncActor Async.OnPreRequestAsync",
+                    "TestFilterAsyncActor Async.OnPreRequestAsync Done",
                     "TestFilterAsyncActor.Atomic 1",
-                    "TestFilterAsyncActor Async.OnPostHandleAsync",
-                    "TestFilterAsyncActor Async.OnPostHandleAsync Done"
+                    "TestFilterAsyncActor Async.OnPostRequestAsync",
+                    "TestFilterAsyncActor Async.OnPostRequestAsync Done"
                 },
                 LogBoard.GetAndClearLogs());
         }
@@ -94,12 +94,12 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterAsyncActor Async.OnPreHandleAsync",
-                    "TestFilterAsyncActor Async.OnPreHandleAsync Done",
+                    "TestFilterAsyncActor Async.OnPreRequestAsync",
+                    "TestFilterAsyncActor Async.OnPreRequestAsync Done",
                     "TestFilterAsyncActor.Reentrant 1",
                     "TestFilterAsyncActor.Reentrant Done 1",
-                    "TestFilterAsyncActor Async.OnPostHandleAsync",
-                    "TestFilterAsyncActor Async.OnPostHandleAsync Done"
+                    "TestFilterAsyncActor Async.OnPostRequestAsync",
+                    "TestFilterAsyncActor Async.OnPostRequestAsync Done"
                 },
                 LogBoard.GetAndClearLogs());
         }

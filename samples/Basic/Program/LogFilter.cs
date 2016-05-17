@@ -8,16 +8,16 @@ using Newtonsoft.Json;
 namespace Basic.Program
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class LogAttribute : Attribute, IFilterPerInvokeFactory
+    public sealed class LogAttribute : Attribute, IFilterPerRequestFactory
     {
         private string _methodName;
 
-        void IFilterPerInvokeFactory.Setup(Type actorType, MethodInfo method)
+        void IFilterPerRequestFactory.Setup(Type actorType, MethodInfo method)
         {
             _methodName = actorType.Name + "." + method.Name.Split('.').Last();
         }
 
-        IFilter IFilterPerInvokeFactory.CreateInstance(object actor, RequestMessage request)
+        IFilter IFilterPerRequestFactory.CreateInstance(object actor, RequestMessage request)
         {
             return new LogFilter(_methodName, actor, request);
         }
@@ -100,12 +100,12 @@ namespace Basic.Program
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
             _handleCount += 1;
-            Console.WriteLine("@{0} : OnPreHandle #{1}", _typeName, _handleCount);
+            Console.WriteLine("@{0} : OnPreRequest #{1}", _typeName, _handleCount);
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            Console.WriteLine("@{0} : OnPostHandle", _typeName);
+            Console.WriteLine("@{0} : OnPostRequest", _typeName);
         }
     }
 }

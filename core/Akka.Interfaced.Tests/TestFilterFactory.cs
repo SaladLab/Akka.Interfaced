@@ -39,12 +39,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
@@ -91,12 +91,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
@@ -144,12 +144,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
@@ -205,12 +205,12 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
@@ -228,32 +228,32 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    // FilterPerInvoke
+    // FilterPerRequest
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterPerInvokeAttribute : Attribute, IFilterPerInvokeFactory
+    public sealed class TestFilterPerRequestAttribute : Attribute, IFilterPerRequestFactory
     {
         private Type _actorType;
         private MethodInfo _method;
 
-        void IFilterPerInvokeFactory.Setup(Type actorType, MethodInfo method)
+        void IFilterPerRequestFactory.Setup(Type actorType, MethodInfo method)
         {
             _actorType = actorType;
             _method = method;
         }
 
-        IFilter IFilterPerInvokeFactory.CreateInstance(object actor, RequestMessage request)
+        IFilter IFilterPerRequestFactory.CreateInstance(object actor, RequestMessage request)
         {
             var name = _actorType.Name + "." + _method.Name.Split('.').Last();
-            return new TestFilterPerInvokeFilter(actor != null ? name : null);
+            return new TestFilterPerRequestFilter(actor != null ? name : null);
         }
     }
 
-    public class TestFilterPerInvokeFilter : IPreRequestFilter, IPostRequestFilter
+    public class TestFilterPerRequestFilter : IPreRequestFilter, IPostRequestFilter
     {
         private string _name;
 
-        public TestFilterPerInvokeFilter(string name)
+        public TestFilterPerRequestFilter(string name)
         {
             if (name != null)
             {
@@ -266,17 +266,17 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPreHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPostHandle");
+            TestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
-    [TestFilterPerInvoke]
-    public class TestFilterPerInvokeActor : InterfacedActor<TestFilterPerInvokeActor>, IWorker
+    [TestFilterPerRequest]
+    public class TestFilterPerRequestActor : InterfacedActor<TestFilterPerRequestActor>, IWorker
     {
         Task IWorker.Atomic(int id)
         {
@@ -308,8 +308,8 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPerClassActor.OnPreHandle",
-                    "TestFilterPerClassActor.OnPostHandle"
+                    "TestFilterPerClassActor.OnPreRequest",
+                    "TestFilterPerClassActor.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }
@@ -324,8 +324,8 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPerClassMethodActor.Call.OnPreHandle",
-                    "TestFilterPerClassMethodActor.Call.OnPostHandle"
+                    "TestFilterPerClassMethodActor.Call.OnPreRequest",
+                    "TestFilterPerClassMethodActor.Call.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }
@@ -342,10 +342,10 @@ namespace Akka.Interfaced.Tests
                 new List<string>
                 {
                     "TestFilterPerInstanceActor.Constructor",
-                    "TestFilterPerInstanceActor.OnPreHandle",
-                    "TestFilterPerInstanceActor.OnPostHandle",
-                    "TestFilterPerInstanceActor.OnPreHandle",
-                    "TestFilterPerInstanceActor.OnPostHandle"
+                    "TestFilterPerInstanceActor.OnPreRequest",
+                    "TestFilterPerInstanceActor.OnPostRequest",
+                    "TestFilterPerInstanceActor.OnPreRequest",
+                    "TestFilterPerInstanceActor.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }
@@ -364,20 +364,20 @@ namespace Akka.Interfaced.Tests
                 {
                     "TestFilterPerInstanceMethodActor.Atomic.Constructor",
                     "TestFilterPerInstanceMethodActor.Reentrant.Constructor",
-                    "TestFilterPerInstanceMethodActor.Atomic.OnPreHandle",
-                    "TestFilterPerInstanceMethodActor.Atomic.OnPostHandle",
-                    "TestFilterPerInstanceMethodActor.Atomic.OnPreHandle",
-                    "TestFilterPerInstanceMethodActor.Atomic.OnPostHandle",
-                    "TestFilterPerInstanceMethodActor.Reentrant.OnPreHandle",
-                    "TestFilterPerInstanceMethodActor.Reentrant.OnPostHandle"
+                    "TestFilterPerInstanceMethodActor.Atomic.OnPreRequest",
+                    "TestFilterPerInstanceMethodActor.Atomic.OnPostRequest",
+                    "TestFilterPerInstanceMethodActor.Atomic.OnPreRequest",
+                    "TestFilterPerInstanceMethodActor.Atomic.OnPostRequest",
+                    "TestFilterPerInstanceMethodActor.Reentrant.OnPreRequest",
+                    "TestFilterPerInstanceMethodActor.Reentrant.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }
 
         [Fact]
-        public async Task Test_FilterPerInvoke_Work()
+        public async Task Test_FilterPerRequest_Work()
         {
-            var actor = ActorOfAsTestActorRef<TestFilterPerInvokeActor>();
+            var actor = ActorOfAsTestActorRef<TestFilterPerRequestActor>();
             var a = new WorkerRef(actor);
             await a.Atomic(1);
             await a.Atomic(2);
@@ -386,15 +386,15 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPerInvokeActor.Atomic.Constructor",
-                    "TestFilterPerInvokeActor.Atomic.OnPreHandle",
-                    "TestFilterPerInvokeActor.Atomic.OnPostHandle",
-                    "TestFilterPerInvokeActor.Atomic.Constructor",
-                    "TestFilterPerInvokeActor.Atomic.OnPreHandle",
-                    "TestFilterPerInvokeActor.Atomic.OnPostHandle",
-                    "TestFilterPerInvokeActor.Reentrant.Constructor",
-                    "TestFilterPerInvokeActor.Reentrant.OnPreHandle",
-                    "TestFilterPerInvokeActor.Reentrant.OnPostHandle"
+                    "TestFilterPerRequestActor.Atomic.Constructor",
+                    "TestFilterPerRequestActor.Atomic.OnPreRequest",
+                    "TestFilterPerRequestActor.Atomic.OnPostRequest",
+                    "TestFilterPerRequestActor.Atomic.Constructor",
+                    "TestFilterPerRequestActor.Atomic.OnPreRequest",
+                    "TestFilterPerRequestActor.Atomic.OnPostRequest",
+                    "TestFilterPerRequestActor.Reentrant.Constructor",
+                    "TestFilterPerRequestActor.Reentrant.OnPreRequest",
+                    "TestFilterPerRequestActor.Reentrant.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }

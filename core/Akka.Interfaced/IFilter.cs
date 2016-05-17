@@ -83,5 +83,38 @@ namespace Akka.Interfaced
     }
 
     // Pre-Message Filter
+
+    public class PreMessageFilterContext
+    {
+        public object Actor;
+        public object Message;
+    }
+
+    public interface IPreMessageFilter : IFilter
+    {
+        void OnPreMessage(PreMessageFilterContext context);
+    }
+
+    public interface IPreMessageAsyncFilter : IFilter
+    {
+        Task OnPreMessageAsync(PreMessageFilterContext context);
+    }
+
     // Post-Message Filter
+
+    public class PostMessageFilterContext
+    {
+        public object Actor;
+        public object Message;
+    }
+
+    public interface IPostMessageFilter : IFilter
+    {
+        void OnPostMessage(PostMessageFilterContext context);
+    }
+
+    public interface IPostMessageAsyncFilter : IFilter
+    {
+        Task OnPostMessageAsync(PostMessageFilterContext context);
+    }
 }

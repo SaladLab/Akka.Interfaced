@@ -33,10 +33,22 @@ namespace Akka.Interfaced
         IFilter CreateInstance(object actor);
     }
 
-    public interface IFilterPerInvokeFactory : IFilterFactory
+    public interface IFilterPerRequestFactory : IFilterFactory
     {
         void Setup(Type actorType, MethodInfo method);
         IFilter CreateInstance(object actor, RequestMessage request);
+    }
+
+    public interface IFilterPerNotificationFactory : IFilterFactory
+    {
+        void Setup(Type actorType, MethodInfo method);
+        IFilter CreateInstance(object actor, NotificationMessage notification);
+    }
+
+    public interface IFilterPerMessageFactory : IFilterFactory
+    {
+        void Setup(Type actorType, MethodInfo method);
+        IFilter CreateInstance(object actor, object message);
     }
 
     // Filter Accessor
@@ -48,5 +60,5 @@ namespace Akka.Interfaced
 
     public delegate IFilter FilterAccessor(
         IFilterPerInstanceProvider perInstanceFilterProvider,
-        IFilter[] filterPerInvokes);
+        IFilter[] filterPerRequests);
 }
