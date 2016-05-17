@@ -16,7 +16,7 @@ using Akka.Actor;
 
 namespace Akka.Interfaced.TestKit.Tests
 {
-    [PayloadTableForInterfacedActor(typeof(IUser))]
+    [PayloadTable(typeof(IUser), PayloadTableKind.Request)]
     public static class IUser_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -129,7 +129,7 @@ namespace Akka.Interfaced.TestKit.Tests
 
 namespace Akka.Interfaced.TestKit.Tests
 {
-    [PayloadTableForInterfacedActor(typeof(IUserLogin))]
+    [PayloadTable(typeof(IUserLogin), PayloadTableKind.Request)]
     public static class IUserLogin_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -215,11 +215,20 @@ namespace Akka.Interfaced.TestKit.Tests
 
 namespace Akka.Interfaced.TestKit.Tests
 {
+    [PayloadTable(typeof(IUserObserver), PayloadTableKind.Notification)]
     public static class IUserObserver_PayloadTable
     {
-        public class Say_Invoke : IInvokable
+        public static Type[] GetPayloadTypes()
+        {
+            return new Type[] {
+                typeof(Say_Invoke),
+            };
+        }
+
+        public class Say_Invoke : IInterfacedPayload, IInvokable
         {
             public System.String message;
+            public Type GetInterfaceType() { return typeof(IUserObserver); }
             public void Invoke(object __target)
             {
                 ((IUserObserver)__target).Say(message);
@@ -229,12 +238,12 @@ namespace Akka.Interfaced.TestKit.Tests
 
     public class UserObserver : InterfacedObserver, IUserObserver
     {
-        public UserObserver(IActorRef target, int observerId)
+        public UserObserver(IActorRef target, int observerId = 0)
             : base(new ActorNotificationChannel(target), observerId)
         {
         }
 
-        public UserObserver(INotificationChannel channel, int observerId)
+        public UserObserver(INotificationChannel channel, int observerId = 0)
             : base(channel, observerId)
         {
         }

@@ -16,7 +16,7 @@ using Akka.Actor;
 
 namespace Akka.Interfaced.Persistence.Tests.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(INotepad))]
+    [PayloadTable(typeof(INotepad), PayloadTableKind.Request)]
     public static class INotepad_PayloadTable
     {
         public static Type[,] GetPayloadTypes()

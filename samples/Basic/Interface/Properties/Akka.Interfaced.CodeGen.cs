@@ -16,7 +16,7 @@ using Akka.Actor;
 
 namespace Basic.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(ICalculator))]
+    [PayloadTable(typeof(ICalculator), PayloadTableKind.Request)]
     public static class ICalculator_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -140,7 +140,7 @@ namespace Basic.Interface
 
 namespace Basic.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(ICounter))]
+    [PayloadTable(typeof(ICounter), PayloadTableKind.Request)]
     public static class ICounter_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -253,7 +253,7 @@ namespace Basic.Interface
 
 namespace Basic.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(IEventGenerator))]
+    [PayloadTable(typeof(IEventGenerator), PayloadTableKind.Request)]
     public static class IEventGenerator_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -421,7 +421,7 @@ namespace Basic.Interface
 
 namespace Basic.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(IOverloaded))]
+    [PayloadTable(typeof(IOverloaded), PayloadTableKind.Request)]
     public static class IOverloaded_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -584,7 +584,7 @@ namespace Basic.Interface
 
 namespace Basic.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(IWorker))]
+    [PayloadTable(typeof(IWorker), PayloadTableKind.Request)]
     public static class IWorker_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -690,22 +690,33 @@ namespace Basic.Interface
 
 namespace Basic.Interface
 {
+    [PayloadTable(typeof(IEventObserver), PayloadTableKind.Notification)]
     public static class IEventObserver_PayloadTable
     {
-        public class OnBuy_Invoke : IInvokable
+        public static Type[] GetPayloadTypes()
+        {
+            return new Type[] {
+                typeof(OnBuy_Invoke),
+                typeof(OnSell_Invoke),
+            };
+        }
+
+        public class OnBuy_Invoke : IInterfacedPayload, IInvokable
         {
             public System.String name;
             public System.Int32 price;
+            public Type GetInterfaceType() { return typeof(IEventObserver); }
             public void Invoke(object __target)
             {
                 ((IEventObserver)__target).OnBuy(name, price);
             }
         }
 
-        public class OnSell_Invoke : IInvokable
+        public class OnSell_Invoke : IInterfacedPayload, IInvokable
         {
             public System.String name;
             public System.Int32 price;
+            public Type GetInterfaceType() { return typeof(IEventObserver); }
             public void Invoke(object __target)
             {
                 ((IEventObserver)__target).OnSell(name, price);
@@ -715,12 +726,12 @@ namespace Basic.Interface
 
     public class EventObserver : InterfacedObserver, IEventObserver
     {
-        public EventObserver(IActorRef target, int observerId)
+        public EventObserver(IActorRef target, int observerId = 0)
             : base(new ActorNotificationChannel(target), observerId)
         {
         }
 
-        public EventObserver(INotificationChannel channel, int observerId)
+        public EventObserver(INotificationChannel channel, int observerId = 0)
             : base(channel, observerId)
         {
         }

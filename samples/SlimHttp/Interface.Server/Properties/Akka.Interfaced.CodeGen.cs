@@ -16,7 +16,7 @@ using Akka.Actor;
 
 namespace SlimHttp.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(ICalculator))]
+    [PayloadTable(typeof(ICalculator), PayloadTableKind.Request)]
     public static class ICalculator_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -140,7 +140,7 @@ namespace SlimHttp.Interface
 
 namespace SlimHttp.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(ICounter))]
+    [PayloadTable(typeof(ICounter), PayloadTableKind.Request)]
     public static class ICounter_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -253,7 +253,7 @@ namespace SlimHttp.Interface
 
 namespace SlimHttp.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(IPedantic))]
+    [PayloadTable(typeof(IPedantic), PayloadTableKind.Request)]
     public static class IPedantic_PayloadTable
     {
         public static Type[,] GetPayloadTypes()

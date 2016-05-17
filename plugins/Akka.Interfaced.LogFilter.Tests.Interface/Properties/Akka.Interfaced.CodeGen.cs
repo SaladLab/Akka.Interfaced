@@ -16,7 +16,7 @@ using Akka.Actor;
 
 namespace Akka.Interfaced.LogFilter.Tests
 {
-    [PayloadTableForInterfacedActor(typeof(ITest))]
+    [PayloadTable(typeof(ITest), PayloadTableKind.Request)]
     public static class ITest_PayloadTable
     {
         public static Type[,] GetPayloadTypes()

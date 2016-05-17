@@ -16,7 +16,7 @@ using Akka.Actor;
 
 namespace HelloWorld.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(IHelloWorld))]
+    [PayloadTable(typeof(IHelloWorld), PayloadTableKind.Request)]
     public static class IHelloWorld_PayloadTable
     {
         public static Type[,] GetPayloadTypes()

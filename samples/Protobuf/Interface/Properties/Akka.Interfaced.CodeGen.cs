@@ -19,7 +19,7 @@ using System.ComponentModel;
 
 namespace Protobuf.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(IHelloWorld))]
+    [PayloadTable(typeof(IHelloWorld), PayloadTableKind.Request)]
     public static class IHelloWorld_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -155,7 +155,7 @@ namespace Protobuf.Interface
 
 namespace Protobuf.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(IPedantic))]
+    [PayloadTable(typeof(IPedantic), PayloadTableKind.Request)]
     public static class IPedantic_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -443,7 +443,7 @@ namespace Protobuf.Interface
 
 namespace Protobuf.Interface
 {
-    [PayloadTableForInterfacedActor(typeof(ISurrogate))]
+    [PayloadTable(typeof(ISurrogate), PayloadTableKind.Request)]
     public static class ISurrogate_PayloadTable
     {
         public static Type[,] GetPayloadTypes()

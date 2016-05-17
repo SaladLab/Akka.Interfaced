@@ -19,7 +19,7 @@ using System.ComponentModel;
 
 namespace Akka.Interfaced.ProtobufSerializer.Tests
 {
-    [PayloadTableForInterfacedActor(typeof(IDefault))]
+    [PayloadTable(typeof(IDefault), PayloadTableKind.Request)]
     public static class IDefault_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
