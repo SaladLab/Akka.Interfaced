@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -9,10 +8,10 @@ using System.Runtime.CompilerServices;
 
 namespace Akka.Interfaced
 {
-    public class RequestHandlerBuilder<T>
+    public class NotificationHandlerBuilder<T>
         where T : class
     {
-        private Dictionary<Type, RequestHandlerItem<T>> _table;
+        private Dictionary<Type, NotificationHandlerItem<T>> _table;
 
         private class FilterItem
         {
@@ -48,12 +47,12 @@ namespace Akka.Interfaced
         private Dictionary<Type, FilterItem> _perClassFilterItemTable;
         private List<Func<object, IFilter>> _perInstanceFilterCreators;
 
-        public Dictionary<Type, RequestHandlerItem<T>> HandlerTable => _table;
+        public Dictionary<Type, NotificationHandlerItem<T>> HandlerTable => _table;
         public List<Func<object, IFilter>> PerInstanceFilterCreators => _perInstanceFilterCreators;
 
         public void Build()
         {
-            _table = new Dictionary<Type, RequestHandlerItem<T>>();
+            _table = new Dictionary<Type, NotificationHandlerItem<T>>();
             _perClassFilterItemTable = new Dictionary<Type, FilterItem>();
             _perInstanceFilterCreators = new List<Func<object, IFilter>>();
 
@@ -67,7 +66,7 @@ namespace Akka.Interfaced
 
             foreach (var ifs in type.GetInterfaces())
             {
-                if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedActor)))
+                if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedObserver)))
                     continue;
 
                 var interfaceMap = type.GetInterfaceMap(ifs);
@@ -79,22 +78,32 @@ namespace Akka.Interfaced
                 for (var i = 0; i < methodItems.Length; i++)
                 {
                     var targetMethod = methodItems[i].Item2;
-                    var invokePayloadType = payloadTypeTable[i, 0];
-                    var returnPayloadType = payloadTypeTable[i, 1];
+                    var invokePayloadType = payloadTypeTable[i];
 
                     var filters = CreateFilters(type, targetMethod);
                     var preHandleFilterItems = filters.Item1;
                     var postHandleFilterItems = filters.Item2;
 
+                    /*
                     var asyncHandler = BuildAsyncHandler(
-                        invokePayloadType, returnPayloadType, targetMethod,
+                        invokePayloadType, targetMethod,
                         preHandleFilterItems, postHandleFilterItems);
 
-                    _table.Add(invokePayloadType, new RequestHandlerItem<T>
+                    _table.Add(invokePayloadType, new NotificationHandlerItem<T>
                     {
                         InterfaceType = ifs,
                         IsReentrant = IsReentrantMethod(targetMethod),
                         AsyncHandler = asyncHandler
+                    });
+                    */
+
+                    _table.Add(invokePayloadType, new NotificationHandlerItem<T>
+                    {
+                        InterfaceType = ifs,
+                        IsReentrant = IsReentrantMethod(targetMethod),
+                        Handler = BuildHandler(
+                            invokePayloadType, targetMethod,
+                            preHandleFilterItems, postHandleFilterItems)
                     });
                 }
             }
@@ -114,7 +123,7 @@ namespace Akka.Interfaced
                 type.GetInterfaces()
                     .Where(t => t.FullName.StartsWith("Akka.Interfaced.IExtendedInterface"))
                     .SelectMany(t => t.GenericTypeArguments)
-                    .Where(t => t.GetInterfaces().Any(i => i == typeof(IInterfacedActor)));
+                    .Where(t => t.GetInterfaces().Any(i => i == typeof(IInterfacedObserver)));
 
             foreach (var ifs in extendedInterfaces)
             {
@@ -124,8 +133,7 @@ namespace Akka.Interfaced
                 for (var i = 0; i < interfaceMethods.Length; i++)
                 {
                     var interfaceMethod = interfaceMethods[i];
-                    var invokePayloadType = payloadTypeTable[i, 0];
-                    var returnPayloadType = payloadTypeTable[i, 1];
+                    var invokePayloadType = payloadTypeTable[i];
                     var name = interfaceMethod.Name;
                     var parameters = interfaceMethod.GetParameters();
 
@@ -180,10 +188,10 @@ namespace Akka.Interfaced
                         // async handler
 
                         var asyncHandler = BuildAsyncHandler(
-                            invokePayloadType, returnPayloadType, targetMethod,
+                            invokePayloadType, targetMethod,
                             preHandleFilterItems, postHandleFilterItems);
 
-                        _table.Add(invokePayloadType, new RequestHandlerItem<T>
+                        _table.Add(invokePayloadType, new NotificationHandlerItem<T>
                         {
                             InterfaceType = ifs,
                             IsReentrant = IsReentrantMethod(targetMethod),
@@ -198,10 +206,10 @@ namespace Akka.Interfaced
                         // sync handler
 
                         var handler = BuildHandler(
-                            invokePayloadType, returnPayloadType, targetMethod,
+                            invokePayloadType, targetMethod,
                             preHandleFilterItems, postHandleFilterItems);
 
-                        _table.Add(invokePayloadType, new RequestHandlerItem<T>
+                        _table.Add(invokePayloadType, new NotificationHandlerItem<T>
                         {
                             InterfaceType = ifs,
                             IsReentrant = false,
@@ -299,12 +307,12 @@ namespace Akka.Interfaced
                                 postHandleFilterItems.OrderByDescending(f => f.Order).ToList());
         }
 
-        private static RequestHandler<T> BuildHandler(
-            Type invokePayloadType, Type returnPayloadType, MethodInfo method,
+        private static NotificationHandler<T> BuildHandler(
+            Type invokePayloadType, MethodInfo method,
             IList<FilterItem> preHandleFilterItems, IList<FilterItem> postHandleFilterItems)
         {
             var handler = RequestHandlerFuncBuilder.Build<T>(
-                invokePayloadType, returnPayloadType, method);
+                invokePayloadType, null, method);
 
             var allFilters = preHandleFilterItems.Concat(postHandleFilterItems).ToList();
             var perInstanceFilterExists = allFilters.Any(i => i.IsPerInstance);
@@ -313,7 +321,7 @@ namespace Akka.Interfaced
             var preHandleFilterAccessors = preHandleFilterItems.Select(i => i.Accessor).ToArray();
             var postHandleFilterAccessors = postHandleFilterItems.Select(i => i.Accessor).ToArray();
 
-            return delegate(T self, RequestMessage request, Action<ResponseMessage> onCompleted)
+            return delegate(T self, NotificationMessage notification)
             {
                 ResponseMessage response = null;
 
@@ -322,23 +330,27 @@ namespace Akka.Interfaced
                 // Create perInvoke filters
 
                 IFilter[] filterPerInvokes = null;
+
+                /*
                 if (perInvokeFilterFactories.Length > 0)
                 {
                     filterPerInvokes = new IFilter[perInvokeFilterFactories.Length];
                     for (var i = 0; i < perInvokeFilterFactories.Length; i++)
                     {
-                        filterPerInvokes[i] = perInvokeFilterFactories[i].CreateInstance(self, request);
+                        filterPerInvokes[i] = perInvokeFilterFactories[i].CreateInstance(self, notification);
                     }
                 }
+                ?*/
 
                 // Call PreHandleFilters
 
+                /*
                 if (preHandleFilterItems.Count > 0)
                 {
                     var context = new PreHandleFilterContext
                     {
                         Actor = self,
-                        Request = request
+                        Notification = message
                     };
                     foreach (var filterAccessor in preHandleFilterAccessors)
                     {
@@ -359,6 +371,7 @@ namespace Akka.Interfaced
                         }
                     }
                 }
+                */
 
                 // Call Handler
 
@@ -366,31 +379,23 @@ namespace Akka.Interfaced
                 {
                     try
                     {
-                        var returnPayload = handler(self, request.InvokePayload);
-                        response = new ResponseMessage
-                        {
-                            RequestId = request.RequestId,
-                            ReturnPayload = returnPayload
-                        };
+                        handler(self, notification.InvokePayload);
                     }
                     catch (Exception e)
                     {
-                        response = new ResponseMessage
-                        {
-                            RequestId = request.RequestId,
-                            Exception = e
-                        };
+                        // TODO: Exception Handling
                     }
                 }
 
                 // Call PostHandleFilters
 
+                /*
                 if (postHandleFilterItems.Count > 0)
                 {
                     var context = new PostHandleFilterContext
                     {
                         Actor = self,
-                        Request = request,
+                        Notification = request,
                         Response = response
                     };
                     foreach (var filterAccessor in postHandleFilterAccessors)
@@ -407,22 +412,18 @@ namespace Akka.Interfaced
                         }
                     }
                 }
-
-                if (onCompleted != null)
-                    onCompleted(response);
-
-                return response;
+                */
             };
         }
 
-        private static RequestAsyncHandler<T> BuildAsyncHandler(
-            Type invokePayloadType, Type returnPayloadType, MethodInfo method,
+        private static NotificationAsyncHandler<T> BuildAsyncHandler(
+            Type invokePayloadType, MethodInfo method,
             IList<FilterItem> preHandleFilterItems, IList<FilterItem> postHandleFilterItems)
         {
             var isAsyncMethod = method.ReturnType.Name.StartsWith("Task");
             var handler = isAsyncMethod
-                ? RequestHandlerAsyncBuilder.Build<T>(invokePayloadType, returnPayloadType, method)
-                : RequestHandlerSyncToAsyncBuilder.Build<T>(invokePayloadType, returnPayloadType, method);
+                ? RequestHandlerAsyncBuilder.Build<T>(invokePayloadType, null, method)
+                : RequestHandlerSyncToAsyncBuilder.Build<T>(invokePayloadType, null, method);
 
             var allFilters = preHandleFilterItems.Concat(postHandleFilterItems).ToList();
             var perInstanceFilterExists = allFilters.Any(i => i.IsPerInstance);
@@ -432,7 +433,7 @@ namespace Akka.Interfaced
             var postHandleFilterAccessors = postHandleFilterItems.Select(i => i.Accessor).ToArray();
 
             // TODO: Optimize this function when without async filter
-            return async delegate(T self, RequestMessage request, Action<ResponseMessage> onCompleted)
+            return async delegate(T self, NotificationMessage notification)
             {
                 ResponseMessage response = null;
 
@@ -441,6 +442,7 @@ namespace Akka.Interfaced
                 // Create perInvoke filters
 
                 IFilter[] filterPerInvokes = null;
+                /*
                 if (perInvokeFilterFactories.Length > 0)
                 {
                     filterPerInvokes = new IFilter[perInvokeFilterFactories.Length];
@@ -449,15 +451,17 @@ namespace Akka.Interfaced
                         filterPerInvokes[i] = perInvokeFilterFactories[i].CreateInstance(self, request);
                     }
                 }
+                */
 
                 // Call PreHandleFilters
 
+                /*
                 if (preHandleFilterItems.Count > 0)
                 {
                     var context = new PreHandleFilterContext
                     {
                         Actor = self,
-                        Request = request
+                        Notification = request
                     };
                     foreach (var filterAccessor in preHandleFilterAccessors)
                     {
@@ -483,6 +487,7 @@ namespace Akka.Interfaced
                         }
                     }
                 }
+                */
 
                 // Call Handler
 
@@ -490,31 +495,23 @@ namespace Akka.Interfaced
                 {
                     try
                     {
-                        var returnPayload = await handler(self, request.InvokePayload);
-                        response = new ResponseMessage
-                        {
-                            RequestId = request.RequestId,
-                            ReturnPayload = returnPayload
-                        };
+                        await handler(self, notification.InvokePayload);
                     }
                     catch (Exception e)
                     {
-                        response = new ResponseMessage
-                        {
-                            RequestId = request.RequestId,
-                            Exception = e
-                        };
+                        // TODO: Exception Handling
                     }
                 }
 
                 // Call PostHandleFilters
 
+                /*
                 if (postHandleFilterItems.Count > 0)
                 {
                     var context = new PostHandleFilterContext
                     {
                         Actor = self,
-                        Request = request,
+                        Notification = request,
                         Response = response
                     };
                     foreach (var filterAccessor in postHandleFilterAccessors)
@@ -535,22 +532,18 @@ namespace Akka.Interfaced
                         }
                     }
                 }
-
-                if (onCompleted != null)
-                    onCompleted(response);
-
-                return response;
+                */
             };
         }
 
-        private static Type[,] GetInterfacePayloadTypeTable(Type interfaceType)
+        private static Type[] GetInterfacePayloadTypeTable(Type interfaceType)
         {
             var payloadTableType =
                 interfaceType.Assembly.GetTypes()
                              .Where(t =>
                              {
                                  var attr = t.GetCustomAttribute<PayloadTableAttribute>();
-                                 return (attr != null && attr.Type == interfaceType && attr.Kind == PayloadTableKind.Request);
+                                 return (attr != null && attr.Type == interfaceType && attr.Kind == PayloadTableKind.Notification);
                              })
                              .FirstOrDefault();
 
@@ -567,7 +560,7 @@ namespace Akka.Interfaced
                     string.Format("Cannot find {0}.GetPayloadTypes method", payloadTableType.FullName));
             }
 
-            var payloadTypes = (Type[,])queryMethodInfo.Invoke(null, new object[] { });
+            var payloadTypes = (Type[])queryMethodInfo.Invoke(null, new object[] { });
             if (payloadTypes == null || payloadTypes.GetLength(0) != interfaceType.GetMethods().Length)
             {
                 throw new InvalidOperationException(

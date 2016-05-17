@@ -42,10 +42,25 @@ namespace CodeGen
             Type type, CodeWriter.CodeWriter w,
             MethodInfo[] methods, Dictionary<MethodInfo, string> method2PayloadTypeNameMap)
         {
-            var className = Utility.GetPayloadTableClassName(type);
-
-            using (w.B($"public static class {className}"))
+            w._($"[PayloadTable(typeof({type.Name}), PayloadTableKind.Notification)]");
+            using (w.B($"public static class {Utility.GetPayloadTableClassName(type)}"))
             {
+                // generate GetPayloadTypes method
+
+                using (w.B("public static Type[] GetPayloadTypes()"))
+                {
+                    using (w.i("return new Type[] {", "};"))
+                    {
+                        foreach (var method in methods)
+                        {
+                            var typeName = method2PayloadTypeNameMap[method];
+                            w._($"typeof({typeName}),");
+                        }
+                    }
+                }
+
+                // generate payload classes for all methods
+
                 foreach (var method in methods)
                 {
                     var payloadTypeName = method2PayloadTypeNameMap[method];
@@ -55,8 +70,10 @@ namespace CodeGen
                         if (Options.UseProtobuf)
                             w._("[ProtoContract, TypeAlias]");
 
-                        using (w.B($"public class {payloadTypeName} : IInvokable"))
+                        using (w.B($"public class {payloadTypeName} : IInterfacedPayload, IInvokable"))
                         {
+                            // Parameters
+
                             var parameters = method.GetParameters();
                             for (var i = 0; i < parameters.Length; i++)
                             {
@@ -65,9 +82,15 @@ namespace CodeGen
                                 w._($"{attr}public {Utility.GetTypeName(parameter.ParameterType)} {parameter.Name};");
                             }
 
-                            var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
+                            // GetInterfaceType
+
+                            w._($"public Type GetInterfaceType() {{ return typeof({type.Name}); }}");
+
+                            // Invoke
+
                             using (w.B("public void Invoke(object __target)"))
                             {
+                                var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
                                 w._($"(({type.Name})__target).{method.Name}({parameterNames});");
                             }
                         }
@@ -114,14 +137,14 @@ namespace CodeGen
 
                 // Constructor (IActorRef)
 
-                using (w.B($"public {className}(IActorRef target, int observerId)",
+                using (w.B($"public {className}(IActorRef target, int observerId = 0)",
                            $": base(new ActorNotificationChannel(target), observerId)"))
                 {
                 }
 
                 // Constructor (INotificationChannel)
 
-                using (w.B($"public {className}(INotificationChannel channel, int observerId)",
+                using (w.B($"public {className}(INotificationChannel channel, int observerId = 0)",
                            $": base(channel, observerId)"))
                 {
                 }

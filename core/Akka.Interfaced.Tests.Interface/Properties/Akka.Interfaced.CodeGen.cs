@@ -16,7 +16,7 @@ using Akka.Actor;
 
 namespace Akka.Interfaced.Tests
 {
-    [PayloadTableForInterfacedActor(typeof(IBasic))]
+    [PayloadTable(typeof(IBasic), PayloadTableKind.Request)]
     public static class IBasic_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -234,7 +234,7 @@ namespace Akka.Interfaced.Tests
 
 namespace Akka.Interfaced.Tests
 {
-    [PayloadTableForInterfacedActor(typeof(IDummy))]
+    [PayloadTable(typeof(IDummy), PayloadTableKind.Request)]
     public static class IDummy_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -318,7 +318,7 @@ namespace Akka.Interfaced.Tests
 
 namespace Akka.Interfaced.Tests
 {
-    [PayloadTableForInterfacedActor(typeof(IOverloaded))]
+    [PayloadTable(typeof(IOverloaded), PayloadTableKind.Request)]
     public static class IOverloaded_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -481,7 +481,7 @@ namespace Akka.Interfaced.Tests
 
 namespace Akka.Interfaced.Tests
 {
-    [PayloadTableForInterfacedActor(typeof(ISubject))]
+    [PayloadTable(typeof(ISubject), PayloadTableKind.Request)]
     public static class ISubject_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -617,7 +617,7 @@ namespace Akka.Interfaced.Tests
 
 namespace Akka.Interfaced.Tests
 {
-    [PayloadTableForInterfacedActor(typeof(IWorker))]
+    [PayloadTable(typeof(IWorker), PayloadTableKind.Request)]
     public static class IWorker_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
@@ -723,11 +723,20 @@ namespace Akka.Interfaced.Tests
 
 namespace Akka.Interfaced.Tests
 {
+    [PayloadTable(typeof(ISubjectObserver), PayloadTableKind.Notification)]
     public static class ISubjectObserver_PayloadTable
     {
-        public class Event_Invoke : IInvokable
+        public static Type[] GetPayloadTypes()
+        {
+            return new Type[] {
+                typeof(Event_Invoke),
+            };
+        }
+
+        public class Event_Invoke : IInterfacedPayload, IInvokable
         {
             public System.String eventName;
+            public Type GetInterfaceType() { return typeof(ISubjectObserver); }
             public void Invoke(object __target)
             {
                 ((ISubjectObserver)__target).Event(eventName);
@@ -737,12 +746,12 @@ namespace Akka.Interfaced.Tests
 
     public class SubjectObserver : InterfacedObserver, ISubjectObserver
     {
-        public SubjectObserver(IActorRef target, int observerId)
+        public SubjectObserver(IActorRef target, int observerId = 0)
             : base(new ActorNotificationChannel(target), observerId)
         {
         }
 
-        public SubjectObserver(INotificationChannel channel, int observerId)
+        public SubjectObserver(INotificationChannel channel, int observerId = 0)
             : base(channel, observerId)
         {
         }

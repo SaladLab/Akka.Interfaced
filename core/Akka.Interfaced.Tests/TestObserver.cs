@@ -46,19 +46,107 @@ namespace Akka.Interfaced.Tests
         async Task<object> IDummy.Call(object param)
         {
             var self = Self; // keep Self safely
-            var id = IssueObserverId();
-            AddObserver(id, this);
-            await _subject.Subscribe(new SubjectObserver(self, id));
+            await _subject.Subscribe(new SubjectObserver(self));
             await _subject.MakeEvent("A");
-            await _subject.Unsubscribe(new SubjectObserver(self, id));
+            await _subject.Unsubscribe(new SubjectObserver(self));
             await _subject.MakeEvent("B");
-            RemoveObserver(1);
             return null;
         }
 
         void ISubjectObserver.Event(string eventName)
         {
             _eventLog.Add(eventName);
+        }
+    }
+
+    public class TestObserverExtendedActor : InterfacedActor<TestObserverExtendedActor>, IDummy, IExtendedInterface<ISubjectObserver>
+    {
+        private SubjectRef _subject;
+        private List<object> _eventLog;
+
+        public TestObserverExtendedActor(SubjectRef subject, List<object> eventLog)
+        {
+            _subject = subject.WithRequestWaiter(this);
+            _eventLog = eventLog;
+        }
+
+        [Reentrant]
+        async Task<object> IDummy.Call(object param)
+        {
+            var self = Self; // keep Self safely
+            await _subject.Subscribe(new SubjectObserver(self));
+            await _subject.MakeEvent("A");
+            await _subject.Unsubscribe(new SubjectObserver(self));
+            await _subject.MakeEvent("B");
+            return null;
+        }
+
+        [ExtendedHandler]
+        private void Event(string eventName)
+        {
+            _eventLog.Add(eventName);
+        }
+    }
+
+    public class TestObserverExtendedAsyncActor : InterfacedActor<TestObserverExtendedAsyncActor>, IDummy, IExtendedInterface<ISubjectObserver>
+    {
+        private SubjectRef _subject;
+        private List<object> _eventLog;
+
+        public TestObserverExtendedAsyncActor(SubjectRef subject, List<object> eventLog)
+        {
+            _subject = subject.WithRequestWaiter(this);
+            _eventLog = eventLog;
+        }
+
+        [Reentrant]
+        async Task<object> IDummy.Call(object param)
+        {
+            var self = Self; // keep Self safely
+            await _subject.Subscribe(new SubjectObserver(self));
+            await _subject.MakeEvent("A");
+            await _subject.MakeEvent("B");
+            await _subject.Unsubscribe(new SubjectObserver(self));
+            return null;
+        }
+
+        [ExtendedHandler]
+        private async Task Event(string eventName)
+        {
+            _eventLog.Add(eventName + ":1");
+            await Task.Delay(10);
+            _eventLog.Add(eventName + ":2");
+        }
+    }
+
+    public class TestObserverExtendedAsyncReentrantActor : InterfacedActor<TestObserverExtendedAsyncReentrantActor>, IDummy, IExtendedInterface<ISubjectObserver>
+    {
+        private SubjectRef _subject;
+        private List<object> _eventLog;
+
+        public TestObserverExtendedAsyncReentrantActor(SubjectRef subject, List<object> eventLog)
+        {
+            _subject = subject.WithRequestWaiter(this);
+            _eventLog = eventLog;
+        }
+
+        [Reentrant]
+        async Task<object> IDummy.Call(object param)
+        {
+            var self = Self; // keep Self safely
+            await _subject.Subscribe(new SubjectObserver(self));
+            await _subject.MakeEvent("A");
+            await _subject.MakeEvent("B");
+            await _subject.Unsubscribe(new SubjectObserver(self));
+            return null;
+        }
+
+        [ExtendedHandler, Reentrant]
+        private async Task Event(string eventName)
+        {
+            _eventLog.Add(eventName + ":1");
+            await Task.Delay(100);
+            _eventLog.Add(eventName + ":2");
         }
     }
 
@@ -70,13 +158,14 @@ namespace Akka.Interfaced.Tests
         }
 
         [Fact]
-        public async Task Test_BasicActor_ThrowException_NoThrow()
+        public async Task Test_BasicActor_ObserveSubject()
         {
             // Arrange
             var eventLog = new List<object>();
             var subjectActor = ActorOfAsTestActorRef<SubjectActor>("SubjectActor");
             var subject = new SubjectRef(subjectActor);
-            var observerActor = ActorOfAsTestActorRef<TestObserverActor>(Props.Create<TestObserverActor>(subject, eventLog), "TestObserverActor");
+            var observerActor = ActorOfAsTestActorRef<TestObserverActor>(
+                Props.Create<TestObserverActor>(subject, eventLog), "TestObserverActor");
             var observer = new DummyRef(observerActor);
 
             // Act
@@ -84,6 +173,61 @@ namespace Akka.Interfaced.Tests
 
             // Assert
             Assert.Equal(new List<object> { "A" }, eventLog);
+        }
+
+        [Fact]
+        public async Task Test_ExtendedActor_ObserveSubject()
+        {
+            // Arrange
+            var eventLog = new List<object>();
+            var subjectActor = ActorOfAsTestActorRef<SubjectActor>("SubjectActor");
+            var subject = new SubjectRef(subjectActor);
+            var observerActor = ActorOfAsTestActorRef<TestObserverExtendedActor>(
+                Props.Create<TestObserverExtendedActor>(subject, eventLog), "TestObserverExtendedActor");
+            var observer = new DummyRef(observerActor);
+
+            // Act
+            await observer.Call(null);
+
+            // Assert
+            Assert.Equal(new List<object> { "A" }, eventLog);
+        }
+
+        [Fact]
+        public async Task Test_ExtendedAsyncActor_ObserveSubject()
+        {
+            // Arrange
+            var eventLog = new List<object>();
+            var subjectActor = ActorOfAsTestActorRef<SubjectActor>("SubjectActor");
+            var subject = new SubjectRef(subjectActor);
+            var observerActor = ActorOfAsTestActorRef<TestObserverExtendedAsyncActor>(
+                Props.Create<TestObserverExtendedAsyncActor>(subject, eventLog), "TestObserverExtendedAsyncActor");
+            var observer = new DummyRef(observerActor);
+
+            // Act
+            await observer.Call(null);
+
+            // Assert
+            Assert.Equal(new List<object> { "A:1", "A:2", "B:1", "B:2" }, eventLog);
+        }
+
+        [Fact]
+        public async Task Test_ExtendedAsyncReentrantActor_ObserveSubject()
+        {
+            // Arrange
+            var eventLog = new List<object>();
+            var subjectActor = ActorOfAsTestActorRef<SubjectActor>("SubjectActor");
+            var subject = new SubjectRef(subjectActor);
+            var observerActor = ActorOfAsTestActorRef<TestObserverExtendedAsyncReentrantActor>(
+                Props.Create<TestObserverExtendedAsyncReentrantActor>(subject, eventLog), "TestObserverExtendedAsyncReentrantActor");
+            var observer = new DummyRef(observerActor);
+
+            // Act
+            await observer.Call(null);
+            await Task.Delay(200);
+
+            // Assert
+            Assert.Equal(new List<object> { "A:1", "B:1", "A:2", "B:2" }, eventLog);
         }
     }
 }

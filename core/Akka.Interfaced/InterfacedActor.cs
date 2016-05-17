@@ -11,8 +11,9 @@ namespace Akka.Interfaced
     {
         #region Static Variables
 
-        private readonly static RequestDispatcher<T> RequestDispatcher;
         private readonly static List<Func<object, IFilter>> PerInstanceFilterCreators;
+        private readonly static RequestDispatcher<T> RequestDispatcher;
+        private readonly static NotificationDispatcher<T> NotificationDispatcher;
         private readonly static MessageDispatcher<T> MessageDispatcher;
 
         static InterfacedActor()
@@ -20,7 +21,12 @@ namespace Akka.Interfaced
             var requestHandlerBuilder = new RequestHandlerBuilder<T>();
             requestHandlerBuilder.Build();
             RequestDispatcher = new RequestDispatcher<T>(requestHandlerBuilder.HandlerTable);
+
             PerInstanceFilterCreators = requestHandlerBuilder.PerInstanceFilterCreators;
+
+            var notificationHandlerBuilder = new NotificationHandlerBuilder<T>();
+            notificationHandlerBuilder.Build();
+            NotificationDispatcher = new NotificationDispatcher<T>(notificationHandlerBuilder.HandlerTable);
 
             MessageDispatcher = new MessageDispatcher<T>();
         }
@@ -152,6 +158,16 @@ namespace Akka.Interfaced
         {
             var sender = base.Sender;
 
+            if (request.InvokePayload == null)
+            {
+                sender.Tell(new ResponseMessage
+                {
+                    RequestId = request.RequestId,
+                    Exception = new InvalidMessageException("Empty payload")
+                });
+                return;
+            }
+
             var handlerItem = RequestDispatcher.GetHandler(request.InvokePayload.GetType());
             if (handlerItem == null)
             {
@@ -215,7 +231,43 @@ namespace Akka.Interfaced
 
         private void OnNotificationMessage(NotificationMessage notification)
         {
-            _observerMap?.Notify(notification);
+            if (notification.ObserverId == 0)
+            {
+                var handlerItem = NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
+
+                if (handlerItem.Handler != null)
+                {
+                    // sync handle
+
+                    handlerItem.Handler((T)this, notification);
+                }
+                else
+                {
+                    // async handle
+
+                    var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+                    if (handlerItem.IsReentrant)
+                    {
+                        _activeReentrantCount += 1;
+                    }
+                    else
+                    {
+                        BecomeStacked(OnReceiveInAtomicTask);
+                        _currentAtomicContext = context;
+                    }
+
+                    using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
+                    {
+                        handlerItem.AsyncHandler((T)this, notification)
+                                   .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
+                                                 TaskContinuationOptions.ExecuteSynchronously);
+                    }
+                }
+            }
+            else
+            {
+                _observerMap?.Notify(notification);
+            }
         }
 
         private void OnTaskRunMessage(TaskRunMessage taskRunMessage)

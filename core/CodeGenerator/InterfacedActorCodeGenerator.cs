@@ -45,11 +45,8 @@ namespace CodeGen
         {
             var tagName = Utility.GetActorInterfaceTagName(type);
 
-            var sb = new StringBuilder();
-            var className = Utility.GetPayloadTableClassName(type);
-
-            w._($"[PayloadTableForInterfacedActor(typeof({type.Name}))]");
-            using (w.B($"public static class {className}"))
+            w._($"[PayloadTable(typeof({type.Name}), PayloadTableKind.Request)]");
+            using (w.B($"public static class {Utility.GetPayloadTableClassName(type)}"))
             {
                 // generate GetPayloadTypes method
 
@@ -83,6 +80,7 @@ namespace CodeGen
                                $": IInterfacedPayload, {tagOverridable}IAsyncInvokable"))
                     {
                         // Parameters
+
                         var parameters = method.GetParameters();
                         for (var i = 0; i < parameters.Length; i++)
                         {
@@ -110,15 +108,12 @@ namespace CodeGen
 
                         // GetInterfaceType
 
-                        if (parameters.Length > 0)
-                            sb.AppendLine();
                         w._($"public Type GetInterfaceType() {{ return typeof({type.Name}); }}");
 
                         // SetTag
 
                         if (tagName != null)
                         {
-                            sb.AppendLine();
                             var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
                             if (tagParameter != null)
                             {
@@ -134,7 +129,6 @@ namespace CodeGen
 
                         // InvokeAsync
 
-                        sb.AppendLine();
                         if (Options.UseSlimClient)
                         {
                             using (w.B("public Task<IValueGetable> InvokeAsync(object __target)"))
