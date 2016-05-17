@@ -332,7 +332,7 @@ namespace Akka.Interfaced
 
                 var filterPerInstanceProvider = perInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
-                // Create perRequest filters
+                // Create PerRequest filters
 
                 IFilter[] filterPerRequests = null;
 
@@ -345,7 +345,7 @@ namespace Akka.Interfaced
                     }
                 }
 
-                // Call PreHandleFilters
+                // Call PreFilters
 
                 if (preFilterItems.Count > 0)
                 {
@@ -383,7 +383,7 @@ namespace Akka.Interfaced
                     }
                 }
 
-                // Call PostHandleFilters
+                // Call PostFilters
 
                 if (postFilterItems.Count > 0)
                 {
@@ -432,7 +432,7 @@ namespace Akka.Interfaced
 
                 var filterPerInstanceProvider = perInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
-                // Create perRequest filters
+                // Create PerRequest filters
 
                 IFilter[] filterPerRequests = null;
                 if (perNotificationFilterFactories.Length > 0)
@@ -444,7 +444,7 @@ namespace Akka.Interfaced
                     }
                 }
 
-                // Call PreHandleFilters
+                // Call PreFilters
 
                 if (preFilterItems.Count > 0)
                 {
@@ -486,7 +486,7 @@ namespace Akka.Interfaced
                     }
                 }
 
-                // Call PostHandleFilters
+                // Call PostFilters
 
                 if (postFilterItems.Count > 0)
                 {

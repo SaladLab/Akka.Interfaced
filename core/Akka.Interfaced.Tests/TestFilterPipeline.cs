@@ -137,7 +137,7 @@ namespace Akka.Interfaced.Tests
         }
 
         [Fact]
-        public async Task Test_PreHandleFilter_Normal()
+        public async Task Test_PreRequestFilter_Normal()
         {
             var actor = ActorOfAsTestActorRef<TestFilterPipelineActor>(Props.Create<TestFilterPipelineActor>(1));
             var a = new WorkerRef(actor);
@@ -157,7 +157,7 @@ namespace Akka.Interfaced.Tests
         }
 
         [Fact]
-        public async Task Test_PreHandleFilter_Intercept()
+        public async Task Test_PreRequestFilter_Intercept()
         {
             var actor = ActorOfAsTestActorRef<TestFilterPipelineActor>(Props.Create<TestFilterPipelineActor>(0));
             var a = new WorkerRef(actor);
