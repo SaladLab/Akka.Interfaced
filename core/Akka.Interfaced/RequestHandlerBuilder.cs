@@ -133,8 +133,21 @@ namespace Akka.Interfaced
                     MethodInfo targetMethod = null;
                     foreach (var method in targetMethods)
                     {
-                        if (method.Item1.Name == name && (method.Item2.Type == null || method.Item2.Type == ifs) &&
-                            AreParameterTypesEqual(method.Item1.GetParameters(), parameters))
+                        if (method.Item2.Type != null || method.Item2.Method != null)
+                        {
+                            // check tagged method
+                            if (method.Item2.Type != null && method.Item2.Type != ifs)
+                                continue;
+                            if (method.Item2.Method != null && method.Item2.Method != name)
+                                continue;
+                        }
+                        else if (method.Item1.Name != name)
+                        {
+                            // check method
+                            continue;
+                        }
+
+                        if (AreParameterTypesEqual(method.Item1.GetParameters(), parameters))
                         {
                             if (targetMethod != null)
                             {

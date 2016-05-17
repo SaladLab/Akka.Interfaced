@@ -1,0 +1,38 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Work out the path to ClientGenerator.exe -->
+  <Choose>
+    <!-- Using NuGet packages -->
+    <When Condition="Exists('$(MSBuildThisFileDirectory)..\tools')">
+      <PropertyGroup>
+        <AkkaInterfacedCodeVerifierToolExeDir>$(MSBuildThisFileDirectory)..\tools</AkkaInterfacedCodeVerifierToolExeDir>
+      </PropertyGroup>
+    </When>
+    <!-- Internal build within Akka.Interfaced solution -->
+    <When Condition="Exists('$(MSBuildThisFileDirectory)..\CodeVerifier')">
+      <PropertyGroup>
+        <AkkaInterfacedCodeVerifierToolExeDir>$(MSBuildThisFileDirectory)..\CodeVerifier\bin\$(ConfigurationName)</AkkaInterfacedCodeVerifierToolExeDir>
+      </PropertyGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="HasTrailingSlash('$(AkkaInterfacedCodeVerifierToolExeDir)')">
+      <PropertyGroup>
+        <AkkaInterfacedCodeVerifierToolExe>$(AkkaInterfacedCodeVerifierToolExeDir)CodeVerifier.exe</AkkaInterfacedCodeVerifierToolExe>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <AkkaInterfacedCodeVerifierToolExe>$(AkkaInterfacedCodeVerifierToolExeDir)\CodeVerifier.exe</AkkaInterfacedCodeVerifierToolExe>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <!-- Code Generation Task -->
+  <Target Name="AkkaInterfacedVerifying"
+          AfterTargets="PostBuildEvent">
+    <Message Text="[AkkaInterfacedVerifying] - Project=$(ProjectName)" Importance="high"/>
+    <Exec Command='"$(AkkaInterfacedCodeVerifierToolExe)" "$(TargetPath)"' />
+  </Target>
+
+</Project>

@@ -43,6 +43,11 @@ let solution =
                                   [ ("Akka.Interfaced-SlimClient", "")
                                     ("protobuf-net", "2.0.0.668")
                                     ("TypeAlias", "1.1.2") ] }
+          { // CodeVerifier
+            emptyProject with Name = "Akka.Interfaced.CodeVerifier"
+                              Folder = "./core/CodeVerifier"
+                              Template = true
+                              Dependencies = [ ] }
           { // Plugins
             emptyProject with Name = "Akka.Interfaced.LogFilter"
                               Folder = "./plugins/Akka.Interfaced.LogFilter"
