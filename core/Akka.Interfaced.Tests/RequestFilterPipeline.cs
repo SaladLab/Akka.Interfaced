@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 namespace Akka.Interfaced.Tests
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterAuthorizeAttribute : Attribute, IFilterPerClassFactory, IPreRequestFilter
+    public sealed class RequestFilterAuthorizeAttribute : Attribute, IFilterPerClassFactory, IPreRequestFilter
     {
         private Type _actorType;
 
@@ -26,9 +26,9 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} Authorize.OnPreRequest");
+            RequestFilterPipeline.LogBoard.Log($"{_actorType.Name} Authorize.OnPreRequest");
 
-            var actor = (TestFilterPipelineActor)context.Actor;
+            var actor = (RequestFilterPipelineActor)context.Actor;
             if (actor.Permission < 1)
             {
                 context.Response = new ResponseMessage
@@ -42,7 +42,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterFirstLogAttribute : Attribute, IFilterPerClassFactory, IPreRequestFilter, IPostRequestFilter
+    public sealed class RequestFilterFirstLogAttribute : Attribute, IFilterPerClassFactory, IPreRequestFilter, IPostRequestFilter
     {
         private Type _actorType;
 
@@ -60,17 +60,17 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPreRequest");
+            RequestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPostRequest");
+            RequestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPostRequest");
         }
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterLastLogAttribute : Attribute, IFilterPerClassFactory, IPreRequestFilter, IPostRequestFilter
+    public sealed class RequestFilterLastLogAttribute : Attribute, IFilterPerClassFactory, IPreRequestFilter, IPostRequestFilter
     {
         private Type _actorType;
 
@@ -88,21 +88,21 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPreRequest");
+            RequestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPostRequest");
+            RequestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPostRequest");
         }
     }
 
-    [TestFilterAuthorize, TestFilterFirstLog, TestFilterLastLog]
-    public class TestFilterPipelineActor : InterfacedActor<TestFilterPipelineActor>, IExtendedInterface<IWorker>
+    [RequestFilterAuthorize, RequestFilterFirstLog, RequestFilterLastLog]
+    public class RequestFilterPipelineActor : InterfacedActor<RequestFilterPipelineActor>, IExtendedInterface<IWorker>
     {
         public int Permission { get; }
 
-        public TestFilterPipelineActor(int permission)
+        public RequestFilterPipelineActor(int permission)
         {
             Permission = permission;
         }
@@ -110,7 +110,7 @@ namespace Akka.Interfaced.Tests
         [ExtendedHandler]
         private void Atomic(int id)
         {
-            TestFilterPipeline.LogBoard.Log($"TestFilterPipelineActor.Atomic {id}");
+            RequestFilterPipeline.LogBoard.Log($"RequestFilterPipelineActor.Atomic {id}");
             if (id == 0)
                 throw new ArgumentException("id");
         }
@@ -118,58 +118,58 @@ namespace Akka.Interfaced.Tests
         [ExtendedHandler, Reentrant]
         private async Task Reentrant(int id)
         {
-            TestFilterPipeline.LogBoard.Log($"TestFilterPipelineActor.Reentrant {id}");
+            RequestFilterPipeline.LogBoard.Log($"RequestFilterPipelineActor.Reentrant {id}");
             if (id == 0)
                 throw new ArgumentException("id");
 
             await Task.Yield();
-            TestFilterPipeline.LogBoard.Log($"TestFilterPipelineActor.Reentrant Done {id}");
+            RequestFilterPipeline.LogBoard.Log($"RequestFilterPipelineActor.Reentrant Done {id}");
         }
     }
 
-    public class TestFilterPipeline : Akka.TestKit.Xunit2.TestKit
+    public class RequestFilterPipeline : Akka.TestKit.Xunit2.TestKit
     {
         public static FilterLogBoard LogBoard = new FilterLogBoard();
 
-        public TestFilterPipeline(ITestOutputHelper output)
+        public RequestFilterPipeline(ITestOutputHelper output)
             : base(output: output)
         {
         }
 
         [Fact]
-        public async Task Test_PreRequestFilter_Normal()
+        public async Task PreRequestFilter_Normal()
         {
-            var actor = ActorOfAsTestActorRef<TestFilterPipelineActor>(Props.Create<TestFilterPipelineActor>(1));
+            var actor = ActorOfAsTestActorRef<RequestFilterPipelineActor>(Props.Create<RequestFilterPipelineActor>(1));
             var a = new WorkerRef(actor);
             await a.Atomic(1);
 
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPipelineActor FirstLog.OnPreRequest",
-                    "TestFilterPipelineActor Authorize.OnPreRequest",
-                    "TestFilterPipelineActor LastLog.OnPreRequest",
-                    "TestFilterPipelineActor.Atomic 1",
-                    "TestFilterPipelineActor LastLog.OnPostRequest",
-                    "TestFilterPipelineActor FirstLog.OnPostRequest",
+                    "RequestFilterPipelineActor FirstLog.OnPreRequest",
+                    "RequestFilterPipelineActor Authorize.OnPreRequest",
+                    "RequestFilterPipelineActor LastLog.OnPreRequest",
+                    "RequestFilterPipelineActor.Atomic 1",
+                    "RequestFilterPipelineActor LastLog.OnPostRequest",
+                    "RequestFilterPipelineActor FirstLog.OnPostRequest",
                 },
                 LogBoard.GetAndClearLogs());
         }
 
         [Fact]
-        public async Task Test_PreRequestFilter_Intercept()
+        public async Task PreRequestFilter_Intercept()
         {
-            var actor = ActorOfAsTestActorRef<TestFilterPipelineActor>(Props.Create<TestFilterPipelineActor>(0));
+            var actor = ActorOfAsTestActorRef<RequestFilterPipelineActor>(Props.Create<RequestFilterPipelineActor>(0));
             var a = new WorkerRef(actor);
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await a.Atomic(1));
 
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPipelineActor FirstLog.OnPreRequest",
-                    "TestFilterPipelineActor Authorize.OnPreRequest",
-                    "TestFilterPipelineActor LastLog.OnPostRequest",
-                    "TestFilterPipelineActor FirstLog.OnPostRequest",
+                    "RequestFilterPipelineActor FirstLog.OnPreRequest",
+                    "RequestFilterPipelineActor Authorize.OnPreRequest",
+                    "RequestFilterPipelineActor LastLog.OnPostRequest",
+                    "RequestFilterPipelineActor FirstLog.OnPostRequest",
                 },
                 LogBoard.GetAndClearLogs());
         }

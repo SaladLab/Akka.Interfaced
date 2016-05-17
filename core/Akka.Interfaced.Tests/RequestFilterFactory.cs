@@ -11,7 +11,7 @@ namespace Akka.Interfaced.Tests
     // FilterPerClass
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterPerClassAttribute : Attribute, IFilterPerClassFactory
+    public sealed class RequestFilterPerClassAttribute : Attribute, IFilterPerClassFactory
     {
         private Type _actorType;
 
@@ -22,15 +22,15 @@ namespace Akka.Interfaced.Tests
 
         IFilter IFilterPerClassFactory.CreateInstance()
         {
-            return new TestFilterPerClassFilter(_actorType.Name);
+            return new RequestFilterPerClassFilter(_actorType.Name);
         }
     }
 
-    public class TestFilterPerClassFilter : IPreRequestFilter, IPostRequestFilter
+    public class RequestFilterPerClassFilter : IPreRequestFilter, IPostRequestFilter
     {
         private readonly string _name;
 
-        public TestFilterPerClassFilter(string name)
+        public RequestFilterPerClassFilter(string name)
         {
             _name = name;
         }
@@ -39,18 +39,18 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
+            RequestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
+            RequestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
-    public class TestFilterPerClassActor : InterfacedActor<TestFilterPerClassActor>, IDummy
+    public class RequestFilterPerClassActor : InterfacedActor<RequestFilterPerClassActor>, IDummy
     {
-        [TestFilterPerClass]
+        [RequestFilterPerClass]
         Task<object> IDummy.Call(object param)
         {
             return Task.FromResult(param);
@@ -60,7 +60,7 @@ namespace Akka.Interfaced.Tests
     // FilterPerClassMethod
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterPerClassMethodAttribute : Attribute, IFilterPerClassMethodFactory
+    public sealed class RequestFilterPerClassMethodAttribute : Attribute, IFilterPerClassMethodFactory
     {
         private Type _actorType;
         private MethodInfo _method;
@@ -74,15 +74,15 @@ namespace Akka.Interfaced.Tests
         IFilter IFilterPerClassMethodFactory.CreateInstance()
         {
             var name = _actorType.Name + "." + _method.Name.Split('.').Last();
-            return new TestFilterPerClassMethodFilter(name);
+            return new RequestFilterPerClassMethodFilter(name);
         }
     }
 
-    public class TestFilterPerClassMethodFilter : IPreRequestFilter, IPostRequestFilter
+    public class RequestFilterPerClassMethodFilter : IPreRequestFilter, IPostRequestFilter
     {
         private readonly string _name;
 
-        public TestFilterPerClassMethodFilter(string name)
+        public RequestFilterPerClassMethodFilter(string name)
         {
             _name = name;
         }
@@ -91,18 +91,18 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
+            RequestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
+            RequestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
-    public class TestFilterPerClassMethodActor : InterfacedActor<TestFilterPerClassMethodActor>, IDummy
+    public class RequestFilterPerClassMethodActor : InterfacedActor<RequestFilterPerClassMethodActor>, IDummy
     {
-        [TestFilterPerClassMethod]
+        [RequestFilterPerClassMethod]
         Task<object> IDummy.Call(object param)
         {
             return Task.FromResult(param);
@@ -112,7 +112,7 @@ namespace Akka.Interfaced.Tests
     // FilterPerInstance
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterPerInstanceAttribute : Attribute, IFilterPerInstanceFactory
+    public sealed class RequestFilterPerInstanceAttribute : Attribute, IFilterPerInstanceFactory
     {
         private Type _actorType;
 
@@ -123,20 +123,20 @@ namespace Akka.Interfaced.Tests
 
         IFilter IFilterPerInstanceFactory.CreateInstance(object actor)
         {
-            return new TestFilterPerInstanceFilter(actor != null ? _actorType.Name : null);
+            return new RequestFilterPerInstanceFilter(actor != null ? _actorType.Name : null);
         }
     }
 
-    public class TestFilterPerInstanceFilter : IPreRequestFilter, IPostRequestFilter
+    public class RequestFilterPerInstanceFilter : IPreRequestFilter, IPostRequestFilter
     {
         private string _name;
 
-        public TestFilterPerInstanceFilter(string name)
+        public RequestFilterPerInstanceFilter(string name)
         {
             if (name != null)
             {
                 _name = name;
-                TestFilterFactory.LogBoard.Log($"{_name}.Constructor");
+                RequestFilterFactory.LogBoard.Log($"{_name}.Constructor");
             }
         }
 
@@ -144,17 +144,17 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
+            RequestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
+            RequestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
-    [TestFilterPerInstance]
-    public class TestFilterPerInstanceActor : InterfacedActor<TestFilterPerInstanceActor>, IWorker
+    [RequestFilterPerInstance]
+    public class RequestFilterPerInstanceActor : InterfacedActor<RequestFilterPerInstanceActor>, IWorker
     {
         Task IWorker.Atomic(int id)
         {
@@ -170,7 +170,7 @@ namespace Akka.Interfaced.Tests
     // FilterPerInstanceMethod
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterPerInstanceMethodAttribute : Attribute, IFilterPerInstanceMethodFactory
+    public sealed class RequestFilterPerInstanceMethodAttribute : Attribute, IFilterPerInstanceMethodFactory
     {
         private Type _actorType;
         private MethodInfo _method;
@@ -184,20 +184,20 @@ namespace Akka.Interfaced.Tests
         IFilter IFilterPerInstanceMethodFactory.CreateInstance(object actor)
         {
             var name = _actorType.Name + "." + _method.Name.Split('.').Last();
-            return new TestFilterPerInstanceMethodFilter(actor != null ? name : null);
+            return new RequestFilterPerInstanceMethodFilter(actor != null ? name : null);
         }
     }
 
-    public class TestFilterPerInstanceMethodFilter : IPreRequestFilter, IPostRequestFilter
+    public class RequestFilterPerInstanceMethodFilter : IPreRequestFilter, IPostRequestFilter
     {
         private string _name;
 
-        public TestFilterPerInstanceMethodFilter(string name)
+        public RequestFilterPerInstanceMethodFilter(string name)
         {
             if (name != null)
             {
                 _name = name;
-                TestFilterFactory.LogBoard.Log($"{_name}.Constructor");
+                RequestFilterFactory.LogBoard.Log($"{_name}.Constructor");
             }
         }
 
@@ -205,17 +205,17 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
+            RequestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
+            RequestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
-    [TestFilterPerInstanceMethod]
-    public class TestFilterPerInstanceMethodActor : InterfacedActor<TestFilterPerInstanceMethodActor>, IWorker
+    [RequestFilterPerInstanceMethod]
+    public class RequestFilterPerInstanceMethodActor : InterfacedActor<RequestFilterPerInstanceMethodActor>, IWorker
     {
         Task IWorker.Atomic(int id)
         {
@@ -231,7 +231,7 @@ namespace Akka.Interfaced.Tests
     // FilterPerRequest
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterPerRequestAttribute : Attribute, IFilterPerRequestFactory
+    public sealed class RequestFilterPerRequestAttribute : Attribute, IFilterPerRequestFactory
     {
         private Type _actorType;
         private MethodInfo _method;
@@ -245,20 +245,20 @@ namespace Akka.Interfaced.Tests
         IFilter IFilterPerRequestFactory.CreateInstance(object actor, RequestMessage request)
         {
             var name = _actorType.Name + "." + _method.Name.Split('.').Last();
-            return new TestFilterPerRequestFilter(actor != null ? name : null);
+            return new RequestFilterPerRequestFilter(actor != null ? name : null);
         }
     }
 
-    public class TestFilterPerRequestFilter : IPreRequestFilter, IPostRequestFilter
+    public class RequestFilterPerRequestFilter : IPreRequestFilter, IPostRequestFilter
     {
         private string _name;
 
-        public TestFilterPerRequestFilter(string name)
+        public RequestFilterPerRequestFilter(string name)
         {
             if (name != null)
             {
                 _name = name;
-                TestFilterFactory.LogBoard.Log($"{_name}.Constructor");
+                RequestFilterFactory.LogBoard.Log($"{_name}.Constructor");
             }
         }
 
@@ -266,17 +266,17 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
+            RequestFilterFactory.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
+            RequestFilterFactory.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
-    [TestFilterPerRequest]
-    public class TestFilterPerRequestActor : InterfacedActor<TestFilterPerRequestActor>, IWorker
+    [RequestFilterPerRequest]
+    public class RequestFilterPerRequestActor : InterfacedActor<RequestFilterPerRequestActor>, IWorker
     {
         Task IWorker.Atomic(int id)
         {
@@ -289,51 +289,51 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestFilterFactory : Akka.TestKit.Xunit2.TestKit
+    public class RequestFilterFactory : Akka.TestKit.Xunit2.TestKit
     {
         public static FilterLogBoard LogBoard = new FilterLogBoard();
 
-        public TestFilterFactory(ITestOutputHelper output)
+        public RequestFilterFactory(ITestOutputHelper output)
             : base(output: output)
         {
         }
 
         [Fact]
-        public async Task Test_FilterPerClass_Work()
+        public async Task FilterPerClass_Work()
         {
-            var actor = ActorOfAsTestActorRef<TestFilterPerClassActor>();
+            var actor = ActorOfAsTestActorRef<RequestFilterPerClassActor>();
             var a = new DummyRef(actor);
             await a.Call(null);
 
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPerClassActor.OnPreRequest",
-                    "TestFilterPerClassActor.OnPostRequest"
+                    "RequestFilterPerClassActor.OnPreRequest",
+                    "RequestFilterPerClassActor.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }
 
         [Fact]
-        public async Task Test_FilterPerClassMethod_Work()
+        public async Task FilterPerClassMethod_Work()
         {
-            var actor = ActorOfAsTestActorRef<TestFilterPerClassMethodActor>();
+            var actor = ActorOfAsTestActorRef<RequestFilterPerClassMethodActor>();
             var a = new DummyRef(actor);
             await a.Call(null);
 
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPerClassMethodActor.Call.OnPreRequest",
-                    "TestFilterPerClassMethodActor.Call.OnPostRequest"
+                    "RequestFilterPerClassMethodActor.Call.OnPreRequest",
+                    "RequestFilterPerClassMethodActor.Call.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }
 
         [Fact]
-        public async Task Test_FilterPerInstance_Work()
+        public async Task FilterPerInstance_Work()
         {
-            var actor = ActorOfAsTestActorRef<TestFilterPerInstanceActor>();
+            var actor = ActorOfAsTestActorRef<RequestFilterPerInstanceActor>();
             var a = new WorkerRef(actor);
             await a.Atomic(1);
             await a.Reentrant(2);
@@ -341,19 +341,19 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPerInstanceActor.Constructor",
-                    "TestFilterPerInstanceActor.OnPreRequest",
-                    "TestFilterPerInstanceActor.OnPostRequest",
-                    "TestFilterPerInstanceActor.OnPreRequest",
-                    "TestFilterPerInstanceActor.OnPostRequest"
+                    "RequestFilterPerInstanceActor.Constructor",
+                    "RequestFilterPerInstanceActor.OnPreRequest",
+                    "RequestFilterPerInstanceActor.OnPostRequest",
+                    "RequestFilterPerInstanceActor.OnPreRequest",
+                    "RequestFilterPerInstanceActor.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }
 
         [Fact]
-        public async Task Test_FilterPerInstanceMethod_Work()
+        public async Task FilterPerInstanceMethod_Work()
         {
-            var actor = ActorOfAsTestActorRef<TestFilterPerInstanceMethodActor>();
+            var actor = ActorOfAsTestActorRef<RequestFilterPerInstanceMethodActor>();
             var a = new WorkerRef(actor);
             await a.Atomic(1);
             await a.Atomic(2);
@@ -362,22 +362,22 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPerInstanceMethodActor.Atomic.Constructor",
-                    "TestFilterPerInstanceMethodActor.Reentrant.Constructor",
-                    "TestFilterPerInstanceMethodActor.Atomic.OnPreRequest",
-                    "TestFilterPerInstanceMethodActor.Atomic.OnPostRequest",
-                    "TestFilterPerInstanceMethodActor.Atomic.OnPreRequest",
-                    "TestFilterPerInstanceMethodActor.Atomic.OnPostRequest",
-                    "TestFilterPerInstanceMethodActor.Reentrant.OnPreRequest",
-                    "TestFilterPerInstanceMethodActor.Reentrant.OnPostRequest"
+                    "RequestFilterPerInstanceMethodActor.Atomic.Constructor",
+                    "RequestFilterPerInstanceMethodActor.Reentrant.Constructor",
+                    "RequestFilterPerInstanceMethodActor.Atomic.OnPreRequest",
+                    "RequestFilterPerInstanceMethodActor.Atomic.OnPostRequest",
+                    "RequestFilterPerInstanceMethodActor.Atomic.OnPreRequest",
+                    "RequestFilterPerInstanceMethodActor.Atomic.OnPostRequest",
+                    "RequestFilterPerInstanceMethodActor.Reentrant.OnPreRequest",
+                    "RequestFilterPerInstanceMethodActor.Reentrant.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }
 
         [Fact]
-        public async Task Test_FilterPerRequest_Work()
+        public async Task FilterPerRequest_Work()
         {
-            var actor = ActorOfAsTestActorRef<TestFilterPerRequestActor>();
+            var actor = ActorOfAsTestActorRef<RequestFilterPerRequestActor>();
             var a = new WorkerRef(actor);
             await a.Atomic(1);
             await a.Atomic(2);
@@ -386,15 +386,15 @@ namespace Akka.Interfaced.Tests
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterPerRequestActor.Atomic.Constructor",
-                    "TestFilterPerRequestActor.Atomic.OnPreRequest",
-                    "TestFilterPerRequestActor.Atomic.OnPostRequest",
-                    "TestFilterPerRequestActor.Atomic.Constructor",
-                    "TestFilterPerRequestActor.Atomic.OnPreRequest",
-                    "TestFilterPerRequestActor.Atomic.OnPostRequest",
-                    "TestFilterPerRequestActor.Reentrant.Constructor",
-                    "TestFilterPerRequestActor.Reentrant.OnPreRequest",
-                    "TestFilterPerRequestActor.Reentrant.OnPostRequest"
+                    "RequestFilterPerRequestActor.Atomic.Constructor",
+                    "RequestFilterPerRequestActor.Atomic.OnPreRequest",
+                    "RequestFilterPerRequestActor.Atomic.OnPostRequest",
+                    "RequestFilterPerRequestActor.Atomic.Constructor",
+                    "RequestFilterPerRequestActor.Atomic.OnPreRequest",
+                    "RequestFilterPerRequestActor.Atomic.OnPostRequest",
+                    "RequestFilterPerRequestActor.Reentrant.Constructor",
+                    "RequestFilterPerRequestActor.Reentrant.OnPreRequest",
+                    "RequestFilterPerRequestActor.Reentrant.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }

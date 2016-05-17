@@ -9,7 +9,7 @@ namespace Akka.Interfaced.Tests
     // FilterFirst
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterFirstAttribute : Attribute, IFilterPerClassFactory
+    public sealed class RequestFilterFirstAttribute : Attribute, IFilterPerClassFactory
     {
         private Type _actorType;
 
@@ -20,15 +20,15 @@ namespace Akka.Interfaced.Tests
 
         IFilter IFilterPerClassFactory.CreateInstance()
         {
-            return new TestFilterFirstFilter(_actorType.Name + "_1");
+            return new RequestFilterFirstFilter(_actorType.Name + "_1");
         }
     }
 
-    public class TestFilterFirstFilter : IPreRequestFilter, IPostRequestFilter
+    public class RequestFilterFirstFilter : IPreRequestFilter, IPostRequestFilter
     {
         private readonly string _name;
 
-        public TestFilterFirstFilter(string name)
+        public RequestFilterFirstFilter(string name)
         {
             _name = name;
         }
@@ -37,19 +37,19 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterOrder.LogBoard.Log($"{_name}.OnPreRequest");
+            RequestFilterOrder.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterOrder.LogBoard.Log($"{_name}.OnPostRequest");
+            RequestFilterOrder.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
     // FilterSecond
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class TestFilterSecondAttribute : Attribute, IFilterPerClassFactory
+    public sealed class RequestFilterSecondAttribute : Attribute, IFilterPerClassFactory
     {
         private Type _actorType;
 
@@ -60,15 +60,15 @@ namespace Akka.Interfaced.Tests
 
         IFilter IFilterPerClassFactory.CreateInstance()
         {
-            return new TestFilterSecondFilter(_actorType.Name + "_2");
+            return new RequestFilterSecondFilter(_actorType.Name + "_2");
         }
     }
 
-    public class TestFilterSecondFilter : IPreRequestFilter, IPostRequestFilter
+    public class RequestFilterSecondFilter : IPreRequestFilter, IPostRequestFilter
     {
         private readonly string _name;
 
-        public TestFilterSecondFilter(string name)
+        public RequestFilterSecondFilter(string name)
         {
             _name = name;
         }
@@ -77,47 +77,47 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            TestFilterOrder.LogBoard.Log($"{_name}.OnPreRequest");
+            RequestFilterOrder.LogBoard.Log($"{_name}.OnPreRequest");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            TestFilterOrder.LogBoard.Log($"{_name}.OnPostRequest");
+            RequestFilterOrder.LogBoard.Log($"{_name}.OnPostRequest");
         }
     }
 
-    public class TestFilterOrderActor : InterfacedActor<TestFilterOrderActor>, IDummy
+    public class RequestFilterOrderActor : InterfacedActor<RequestFilterOrderActor>, IDummy
     {
-        [TestFilterFirst, TestFilterSecond]
+        [RequestFilterFirst, RequestFilterSecond]
         Task<object> IDummy.Call(object param)
         {
             return Task.FromResult(param);
         }
     }
 
-    public class TestFilterOrder : Akka.TestKit.Xunit2.TestKit
+    public class RequestFilterOrder : Akka.TestKit.Xunit2.TestKit
     {
         public static FilterLogBoard LogBoard = new FilterLogBoard();
 
-        public TestFilterOrder(ITestOutputHelper output)
+        public RequestFilterOrder(ITestOutputHelper output)
             : base(output: output)
         {
         }
 
         [Fact]
-        public async Task Test_FilterOrder_Work()
+        public async Task FilterOrder_Work()
         {
-            var actor = ActorOfAsTestActorRef<TestFilterOrderActor>();
+            var actor = ActorOfAsTestActorRef<RequestFilterOrderActor>();
             var a = new DummyRef(actor);
             await a.Call(null);
 
             Assert.Equal(
                 new List<string>
                 {
-                    "TestFilterOrderActor_1.OnPreRequest",
-                    "TestFilterOrderActor_2.OnPreRequest",
-                    "TestFilterOrderActor_2.OnPostRequest",
-                    "TestFilterOrderActor_1.OnPostRequest"
+                    "RequestFilterOrderActor_1.OnPreRequest",
+                    "RequestFilterOrderActor_2.OnPreRequest",
+                    "RequestFilterOrderActor_2.OnPostRequest",
+                    "RequestFilterOrderActor_1.OnPostRequest"
                 },
                 LogBoard.GetAndClearLogs());
         }
