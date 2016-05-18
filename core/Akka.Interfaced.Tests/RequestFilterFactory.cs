@@ -307,7 +307,7 @@ namespace Akka.Interfaced.Tests
             await a.Call(null);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "RequestFilterPerClassActor.OnPreRequest",
                     "RequestFilterPerClassActor.OnPostRequest"
@@ -323,7 +323,7 @@ namespace Akka.Interfaced.Tests
             await a.Call(null);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "RequestFilterPerClassMethodActor.Call.OnPreRequest",
                     "RequestFilterPerClassMethodActor.Call.OnPostRequest"
@@ -340,7 +340,7 @@ namespace Akka.Interfaced.Tests
             await a.Reentrant(2);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "RequestFilterPerInstanceActor.Constructor",
                     "RequestFilterPerInstanceActor.OnPreRequest",
@@ -361,7 +361,7 @@ namespace Akka.Interfaced.Tests
             await a.Reentrant(3);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "RequestFilterPerInstanceMethodActor.Atomic.Constructor",
                     "RequestFilterPerInstanceMethodActor.Reentrant.Constructor",
@@ -385,7 +385,7 @@ namespace Akka.Interfaced.Tests
             await a.Reentrant(3);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "RequestFilterPerRequestActor.Atomic.Constructor",
                     "RequestFilterPerRequestActor.Atomic.OnPreRequest",

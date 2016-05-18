@@ -70,4 +70,46 @@ namespace Akka.Interfaced
             };
         }
     }
+
+    // Convert
+    //    void T.Method(object)
+    // -> MessageAsyncHandler<T>
+    internal static class MessageHandlerSyncToAsyncBuilder
+    {
+        private static readonly MethodInfo _buildHelperMethodInfo =
+            typeof(MessageHandlerSyncToAsyncBuilder).GetMethod(
+                "BuildHelper", BindingFlags.Static | BindingFlags.NonPublic);
+
+        public static MessageAsyncHandler<T> Build<T>(MethodInfo method)
+            where T : class
+        {
+            var constructedHelper = _buildHelperMethodInfo.MakeGenericMethod(
+                typeof(T), method.GetParameters()[0].ParameterType);
+
+            var ret = constructedHelper.Invoke(null, new object[] { method });
+            return (MessageAsyncHandler<T>)ret;
+        }
+
+        private static MessageAsyncHandler<TTarget> BuildHelper<TTarget, TParam>(MethodInfo method)
+            where TTarget : class
+        {
+            var func = (Action<TTarget, TParam>)Delegate.CreateDelegate(
+                typeof(Action<TTarget, TParam>), method);
+
+            return (target, param) =>
+            {
+                try
+                {
+                    func(target, (TParam)param);
+                    return Task.FromResult(true);
+                }
+                catch (Exception e)
+                {
+                    var tcs = new TaskCompletionSource<bool>();
+                    tcs.SetException(e);
+                    return tcs.Task;
+                }
+            };
+        }
+    }
 }

@@ -376,7 +376,7 @@ namespace Akka.Interfaced.Tests
             await subject.MakeEvent2("B");
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "NotificationFilterPerInstanceMethodActor.Event.Constructor",
                     "NotificationFilterPerInstanceMethodActor.Event2.Constructor",
@@ -398,7 +398,7 @@ namespace Akka.Interfaced.Tests
             await subject.MakeEvent("B");
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "NotificationFilterPerNotificationActor.Event.Constructor",
                     "NotificationFilterPerNotificationActor.Event.OnPreNotification",

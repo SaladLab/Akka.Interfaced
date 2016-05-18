@@ -182,8 +182,6 @@ namespace Akka.Interfaced
 
             return delegate(T self, NotificationMessage notification)
             {
-                ResponseMessage response = null;
-
                 var filterPerInstanceProvider = filterChain.PerInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
                 // Create PerRequest filters
@@ -225,17 +223,14 @@ namespace Akka.Interfaced
 
                 // Call Handler
 
-                if (response == null)
+                try
                 {
-                    try
-                    {
-                        handler(self, notification.InvokePayload);
-                    }
-                    catch (Exception e)
-                    {
-                        // TODO: Exception Handling
-                        Console.WriteLine(e);
-                    }
+                    handler(self, notification.InvokePayload);
+                }
+                catch (Exception e)
+                {
+                    // TODO: Exception Handling
+                    Console.WriteLine(e);
                 }
 
                 // Call PostFilters
@@ -275,8 +270,6 @@ namespace Akka.Interfaced
             // TODO: Optimize this function when without async filter
             return async delegate(T self, NotificationMessage notification)
             {
-                ResponseMessage response = null;
-
                 var filterPerInstanceProvider = filterChain.PerInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
                 // Create PerRequest filters
@@ -321,17 +314,14 @@ namespace Akka.Interfaced
 
                 // Call Handler
 
-                if (response == null)
+                try
                 {
-                    try
-                    {
-                        await handler(self, notification.InvokePayload);
-                    }
-                    catch (Exception e)
-                    {
-                        // TODO: Exception Handling
-                        Console.WriteLine(e);
-                    }
+                    await handler(self, notification.InvokePayload);
+                }
+                catch (Exception e)
+                {
+                    // TODO: Exception Handling
+                    Console.WriteLine(e);
                 }
 
                 // Call PostFilters

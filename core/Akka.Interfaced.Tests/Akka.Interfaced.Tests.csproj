@@ -83,6 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FilterLogBoard.cs" />
+    <Compile Include="MessageFilterAsync.cs" />
+    <Compile Include="MessageFilterFactory.cs" />
+    <Compile Include="MessageFilterOrder.cs" />
     <Compile Include="NotificationFilterAsync.cs" />
     <Compile Include="NotificationFilterFactory.cs" />
     <Compile Include="NotificationFilterOrder.cs" />

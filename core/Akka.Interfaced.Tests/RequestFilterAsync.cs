@@ -74,7 +74,7 @@ namespace Akka.Interfaced.Tests
             await a.Atomic(1);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "RequestFilterAsyncActor Async.OnPreRequestAsync",
                     "RequestFilterAsyncActor Async.OnPreRequestAsync Done",
@@ -93,7 +93,7 @@ namespace Akka.Interfaced.Tests
             await a.Reentrant(1);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "RequestFilterAsyncActor Async.OnPreRequestAsync",
                     "RequestFilterAsyncActor Async.OnPreRequestAsync Done",

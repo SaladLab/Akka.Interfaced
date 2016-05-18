@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace Akka.Interfaced
 {
@@ -52,6 +50,7 @@ namespace Akka.Interfaced
         public FilterAccessor[] PreFilterAccessors;
         public FilterAccessor[] PostFilterAccessors;
         public IFilterPerInvokeFactory[] PerInvokeFilterFactories;
+        public bool Empty;
         public bool AsyncFilterExists;
         public bool PerInstanceFilterExists;
     }
@@ -87,8 +86,9 @@ namespace Akka.Interfaced
                 PostFilterAccessors = filterItems.Where(f => f.IsPostFilter).Select(f => f.Accessor).Reverse().ToArray(),
                 PerInvokeFilterFactories = filterItems.Where(f => f.IsPerInvoke).GroupBy(f => f.PerInvokeIndex)
                                                       .OrderBy(g => g.Key).Select(g => (IFilterPerInvokeFactory)g.Last().Factory).ToArray(),
+                Empty = filterItems.Any() == false,
+                AsyncFilterExists = filterItems.Any(f => f.IsAsync),
                 PerInstanceFilterExists = filterItems.Any(f => f.IsPerInstance),
-                AsyncFilterExists = filterItems.Any(f => f.IsAsync)
             };
         }
 

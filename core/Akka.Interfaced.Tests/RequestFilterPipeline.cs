@@ -144,7 +144,7 @@ namespace Akka.Interfaced.Tests
             await a.Atomic(1);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "RequestFilterPipelineActor FirstLog.OnPreRequest",
                     "RequestFilterPipelineActor Authorize.OnPreRequest",
@@ -164,7 +164,7 @@ namespace Akka.Interfaced.Tests
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await a.Atomic(1));
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "RequestFilterPipelineActor FirstLog.OnPreRequest",
                     "RequestFilterPipelineActor Authorize.OnPreRequest",

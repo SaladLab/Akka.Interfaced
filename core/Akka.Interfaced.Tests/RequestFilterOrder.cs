@@ -112,7 +112,7 @@ namespace Akka.Interfaced.Tests
             await a.Call(null);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "RequestFilterOrderActor_1.OnPreRequest",
                     "RequestFilterOrderActor_2.OnPreRequest",

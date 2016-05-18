@@ -8,10 +8,9 @@ namespace Akka.Interfaced
     {
         private readonly Dictionary<Type, MessageHandlerItem<T>> _handlerTable;
 
-        public MessageDispatcher()
+        public MessageDispatcher(Dictionary<Type, MessageHandlerItem<T>> handlerTable)
         {
-            var builder = new MessageHandlerBuilder<T>();
-            _handlerTable = builder.BuildTable();
+            _handlerTable = handlerTable;
         }
 
         public MessageHandlerItem<T> GetHandler(Type type)

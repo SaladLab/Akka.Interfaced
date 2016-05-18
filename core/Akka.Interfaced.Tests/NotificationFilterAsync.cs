@@ -86,7 +86,7 @@ namespace Akka.Interfaced.Tests
             await subject.Actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "NotificationFilterAsyncActor Async.OnPreNotificationAsync",
                     "NotificationFilterAsyncActor Async.OnPreNotificationAsync Done",
@@ -105,7 +105,7 @@ namespace Akka.Interfaced.Tests
             await subject.Actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "NotificationFilterAsyncActor Async.OnPreNotificationAsync",
                     "NotificationFilterAsyncActor Async.OnPreNotificationAsync Done",

@@ -26,7 +26,8 @@ namespace Akka.Interfaced
             var notificationHandlerBuilder = new NotificationHandlerBuilder<T>();
             NotificationDispatcher = new NotificationDispatcher<T>(notificationHandlerBuilder.Build(filterHandlerBuilder));
 
-            MessageDispatcher = new MessageDispatcher<T>();
+            var messageHandlerBuilder = new MessageHandlerBuilder<T>();
+            MessageDispatcher = new MessageDispatcher<T>(messageHandlerBuilder.Build(filterHandlerBuilder));
 
             PerInstanceFilterCreators = filterHandlerBuilder.PerInstanceFilterCreators;
         }
