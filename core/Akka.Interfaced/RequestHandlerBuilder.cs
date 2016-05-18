@@ -51,11 +51,11 @@ namespace Akka.Interfaced
         public Dictionary<Type, RequestHandlerItem<T>> HandlerTable => _table;
         public List<Func<object, IFilter>> PerInstanceFilterCreators => _perInstanceFilterCreators;
 
-        public void Build()
+        public void Build(List<Func<object, IFilter>> perInstanceFilterCreators)
         {
             _table = new Dictionary<Type, RequestHandlerItem<T>>();
             _perClassFilterItemTable = new Dictionary<Type, FilterItem>();
-            _perInstanceFilterCreators = new List<Func<object, IFilter>>();
+            _perInstanceFilterCreators = perInstanceFilterCreators;
 
             BuildRegularInterfaceHandler();
             BuildExtendedInterfaceHandler();

@@ -613,6 +613,172 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
+#region Akka.Interfaced.Tests.ISubject2
+
+namespace Akka.Interfaced.Tests
+{
+    [PayloadTable(typeof(ISubject2), PayloadTableKind.Request)]
+    public static class ISubject2_PayloadTable
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(MakeEvent_Invoke), null },
+                { typeof(MakeEvent2_Invoke), null },
+                { typeof(Subscribe_Invoke), null },
+                { typeof(Unsubscribe_Invoke), null },
+            };
+        }
+
+        public class MakeEvent_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.String eventName;
+            public Type GetInterfaceType() { return typeof(ISubject2); }
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject2)__target).MakeEvent(eventName);
+                return null;
+            }
+        }
+
+        public class MakeEvent2_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.String eventName;
+            public Type GetInterfaceType() { return typeof(ISubject2); }
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject2)__target).MakeEvent2(eventName);
+                return null;
+            }
+        }
+
+        public class Subscribe_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public Akka.Interfaced.Tests.Subject2Observer observer;
+            public Type GetInterfaceType() { return typeof(ISubject2); }
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject2)__target).Subscribe(observer);
+                return null;
+            }
+        }
+
+        public class Unsubscribe_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public Akka.Interfaced.Tests.Subject2Observer observer;
+            public Type GetInterfaceType() { return typeof(ISubject2); }
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject2)__target).Unsubscribe(observer);
+                return null;
+            }
+        }
+    }
+
+    public interface ISubject2_NoReply
+    {
+        void MakeEvent(System.String eventName);
+        void MakeEvent2(System.String eventName);
+        void Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer);
+        void Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer);
+    }
+
+    public class Subject2Ref : InterfacedActorRef, ISubject2, ISubject2_NoReply
+    {
+        public Subject2Ref(IActorRef actor) : base(actor)
+        {
+        }
+
+        public Subject2Ref(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        {
+        }
+
+        public ISubject2_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public Subject2Ref WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new Subject2Ref(Actor, requestWaiter, Timeout);
+        }
+
+        public Subject2Ref WithTimeout(TimeSpan? timeout)
+        {
+            return new Subject2Ref(Actor, RequestWaiter, timeout);
+        }
+
+        public Task MakeEvent(System.String eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject2_PayloadTable.MakeEvent_Invoke { eventName = eventName }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task MakeEvent2(System.String eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject2_PayloadTable.MakeEvent2_Invoke { eventName = eventName }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = (Akka.Interfaced.Tests.Subject2Observer)observer }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = (Akka.Interfaced.Tests.Subject2Observer)observer }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        void ISubject2_NoReply.MakeEvent(System.String eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject2_PayloadTable.MakeEvent_Invoke { eventName = eventName }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubject2_NoReply.MakeEvent2(System.String eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject2_PayloadTable.MakeEvent2_Invoke { eventName = eventName }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubject2_NoReply.Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = (Akka.Interfaced.Tests.Subject2Observer)observer }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubject2_NoReply.Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = (Akka.Interfaced.Tests.Subject2Observer)observer }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+}
+
+#endregion
 #region Akka.Interfaced.Tests.IWorker
 
 namespace Akka.Interfaced.Tests
@@ -714,6 +880,69 @@ namespace Akka.Interfaced.Tests
                 InvokePayload = new IWorker_PayloadTable.Reentrant_Invoke { id = id }
             };
             SendRequest(requestMessage);
+        }
+    }
+}
+
+#endregion
+#region Akka.Interfaced.Tests.ISubject2Observer
+
+namespace Akka.Interfaced.Tests
+{
+    [PayloadTable(typeof(ISubject2Observer), PayloadTableKind.Notification)]
+    public static class ISubject2Observer_PayloadTable
+    {
+        public static Type[] GetPayloadTypes()
+        {
+            return new Type[] {
+                typeof(Event_Invoke),
+                typeof(Event2_Invoke),
+            };
+        }
+
+        public class Event_Invoke : IInterfacedPayload, IInvokable
+        {
+            public System.String eventName;
+            public Type GetInterfaceType() { return typeof(ISubject2Observer); }
+            public void Invoke(object __target)
+            {
+                ((ISubject2Observer)__target).Event(eventName);
+            }
+        }
+
+        public class Event2_Invoke : IInterfacedPayload, IInvokable
+        {
+            public System.String eventName;
+            public Type GetInterfaceType() { return typeof(ISubject2Observer); }
+            public void Invoke(object __target)
+            {
+                ((ISubject2Observer)__target).Event2(eventName);
+            }
+        }
+    }
+
+    public class Subject2Observer : InterfacedObserver, ISubject2Observer
+    {
+        public Subject2Observer(IActorRef target, int observerId = 0)
+            : base(new ActorNotificationChannel(target), observerId)
+        {
+        }
+
+        public Subject2Observer(INotificationChannel channel, int observerId = 0)
+            : base(channel, observerId)
+        {
+        }
+
+        public void Event(System.String eventName)
+        {
+            var payload = new ISubject2Observer_PayloadTable.Event_Invoke { eventName = eventName };
+            Notify(payload);
+        }
+
+        public void Event2(System.String eventName)
+        {
+            var payload = new ISubject2Observer_PayloadTable.Event2_Invoke { eventName = eventName };
+            Notify(payload);
         }
     }
 }

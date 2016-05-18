@@ -32,6 +32,39 @@ namespace Akka.Interfaced.Tests
         }
     }
 
+    public class Subject2Actor : InterfacedActor<Subject2Actor>, ISubject2
+    {
+        private List<ISubject2Observer> _observers = new List<ISubject2Observer>();
+
+        async Task ISubject2.MakeEvent(string eventName)
+        {
+            await Task.Delay(10);
+
+            foreach (var observer in _observers)
+                observer.Event(eventName);
+        }
+
+        async Task ISubject2.MakeEvent2(string eventName)
+        {
+            await Task.Delay(10);
+
+            foreach (var observer in _observers)
+                observer.Event2(eventName);
+        }
+
+        Task ISubject2.Subscribe(ISubject2Observer observer)
+        {
+            _observers.Add(observer);
+            return Task.FromResult(0);
+        }
+
+        Task ISubject2.Unsubscribe(ISubject2Observer observer)
+        {
+            _observers.Remove(observer);
+            return Task.FromResult(0);
+        }
+    }
+
     public class ObserverActor : InterfacedActor<ObserverActor>, IDummy, ISubjectObserver
     {
         private SubjectRef _subject;

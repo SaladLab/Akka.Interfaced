@@ -291,11 +291,12 @@ namespace Akka.Interfaced.Tests
 
     public class RequestFilterFactory : Akka.TestKit.Xunit2.TestKit
     {
-        public static FilterLogBoard LogBoard = new FilterLogBoard();
+        public static FilterLogBoard LogBoard;
 
         public RequestFilterFactory(ITestOutputHelper output)
             : base(output: output)
         {
+            LogBoard = new FilterLogBoard();
         }
 
         [Fact]

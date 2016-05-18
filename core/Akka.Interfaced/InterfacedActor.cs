@@ -18,14 +18,14 @@ namespace Akka.Interfaced
 
         static InterfacedActor()
         {
+            PerInstanceFilterCreators = new List<Func<object, IFilter>>();
+
             var requestHandlerBuilder = new RequestHandlerBuilder<T>();
-            requestHandlerBuilder.Build();
+            requestHandlerBuilder.Build(PerInstanceFilterCreators);
             RequestDispatcher = new RequestDispatcher<T>(requestHandlerBuilder.HandlerTable);
 
-            PerInstanceFilterCreators = requestHandlerBuilder.PerInstanceFilterCreators;
-
             var notificationHandlerBuilder = new NotificationHandlerBuilder<T>();
-            notificationHandlerBuilder.Build();
+            notificationHandlerBuilder.Build(PerInstanceFilterCreators);
             NotificationDispatcher = new NotificationDispatcher<T>(notificationHandlerBuilder.HandlerTable);
 
             MessageDispatcher = new MessageDispatcher<T>();
@@ -234,6 +234,11 @@ namespace Akka.Interfaced
             if (notification.ObserverId == 0)
             {
                 var handlerItem = NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
+                if (handlerItem == null)
+                {
+                    // TODO: log no handler.
+                    return;
+                }
 
                 if (handlerItem.Handler != null)
                 {

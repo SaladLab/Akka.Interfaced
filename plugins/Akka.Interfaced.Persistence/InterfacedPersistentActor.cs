@@ -11,16 +11,22 @@ namespace Akka.Interfaced.Persistence
     {
         #region Static Variables
 
-        private readonly static RequestDispatcher<T> RequestDispatcher;
         private readonly static List<Func<object, IFilter>> PerInstanceFilterCreators;
+        private readonly static RequestDispatcher<T> RequestDispatcher;
+        private readonly static NotificationDispatcher<T> NotificationDispatcher;
         private readonly static MessageDispatcher<T> MessageDispatcher;
 
         static InterfacedPersistentActor()
         {
+            PerInstanceFilterCreators = new List<Func<object, IFilter>>();
+
             var requestHandlerBuilder = new RequestHandlerBuilder<T>();
-            requestHandlerBuilder.Build();
+            requestHandlerBuilder.Build(PerInstanceFilterCreators);
             RequestDispatcher = new RequestDispatcher<T>(requestHandlerBuilder.HandlerTable);
-            PerInstanceFilterCreators = requestHandlerBuilder.PerInstanceFilterCreators;
+
+            var notificationHandlerBuilder = new NotificationHandlerBuilder<T>();
+            notificationHandlerBuilder.Build(PerInstanceFilterCreators);
+            NotificationDispatcher = new NotificationDispatcher<T>(notificationHandlerBuilder.HandlerTable);
 
             MessageDispatcher = new MessageDispatcher<T>();
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Akka.Actor;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -48,12 +49,12 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class NotificationFilterPerClassActor : InterfacedActor<NotificationFilterPerClassActor>, IDummy
+    public class NotificationFilterPerClassActor : InterfacedActor<NotificationFilterPerClassActor>, ISubjectObserver
     {
         [NotificationFilterPerClass]
-        Task<object> IDummy.Call(object param)
+        void ISubjectObserver.Event(string eventName)
         {
-            return Task.FromResult(param);
+            NotificationFilterFactory.LogBoard.Log($"Event({eventName})");
         }
     }
 
@@ -100,12 +101,12 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class NotificationFilterPerClassMethodActor : InterfacedActor<NotificationFilterPerClassMethodActor>, IDummy
+    public class NotificationFilterPerClassMethodActor : InterfacedActor<NotificationFilterPerClassMethodActor>, ISubjectObserver
     {
         [NotificationFilterPerClassMethod]
-        Task<object> IDummy.Call(object param)
+        void ISubjectObserver.Event(string eventName)
         {
-            return Task.FromResult(param);
+            NotificationFilterFactory.LogBoard.Log($"Event({eventName})");
         }
     }
 
@@ -154,16 +155,16 @@ namespace Akka.Interfaced.Tests
     }
 
     [NotificationFilterPerInstance]
-    public class NotificationFilterPerInstanceActor : InterfacedActor<NotificationFilterPerInstanceActor>, IWorker
+    public class NotificationFilterPerInstanceActor : InterfacedActor<NotificationFilterPerInstanceActor>, ISubject2Observer
     {
-        Task IWorker.Atomic(int id)
+        void ISubject2Observer.Event(string eventName)
         {
-            return Task.FromResult(0);
+            NotificationFilterFactory.LogBoard.Log($"Event({eventName})");
         }
 
-        Task IWorker.Reentrant(int id)
+        void ISubject2Observer.Event2(string eventName)
         {
-            return Task.FromResult(0);
+            NotificationFilterFactory.LogBoard.Log($"Event2({eventName})");
         }
     }
 
@@ -215,16 +216,16 @@ namespace Akka.Interfaced.Tests
     }
 
     [NotificationFilterPerInstanceMethod]
-    public class NotificationFilterPerInstanceMethodActor : InterfacedActor<NotificationFilterPerInstanceMethodActor>, IWorker
+    public class NotificationFilterPerInstanceMethodActor : InterfacedActor<NotificationFilterPerInstanceMethodActor>, ISubject2Observer
     {
-        Task IWorker.Atomic(int id)
+        void ISubject2Observer.Event(string eventName)
         {
-            return Task.FromResult(0);
+            NotificationFilterFactory.LogBoard.Log($"Event({eventName})");
         }
 
-        Task IWorker.Reentrant(int id)
+        void ISubject2Observer.Event2(string eventName)
         {
-            return Task.FromResult(0);
+            NotificationFilterFactory.LogBoard.Log($"Event2({eventName})");
         }
     }
 
@@ -276,40 +277,55 @@ namespace Akka.Interfaced.Tests
     }
 
     [NotificationFilterPerNotification]
-    public class NotificationFilterPerNotificationActor : InterfacedActor<NotificationFilterPerNotificationActor>, IWorker
+    public class NotificationFilterPerNotificationActor : InterfacedActor<NotificationFilterPerNotificationActor>, ISubjectObserver
     {
-        Task IWorker.Atomic(int id)
+        void ISubjectObserver.Event(string eventName)
         {
-            return Task.FromResult(0);
-        }
-
-        Task IWorker.Reentrant(int id)
-        {
-            return Task.FromResult(0);
+            NotificationFilterFactory.LogBoard.Log($"Event({eventName})");
         }
     }
 
     public class NotificationFilterFactory : Akka.TestKit.Xunit2.TestKit
     {
-        public static FilterLogBoard LogBoard = new FilterLogBoard();
+        public static FilterLogBoard LogBoard;
 
         public NotificationFilterFactory(ITestOutputHelper output)
             : base(output: output)
         {
+            LogBoard = new FilterLogBoard();
         }
 
-        /*
+        private async Task<SubjectRef> SetupActors<TObservingActor>()
+            where TObservingActor : ActorBase, new()
+        {
+            var subjectActor = ActorOfAsTestActorRef<SubjectActor>("Subject");
+            var subject = new SubjectRef(subjectActor);
+            var observingActor = ActorOfAsTestActorRef<TObservingActor>();
+            await subject.Subscribe(new SubjectObserver(observingActor));
+            return subject;
+        }
+
+        private async Task<Subject2Ref> SetupActors2<TObservingActor>()
+            where TObservingActor : ActorBase, new()
+        {
+            var subjectActor = ActorOfAsTestActorRef<Subject2Actor>("Subject");
+            var subject = new Subject2Ref(subjectActor);
+            var observingActor = ActorOfAsTestActorRef<TObservingActor>();
+            await subject.Subscribe(new Subject2Observer(observingActor));
+            return subject;
+        }
+
         [Fact]
         public async Task FilterPerClass_Work()
         {
-            var actor = ActorOfAsTestActorRef<NotificationFilterPerClassActor>();
-            var a = new DummyRef(actor);
-            await a.Call(null);
+            var subject = await SetupActors<NotificationFilterPerClassActor>();
+            await subject.MakeEvent("A");
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "NotificationFilterPerClassActor.OnPreNotification",
+                    "Event(A)",
                     "NotificationFilterPerClassActor.OnPostNotification"
                 },
                 LogBoard.GetAndClearLogs());
@@ -318,15 +334,15 @@ namespace Akka.Interfaced.Tests
         [Fact]
         public async Task FilterPerClassMethod_Work()
         {
-            var actor = ActorOfAsTestActorRef<NotificationFilterPerClassMethodActor>();
-            var a = new DummyRef(actor);
-            await a.Call(null);
+            var subject = await SetupActors<NotificationFilterPerClassMethodActor>();
+            await subject.MakeEvent("A");
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
-                    "NotificationFilterPerClassMethodActor.Call.OnPreNotification",
-                    "NotificationFilterPerClassMethodActor.Call.OnPostNotification"
+                    "NotificationFilterPerClassMethodActor.Event.OnPreNotification",
+                    "Event(A)",
+                    "NotificationFilterPerClassMethodActor.Event.OnPostNotification"
                 },
                 LogBoard.GetAndClearLogs());
         }
@@ -334,18 +350,19 @@ namespace Akka.Interfaced.Tests
         [Fact]
         public async Task FilterPerInstance_Work()
         {
-            var actor = ActorOfAsTestActorRef<NotificationFilterPerInstanceActor>();
-            var a = new WorkerRef(actor);
-            await a.Atomic(1);
-            await a.Reentrant(2);
+            var subject = await SetupActors2<NotificationFilterPerInstanceActor>();
+            await subject.MakeEvent("A");
+            await subject.MakeEvent2("B");
 
             Assert.Equal(
-                new List<string>
+                new[]
                 {
                     "NotificationFilterPerInstanceActor.Constructor",
                     "NotificationFilterPerInstanceActor.OnPreNotification",
+                    "Event(A)",
                     "NotificationFilterPerInstanceActor.OnPostNotification",
                     "NotificationFilterPerInstanceActor.OnPreNotification",
+                    "Event2(B)",
                     "NotificationFilterPerInstanceActor.OnPostNotification"
                 },
                 LogBoard.GetAndClearLogs());
@@ -354,23 +371,21 @@ namespace Akka.Interfaced.Tests
         [Fact]
         public async Task FilterPerInstanceMethod_Work()
         {
-            var actor = ActorOfAsTestActorRef<NotificationFilterPerInstanceMethodActor>();
-            var a = new WorkerRef(actor);
-            await a.Atomic(1);
-            await a.Atomic(2);
-            await a.Reentrant(3);
+            var subject = await SetupActors2<NotificationFilterPerInstanceMethodActor>();
+            await subject.MakeEvent("A");
+            await subject.MakeEvent2("B");
 
             Assert.Equal(
                 new List<string>
                 {
-                    "NotificationFilterPerInstanceMethodActor.Atomic.Constructor",
-                    "NotificationFilterPerInstanceMethodActor.Reentrant.Constructor",
-                    "NotificationFilterPerInstanceMethodActor.Atomic.OnPreNotification",
-                    "NotificationFilterPerInstanceMethodActor.Atomic.OnPostNotification",
-                    "NotificationFilterPerInstanceMethodActor.Atomic.OnPreNotification",
-                    "NotificationFilterPerInstanceMethodActor.Atomic.OnPostNotification",
-                    "NotificationFilterPerInstanceMethodActor.Reentrant.OnPreNotification",
-                    "NotificationFilterPerInstanceMethodActor.Reentrant.OnPostNotification"
+                    "NotificationFilterPerInstanceMethodActor.Event.Constructor",
+                    "NotificationFilterPerInstanceMethodActor.Event2.Constructor",
+                    "NotificationFilterPerInstanceMethodActor.Event.OnPreNotification",
+                    "Event(A)",
+                    "NotificationFilterPerInstanceMethodActor.Event.OnPostNotification",
+                    "NotificationFilterPerInstanceMethodActor.Event2.OnPreNotification",
+                    "Event2(B)",
+                    "NotificationFilterPerInstanceMethodActor.Event2.OnPostNotification"
                 },
                 LogBoard.GetAndClearLogs());
         }
@@ -378,27 +393,23 @@ namespace Akka.Interfaced.Tests
         [Fact]
         public async Task FilterPerNotification_Work()
         {
-            var actor = ActorOfAsTestActorRef<NotificationFilterPerNotificationActor>();
-            var a = new WorkerRef(actor);
-            await a.Atomic(1);
-            await a.Atomic(2);
-            await a.Reentrant(3);
+            var subject = await SetupActors<NotificationFilterPerNotificationActor>();
+            await subject.MakeEvent("A");
+            await subject.MakeEvent("B");
 
             Assert.Equal(
                 new List<string>
                 {
-                    "NotificationFilterPerNotificationActor.Atomic.Constructor",
-                    "NotificationFilterPerNotificationActor.Atomic.OnPreNotification",
-                    "NotificationFilterPerNotificationActor.Atomic.OnPostNotification",
-                    "NotificationFilterPerNotificationActor.Atomic.Constructor",
-                    "NotificationFilterPerNotificationActor.Atomic.OnPreNotification",
-                    "NotificationFilterPerNotificationActor.Atomic.OnPostNotification",
-                    "NotificationFilterPerNotificationActor.Reentrant.Constructor",
-                    "NotificationFilterPerNotificationActor.Reentrant.OnPreNotification",
-                    "NotificationFilterPerNotificationActor.Reentrant.OnPostNotification"
+                    "NotificationFilterPerNotificationActor.Event.Constructor",
+                    "NotificationFilterPerNotificationActor.Event.OnPreNotification",
+                    "Event(A)",
+                    "NotificationFilterPerNotificationActor.Event.OnPostNotification",
+                    "NotificationFilterPerNotificationActor.Event.Constructor",
+                    "NotificationFilterPerNotificationActor.Event.OnPreNotification",
+                    "Event(B)",
+                    "NotificationFilterPerNotificationActor.Event.OnPostNotification",
                 },
                 LogBoard.GetAndClearLogs());
         }
-        */
     }
 }
