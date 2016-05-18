@@ -55,7 +55,7 @@ namespace Akka.Interfaced
                         _table.Add(invokePayloadType, new NotificationHandlerItem<T>
                         {
                             InterfaceType = ifs,
-                            IsReentrant = IsReentrantMethod(targetMethod),
+                            IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
                             AsyncHandler = BuildAsyncHandler(invokePayloadType, targetMethod, filterChain)
                         });
                     }
@@ -123,7 +123,7 @@ namespace Akka.Interfaced
                             continue;
                         }
 
-                        if (AreParameterTypesEqual(method.Item1.GetParameters(), parameters))
+                        if (HandlerBuilderHelpers.AreParameterTypesEqual(method.Item1.GetParameters(), parameters))
                         {
                             if (targetMethod != null)
                             {
@@ -153,7 +153,7 @@ namespace Akka.Interfaced
                         _table.Add(invokePayloadType, new NotificationHandlerItem<T>
                         {
                             InterfaceType = ifs,
-                            IsReentrant = IsReentrantMethod(targetMethod),
+                            IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
                             AsyncHandler = BuildAsyncHandler(invokePayloadType, targetMethod, filterChain)
                         });
                     }
@@ -366,54 +366,14 @@ namespace Akka.Interfaced
 
         private static Type[] GetInterfacePayloadTypeTable(Type interfaceType)
         {
-            var payloadTableType =
-                interfaceType.Assembly.GetTypes()
-                             .Where(t =>
-                             {
-                                 var attr = t.GetCustomAttribute<PayloadTableAttribute>();
-                                 return (attr != null && attr.Type == interfaceType && attr.Kind == PayloadTableKind.Notification);
-                             })
-                             .FirstOrDefault();
-
-            if (payloadTableType == null)
-            {
-                throw new InvalidOperationException(
-                    string.Format("Cannot find payload table class for {0}", interfaceType.FullName));
-            }
-
-            var queryMethodInfo = payloadTableType.GetMethod("GetPayloadTypes");
-            if (queryMethodInfo == null)
-            {
-                throw new InvalidOperationException(
-                    string.Format("Cannot find {0}.GetPayloadTypes method", payloadTableType.FullName));
-            }
-
-            var payloadTypes = (Type[])queryMethodInfo.Invoke(null, new object[] { });
+            var payloadTypes = (Type[])HandlerBuilderHelpers.GetInterfacePayloadTypeTable(interfaceType, PayloadTableKind.Notification);
             if (payloadTypes == null || payloadTypes.GetLength(0) != interfaceType.GetMethods().Length)
             {
                 throw new InvalidOperationException(
-                    string.Format("Mismatched messageTable from {0}", payloadTableType.FullName));
+                    $"Mismatched a payload table for {interfaceType.FullName}");
             }
 
             return payloadTypes;
-        }
-
-        private static bool IsReentrantMethod(MethodInfo method)
-        {
-            return method.CustomAttributes.Any(x => x.AttributeType == typeof(ReentrantAttribute));
-        }
-
-        private static bool AreParameterTypesEqual(ParameterInfo[] a, ParameterInfo[] b)
-        {
-            if (a.Length != b.Length)
-                return false;
-
-            for (int i = 0; i < a.Length; i++)
-            {
-                if (a[i].ParameterType != b[i].ParameterType)
-                    return false;
-            }
-            return true;
         }
     }
 }
