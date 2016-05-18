@@ -33,19 +33,7 @@ namespace Akka.Interfaced
         IFilter CreateInstance(object actor);
     }
 
-    public interface IFilterPerRequestFactory : IFilterFactory
-    {
-        void Setup(Type actorType, MethodInfo method);
-        IFilter CreateInstance(object actor, RequestMessage request);
-    }
-
-    public interface IFilterPerNotificationFactory : IFilterFactory
-    {
-        void Setup(Type actorType, MethodInfo method);
-        IFilter CreateInstance(object actor, NotificationMessage notification);
-    }
-
-    public interface IFilterPerMessageFactory : IFilterFactory
+    public interface IFilterPerInvokeFactory : IFilterFactory
     {
         void Setup(Type actorType, MethodInfo method);
         IFilter CreateInstance(object actor, object message);

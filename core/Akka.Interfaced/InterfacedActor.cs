@@ -11,24 +11,24 @@ namespace Akka.Interfaced
     {
         #region Static Variables
 
-        private readonly static List<Func<object, IFilter>> PerInstanceFilterCreators;
         private readonly static RequestDispatcher<T> RequestDispatcher;
         private readonly static NotificationDispatcher<T> NotificationDispatcher;
         private readonly static MessageDispatcher<T> MessageDispatcher;
+        private readonly static List<Func<object, IFilter>> PerInstanceFilterCreators;
 
         static InterfacedActor()
         {
-            PerInstanceFilterCreators = new List<Func<object, IFilter>>();
+            var filterHandlerBuilder = new FilterHandlerBuilder(typeof(T));
 
             var requestHandlerBuilder = new RequestHandlerBuilder<T>();
-            requestHandlerBuilder.Build(PerInstanceFilterCreators);
-            RequestDispatcher = new RequestDispatcher<T>(requestHandlerBuilder.HandlerTable);
+            RequestDispatcher = new RequestDispatcher<T>(requestHandlerBuilder.Build(filterHandlerBuilder));
 
             var notificationHandlerBuilder = new NotificationHandlerBuilder<T>();
-            notificationHandlerBuilder.Build(PerInstanceFilterCreators);
-            NotificationDispatcher = new NotificationDispatcher<T>(notificationHandlerBuilder.HandlerTable);
+            NotificationDispatcher = new NotificationDispatcher<T>(notificationHandlerBuilder.Build(filterHandlerBuilder));
 
             MessageDispatcher = new MessageDispatcher<T>();
+
+            PerInstanceFilterCreators = filterHandlerBuilder.PerInstanceFilterCreators;
         }
 
         #endregion

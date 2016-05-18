@@ -231,18 +231,18 @@ namespace Akka.Interfaced.Tests
     // FilterPerRequest
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class RequestFilterPerRequestAttribute : Attribute, IFilterPerRequestFactory
+    public sealed class RequestFilterPerRequestAttribute : Attribute, IFilterPerInvokeFactory
     {
         private Type _actorType;
         private MethodInfo _method;
 
-        void IFilterPerRequestFactory.Setup(Type actorType, MethodInfo method)
+        void IFilterPerInvokeFactory.Setup(Type actorType, MethodInfo method)
         {
             _actorType = actorType;
             _method = method;
         }
 
-        IFilter IFilterPerRequestFactory.CreateInstance(object actor, RequestMessage request)
+        IFilter IFilterPerInvokeFactory.CreateInstance(object actor, object message)
         {
             var name = _actorType.Name + "." + _method.Name.Split('.').Last();
             return new RequestFilterPerRequestFilter(actor != null ? name : null);

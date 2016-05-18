@@ -59,6 +59,7 @@
     <Compile Include="DeadRequestProcessingActor.cs" />
     <Compile Include="AkkaAskRequestWaiter.cs" />
     <Compile Include="ExtendedHandlerAttribute.cs" />
+    <Compile Include="FilterHandlerBuilder.cs" />
     <Compile Include="IAsyncInvokable.cs" />
     <Compile Include="IFilter.cs" />
     <Compile Include="IFilterFactory.cs" />

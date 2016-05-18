@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -9,56 +8,21 @@ using System.Runtime.CompilerServices;
 
 namespace Akka.Interfaced
 {
-    public class RequestHandlerBuilder<T>
+    internal class RequestHandlerBuilder<T>
         where T : class
     {
         private Dictionary<Type, RequestHandlerItem<T>> _table;
+        private FilterHandlerBuilder _filterHandlerBuilder;
 
-        private class FilterItem
-        {
-            public FilterItem(IFilterFactory factory, IFilter referenceFilter, FilterAccessor accessor, int filterPerRequestIndex = -1)
-            {
-                Factory = factory;
-                Accessor = accessor;
-
-                Order = referenceFilter.Order;
-                IsAsync = referenceFilter is IPreRequestAsyncFilter ||
-                          referenceFilter is IPostRequestAsyncFilter;
-                IsPreFilter = referenceFilter is IPreRequestFilter ||
-                              referenceFilter is IPreRequestAsyncFilter;
-                IsPostFilter = referenceFilter is IPostRequestFilter ||
-                               referenceFilter is IPostRequestAsyncFilter;
-                IsPerInstance = factory is IFilterPerInstanceFactory ||
-                                factory is IFilterPerInstanceMethodFactory;
-                IsPerRequest = factory is IFilterPerRequestFactory;
-                FilterPerRequestIndex = FilterPerRequestIndex;
-            }
-
-            public IFilterFactory Factory { get; }
-            public FilterAccessor Accessor { get; }
-            public int Order { get; }
-            public bool IsAsync { get; }
-            public bool IsPreFilter { get; }
-            public bool IsPostFilter { get; }
-            public bool IsPerInstance { get; }
-            public bool IsPerRequest { get; }
-            public int FilterPerRequestIndex { get; }
-        }
-
-        private Dictionary<Type, FilterItem> _perClassFilterItemTable;
-        private List<Func<object, IFilter>> _perInstanceFilterCreators;
-
-        public Dictionary<Type, RequestHandlerItem<T>> HandlerTable => _table;
-        public List<Func<object, IFilter>> PerInstanceFilterCreators => _perInstanceFilterCreators;
-
-        public void Build(List<Func<object, IFilter>> perInstanceFilterCreators)
+        public Dictionary<Type, RequestHandlerItem<T>> Build(FilterHandlerBuilder filterHandlerBuilder)
         {
             _table = new Dictionary<Type, RequestHandlerItem<T>>();
-            _perClassFilterItemTable = new Dictionary<Type, FilterItem>();
-            _perInstanceFilterCreators = perInstanceFilterCreators;
+            _filterHandlerBuilder = filterHandlerBuilder;
 
             BuildRegularInterfaceHandler();
             BuildExtendedInterfaceHandler();
+
+            return _table;
         }
 
         private void BuildRegularInterfaceHandler()
@@ -81,14 +45,8 @@ namespace Akka.Interfaced
                     var targetMethod = methodItems[i].Item2;
                     var invokePayloadType = payloadTypeTable[i, 0];
                     var returnPayloadType = payloadTypeTable[i, 1];
-
-                    var filters = CreateFilters(type, targetMethod);
-                    var preFilterItems = filters.Item1;
-                    var postFilterItems = filters.Item2;
-
-                    var asyncHandler = BuildAsyncHandler(
-                        invokePayloadType, returnPayloadType, targetMethod,
-                        preFilterItems, postFilterItems);
+                    var filterChain = _filterHandlerBuilder.Build(targetMethod, FilterChainKind.Request);
+                    var asyncHandler = BuildAsyncHandler(invokePayloadType, returnPayloadType, targetMethod, filterChain);
 
                     _table.Add(invokePayloadType, new RequestHandlerItem<T>
                     {
@@ -169,25 +127,15 @@ namespace Akka.Interfaced
                     // build handler
 
                     var isAsyncMethod = targetMethod.ReturnType.Name.StartsWith("Task");
-                    var filters = CreateFilters(type, targetMethod);
-                    var preFilterItems = filters.Item1;
-                    var postFilterItems = filters.Item2;
+                    var filterChain = _filterHandlerBuilder.Build(targetMethod, FilterChainKind.Request);
 
-                    if (isAsyncMethod ||
-                        preFilterItems.Any(f => f.IsAsync) ||
-                        postFilterItems.Any(f => f.IsAsync))
+                    if (isAsyncMethod || filterChain.AsyncFilterExists)
                     {
-                        // async handler
-
-                        var asyncHandler = BuildAsyncHandler(
-                            invokePayloadType, returnPayloadType, targetMethod,
-                            preFilterItems, postFilterItems);
-
                         _table.Add(invokePayloadType, new RequestHandlerItem<T>
                         {
                             InterfaceType = ifs,
                             IsReentrant = IsReentrantMethod(targetMethod),
-                            AsyncHandler = asyncHandler
+                            AsyncHandler = BuildAsyncHandler(invokePayloadType, returnPayloadType, targetMethod, filterChain)
                         });
                     }
                     else
@@ -195,152 +143,50 @@ namespace Akka.Interfaced
                         if (targetMethod.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
                             throw new InvalidOperationException($"Async void handler is not supported. ({type.FullName}.{targetMethod.Name})");
 
-                        // sync handler
-
-                        var handler = BuildHandler(
-                            invokePayloadType, returnPayloadType, targetMethod,
-                            preFilterItems, postFilterItems);
-
                         _table.Add(invokePayloadType, new RequestHandlerItem<T>
                         {
                             InterfaceType = ifs,
                             IsReentrant = false,
-                            Handler = handler
+                            Handler = BuildHandler(invokePayloadType, returnPayloadType, targetMethod, filterChain)
                         });
                     }
                 }
             }
-
-            //if (targetMethods.Any())
-            //{
-            //    throw new InvalidOperationException(
-            //        $"{typeof(T).FullName} has dangling handlers.\n" +
-            //        string.Join("\n", targetMethods.Select(x => x.Item1.Name)));
-            //}
-        }
-
-        private Tuple<List<FilterItem>, List<FilterItem>> CreateFilters(Type type, MethodInfo method)
-        {
-            var preFilterItems = new List<FilterItem>();
-            var postFilterItems = new List<FilterItem>();
-
-            var filterPerRequestIndex = 0;
-            var filterFactories = type.GetCustomAttributes().Concat(method.GetCustomAttributes()).OfType<IFilterFactory>();
-            foreach (var filterFactory in filterFactories)
-            {
-                // create filter with factory
-
-                FilterItem filterItem = null;
-                if (filterFactory is IFilterPerClassFactory)
-                {
-                    var factoryType = filterFactory.GetType();
-                    if (_perClassFilterItemTable.TryGetValue(factoryType, out filterItem) == false)
-                    {
-                        var factory = (IFilterPerClassFactory)filterFactory;
-                        factory.Setup(type);
-                        var filter = factory.CreateInstance();
-                        filterItem = new FilterItem(filterFactory, filter, (_, x) => filter);
-                        _perClassFilterItemTable.Add(factoryType, filterItem);
-                    }
-                }
-                else if (filterFactory is IFilterPerClassMethodFactory)
-                {
-                    var factory = (IFilterPerClassMethodFactory)filterFactory;
-                    factory.Setup(type, method);
-                    var filter = factory.CreateInstance();
-                    filterItem = new FilterItem(filterFactory, filter, (_, x) => filter);
-                }
-                else if (filterFactory is IFilterPerInstanceFactory)
-                {
-                    var factoryType = filterFactory.GetType();
-                    if (_perClassFilterItemTable.TryGetValue(factoryType, out filterItem) == false)
-                    {
-                        var factory = ((IFilterPerInstanceFactory)filterFactory);
-                        factory.Setup(type);
-                        var filter = factory.CreateInstance(null);
-                        var arrayIndex = _perInstanceFilterCreators.Count;
-                        _perInstanceFilterCreators.Add(a => factory.CreateInstance(a));
-                        filterItem = new FilterItem(filterFactory, filter,
-                                                    (provider, _) => provider.GetFilter(arrayIndex));
-                        _perClassFilterItemTable.Add(factoryType, filterItem);
-                    }
-                }
-                else if (filterFactory is IFilterPerInstanceMethodFactory)
-                {
-                    var factory = ((IFilterPerInstanceMethodFactory)filterFactory);
-                    factory.Setup(type, method);
-                    var filter = factory.CreateInstance(null);
-                    var arrayIndex = _perInstanceFilterCreators.Count;
-                    _perInstanceFilterCreators.Add(a => factory.CreateInstance(a));
-                    filterItem = new FilterItem(filterFactory, filter,
-                                                (provider, _) => provider.GetFilter(arrayIndex));
-                }
-                else if (filterFactory is IFilterPerRequestFactory)
-                {
-                    var factory = ((IFilterPerRequestFactory)filterFactory);
-                    factory.Setup(type, method);
-                    var filter = factory.CreateInstance(null, null);
-                    var arrayIndex = filterPerRequestIndex++;
-                    filterItem = new FilterItem(filterFactory, filter,
-                                                (_, filters) => filters[arrayIndex], filterPerRequestIndex);
-                }
-
-                // classify filter and add it to list
-                // beware that a filter can be added to both pre and post handle filter list.
-
-                if (filterItem.IsPreFilter)
-                    preFilterItems.Add(filterItem);
-
-                if (filterItem.IsPostFilter)
-                    postFilterItems.Add(filterItem);
-            }
-
-            return Tuple.Create(preFilterItems.OrderBy(f => f.Order).ToList(),
-                                postFilterItems.OrderByDescending(f => f.Order).ToList());
         }
 
         private static RequestHandler<T> BuildHandler(
-            Type invokePayloadType, Type returnPayloadType, MethodInfo method,
-            IList<FilterItem> preFilterItems, IList<FilterItem> postFilterItems)
+            Type invokePayloadType, Type returnPayloadType, MethodInfo method, FilterChain filterChain)
         {
-            var handler = RequestHandlerFuncBuilder.Build<T>(
-                invokePayloadType, returnPayloadType, method);
-
-            var allFilters = preFilterItems.Concat(postFilterItems).ToList();
-            var perInstanceFilterExists = allFilters.Any(i => i.IsPerInstance);
-            var perRequestFilterFactories = allFilters.Where(i => i.IsPerRequest).GroupBy(i => i.FilterPerRequestIndex)
-                                                     .OrderBy(g => g.Key).Select(g => (IFilterPerRequestFactory)g.Last().Factory).ToArray();
-            var preFilterAccessors = preFilterItems.Select(i => i.Accessor).ToArray();
-            var postFilterAccessors = postFilterItems.Select(i => i.Accessor).ToArray();
+            var handler = RequestHandlerFuncBuilder.Build<T>(invokePayloadType, returnPayloadType, method);
 
             return delegate(T self, RequestMessage request, Action<ResponseMessage> onCompleted)
             {
                 ResponseMessage response = null;
 
-                var filterPerInstanceProvider = perInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
+                var filterPerInstanceProvider = filterChain.PerInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
                 // Create PerRequest filters
 
                 IFilter[] filterPerRequests = null;
-                if (perRequestFilterFactories.Length > 0)
+                if (filterChain.PerInvokeFilterFactories.Length > 0)
                 {
-                    filterPerRequests = new IFilter[perRequestFilterFactories.Length];
-                    for (var i = 0; i < perRequestFilterFactories.Length; i++)
+                    filterPerRequests = new IFilter[filterChain.PerInvokeFilterFactories.Length];
+                    for (var i = 0; i < filterChain.PerInvokeFilterFactories.Length; i++)
                     {
-                        filterPerRequests[i] = perRequestFilterFactories[i].CreateInstance(self, request);
+                        filterPerRequests[i] = filterChain.PerInvokeFilterFactories[i].CreateInstance(self, request);
                     }
                 }
 
                 // Call PreFilters
 
-                if (preFilterItems.Count > 0)
+                if (filterChain.PreFilterAccessors.Length > 0)
                 {
                     var context = new PreRequestFilterContext
                     {
                         Actor = self,
                         Request = request
                     };
-                    foreach (var filterAccessor in preFilterAccessors)
+                    foreach (var filterAccessor in filterChain.PreFilterAccessors)
                     {
                         try
                         {
@@ -385,7 +231,7 @@ namespace Akka.Interfaced
 
                 // Call PostFilters
 
-                if (postFilterItems.Count > 0)
+                if (filterChain.PostFilterAccessors.Length > 0)
                 {
                     var context = new PostRequestFilterContext
                     {
@@ -393,7 +239,7 @@ namespace Akka.Interfaced
                         Request = request,
                         Response = response
                     };
-                    foreach (var filterAccessor in postFilterAccessors)
+                    foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {
                         try
                         {
@@ -416,50 +262,42 @@ namespace Akka.Interfaced
         }
 
         private static RequestAsyncHandler<T> BuildAsyncHandler(
-            Type invokePayloadType, Type returnPayloadType, MethodInfo method,
-            IList<FilterItem> preFilterItems, IList<FilterItem> postFilterItems)
+            Type invokePayloadType, Type returnPayloadType, MethodInfo method, FilterChain filterChain)
         {
             var isAsyncMethod = method.ReturnType.Name.StartsWith("Task");
             var handler = isAsyncMethod
                 ? RequestHandlerAsyncBuilder.Build<T>(invokePayloadType, returnPayloadType, method)
                 : RequestHandlerSyncToAsyncBuilder.Build<T>(invokePayloadType, returnPayloadType, method);
 
-            var allFilters = preFilterItems.Concat(postFilterItems).ToList();
-            var perInstanceFilterExists = allFilters.Any(i => i.IsPerInstance);
-            var perRequestFilterFactories = allFilters.Where(i => i.IsPerRequest).GroupBy(i => i.FilterPerRequestIndex)
-                                                     .OrderBy(g => g.Key).Select(g => (IFilterPerRequestFactory)g.Last().Factory).ToArray();
-            var preFilterAccessors = preFilterItems.Select(i => i.Accessor).ToArray();
-            var postFilterAccessors = postFilterItems.Select(i => i.Accessor).ToArray();
-
             // TODO: Optimize this function when without async filter
             return async delegate(T self, RequestMessage request, Action<ResponseMessage> onCompleted)
             {
                 ResponseMessage response = null;
 
-                var filterPerInstanceProvider = perInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
+                var filterPerInstanceProvider = filterChain.PerInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
                 // Create PerRequest filters
 
                 IFilter[] filterPerRequests = null;
-                if (perRequestFilterFactories.Length > 0)
+                if (filterChain.PerInvokeFilterFactories.Length > 0)
                 {
-                    filterPerRequests = new IFilter[perRequestFilterFactories.Length];
-                    for (var i = 0; i < perRequestFilterFactories.Length; i++)
+                    filterPerRequests = new IFilter[filterChain.PerInvokeFilterFactories.Length];
+                    for (var i = 0; i < filterChain.PerInvokeFilterFactories.Length; i++)
                     {
-                        filterPerRequests[i] = perRequestFilterFactories[i].CreateInstance(self, request);
+                        filterPerRequests[i] = filterChain.PerInvokeFilterFactories[i].CreateInstance(self, request);
                     }
                 }
 
                 // Call PreFilters
 
-                if (preFilterItems.Count > 0)
+                if (filterChain.PreFilterAccessors.Length > 0)
                 {
                     var context = new PreRequestFilterContext
                     {
                         Actor = self,
                         Request = request
                     };
-                    foreach (var filterAccessor in preFilterAccessors)
+                    foreach (var filterAccessor in filterChain.PreFilterAccessors)
                     {
                         try
                         {
@@ -509,7 +347,7 @@ namespace Akka.Interfaced
 
                 // Call PostFilters
 
-                if (postFilterItems.Count > 0)
+                if (filterChain.PostFilterAccessors.Length > 0)
                 {
                     var context = new PostRequestFilterContext
                     {
@@ -517,7 +355,7 @@ namespace Akka.Interfaced
                         Request = request,
                         Response = response
                     };
-                    foreach (var filterAccessor in postFilterAccessors)
+                    foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {
                         try
                         {

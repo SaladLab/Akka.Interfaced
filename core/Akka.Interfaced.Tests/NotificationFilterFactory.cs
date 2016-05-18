@@ -232,18 +232,18 @@ namespace Akka.Interfaced.Tests
     // FilterPerNotification
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class NotificationFilterPerNotificationAttribute : Attribute, IFilterPerNotificationFactory
+    public sealed class NotificationFilterPerNotificationAttribute : Attribute, IFilterPerInvokeFactory
     {
         private Type _actorType;
         private MethodInfo _method;
 
-        void IFilterPerNotificationFactory.Setup(Type actorType, MethodInfo method)
+        void IFilterPerInvokeFactory.Setup(Type actorType, MethodInfo method)
         {
             _actorType = actorType;
             _method = method;
         }
 
-        IFilter IFilterPerNotificationFactory.CreateInstance(object actor, NotificationMessage request)
+        IFilter IFilterPerInvokeFactory.CreateInstance(object actor, object message)
         {
             var name = _actorType.Name + "." + _method.Name.Split('.').Last();
             return new NotificationFilterPerNotificationFilter(actor != null ? name : null);

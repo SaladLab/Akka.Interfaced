@@ -8,18 +8,18 @@ using Newtonsoft.Json;
 namespace Basic.Program
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public sealed class LogAttribute : Attribute, IFilterPerRequestFactory
+    public sealed class LogAttribute : Attribute, IFilterPerInvokeFactory
     {
         private string _methodName;
 
-        void IFilterPerRequestFactory.Setup(Type actorType, MethodInfo method)
+        void IFilterPerInvokeFactory.Setup(Type actorType, MethodInfo method)
         {
             _methodName = actorType.Name + "." + method.Name.Split('.').Last();
         }
 
-        IFilter IFilterPerRequestFactory.CreateInstance(object actor, RequestMessage request)
+        IFilter IFilterPerInvokeFactory.CreateInstance(object actor, object message)
         {
-            return new LogFilter(_methodName, actor, request);
+            return new LogFilter(_methodName, actor);
         }
     }
 
@@ -28,7 +28,7 @@ namespace Basic.Program
         private readonly string _methodName;
         private Stopwatch _watch;
 
-        public LogFilter(string methodName, object actor, RequestMessage request)
+        public LogFilter(string methodName, object actor)
         {
             _methodName = methodName;
         }
