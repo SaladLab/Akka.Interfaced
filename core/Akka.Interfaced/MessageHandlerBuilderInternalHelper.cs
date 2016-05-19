@@ -9,24 +9,23 @@ namespace Akka.Interfaced
 
     // Convert
     //    void T.Method(object)
-    // -> MessageHandler<T>
+    // -> MessageHandler
     internal static class MessageHandlerFuncBuilder
     {
         private static readonly MethodInfo _buildHelperMethodInfo =
             typeof(MessageHandlerFuncBuilder).GetMethod(
                 "BuildHelper", BindingFlags.Static | BindingFlags.NonPublic);
 
-        public static MessageHandler<T> Build<T>(MethodInfo method)
-            where T : class
+        public static MessageHandler Build(Type targetType, MethodInfo method)
         {
             var constructedHelper = _buildHelperMethodInfo.MakeGenericMethod(
-                typeof(T), method.GetParameters()[0].ParameterType);
+                targetType, method.GetParameters()[0].ParameterType);
 
             var ret = constructedHelper.Invoke(null, new object[] { method });
-            return (MessageHandler<T>)ret;
+            return (MessageHandler)ret;
         }
 
-        private static MessageHandler<TTarget> BuildHelper<TTarget, TParam>(MethodInfo method)
+        private static MessageHandler BuildHelper<TTarget, TParam>(MethodInfo method)
             where TTarget : class
         {
             var func = (Action<TTarget, TParam>)Delegate.CreateDelegate(
@@ -34,64 +33,60 @@ namespace Akka.Interfaced
 
             return (target, param) =>
             {
-                func(target, (TParam)param);
+                func((TTarget)target, (TParam)param);
             };
         }
     }
 
     // Convert
     //    Task T.Method(object)
-    // -> MessageAsyncHandler<T>
+    // -> MessageAsyncHandler
     internal static class MessageHandlerAsyncBuilder
     {
         private static readonly MethodInfo _buildHelperMethodInfo =
             typeof(MessageHandlerAsyncBuilder).GetMethod(
                 "BuildHelper", BindingFlags.Static | BindingFlags.NonPublic);
 
-        public static MessageAsyncHandler<T> Build<T>(MethodInfo method)
-            where T : class
+        public static MessageAsyncHandler Build(Type targetType, MethodInfo method)
         {
             var constructedHelper = _buildHelperMethodInfo.MakeGenericMethod(
-                typeof(T), method.GetParameters()[0].ParameterType);
+                targetType, method.GetParameters()[0].ParameterType);
 
             var ret = constructedHelper.Invoke(null, new object[] { method });
-            return (MessageAsyncHandler<T>)ret;
+            return (MessageAsyncHandler)ret;
         }
 
-        private static MessageAsyncHandler<TTarget> BuildHelper<TTarget, TParam>(MethodInfo method)
-            where TTarget : class
+        private static MessageAsyncHandler BuildHelper<TTarget, TParam>(MethodInfo method)
         {
             var func = (Func<TTarget, TParam, Task>)Delegate.CreateDelegate(
                 typeof(Func<TTarget, TParam, Task>), method);
 
             return (target, param) =>
             {
-                return func(target, (TParam)param);
+                return func((TTarget)target, (TParam)param);
             };
         }
     }
 
     // Convert
     //    void T.Method(object)
-    // -> MessageAsyncHandler<T>
+    // -> MessageAsyncHandler
     internal static class MessageHandlerSyncToAsyncBuilder
     {
         private static readonly MethodInfo _buildHelperMethodInfo =
             typeof(MessageHandlerSyncToAsyncBuilder).GetMethod(
                 "BuildHelper", BindingFlags.Static | BindingFlags.NonPublic);
 
-        public static MessageAsyncHandler<T> Build<T>(MethodInfo method)
-            where T : class
+        public static MessageAsyncHandler Build(Type targetType, MethodInfo method)
         {
             var constructedHelper = _buildHelperMethodInfo.MakeGenericMethod(
-                typeof(T), method.GetParameters()[0].ParameterType);
+                targetType, method.GetParameters()[0].ParameterType);
 
             var ret = constructedHelper.Invoke(null, new object[] { method });
-            return (MessageAsyncHandler<T>)ret;
+            return (MessageAsyncHandler)ret;
         }
 
-        private static MessageAsyncHandler<TTarget> BuildHelper<TTarget, TParam>(MethodInfo method)
-            where TTarget : class
+        private static MessageAsyncHandler BuildHelper<TTarget, TParam>(MethodInfo method)
         {
             var func = (Action<TTarget, TParam>)Delegate.CreateDelegate(
                 typeof(Action<TTarget, TParam>), method);
@@ -100,7 +95,7 @@ namespace Akka.Interfaced
             {
                 try
                 {
-                    func(target, (TParam)param);
+                    func((TTarget)target, (TParam)param);
                     return Task.FromResult(true);
                 }
                 catch (Exception e)

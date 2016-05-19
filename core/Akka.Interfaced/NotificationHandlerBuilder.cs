@@ -8,33 +8,32 @@ using System.Runtime.CompilerServices;
 
 namespace Akka.Interfaced
 {
-    internal class NotificationHandlerBuilder<T>
-        where T : class
+    internal class NotificationHandlerBuilder
     {
-        private Dictionary<Type, NotificationHandlerItem<T>> _table;
+        private Type _type;
         private FilterHandlerBuilder _filterHandlerBuilder;
+        private Dictionary<Type, NotificationHandlerItem> _table;
 
-        public Dictionary<Type, NotificationHandlerItem<T>> Build(FilterHandlerBuilder filterHandlerBuilder)
+        public Dictionary<Type, NotificationHandlerItem> Build(Type type, FilterHandlerBuilder filterHandlerBuilder)
         {
-            _table = new Dictionary<Type, NotificationHandlerItem<T>>();
+            _type = type;
             _filterHandlerBuilder = filterHandlerBuilder;
+            _table = new Dictionary<Type, NotificationHandlerItem>();
 
-            BuildRegularInterfaceHandler();
-            BuildExtendedInterfaceHandler();
+            BuildRegularInterfaceHandlers();
+            BuildExtendedInterfaceHandlers();
 
             return _table;
         }
 
-        private void BuildRegularInterfaceHandler()
+        private void BuildRegularInterfaceHandlers()
         {
-            var type = typeof(T);
-
-            foreach (var ifs in type.GetInterfaces())
+            foreach (var ifs in _type.GetInterfaces())
             {
                 if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedObserver)))
                     continue;
 
-                var interfaceMap = type.GetInterfaceMap(ifs);
+                var interfaceMap = _type.GetInterfaceMap(ifs);
                 var methodItems = interfaceMap.InterfaceMethods.Zip(interfaceMap.TargetMethods, Tuple.Create)
                                               .OrderBy(p => p.Item1, new MethodInfoComparer())
                                               .ToArray();
@@ -52,43 +51,41 @@ namespace Akka.Interfaced
                     {
                         // async handler
 
-                        _table.Add(invokePayloadType, new NotificationHandlerItem<T>
+                        _table.Add(invokePayloadType, new NotificationHandlerItem
                         {
                             InterfaceType = ifs,
                             IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
-                            AsyncHandler = BuildAsyncHandler(invokePayloadType, targetMethod, filterChain)
+                            AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, targetMethod, filterChain)
                         });
                     }
                     else
                     {
                         // sync handler
 
-                        _table.Add(invokePayloadType, new NotificationHandlerItem<T>
+                        _table.Add(invokePayloadType, new NotificationHandlerItem
                         {
                             InterfaceType = ifs,
                             IsReentrant = false,
-                            Handler = BuildHandler(invokePayloadType, targetMethod, filterChain)
+                            Handler = BuildHandler(_type, invokePayloadType, targetMethod, filterChain)
                         });
                     }
                 }
             }
         }
 
-        private void BuildExtendedInterfaceHandler()
+        private void BuildExtendedInterfaceHandlers()
         {
-            var type = typeof(T);
-
             var targetMethods =
-                type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-                    .Where(m => m.GetCustomAttribute<ExtendedHandlerAttribute>() != null)
-                    .Select(m => Tuple.Create(m, m.GetCustomAttribute<ExtendedHandlerAttribute>()))
-                    .ToList();
+                _type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                     .Where(m => m.GetCustomAttribute<ExtendedHandlerAttribute>() != null)
+                     .Select(m => Tuple.Create(m, m.GetCustomAttribute<ExtendedHandlerAttribute>()))
+                     .ToList();
 
             var extendedInterfaces =
-                type.GetInterfaces()
-                    .Where(t => t.FullName.StartsWith("Akka.Interfaced.IExtendedInterface"))
-                    .SelectMany(t => t.GenericTypeArguments)
-                    .Where(t => t.GetInterfaces().Any(i => i == typeof(IInterfacedObserver)));
+                _type.GetInterfaces()
+                     .Where(t => t.FullName.StartsWith("Akka.Interfaced.IExtendedInterface"))
+                     .SelectMany(t => t.GenericTypeArguments)
+                     .Where(t => t.GetInterfaces().Any(i => i == typeof(IInterfacedObserver)));
 
             foreach (var ifs in extendedInterfaces)
             {
@@ -150,37 +147,37 @@ namespace Akka.Interfaced
                     {
                         // async handler
 
-                        _table.Add(invokePayloadType, new NotificationHandlerItem<T>
+                        _table.Add(invokePayloadType, new NotificationHandlerItem
                         {
                             InterfaceType = ifs,
                             IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
-                            AsyncHandler = BuildAsyncHandler(invokePayloadType, targetMethod, filterChain)
+                            AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, targetMethod, filterChain)
                         });
                     }
                     else
                     {
                         if (targetMethod.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
-                            throw new InvalidOperationException($"Async void handler is not supported. ({type.FullName}.{targetMethod.Name})");
+                            throw new InvalidOperationException($"Async void handler is not supported. ({_type.FullName}.{targetMethod.Name})");
 
                         // sync handler
 
-                        _table.Add(invokePayloadType, new NotificationHandlerItem<T>
+                        _table.Add(invokePayloadType, new NotificationHandlerItem
                         {
                             InterfaceType = ifs,
                             IsReentrant = false,
-                            Handler = BuildHandler(invokePayloadType, targetMethod, filterChain)
+                            Handler = BuildHandler(_type, invokePayloadType, targetMethod, filterChain)
                         });
                     }
                 }
             }
         }
 
-        private static NotificationHandler<T> BuildHandler(
-            Type invokePayloadType, MethodInfo method, FilterChain filterChain)
+        private static NotificationHandler BuildHandler(
+            Type targetType, Type invokePayloadType, MethodInfo method, FilterChain filterChain)
         {
-            var handler = RequestHandlerFuncBuilder.Build<T>(invokePayloadType, null, method);
+            var handler = RequestHandlerFuncBuilder.Build(targetType, invokePayloadType, null, method);
 
-            return delegate(T self, NotificationMessage notification)
+            return delegate(object self, NotificationMessage notification)
             {
                 var filterPerInstanceProvider = filterChain.PerInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
@@ -259,16 +256,16 @@ namespace Akka.Interfaced
             };
         }
 
-        private static NotificationAsyncHandler<T> BuildAsyncHandler(
-            Type invokePayloadType, MethodInfo method, FilterChain filterChain)
+        private static NotificationAsyncHandler BuildAsyncHandler(
+            Type targetType, Type invokePayloadType, MethodInfo method, FilterChain filterChain)
         {
             var isAsyncMethod = method.ReturnType.Name.StartsWith("Task");
             var handler = isAsyncMethod
-                ? RequestHandlerAsyncBuilder.Build<T>(invokePayloadType, null, method)
-                : RequestHandlerSyncToAsyncBuilder.Build<T>(invokePayloadType, null, method);
+                ? RequestHandlerAsyncBuilder.Build(targetType, invokePayloadType, null, method)
+                : RequestHandlerSyncToAsyncBuilder.Build(targetType, invokePayloadType, null, method);
 
             // TODO: Optimize this function when without async filter
-            return async delegate(T self, NotificationMessage notification)
+            return async delegate(object self, NotificationMessage notification)
             {
                 var filterPerInstanceProvider = filterChain.PerInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 

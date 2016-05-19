@@ -21,33 +21,31 @@ namespace Akka.Interfaced
             typeof(RequestHandlerFuncBuilder).GetMethod(
                 "BuildHelperWithReturn", BindingFlags.Static | BindingFlags.NonPublic);
 
-        public static Func<TTarget, object, IValueGetable> Build<TTarget>(
-            Type invokePayloadType, Type returnPayloadType, MethodInfo method)
-            where TTarget : class
+        public static Func<object, object, IValueGetable> Build(
+            Type targetType, Type invokePayloadType, Type returnPayloadType, MethodInfo method)
         {
             var constructedHelper =
                 returnPayloadType == null
                     ? _buildHelperMethodInfo.MakeGenericMethod(
-                        typeof(TTarget), invokePayloadType)
+                        targetType, invokePayloadType)
                     : _buildHelperWithReplyMethodInfo.MakeGenericMethod(
-                        typeof(TTarget), invokePayloadType, method.ReturnType, returnPayloadType);
+                        targetType, invokePayloadType, method.ReturnType, returnPayloadType);
 
             var ret = constructedHelper.Invoke(null, new object[] { method });
-            return (Func<TTarget, object, IValueGetable>)ret;
+            return (Func<object, object, IValueGetable>)ret;
         }
 
-        private static Func<TTarget, object, IValueGetable>
+        private static Func<object, object, IValueGetable>
             BuildHelper<TTarget, TInvokePayload>(MethodInfo method)
-            where TTarget : class
         {
-            // IValueGetable Handler(TTarget instance, object invokePayload)
+            // IValueGetable Handler(object instance, object invokePayload)
             // {
             //      var invoke = (TInvokePayload)invokePayload;
-            //      method(instance, invoke.a, invoke.b, ...);
+            //      ((TTarget)instance).method(invoke.a, invoke.b, ...);
             //      return null;
             // }
 
-            var instance = Expression.Parameter(typeof(TTarget), "instance");
+            var instance = Expression.Parameter(typeof(object), "instance");
             var invokePayload = Expression.Parameter(typeof(object), "invokePayload");
             var invoke = Expression.Variable(typeof(TInvokePayload), "invoke");
             var parameterVars = method.GetParameters().Select(p => Expression.Field(invoke, p.Name)).ToArray();
@@ -55,26 +53,25 @@ namespace Akka.Interfaced
             var body = Expression.Block(
                 new[] { invoke },
                 Expression.Assign(invoke, Expression.Convert(invokePayload, typeof(TInvokePayload))),
-                Expression.Call(instance, method, parameterVars),
+                Expression.Call(Expression.Convert(instance, typeof(TTarget)), method, parameterVars),
                 Expression.Constant(null, typeof(IValueGetable)));
 
-            return (Func<TTarget, object, IValueGetable>)Expression.Lambda(body, instance, invokePayload).Compile();
+            return (Func<object, object, IValueGetable>)Expression.Lambda(body, instance, invokePayload).Compile();
         }
 
-        private static Func<TTarget, object, IValueGetable>
+        private static Func<object, object, IValueGetable>
             BuildHelperWithReturn<TTarget, TInvokePayload, TReturn, TReturnPayload>(MethodInfo method)
-            where TTarget : class
         {
             // IValueGetable Handler(TTarget instance, object invokePayload)
             // {
             //      var invoke = (TInvokePayload)invokePayload;
-            //      var returnValue = method(instance, invoke.a, invoke.b, ...);
+            //      var returnValue = ((TTarget)instance).method(invoke.a, invoke.b, ...);
             //      var returnPayload = new TReturnPayload();
             //      returnPayload.v = returnValue;
             //      return (IValueGetable)returnPayload;
             // }
 
-            var instance = Expression.Parameter(typeof(TTarget), "instance");
+            var instance = Expression.Parameter(typeof(object), "instance");
             var invokePayload = Expression.Parameter(typeof(object), "invokePayload");
             var invoke = Expression.Variable(typeof(TInvokePayload), "invoke");
             var parameterVars = method.GetParameters().Select(p => Expression.Field(invoke, p.Name)).ToArray();
@@ -85,7 +82,7 @@ namespace Akka.Interfaced
             var body = Expression.Block(
                 new[] { invoke, returnValue, returnPayload },
                 Expression.Assign(invoke, Expression.Convert(invokePayload, typeof(TInvokePayload))),
-                Expression.Assign(returnValue, Expression.Call(instance, method, parameterVars)),
+                Expression.Assign(returnValue, Expression.Call(Expression.Convert(instance, typeof(TTarget)), method, parameterVars)),
                 Expression.Assign(returnPayload, Expression.New(typeof(TReturnPayload).GetConstructor(Type.EmptyTypes))),
                 Expression.Assign(
                     Expression.Field(returnPayload, "v"),
@@ -94,7 +91,7 @@ namespace Akka.Interfaced
                         : (Expression)returnValue),
                 returnPayload);
 
-            return (Func<TTarget, object, IValueGetable>)Expression.Lambda(body, instance, invokePayload).Compile();
+            return (Func<object, object, IValueGetable>)Expression.Lambda(body, instance, invokePayload).Compile();
         }
     }
 
@@ -119,33 +116,31 @@ namespace Akka.Interfaced
             typeof(RequestHandlerAsyncBuilder).GetMethod(
                 "AfterTaskValueAsync", BindingFlags.Static | BindingFlags.NonPublic);
 
-        public static Func<TTarget, object, Task<IValueGetable>> Build<TTarget>(
-            Type invokePayloadType, Type returnPayloadType, MethodInfo method)
-            where TTarget : class
+        public static Func<object, object, Task<IValueGetable>> Build(
+            Type targetType, Type invokePayloadType, Type returnPayloadType, MethodInfo method)
         {
             var constructedHelper =
                 returnPayloadType == null
                     ? _buildHelperMethodInfo.MakeGenericMethod(
-                        typeof(TTarget), invokePayloadType)
+                        targetType, invokePayloadType)
                     : _buildHelperWithReplyMethodInfo.MakeGenericMethod(
-                        typeof(TTarget), invokePayloadType, method.ReturnType.GetGenericArguments()[0], returnPayloadType);
+                        targetType, invokePayloadType, method.ReturnType.GetGenericArguments()[0], returnPayloadType);
 
             var ret = constructedHelper.Invoke(null, new object[] { method });
-            return (Func<TTarget, object, Task<IValueGetable>>)ret;
+            return (Func<object, object, Task<IValueGetable>>)ret;
         }
 
-        private static Func<TTarget, object, Task<IValueGetable>>
+        private static Func<object, object, Task<IValueGetable>>
             BuildHelper<TTarget, TInvokePayload>(MethodInfo method)
-            where TTarget : class
         {
-            // async Task<IValueGetable> Handler(TTarget instance, object invokePayload)
+            // async Task<IValueGetable> Handler(object instance, object invokePayload)
             // {
             //      var invoke = (TInvokePayload)invokePayload;
-            //      await method(instance, invoke.a, invoke.b, ...);
+            //      await ((TTarget)instance).method(invoke.a, invoke.b, ...);
             //      return null;
             // }
 
-            var instance = Expression.Parameter(typeof(TTarget), "instance");
+            var instance = Expression.Parameter(typeof(object), "instance");
             var invokePayload = Expression.Parameter(typeof(object), "invokePayload");
             var invoke = Expression.Variable(typeof(TInvokePayload), "invoke");
             var parameterVars = method.GetParameters().Select(p => Expression.Field(invoke, p.Name)).ToArray();
@@ -154,28 +149,28 @@ namespace Akka.Interfaced
             var body = Expression.Block(
                 new[] { invoke, taskVar },
                 Expression.Assign(invoke, Expression.Convert(invokePayload, typeof(TInvokePayload))),
-                Expression.Assign(taskVar, Expression.Call(instance, method, parameterVars)),
+                Expression.Assign(taskVar, Expression.Call(Expression.Convert(instance, typeof(TTarget)), method, parameterVars)),
                 Expression.Call(_afterTaskAsyncMethodInfo, taskVar));
 
-            return (Func<TTarget, object, Task<IValueGetable>>)Expression.Lambda(body, instance, invokePayload).Compile();
+            return (Func<object, object, Task<IValueGetable>>)Expression.Lambda(body, instance, invokePayload).Compile();
         }
 
-        private static Func<TTarget, object, Task<IValueGetable>>
+        private static Func<object, object, Task<IValueGetable>>
             BuildHelperWithReturn<TTarget, TInvokePayload, TReturn, TReturnPayload>(MethodInfo method)
             where TTarget : class
         {
             var afterTaskValueAsync = _afterTaskValueAsyncMethodInfo.MakeGenericMethod(typeof(TReturn));
 
-            // async Task<IValueGetable> Handler(TTarget instance, object invokePayload)
+            // async Task<IValueGetable> Handler(object instance, object invokePayload)
             // {
             //      var invoke = (TInvokePayload)invokePayload;
-            //      var returnValue = await method(instance, invoke.a, invoke.b, ...);
+            //      var returnValue = await ((TTarget)instance).method(invoke.a, invoke.b, ...);
             //      var returnPayload = new TReturnPayload();
             //      returnPayload.v = returnValue;
             //      return (IValueGetable)returnPayload;
             // }
 
-            var instance = Expression.Parameter(typeof(TTarget), "instance");
+            var instance = Expression.Parameter(typeof(object), "instance");
             var invokePayload = Expression.Parameter(typeof(object), "invokePayload");
             var invoke = Expression.Variable(typeof(TInvokePayload), "invoke");
             var parameterVars = method.GetParameters().Select(p => Expression.Field(invoke, p.Name)).ToArray();
@@ -199,10 +194,10 @@ namespace Akka.Interfaced
             var body = Expression.Block(
                 new[] { invoke, taskVar },
                 Expression.Assign(invoke, Expression.Convert(invokePayload, typeof(TInvokePayload))),
-                Expression.Assign(taskVar, Expression.Call(instance, method, parameterVars)),
+                Expression.Assign(taskVar, Expression.Call(Expression.Convert(instance, typeof(TTarget)), method, parameterVars)),
                 Expression.Call(afterTaskValueAsync, taskVar, Expression.Constant(returnWrapper)));
 
-            return (Func<TTarget, object, Task<IValueGetable>>)Expression.Lambda(body, instance, invokePayload).Compile();
+            return (Func<object, object, Task<IValueGetable>>)Expression.Lambda(body, instance, invokePayload).Compile();
         }
 
         private static async Task<IValueGetable> AfterTaskAsync(Task task)
@@ -239,31 +234,29 @@ namespace Akka.Interfaced
             typeof(RequestHandlerSyncToAsyncBuilder).GetMethod(
                 "TaskFromException", BindingFlags.Static | BindingFlags.NonPublic);
 
-        public static Func<TTarget, object, Task<IValueGetable>> Build<TTarget>(
-            Type invokePayloadType, Type returnPayloadType, MethodInfo method)
-            where TTarget : class
+        public static Func<object, object, Task<IValueGetable>> Build(
+            Type targetType, Type invokePayloadType, Type returnPayloadType, MethodInfo method)
         {
             var constructedHelper =
                 returnPayloadType == null
                     ? _buildHelperMethodInfo.MakeGenericMethod(
-                        typeof(TTarget), invokePayloadType)
+                        targetType, invokePayloadType)
                     : _buildHelperWithReplyMethodInfo.MakeGenericMethod(
-                        typeof(TTarget), invokePayloadType, method.ReturnType, returnPayloadType);
+                        targetType, invokePayloadType, method.ReturnType, returnPayloadType);
 
             var ret = constructedHelper.Invoke(null, new object[] { method });
-            return (Func<TTarget, object, Task<IValueGetable>>)ret;
+            return (Func<object, object, Task<IValueGetable>>)ret;
         }
 
-        private static Func<TTarget, object, Task<IValueGetable>>
+        private static Func<object, object, Task<IValueGetable>>
             BuildHelper<TTarget, TInvokePayload>(MethodInfo method)
-            where TTarget : class
         {
             // Task<IValueGetable> Handler(TTarget instance, object invokePayload)
             // {
             //      try
             //      {
             //          var invoke = (TInvokePayload)invokePayload;
-            //          method(instance, invoke.a, invoke.b, ...);
+            //          ((TTarget)instance).method(invoke.a, invoke.b, ...);
             //          return Task.FromResult((IValueGetable)null);
             //      }
             //      catch (Exception e)
@@ -272,7 +265,7 @@ namespace Akka.Interfaced
             //      }
             // }
 
-            var instance = Expression.Parameter(typeof(TTarget), "instance");
+            var instance = Expression.Parameter(typeof(object), "instance");
             var invokePayload = Expression.Parameter(typeof(object), "invokePayload");
             var invoke = Expression.Variable(typeof(TInvokePayload), "invoke");
             var parameterVars = method.GetParameters().Select(p => Expression.Field(invoke, p.Name)).ToArray();
@@ -282,7 +275,7 @@ namespace Akka.Interfaced
                 Expression.Block(
                     new[] { invoke },
                     Expression.Assign(invoke, Expression.Convert(invokePayload, typeof(TInvokePayload))),
-                    Expression.Call(instance, method, parameterVars),
+                    Expression.Call(Expression.Convert(instance, typeof(TTarget)), method, parameterVars),
                     Expression.Call(
                         _taskFromResultMethodInfo,
                         Expression.Constant(null, typeof(IValueGetable)))),
@@ -290,19 +283,18 @@ namespace Akka.Interfaced
                     exception,
                     Expression.Call(_taskFromExceptionMethodInfo, exception)));
 
-            return (Func<TTarget, object, Task<IValueGetable>>)Expression.Lambda(body, instance, invokePayload).Compile();
+            return (Func<object, object, Task<IValueGetable>>)Expression.Lambda(body, instance, invokePayload).Compile();
         }
 
-        private static Func<TTarget, object, Task<IValueGetable>>
+        private static Func<object, object, Task<IValueGetable>>
             BuildHelperWithReturn<TTarget, TInvokePayload, TReturn, TReturnPayload>(MethodInfo method)
-            where TTarget : class
         {
-            // Task<IValueGetable> Handler(TTarget instance, object invokePayload)
+            // Task<IValueGetable> Handler(object instance, object invokePayload)
             // {
             //      try
             //      {
             //          var invoke = (TInvokePayload)invokePayload;
-            //          var returnValue = method(instance, invoke.a, invoke.b, ...);
+            //          var returnValue = ((TTarget)instance).method(invoke.a, invoke.b, ...);
             //          var returnPayload = new TReturnPayload();
             //          returnPayload.v = returnValue;
             //          return Task.FromResult((IValueGetable)returnPayload);
@@ -313,7 +305,7 @@ namespace Akka.Interfaced
             //      }
             // }
 
-            var instance = Expression.Parameter(typeof(TTarget), "instance");
+            var instance = Expression.Parameter(typeof(object), "instance");
             var invokePayload = Expression.Parameter(typeof(object), "invokePayload");
             var invoke = Expression.Variable(typeof(TInvokePayload), "invoke");
             var parameterVars = method.GetParameters().Select(p => Expression.Field(invoke, p.Name)).ToArray();
@@ -326,7 +318,7 @@ namespace Akka.Interfaced
                 Expression.Block(
                     new[] { invoke, returnValue, returnPayload },
                     Expression.Assign(invoke, Expression.Convert(invokePayload, typeof(TInvokePayload))),
-                    Expression.Assign(returnValue, Expression.Call(instance, method, parameterVars)),
+                    Expression.Assign(returnValue, Expression.Call(Expression.Convert(instance, typeof(TTarget)), method, parameterVars)),
                     Expression.Assign(returnPayload, Expression.New(typeof(TReturnPayload).GetConstructor(Type.EmptyTypes))),
                     Expression.Assign(
                         Expression.Field(returnPayload, "v"),
@@ -338,7 +330,7 @@ namespace Akka.Interfaced
                     exception,
                     Expression.Call(_taskFromExceptionMethodInfo, exception)));
 
-            return (Func<TTarget, object, Task<IValueGetable>>)Expression.Lambda(body, instance, invokePayload).Compile();
+            return (Func<object, object, Task<IValueGetable>>)Expression.Lambda(body, instance, invokePayload).Compile();
         }
 
         private static Task<IValueGetable> TaskFromResult(IValueGetable reply)

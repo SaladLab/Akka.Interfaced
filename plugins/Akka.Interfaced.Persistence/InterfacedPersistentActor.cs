@@ -6,36 +6,9 @@ using Akka.Persistence;
 
 namespace Akka.Interfaced.Persistence
 {
-    public abstract class InterfacedPersistentActor<T> : UntypedPersistentActor, IRequestWaiter, IFilterPerInstanceProvider
-        where T : InterfacedPersistentActor<T>
+    public abstract class InterfacedPersistentActor : UntypedPersistentActor, IRequestWaiter, IFilterPerInstanceProvider
     {
-        #region Static Variables
-
-        private readonly static RequestDispatcher<T> RequestDispatcher;
-        private readonly static NotificationDispatcher<T> NotificationDispatcher;
-        private readonly static MessageDispatcher<T> MessageDispatcher;
-        private readonly static List<Func<object, IFilter>> PerInstanceFilterCreators;
-
-        static InterfacedPersistentActor()
-        {
-            var filterHandlerBuilder = new FilterHandlerBuilder(typeof(T));
-
-            var requestHandlerBuilder = new RequestHandlerBuilder<T>();
-            RequestDispatcher = new RequestDispatcher<T>(requestHandlerBuilder.Build(filterHandlerBuilder));
-
-            var notificationHandlerBuilder = new NotificationHandlerBuilder<T>();
-            NotificationDispatcher = new NotificationDispatcher<T>(notificationHandlerBuilder.Build(filterHandlerBuilder));
-
-            var messageHandlerBuilder = new MessageHandlerBuilder<T>();
-            MessageDispatcher = new MessageDispatcher<T>(messageHandlerBuilder.Build(filterHandlerBuilder));
-
-            PerInstanceFilterCreators = filterHandlerBuilder.PerInstanceFilterCreators;
-        }
-
-        #endregion
-
-        #region Member Variables
-
+        private readonly InterfacedActorHandler _handler;
         private int _activeReentrantCount;
         private MessageHandleContext _currentAtomicContext;
         private InterfacedActorRequestWaiter _requestWaiter;
@@ -43,7 +16,10 @@ namespace Akka.Interfaced.Persistence
         private InterfacedActorPerInstanceFilterList _perInstanceFilterList;
         private Dictionary<long, TaskCompletionSource<SnapshotMetadata>> _saveSnapshotTcsMap;
 
-        #endregion
+        public InterfacedPersistentActor()
+        {
+            _handler = InterfacedActorHandlerTable.Get(GetType());
+        }
 
         protected new IActorRef Sender
         {
@@ -69,8 +45,8 @@ namespace Akka.Interfaced.Persistence
 
         protected override void PreStart()
         {
-            if (PerInstanceFilterCreators.Count > 0)
-                _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, PerInstanceFilterCreators);
+            if (_handler.PerInstanceFilterCreators.Count > 0)
+                _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, _handler.PerInstanceFilterCreators);
 
             InvokeOnPreStart();
             base.PreStart();
@@ -104,7 +80,7 @@ namespace Akka.Interfaced.Persistence
 
         protected override void OnRecover(object message)
         {
-            var messageHandler = MessageDispatcher.GetHandler(message.GetType());
+            var messageHandler = _handler.MessageDispatcher.GetHandler(message.GetType());
             if (messageHandler != null)
             {
                 HandleMessageByHandler(message, messageHandler);
@@ -158,7 +134,7 @@ namespace Akka.Interfaced.Persistence
                 return;
             }
 
-            var messageHandler = MessageDispatcher.GetHandler(message.GetType());
+            var messageHandler = _handler.MessageDispatcher.GetHandler(message.GetType());
             if (messageHandler != null)
             {
                 HandleMessageByHandler(message, messageHandler);
@@ -185,7 +161,7 @@ namespace Akka.Interfaced.Persistence
                 return;
             }
 
-            var handlerItem = RequestDispatcher.GetHandler(request.InvokePayload.GetType());
+            var handlerItem = _handler.RequestDispatcher.GetHandler(request.InvokePayload.GetType());
             if (handlerItem == null)
             {
                 sender.Tell(new ResponseMessage
@@ -200,7 +176,7 @@ namespace Akka.Interfaced.Persistence
             {
                 // sync handle
 
-                var response = handlerItem.Handler((T)this, request, null);
+                var response = handlerItem.Handler(this, request, null);
                 if (request.RequestId != 0)
                     sender.Tell(response);
             }
@@ -223,7 +199,7 @@ namespace Akka.Interfaced.Persistence
                 {
                     var requestId = request.RequestId;
                     var isReentrant = handlerItem.IsReentrant;
-                    handlerItem.AsyncHandler((T)this, request, response =>
+                    handlerItem.AsyncHandler(this, request, response =>
                     {
                         if (requestId != 0)
                             sender.Tell(response);
@@ -250,7 +226,7 @@ namespace Akka.Interfaced.Persistence
         {
             if (notification.ObserverId == 0)
             {
-                var handlerItem = NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
+                var handlerItem = _handler.NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
                 if (handlerItem == null)
                     return;
 
@@ -258,7 +234,7 @@ namespace Akka.Interfaced.Persistence
                 {
                     // sync handle
 
-                    handlerItem.Handler((T)this, notification);
+                    handlerItem.Handler(this, notification);
                 }
                 else
                 {
@@ -277,7 +253,7 @@ namespace Akka.Interfaced.Persistence
 
                     using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                     {
-                        handlerItem.AsyncHandler((T)this, notification)
+                        handlerItem.AsyncHandler(this, notification)
                                    .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
                                                  TaskContinuationOptions.ExecuteSynchronously);
                     }
@@ -322,7 +298,7 @@ namespace Akka.Interfaced.Persistence
             }
         }
 
-        private void HandleMessageByHandler(object message, MessageHandlerItem<T> handlerItem)
+        private void HandleMessageByHandler(object message, MessageHandlerItem handlerItem)
         {
             if (handlerItem.AsyncHandler != null)
             {
@@ -339,14 +315,14 @@ namespace Akka.Interfaced.Persistence
 
                 using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                 {
-                    handlerItem.AsyncHandler((T)this, message)
+                    handlerItem.AsyncHandler(this, message)
                                .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
                                              TaskContinuationOptions.ExecuteSynchronously);
                 }
             }
             else
             {
-                handlerItem.Handler((T)this, message);
+                handlerItem.Handler(this, message);
             }
         }
 
@@ -571,5 +547,10 @@ namespace Akka.Interfaced.Persistence
 
             return false;
         }
+    }
+
+    [Obsolete("Use non generic version of InterfacedPersistentActor.")]
+    public abstract class InterfacedPersistentActor<T> : InterfacedPersistentActor
+    {
     }
 }

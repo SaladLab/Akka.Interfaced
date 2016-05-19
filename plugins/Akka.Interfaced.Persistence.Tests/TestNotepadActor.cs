@@ -6,7 +6,6 @@ using Akka.Interfaced;
 using Akka.Interfaced.Persistence.Tests.Interface;
 using Akka.Interfaced.Persistence;
 using Akka.Persistence;
-using Xunit;
 
 namespace Akka.Interfaced.Persistence.Tests
 {
@@ -24,7 +23,7 @@ namespace Akka.Interfaced.Persistence.Tests
         public List<string> Document;
     }
 
-    public class TestNotepadActor : InterfacedPersistentActor<TestNotepadActor>, INotepad
+    public class TestNotepadActor : InterfacedPersistentActor, INotepad
     {
         private List<string> _eventLog;
         private NotepadState _state;

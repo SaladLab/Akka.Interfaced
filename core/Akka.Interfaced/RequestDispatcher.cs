@@ -3,19 +3,18 @@ using System.Collections.Generic;
 
 namespace Akka.Interfaced
 {
-    public class RequestDispatcher<T>
-        where T : class
+    public class RequestDispatcher
     {
-        private readonly Dictionary<Type, RequestHandlerItem<T>> _handlerTable;
+        private readonly Dictionary<Type, RequestHandlerItem> _handlerTable;
 
-        public RequestDispatcher(Dictionary<Type, RequestHandlerItem<T>> handlerTable)
+        public RequestDispatcher(Dictionary<Type, RequestHandlerItem> handlerTable)
         {
             _handlerTable = handlerTable;
         }
 
-        public RequestHandlerItem<T> GetHandler(Type type)
+        public RequestHandlerItem GetHandler(Type type)
         {
-            RequestHandlerItem<T> item;
+            RequestHandlerItem item;
             return _handlerTable.TryGetValue(type, out item) ? item : null;
         }
     }

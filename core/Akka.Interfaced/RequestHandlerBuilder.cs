@@ -8,33 +8,32 @@ using System.Runtime.CompilerServices;
 
 namespace Akka.Interfaced
 {
-    internal class RequestHandlerBuilder<T>
-        where T : class
+    internal class RequestHandlerBuilder
     {
-        private Dictionary<Type, RequestHandlerItem<T>> _table;
+        private Type _type;
         private FilterHandlerBuilder _filterHandlerBuilder;
+        private Dictionary<Type, RequestHandlerItem> _table;
 
-        public Dictionary<Type, RequestHandlerItem<T>> Build(FilterHandlerBuilder filterHandlerBuilder)
+        public Dictionary<Type, RequestHandlerItem> Build(Type type, FilterHandlerBuilder filterHandlerBuilder)
         {
-            _table = new Dictionary<Type, RequestHandlerItem<T>>();
+            _type = type;
             _filterHandlerBuilder = filterHandlerBuilder;
+            _table = new Dictionary<Type, RequestHandlerItem>();
 
-            BuildRegularInterfaceHandler();
-            BuildExtendedInterfaceHandler();
+            BuildRegularInterfaceHandlers();
+            BuildExtendedInterfaceHandlers();
 
             return _table;
         }
 
-        private void BuildRegularInterfaceHandler()
+        private void BuildRegularInterfaceHandlers()
         {
-            var type = typeof(T);
-
-            foreach (var ifs in type.GetInterfaces())
+            foreach (var ifs in _type.GetInterfaces())
             {
                 if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedActor)))
                     continue;
 
-                var interfaceMap = type.GetInterfaceMap(ifs);
+                var interfaceMap = _type.GetInterfaceMap(ifs);
                 var methodItems = interfaceMap.InterfaceMethods.Zip(interfaceMap.TargetMethods, Tuple.Create)
                                               .OrderBy(p => p.Item1, new MethodInfoComparer())
                                               .ToArray();
@@ -46,9 +45,9 @@ namespace Akka.Interfaced
                     var invokePayloadType = payloadTypeTable[i, 0];
                     var returnPayloadType = payloadTypeTable[i, 1];
                     var filterChain = _filterHandlerBuilder.Build(targetMethod, FilterChainKind.Request);
-                    var asyncHandler = BuildAsyncHandler(invokePayloadType, returnPayloadType, targetMethod, filterChain);
+                    var asyncHandler = BuildAsyncHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain);
 
-                    _table.Add(invokePayloadType, new RequestHandlerItem<T>
+                    _table.Add(invokePayloadType, new RequestHandlerItem
                     {
                         InterfaceType = ifs,
                         IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
@@ -58,21 +57,19 @@ namespace Akka.Interfaced
             }
         }
 
-        private void BuildExtendedInterfaceHandler()
+        private void BuildExtendedInterfaceHandlers()
         {
-            var type = typeof(T);
-
             var targetMethods =
-                type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-                    .Where(m => m.GetCustomAttribute<ExtendedHandlerAttribute>() != null)
-                    .Select(m => Tuple.Create(m, m.GetCustomAttribute<ExtendedHandlerAttribute>()))
-                    .ToList();
+                _type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                     .Where(m => m.GetCustomAttribute<ExtendedHandlerAttribute>() != null)
+                     .Select(m => Tuple.Create(m, m.GetCustomAttribute<ExtendedHandlerAttribute>()))
+                     .ToList();
 
             var extendedInterfaces =
-                type.GetInterfaces()
-                    .Where(t => t.FullName.StartsWith("Akka.Interfaced.IExtendedInterface"))
-                    .SelectMany(t => t.GenericTypeArguments)
-                    .Where(t => t.GetInterfaces().Any(i => i == typeof(IInterfacedActor)));
+                _type.GetInterfaces()
+                     .Where(t => t.FullName.StartsWith("Akka.Interfaced.IExtendedInterface"))
+                     .SelectMany(t => t.GenericTypeArguments)
+                     .Where(t => t.GetInterfaces().Any(i => i == typeof(IInterfacedActor)));
 
             foreach (var ifs in extendedInterfaces)
             {
@@ -131,35 +128,35 @@ namespace Akka.Interfaced
 
                     if (isAsyncMethod || filterChain.AsyncFilterExists)
                     {
-                        _table.Add(invokePayloadType, new RequestHandlerItem<T>
+                        _table.Add(invokePayloadType, new RequestHandlerItem
                         {
                             InterfaceType = ifs,
                             IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
-                            AsyncHandler = BuildAsyncHandler(invokePayloadType, returnPayloadType, targetMethod, filterChain)
+                            AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
                         });
                     }
                     else
                     {
                         if (targetMethod.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
-                            throw new InvalidOperationException($"Async void handler is not supported. ({type.FullName}.{targetMethod.Name})");
+                            throw new InvalidOperationException($"Async void handler is not supported. ({_type.FullName}.{targetMethod.Name})");
 
-                        _table.Add(invokePayloadType, new RequestHandlerItem<T>
+                        _table.Add(invokePayloadType, new RequestHandlerItem
                         {
                             InterfaceType = ifs,
                             IsReentrant = false,
-                            Handler = BuildHandler(invokePayloadType, returnPayloadType, targetMethod, filterChain)
+                            Handler = BuildHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
                         });
                     }
                 }
             }
         }
 
-        private static RequestHandler<T> BuildHandler(
-            Type invokePayloadType, Type returnPayloadType, MethodInfo method, FilterChain filterChain)
+        private static RequestHandler BuildHandler(
+            Type targetType, Type invokePayloadType, Type returnPayloadType, MethodInfo method, FilterChain filterChain)
         {
-            var handler = RequestHandlerFuncBuilder.Build<T>(invokePayloadType, returnPayloadType, method);
+            var handler = RequestHandlerFuncBuilder.Build(targetType, invokePayloadType, returnPayloadType, method);
 
-            return delegate(T self, RequestMessage request, Action<ResponseMessage> onCompleted)
+            return delegate(object self, RequestMessage request, Action<ResponseMessage> onCompleted)
             {
                 ResponseMessage response = null;
 
@@ -261,16 +258,16 @@ namespace Akka.Interfaced
             };
         }
 
-        private static RequestAsyncHandler<T> BuildAsyncHandler(
-            Type invokePayloadType, Type returnPayloadType, MethodInfo method, FilterChain filterChain)
+        private static RequestAsyncHandler BuildAsyncHandler(
+            Type targetType, Type invokePayloadType, Type returnPayloadType, MethodInfo method, FilterChain filterChain)
         {
             var isAsyncMethod = method.ReturnType.Name.StartsWith("Task");
             var handler = isAsyncMethod
-                ? RequestHandlerAsyncBuilder.Build<T>(invokePayloadType, returnPayloadType, method)
-                : RequestHandlerSyncToAsyncBuilder.Build<T>(invokePayloadType, returnPayloadType, method);
+                ? RequestHandlerAsyncBuilder.Build(targetType, invokePayloadType, returnPayloadType, method)
+                : RequestHandlerSyncToAsyncBuilder.Build(targetType, invokePayloadType, returnPayloadType, method);
 
             // TODO: Optimize this function when without async filter
-            return async delegate(T self, RequestMessage request, Action<ResponseMessage> onCompleted)
+            return async delegate(object self, RequestMessage request, Action<ResponseMessage> onCompleted)
             {
                 ResponseMessage response = null;
 

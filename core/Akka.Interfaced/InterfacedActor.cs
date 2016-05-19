@@ -1,49 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 
 namespace Akka.Interfaced
 {
-    public abstract class InterfacedActor<T> : UntypedActor, IWithUnboundedStash, IRequestWaiter, IFilterPerInstanceProvider
-        where T : InterfacedActor<T>
+    public abstract class InterfacedActor : UntypedActor, IWithUnboundedStash, IRequestWaiter, IFilterPerInstanceProvider
     {
-        #region Static Variables
-
-        private readonly static RequestDispatcher<T> RequestDispatcher;
-        private readonly static NotificationDispatcher<T> NotificationDispatcher;
-        private readonly static MessageDispatcher<T> MessageDispatcher;
-        private readonly static List<Func<object, IFilter>> PerInstanceFilterCreators;
-
-        static InterfacedActor()
-        {
-            var filterHandlerBuilder = new FilterHandlerBuilder(typeof(T));
-
-            var requestHandlerBuilder = new RequestHandlerBuilder<T>();
-            RequestDispatcher = new RequestDispatcher<T>(requestHandlerBuilder.Build(filterHandlerBuilder));
-
-            var notificationHandlerBuilder = new NotificationHandlerBuilder<T>();
-            NotificationDispatcher = new NotificationDispatcher<T>(notificationHandlerBuilder.Build(filterHandlerBuilder));
-
-            var messageHandlerBuilder = new MessageHandlerBuilder<T>();
-            MessageDispatcher = new MessageDispatcher<T>(messageHandlerBuilder.Build(filterHandlerBuilder));
-
-            PerInstanceFilterCreators = filterHandlerBuilder.PerInstanceFilterCreators;
-        }
-
-        #endregion
-
-        #region Member Variables
-
         public IStash Stash { get; set; }
+
+        private readonly InterfacedActorHandler _handler;
         private int _activeReentrantCount;
         private MessageHandleContext _currentAtomicContext;
         private InterfacedActorRequestWaiter _requestWaiter;
         private InterfacedActorObserverMap _observerMap;
         private InterfacedActorPerInstanceFilterList _perInstanceFilterList;
-
-        #endregion
 
         protected new IActorRef Sender
         {
@@ -52,6 +23,11 @@ namespace Akka.Interfaced
                 var context = ActorSynchronizationContext.GetCurrentContext();
                 return context != null ? context.Sender : base.Sender;
             }
+        }
+
+        public InterfacedActor()
+        {
+            _handler = InterfacedActorHandlerTable.Get(GetType());
         }
 
         // Atomic async OnPreStart event (it will be called after PreStart)
@@ -69,8 +45,8 @@ namespace Akka.Interfaced
 
         protected override void PreStart()
         {
-            if (PerInstanceFilterCreators.Count > 0)
-                _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, PerInstanceFilterCreators);
+            if (_handler.PerInstanceFilterCreators.Count > 0)
+                _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, _handler.PerInstanceFilterCreators);
 
             InvokeOnPreStart();
         }
@@ -145,7 +121,7 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var messageHandler = MessageDispatcher.GetHandler(message.GetType());
+            var messageHandler = _handler.MessageDispatcher.GetHandler(message.GetType());
             if (messageHandler != null)
             {
                 HandleMessageByHandler(message, messageHandler);
@@ -169,7 +145,7 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var handlerItem = RequestDispatcher.GetHandler(request.InvokePayload.GetType());
+            var handlerItem = _handler.RequestDispatcher.GetHandler(request.InvokePayload.GetType());
             if (handlerItem == null)
             {
                 sender.Tell(new ResponseMessage
@@ -184,7 +160,7 @@ namespace Akka.Interfaced
             {
                 // sync handle
 
-                var response = handlerItem.Handler((T)this, request, null);
+                var response = handlerItem.Handler(this, request, null);
                 if (request.RequestId != 0)
                     sender.Tell(response);
             }
@@ -207,7 +183,7 @@ namespace Akka.Interfaced
                 {
                     var requestId = request.RequestId;
                     var isReentrant = handlerItem.IsReentrant;
-                    handlerItem.AsyncHandler((T)this, request, response =>
+                    handlerItem.AsyncHandler(this, request, response =>
                     {
                         if (requestId != 0)
                             sender.Tell(response);
@@ -234,7 +210,7 @@ namespace Akka.Interfaced
         {
             if (notification.ObserverId == 0)
             {
-                var handlerItem = NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
+                var handlerItem = _handler.NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
                 if (handlerItem == null)
                     return;
 
@@ -242,7 +218,7 @@ namespace Akka.Interfaced
                 {
                     // sync handle
 
-                    handlerItem.Handler((T)this, notification);
+                    handlerItem.Handler(this, notification);
                 }
                 else
                 {
@@ -261,7 +237,7 @@ namespace Akka.Interfaced
 
                     using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                     {
-                        handlerItem.AsyncHandler((T)this, notification)
+                        handlerItem.AsyncHandler(this, notification)
                                    .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
                                                  TaskContinuationOptions.ExecuteSynchronously);
                     }
@@ -306,7 +282,7 @@ namespace Akka.Interfaced
             }
         }
 
-        private void HandleMessageByHandler(object message, MessageHandlerItem<T> handlerItem)
+        private void HandleMessageByHandler(object message, MessageHandlerItem handlerItem)
         {
             if (handlerItem.AsyncHandler != null)
             {
@@ -323,14 +299,14 @@ namespace Akka.Interfaced
 
                 using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                 {
-                    handlerItem.AsyncHandler((T)this, message)
+                    handlerItem.AsyncHandler(this, message)
                                .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
                                              TaskContinuationOptions.ExecuteSynchronously);
                 }
             }
             else
             {
-                handlerItem.Handler((T)this, message);
+                handlerItem.Handler(this, message);
             }
         }
 
@@ -489,5 +465,10 @@ namespace Akka.Interfaced
         {
             return _perInstanceFilterList.Get(index);
         }
+    }
+
+    [Obsolete("Use non generic version of InterfacedActor.")]
+    public abstract class InterfacedActor<T> : InterfacedActor
+    {
     }
 }

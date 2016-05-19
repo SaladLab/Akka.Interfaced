@@ -5,16 +5,17 @@ using System.Runtime.CompilerServices;
 
 namespace Akka.Interfaced
 {
-    internal class MessageHandlerBuilder<T>
-        where T : class
+    internal class MessageHandlerBuilder
     {
-        private Dictionary<Type, MessageHandlerItem<T>> _table;
+        private Type _type;
         private FilterHandlerBuilder _filterHandlerBuilder;
+        private Dictionary<Type, MessageHandlerItem> _table;
 
-        internal Dictionary<Type, MessageHandlerItem<T>> Build(FilterHandlerBuilder filterHandlerBuilder)
+        internal Dictionary<Type, MessageHandlerItem> Build(Type type, FilterHandlerBuilder filterHandlerBuilder)
         {
-            _table = new Dictionary<Type, MessageHandlerItem<T>>();
+            _type = type;
             _filterHandlerBuilder = filterHandlerBuilder;
+            _table = new Dictionary<Type, MessageHandlerItem>();
 
             BuildAnnotatedMessageHandlers();
 
@@ -23,11 +24,9 @@ namespace Akka.Interfaced
 
         private void BuildAnnotatedMessageHandlers()
         {
-            var type = typeof(T);
-
             // create a handler for every method which has MessageHandlerAttribute
 
-            var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var methods = _type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (var method in methods)
             {
                 var attr = method.GetCustomAttribute<MessageHandlerAttribute>();
@@ -40,31 +39,31 @@ namespace Akka.Interfaced
 
                 if (isAsyncMethod || filterChain.AsyncFilterExists)
                 {
-                    var item = new MessageHandlerItem<T>
+                    var item = new MessageHandlerItem
                     {
                         IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(method),
-                        AsyncHandler = BuildAsyncHandler(messageType, method, filterChain)
+                        AsyncHandler = BuildAsyncHandler(_type, messageType, method, filterChain)
                     };
                     _table.Add(messageType, item);
                 }
                 else
                 {
                     if (method.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
-                        throw new InvalidOperationException($"Async void handler is not supported. ({type.FullName}.{method.Name})");
+                        throw new InvalidOperationException($"Async void handler is not supported. ({_type.FullName}.{method.Name})");
 
-                    var item = new MessageHandlerItem<T>
+                    var item = new MessageHandlerItem
                     {
-                        Handler = BuildHandler(messageType, method, filterChain)
+                        Handler = BuildHandler(_type, messageType, method, filterChain)
                     };
                     _table.Add(messageType, item);
                 }
             }
         }
 
-        private static MessageHandler<T> BuildHandler(
-            Type messageType, MethodInfo method, FilterChain filterChain)
+        private static MessageHandler BuildHandler(
+            Type targetType, Type messageType, MethodInfo method, FilterChain filterChain)
         {
-            var handler = MessageHandlerFuncBuilder.Build<T>(method);
+            var handler = MessageHandlerFuncBuilder.Build(targetType, method);
             if (filterChain.Empty)
                 return handler;
 
@@ -123,13 +122,13 @@ namespace Akka.Interfaced
             };
         }
 
-        private static MessageAsyncHandler<T> BuildAsyncHandler(
-            Type messageType, MethodInfo method, FilterChain filterChain)
+        private static MessageAsyncHandler BuildAsyncHandler(
+            Type targetType, Type messageType, MethodInfo method, FilterChain filterChain)
         {
             var isAsyncMethod = method.ReturnType.Name.StartsWith("Task");
             var handler = isAsyncMethod
-                ? MessageHandlerAsyncBuilder.Build<T>(method)
-                : MessageHandlerSyncToAsyncBuilder.Build<T>(method);
+                ? MessageHandlerAsyncBuilder.Build(targetType, method)
+                : MessageHandlerSyncToAsyncBuilder.Build(targetType, method);
             if (filterChain.Empty)
                 return handler;
 

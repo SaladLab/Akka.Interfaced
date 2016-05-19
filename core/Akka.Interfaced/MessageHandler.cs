@@ -2,13 +2,13 @@
 
 namespace Akka.Interfaced
 {
-    public delegate void MessageHandler<in T>(T self, object message);
-    public delegate Task MessageAsyncHandler<in T>(T self, object message);
+    public delegate void MessageHandler(object self, object message);
+    public delegate Task MessageAsyncHandler(object self, object message);
 
-    public class MessageHandlerItem<T>
+    public class MessageHandlerItem
     {
         public bool IsReentrant;
-        public MessageHandler<T> Handler;
-        public MessageAsyncHandler<T> AsyncHandler;
+        public MessageHandler Handler;
+        public MessageAsyncHandler AsyncHandler;
     }
 }
