@@ -236,10 +236,7 @@ namespace Akka.Interfaced
             {
                 var handlerItem = NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
                 if (handlerItem == null)
-                {
-                    // TODO: log no handler.
                     return;
-                }
 
                 if (handlerItem.Handler != null)
                 {

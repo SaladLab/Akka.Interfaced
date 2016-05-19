@@ -175,6 +175,16 @@ namespace Akka.Interfaced.Persistence
         {
             var sender = base.Sender;
 
+            if (request.InvokePayload == null)
+            {
+                sender.Tell(new ResponseMessage
+                {
+                    RequestId = request.RequestId,
+                    Exception = new InvalidMessageException("Empty payload")
+                });
+                return;
+            }
+
             var handlerItem = RequestDispatcher.GetHandler(request.InvokePayload.GetType());
             if (handlerItem == null)
             {
@@ -238,7 +248,45 @@ namespace Akka.Interfaced.Persistence
 
         private void OnNotificationMessage(NotificationMessage notification)
         {
-            _observerMap?.Notify(notification);
+            if (notification.ObserverId == 0)
+            {
+                var handlerItem = NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
+                if (handlerItem == null)
+                    return;
+
+                if (handlerItem.Handler != null)
+                {
+                    // sync handle
+
+                    handlerItem.Handler((T)this, notification);
+                }
+                else
+                {
+                    // async handle
+
+                    var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+                    if (handlerItem.IsReentrant)
+                    {
+                        _activeReentrantCount += 1;
+                    }
+                    else
+                    {
+                        BecomeStacked(OnReceiveInAtomicTask);
+                        _currentAtomicContext = context;
+                    }
+
+                    using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
+                    {
+                        handlerItem.AsyncHandler((T)this, notification)
+                                   .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
+                                                 TaskContinuationOptions.ExecuteSynchronously);
+                    }
+                }
+            }
+            else
+            {
+                _observerMap?.Notify(notification);
+            }
         }
 
         private void OnTaskRunMessage(TaskRunMessage taskRunMessage)
