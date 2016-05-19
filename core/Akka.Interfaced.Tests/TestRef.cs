@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
-    public class TestRefActor : InterfacedActor<TestRefActor>, IDummy
+    public class TestRefActor : InterfacedActor, IDummy
     {
         async Task<object> IDummy.Call(object param)
         {

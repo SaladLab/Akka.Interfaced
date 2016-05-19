@@ -11,7 +11,7 @@ using SlimHttp.Interface;
 
 namespace SlimHttp.Program.Server
 {
-    public class PedanticActor : InterfacedActor<PedanticActor>, IPedantic
+    public class PedanticActor : InterfacedActor, IPedantic
     {
         async Task IPedantic.TestCall()
         {

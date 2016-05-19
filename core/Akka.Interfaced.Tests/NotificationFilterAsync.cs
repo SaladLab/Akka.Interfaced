@@ -41,7 +41,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [NotificationFilterAsync]
-    public class NotificationFilterAsyncActor : InterfacedActor<NotificationFilterAsyncActor>, IExtendedInterface<ISubject2Observer>
+    public class NotificationFilterAsyncActor : InterfacedActor, IExtendedInterface<ISubject2Observer>
     {
         [ExtendedHandler]
         private void Event(string eventName)

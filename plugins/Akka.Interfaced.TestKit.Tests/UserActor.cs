@@ -2,7 +2,7 @@
 
 namespace Akka.Interfaced.TestKit.Tests
 {
-    public class UserActor : InterfacedActor<UserActor>, IUser
+    public class UserActor : InterfacedActor, IUser
     {
         private readonly string _id;
         private readonly UserObserver _observer;

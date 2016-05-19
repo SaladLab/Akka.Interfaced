@@ -98,7 +98,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [RequestFilterAuthorize, RequestFilterFirstLog, RequestFilterLastLog]
-    public class RequestFilterPipelineActor : InterfacedActor<RequestFilterPipelineActor>, IExtendedInterface<IWorker>
+    public class RequestFilterPipelineActor : InterfacedActor, IExtendedInterface<IWorker>
     {
         public int Permission { get; }
 

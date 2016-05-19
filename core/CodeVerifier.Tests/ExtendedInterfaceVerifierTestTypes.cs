@@ -21,7 +21,7 @@ namespace CodeVerifier.Tests
         Task<string> Bye();
     }
 
-    public class ExtendedClass_MethodCompleted : InterfacedActor<ExtendedClass_MethodCompleted>, IExtendedInterface<IFoo>
+    public class ExtendedClass_MethodCompleted : InterfacedActor, IExtendedInterface<IFoo>
     {
         [ExtendedHandler]
         private void Hello(int delta)
@@ -35,7 +35,7 @@ namespace CodeVerifier.Tests
         }
     }
 
-    public class ExtendedClass_MethodMissing : InterfacedActor<ExtendedClass_MethodMissing>, IExtendedInterface<IFoo>
+    public class ExtendedClass_MethodMissing : InterfacedActor, IExtendedInterface<IFoo>
     {
         [ExtendedHandler]
         private void Hello(int delta)
@@ -43,7 +43,7 @@ namespace CodeVerifier.Tests
         }
     }
 
-    public class ExtendedClass_MethodRedundant : InterfacedActor<ExtendedClass_MethodRedundant>, IExtendedInterface<IFoo>
+    public class ExtendedClass_MethodRedundant : InterfacedActor, IExtendedInterface<IFoo>
     {
         [ExtendedHandler]
         private void Hello(int delta)
@@ -62,7 +62,7 @@ namespace CodeVerifier.Tests
         }
     }
 
-    public class ExtendedClass_ExplicitMethodCompleted : InterfacedActor<ExtendedClass_ExplicitMethodCompleted>, IExtendedInterface<IBar, IBar2>
+    public class ExtendedClass_ExplicitMethodCompleted : InterfacedActor, IExtendedInterface<IBar, IBar2>
     {
         [ExtendedHandler(typeof(IBar))]
         private void Bye(int delta)

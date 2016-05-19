@@ -9,7 +9,7 @@ using Protobuf.Interface;
 
 namespace Protobuf.Program
 {
-    public class SurrogateActor : InterfacedActor<SurrogateActor>, ISurrogate
+    public class SurrogateActor : InterfacedActor, ISurrogate
     {
         Task<ActorPath> ISurrogate.GetPath(ActorPath path)
         {

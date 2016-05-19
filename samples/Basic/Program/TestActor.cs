@@ -5,7 +5,7 @@ using Basic.Interface;
 
 namespace Basic.Program
 {
-    public class TestActor : InterfacedActor<TestActor>, ICalculator, ICounter, IWorker
+    public class TestActor : InterfacedActor, ICalculator, ICounter, IWorker
     {
         private int _counter;
 

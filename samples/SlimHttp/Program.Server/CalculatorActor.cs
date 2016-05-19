@@ -12,7 +12,7 @@ using SlimHttp.Interface;
 
 namespace SlimHttp.Program.Server
 {
-    public class CalculatorActor : InterfacedActor<CalculatorActor>, ICalculator
+    public class CalculatorActor : InterfacedActor, ICalculator
     {
         Task<string> ICalculator.Concat(string a, string b)
         {

@@ -6,7 +6,7 @@ using Basic.Interface;
 
 namespace Basic.Program
 {
-    public class TestOverloadedActor : InterfacedActor<TestOverloadedActor>, IOverloaded
+    public class TestOverloadedActor : InterfacedActor, IOverloaded
     {
         Task<int> IOverloaded.Min(int a, int b)
         {

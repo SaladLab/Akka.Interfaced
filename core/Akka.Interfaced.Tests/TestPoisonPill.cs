@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
-    public class TestPoisonPillActor : InterfacedActor<TestPoisonPillActor>, IWorker
+    public class TestPoisonPillActor : InterfacedActor, IWorker
     {
         private readonly List<string> _eventLog;
 

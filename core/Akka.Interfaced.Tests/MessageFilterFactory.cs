@@ -49,7 +49,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class MessageFilterPerClassActor : InterfacedActor<MessageFilterPerClassActor>
+    public class MessageFilterPerClassActor : InterfacedActor
     {
         [MessageHandler, MessageFilterPerClass]
         private void Handle(string message)
@@ -101,7 +101,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class MessageFilterPerClassMethodActor : InterfacedActor<MessageFilterPerClassMethodActor>
+    public class MessageFilterPerClassMethodActor : InterfacedActor
     {
         [MessageHandler, MessageFilterPerClassMethod]
         private void Handle(string message)
@@ -155,7 +155,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [MessageFilterPerInstance]
-    public class MessageFilterPerInstanceActor : InterfacedActor<MessageFilterPerInstanceActor>
+    public class MessageFilterPerInstanceActor : InterfacedActor
     {
         [MessageHandler]
         private void Handle(string message)
@@ -218,7 +218,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [MessageFilterPerInstanceMethod]
-    public class MessageFilterPerInstanceMethodActor : InterfacedActor<MessageFilterPerInstanceMethodActor>
+    public class MessageFilterPerInstanceMethodActor : InterfacedActor
     {
         [MessageHandler]
         private void Handle(string message)
@@ -281,7 +281,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [MessageFilterPerMessage]
-    public class MessageFilterPerMessageActor : InterfacedActor<MessageFilterPerMessageActor>
+    public class MessageFilterPerMessageActor : InterfacedActor
     {
         [MessageHandler]
         private void Handle(string message)

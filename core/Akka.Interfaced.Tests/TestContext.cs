@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
-    public class TestContextActor : InterfacedActor<TestContextActor>, IDummy
+    public class TestContextActor : InterfacedActor, IDummy
     {
         async Task<object> IDummy.Call(object param)
         {
@@ -18,7 +18,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestContextReentrantActor : InterfacedActor<TestContextReentrantActor>, IDummy
+    public class TestContextReentrantActor : InterfacedActor, IDummy
     {
         [Reentrant]
         async Task<object> IDummy.Call(object param)
@@ -31,7 +31,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestContextMessageActor : InterfacedActor<TestContextMessageActor>
+    public class TestContextMessageActor : InterfacedActor
     {
         [MessageHandler]
         private async Task OnMessage(List<IUntypedActorContext> list)
@@ -43,7 +43,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestContextMessageReentrantActor : InterfacedActor<TestContextMessageReentrantActor>
+    public class TestContextMessageReentrantActor : InterfacedActor
     {
         [MessageHandler, Reentrant]
         private async Task OnMessage(List<IUntypedActorContext> list)

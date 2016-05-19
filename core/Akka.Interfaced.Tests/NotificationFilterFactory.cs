@@ -49,7 +49,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class NotificationFilterPerClassActor : InterfacedActor<NotificationFilterPerClassActor>, ISubjectObserver
+    public class NotificationFilterPerClassActor : InterfacedActor, ISubjectObserver
     {
         [NotificationFilterPerClass]
         void ISubjectObserver.Event(string eventName)
@@ -101,7 +101,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class NotificationFilterPerClassMethodActor : InterfacedActor<NotificationFilterPerClassMethodActor>, ISubjectObserver
+    public class NotificationFilterPerClassMethodActor : InterfacedActor, ISubjectObserver
     {
         [NotificationFilterPerClassMethod]
         void ISubjectObserver.Event(string eventName)
@@ -155,7 +155,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [NotificationFilterPerInstance]
-    public class NotificationFilterPerInstanceActor : InterfacedActor<NotificationFilterPerInstanceActor>, ISubject2Observer
+    public class NotificationFilterPerInstanceActor : InterfacedActor, ISubject2Observer
     {
         void ISubject2Observer.Event(string eventName)
         {
@@ -216,7 +216,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [NotificationFilterPerInstanceMethod]
-    public class NotificationFilterPerInstanceMethodActor : InterfacedActor<NotificationFilterPerInstanceMethodActor>, ISubject2Observer
+    public class NotificationFilterPerInstanceMethodActor : InterfacedActor, ISubject2Observer
     {
         void ISubject2Observer.Event(string eventName)
         {
@@ -277,7 +277,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [NotificationFilterPerNotification]
-    public class NotificationFilterPerNotificationActor : InterfacedActor<NotificationFilterPerNotificationActor>, ISubjectObserver
+    public class NotificationFilterPerNotificationActor : InterfacedActor, ISubjectObserver
     {
         void ISubjectObserver.Event(string eventName)
         {

@@ -6,7 +6,7 @@ using Xunit;
 namespace Akka.Interfaced.LogFilter.Tests
 {
     [Log]
-    public class TestActor : InterfacedActor<TestActor>, ITest
+    public class TestActor : InterfacedActor, ITest
     {
         private NLog.ILogger _logger;
         private int _helloCount;

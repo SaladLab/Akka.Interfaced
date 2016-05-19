@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
-    public class TestMessageDispatchRequestExtendedActor : InterfacedActor<TestMessageDispatchRequestExtendedActor>,
+    public class TestMessageDispatchRequestExtendedActor : InterfacedActor,
         IDummy,
         IExtendedInterface<IBasic>
     {
@@ -61,7 +61,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestMessageDispatchRequestExtendedActor2 : InterfacedActor<TestMessageDispatchRequestExtendedActor2>,
+    public class TestMessageDispatchRequestExtendedActor2 : InterfacedActor,
            IDummy,
            IExtendedInterface<IBasic>
     {

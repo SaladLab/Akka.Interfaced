@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
-    public class SubjectActor : InterfacedActor<SubjectActor>, ISubject
+    public class SubjectActor : InterfacedActor, ISubject
     {
         private List<ISubjectObserver> _observers = new List<ISubjectObserver>();
 
@@ -32,7 +32,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class Subject2Actor : InterfacedActor<Subject2Actor>, ISubject2
+    public class Subject2Actor : InterfacedActor, ISubject2
     {
         private List<ISubject2Observer> _observers = new List<ISubject2Observer>();
 
@@ -65,7 +65,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class ObserverActor : InterfacedActor<ObserverActor>, IDummy, ISubjectObserver
+    public class ObserverActor : InterfacedActor, IDummy, ISubjectObserver
     {
         private SubjectRef _subject;
         private List<string> _eventLog;
@@ -93,7 +93,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class ObserverExtendedActor : InterfacedActor<ObserverExtendedActor>, IDummy, IExtendedInterface<ISubjectObserver>
+    public class ObserverExtendedActor : InterfacedActor, IDummy, IExtendedInterface<ISubjectObserver>
     {
         private SubjectRef _subject;
         private List<string> _eventLog;
@@ -122,7 +122,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class ObserverExtendedAsyncActor : InterfacedActor<ObserverExtendedAsyncActor>, IDummy, IExtendedInterface<ISubjectObserver>
+    public class ObserverExtendedAsyncActor : InterfacedActor, IDummy, IExtendedInterface<ISubjectObserver>
     {
         private SubjectRef _subject;
         private List<string> _eventLog;
@@ -153,7 +153,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class ObserverExtendedAsyncReentrantActor : InterfacedActor<ObserverExtendedAsyncReentrantActor>, IDummy, IExtendedInterface<ISubjectObserver>
+    public class ObserverExtendedAsyncReentrantActor : InterfacedActor, IDummy, IExtendedInterface<ISubjectObserver>
     {
         private SubjectRef _subject;
         private List<string> _eventLog;

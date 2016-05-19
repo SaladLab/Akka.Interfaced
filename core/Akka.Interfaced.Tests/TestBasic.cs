@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
-    public class BasicActor : InterfacedActor<BasicActor>, IBasic
+    public class BasicActor : InterfacedActor, IBasic
     {
         private List<object> _blackhole;
 

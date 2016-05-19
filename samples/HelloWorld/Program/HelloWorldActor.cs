@@ -4,7 +4,7 @@ using HelloWorld.Interface;
 
 namespace HelloWorld.Program
 {
-    public class HelloWorldActor : InterfacedActor<HelloWorldActor>, IHelloWorld
+    public class HelloWorldActor : InterfacedActor, IHelloWorld
     {
         private int _helloCount;
 

@@ -5,7 +5,7 @@ using Akka.Actor;
 
 namespace Akka.Interfaced.TestKit.Tests
 {
-    public class UserLoginActor : InterfacedActor<UserLoginActor>, IUserLogin
+    public class UserLoginActor : InterfacedActor, IUserLogin
     {
         private readonly IActorRef _actorBoundSession;
 

@@ -86,7 +86,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class RequestFilterOrderActor : InterfacedActor<RequestFilterOrderActor>, IDummy
+    public class RequestFilterOrderActor : InterfacedActor, IDummy
     {
         [RequestFilterFirst, RequestFilterSecond]
         Task<object> IDummy.Call(object param)

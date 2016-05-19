@@ -24,7 +24,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class TestMessageDispatchPlainActor : InterfacedActor<TestMessageDispatchPlainActor>, IDummy
+    public class TestMessageDispatchPlainActor : InterfacedActor, IDummy
     {
         private List<string> _eventLog;
 

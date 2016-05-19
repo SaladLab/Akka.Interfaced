@@ -5,7 +5,7 @@ using Basic.Interface;
 
 namespace Basic.Program
 {
-    public class TestExtendedActor : InterfacedActor<TestExtendedActor>, IExtendedInterface<ICounter>
+    public class TestExtendedActor : InterfacedActor, IExtendedInterface<ICounter>
     {
         private List<int> _values = new List<int>();
 

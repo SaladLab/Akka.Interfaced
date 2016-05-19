@@ -7,7 +7,7 @@ using Basic.Interface;
 
 namespace Basic.Program
 {
-    public class TestEventGenerator : InterfacedActor<TestEventGenerator>, IEventGenerator
+    public class TestEventGenerator : InterfacedActor, IEventGenerator
     {
         private HashSet<IEventObserver> _observers = new HashSet<IEventObserver>();
 

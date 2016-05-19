@@ -86,7 +86,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class NotificationFilterOrderActor : InterfacedActor<NotificationFilterOrderActor>, ISubjectObserver
+    public class NotificationFilterOrderActor : InterfacedActor, ISubjectObserver
     {
         [NotificationFilterFirst, NotificationFilterSecond]
         void ISubjectObserver.Event(string eventName)

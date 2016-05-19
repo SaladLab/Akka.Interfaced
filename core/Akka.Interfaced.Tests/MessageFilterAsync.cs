@@ -41,7 +41,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [MessageFilterAsync]
-    public class MessageFilterAsyncActor : InterfacedActor<MessageFilterAsyncActor>
+    public class MessageFilterAsyncActor : InterfacedActor
     {
         [MessageHandler]
         private void Handle(string message)

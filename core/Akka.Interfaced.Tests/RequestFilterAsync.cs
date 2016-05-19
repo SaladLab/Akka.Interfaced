@@ -40,7 +40,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [RequestFilterAsync]
-    public class RequestFilterAsyncActor : InterfacedActor<RequestFilterAsyncActor>, IExtendedInterface<IWorker>
+    public class RequestFilterAsyncActor : InterfacedActor, IExtendedInterface<IWorker>
     {
         [ExtendedHandler]
         private void Atomic(int id)

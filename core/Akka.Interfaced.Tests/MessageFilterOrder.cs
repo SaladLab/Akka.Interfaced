@@ -86,7 +86,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class MessageFilterOrderActor : InterfacedActor<MessageFilterOrderActor>
+    public class MessageFilterOrderActor : InterfacedActor
     {
         [MessageHandler, MessageFilterFirst, MessageFilterSecond]
         private void Handle(string message)

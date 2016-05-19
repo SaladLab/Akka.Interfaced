@@ -5,7 +5,7 @@ using Basic.Interface;
 
 namespace Basic.Program
 {
-    public class TestExceptionActor : InterfacedActor<TestExceptionActor>, ICounter
+    public class TestExceptionActor : InterfacedActor, ICounter
     {
         private int _counter;
 

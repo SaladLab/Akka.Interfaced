@@ -48,7 +48,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class RequestFilterPerClassActor : InterfacedActor<RequestFilterPerClassActor>, IDummy
+    public class RequestFilterPerClassActor : InterfacedActor, IDummy
     {
         [RequestFilterPerClass]
         Task<object> IDummy.Call(object param)
@@ -100,7 +100,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    public class RequestFilterPerClassMethodActor : InterfacedActor<RequestFilterPerClassMethodActor>, IDummy
+    public class RequestFilterPerClassMethodActor : InterfacedActor, IDummy
     {
         [RequestFilterPerClassMethod]
         Task<object> IDummy.Call(object param)
@@ -154,7 +154,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [RequestFilterPerInstance]
-    public class RequestFilterPerInstanceActor : InterfacedActor<RequestFilterPerInstanceActor>, IWorker
+    public class RequestFilterPerInstanceActor : InterfacedActor, IWorker
     {
         Task IWorker.Atomic(int id)
         {
@@ -215,7 +215,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [RequestFilterPerInstanceMethod]
-    public class RequestFilterPerInstanceMethodActor : InterfacedActor<RequestFilterPerInstanceMethodActor>, IWorker
+    public class RequestFilterPerInstanceMethodActor : InterfacedActor, IWorker
     {
         Task IWorker.Atomic(int id)
         {
@@ -276,7 +276,7 @@ namespace Akka.Interfaced.Tests
     }
 
     [RequestFilterPerRequest]
-    public class RequestFilterPerRequestActor : InterfacedActor<RequestFilterPerRequestActor>, IWorker
+    public class RequestFilterPerRequestActor : InterfacedActor, IWorker
     {
         Task IWorker.Atomic(int id)
         {

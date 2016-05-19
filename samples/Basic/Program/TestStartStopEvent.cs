@@ -5,7 +5,7 @@ using Basic.Interface;
 
 namespace Basic.Program
 {
-    public class TestStartStopEvent : InterfacedActor<TestStartStopEvent>, IWorker
+    public class TestStartStopEvent : InterfacedActor, IWorker
     {
         protected override async Task OnPreStart()
         {

@@ -12,7 +12,7 @@ using SlimHttp.Interface;
 
 namespace SlimHttp.Program.Server
 {
-    public class CounterActor : InterfacedActor<CounterActor>, ICounter
+    public class CounterActor : InterfacedActor, ICounter
     {
         private int _counter = 0;
 

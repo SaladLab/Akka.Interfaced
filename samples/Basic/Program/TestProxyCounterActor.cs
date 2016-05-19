@@ -10,7 +10,7 @@ using Basic.Interface;
 
 namespace Basic.Program
 {
-    public class TestProxyCounterActor : InterfacedActor<TestProxyCounterActor>, ICounter
+    public class TestProxyCounterActor : InterfacedActor, ICounter
     {
         private CounterRef _counter;
 

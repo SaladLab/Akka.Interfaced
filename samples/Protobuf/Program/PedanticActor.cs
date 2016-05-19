@@ -11,7 +11,7 @@ using Protobuf.Interface;
 
 namespace Protobuf.Program
 {
-    public class PedanticActor : InterfacedActor<PedanticActor>, IPedantic
+    public class PedanticActor : InterfacedActor, IPedantic
     {
         async Task IPedantic.TestCall()
         {

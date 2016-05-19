@@ -6,7 +6,7 @@ using Basic.Interface;
 
 namespace Basic.Program
 {
-    public class TestCounterActor : InterfacedActor<TestCounterActor>, ICounter
+    public class TestCounterActor : InterfacedActor, ICounter
     {
         private List<int> _values = new List<int>();
 

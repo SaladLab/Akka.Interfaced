@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
-    public class WorkerActor : InterfacedActor<WorkerActor>, IWorker
+    public class WorkerActor : InterfacedActor, IWorker
     {
         private List<Tuple<int, int>> _workLog;
 

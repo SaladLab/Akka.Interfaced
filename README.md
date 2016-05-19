@@ -25,7 +25,7 @@ After defining interface, it's time to define the class implementing IHelloWorld
 It should inherit InterfacedActor\<HelloWorldActor\> because it's an Akka.NET actor. Implementing IHelloWorld interface is a bit simple.
 
 ```csharp
-public class HelloWorldActor : InterfacedActor<HelloWorldActor>, IHelloWorld
+public class HelloWorldActor : InterfacedActor, IHelloWorld
 {
 	private int _helloCount;
 
@@ -70,7 +70,7 @@ When an actor process a message it can throw an exception and it propagate to ca
 TestActor.IncCounter will throw an ArgumentException if delta is not positive.
 
 ```csharp
-public class TestActor : InterfacedActor<TestActor>, ICounter
+public class TestActor : InterfacedActor, ICounter
 {
 	async Task ICounter.IncCounter(int delta)
 	{
@@ -110,7 +110,7 @@ static async Task Test()
 TODO
 
 ```csharp
-public class TestActor : InterfacedActor<TestActor>, IWorker
+public class TestActor : InterfacedActor, IWorker
 {
 	async Task IWorker.Atomic(string name)
 	{
