@@ -30,29 +30,30 @@ namespace Akka.Interfaced.Persistence
             }
         }
 
-        // Atomic async OnPreStart event (it will be called after PreStart)
-        protected virtual Task OnPreStart()
+        // Atomic async OnStart event (it will be called after PreStart)
+        protected virtual Task OnStart()
         {
             return Task.FromResult(true);
         }
 
-        // Atomic async OnPreStop event (it will be called when receives StopMessage)
+        // Atomic async OnGracefulStop event (it will be called when receives InterfacedPoisonPill)
         // After finishing this call, actor will be stopped.
-        protected virtual Task OnPreStop()
+        protected virtual Task OnGracefulStop()
         {
             return Task.FromResult(true);
         }
 
-        protected override void PreStart()
+        public override void AroundPreStart()
         {
             if (_handler.PerInstanceFilterCreators.Count > 0)
                 _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, _handler.PerInstanceFilterCreators);
 
-            InvokeOnPreStart();
-            base.PreStart();
+            base.AroundPreStart();
+
+            InvokeOnStart();
         }
 
-        private void InvokeOnPreStart()
+        private void InvokeOnStart()
         {
             var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
             BecomeStacked(OnReceiveInAtomicTask);
@@ -60,12 +61,18 @@ namespace Akka.Interfaced.Persistence
 
             using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
             {
-                OnPreStart().ContinueWith(t => OnTaskCompleted(false),
-                                          TaskContinuationOptions.ExecuteSynchronously);
+                OnStart().ContinueWith(
+                    t =>
+                    {
+                        OnTaskCompleted(false);
+                        if (t.Exception != null)
+                            ((ActorCell)Context).InvokeFailure(t.Exception);
+                    },
+                    TaskContinuationOptions.ExecuteSynchronously);
             }
         }
 
-        private void InvokeOnPreStop()
+        private void InvokeOnGracefulStop()
         {
             var context = new MessageHandleContext { Self = Self };
             BecomeStacked(OnReceiveInAtomicTask);
@@ -73,8 +80,16 @@ namespace Akka.Interfaced.Persistence
 
             using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
             {
-                OnPreStop().ContinueWith(t => OnTaskCompleted(false, true),
-                                         TaskContinuationOptions.ExecuteSynchronously);
+                OnGracefulStop().ContinueWith(
+                    t =>
+                    {
+                        OnTaskCompleted(false);
+                        if (t.Exception != null)
+                            ((ActorCell)Context).InvokeFailure(t.Exception);
+                        else
+                            Context.Stop(Self);
+                    },
+                    TaskContinuationOptions.ExecuteSynchronously);
             }
         }
 
@@ -294,7 +309,7 @@ namespace Akka.Interfaced.Persistence
             }
             else
             {
-                InvokeOnPreStop();
+                InvokeOnGracefulStop();
             }
         }
 
@@ -364,7 +379,7 @@ namespace Akka.Interfaced.Persistence
                 if (_activeReentrantCount == 0)
                 {
                     UnbecomeStacked();
-                    InvokeOnPreStop();
+                    InvokeOnGracefulStop();
                 }
                 return;
             }
@@ -379,7 +394,7 @@ namespace Akka.Interfaced.Persistence
             Stash.Stash();
         }
 
-        private void OnTaskCompleted(bool isReentrant, bool stopOnCompleted = false)
+        private void OnTaskCompleted(bool isReentrant)
         {
             if (isReentrant)
             {
@@ -390,11 +405,6 @@ namespace Akka.Interfaced.Persistence
                 _currentAtomicContext = null;
                 UnbecomeStacked();
                 Stash.UnstashAll();
-            }
-
-            if (stopOnCompleted)
-            {
-                Context.Stop(Self);
             }
         }
 

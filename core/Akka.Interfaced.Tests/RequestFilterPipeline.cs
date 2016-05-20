@@ -129,7 +129,7 @@ namespace Akka.Interfaced.Tests
 
     public class RequestFilterPipeline : Akka.TestKit.Xunit2.TestKit
     {
-        public static FilterLogBoard LogBoard = new FilterLogBoard();
+        public static LogBoard LogBoard = new LogBoard();
 
         public RequestFilterPipeline(ITestOutputHelper output)
             : base(output: output)

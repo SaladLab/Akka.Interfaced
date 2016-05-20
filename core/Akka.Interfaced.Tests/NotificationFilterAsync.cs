@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Akka.TestKit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -60,30 +61,30 @@ namespace Akka.Interfaced.Tests
 
     public class NotificationFilterAsync : Akka.TestKit.Xunit2.TestKit
     {
-        public static FilterLogBoard LogBoard;
+        public static LogBoard LogBoard;
 
         public NotificationFilterAsync(ITestOutputHelper output)
             : base(output: output)
         {
-            LogBoard = new FilterLogBoard();
+            LogBoard = new LogBoard();
         }
 
-        private async Task<Subject2Ref> SetupActors2<TObservingActor>()
+        private async Task<Tuple<Subject2Ref, TestActorRef<TObservingActor>>> SetupActors2<TObservingActor>()
             where TObservingActor : ActorBase, new()
         {
             var subjectActor = ActorOfAsTestActorRef<Subject2Actor>("Subject");
             var subject = new Subject2Ref(subjectActor);
             var observingActor = ActorOfAsTestActorRef<TObservingActor>();
             await subject.Subscribe(new Subject2Observer(observingActor));
-            return subject;
+            return Tuple.Create(subject, observingActor);
         }
 
         [Fact]
         public async Task SyncHandler_With_AsyncFilter_Work()
         {
-            var subject = await SetupActors2<NotificationFilterAsyncActor>();
-            await subject.MakeEvent("A");
-            await subject.Actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
+            var actors = await SetupActors2<NotificationFilterAsyncActor>();
+            await actors.Item1.MakeEvent("A");
+            await actors.Item2.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             Assert.Equal(
                 new[]
@@ -100,9 +101,9 @@ namespace Akka.Interfaced.Tests
         [Fact]
         public async Task AsyncHandler_With_AsyncFilter_Work()
         {
-            var subject = await SetupActors2<NotificationFilterAsyncActor>();
-            await subject.MakeEvent2("A");
-            await subject.Actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
+            var actors = await SetupActors2<NotificationFilterAsyncActor>();
+            await actors.Item1.MakeEvent2("A");
+            await actors.Item2.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             Assert.Equal(
                 new[]

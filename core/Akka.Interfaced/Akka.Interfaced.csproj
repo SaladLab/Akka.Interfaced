@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="ActorBoundSession.cs" />
     <Compile Include="ActorBoundSessionMessage.cs" />
+    <Compile Include="ActorFaultExtentions.cs" />
     <Compile Include="ActorSynchronizationContext.cs" />
     <Compile Include="DeadRequestProcessingActor.cs" />
     <Compile Include="AkkaAskRequestWaiter.cs" />

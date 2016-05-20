@@ -82,7 +82,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FilterLogBoard.cs" />
+    <Compile Include="ExceptionHandle.cs" />
+    <Compile Include="LogBoard.cs" />
     <Compile Include="MessageFilterAsync.cs" />
     <Compile Include="MessageFilterFactory.cs" />
     <Compile Include="MessageFilterOrder.cs" />

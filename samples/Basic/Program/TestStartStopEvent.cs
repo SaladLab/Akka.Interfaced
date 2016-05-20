@@ -7,22 +7,22 @@ namespace Basic.Program
 {
     public class TestStartStopEvent : InterfacedActor, IWorker
     {
-        protected override async Task OnPreStart()
+        protected override async Task OnStart()
         {
-            Console.WriteLine("OnPreStart() Enter");
+            Console.WriteLine("OnStart() Enter");
             await Task.Delay(10);
-            Console.WriteLine("OnPreStart() Mid");
+            Console.WriteLine("OnStart() Mid");
             await Task.Delay(10);
-            Console.WriteLine("OnPreStart() Leave");
+            Console.WriteLine("OnStart() Leave");
         }
 
-        protected override async Task OnPreStop()
+        protected override async Task OnGracefulStop()
         {
-            Console.WriteLine("OnPreStop() Enter");
+            Console.WriteLine("OnGracefulStop() Enter");
             await Task.Delay(10);
-            Console.WriteLine("OnPreStop() Mid");
+            Console.WriteLine("OnGracefulStop() Mid");
             await Task.Delay(10);
-            Console.WriteLine("OnPreStop() Leave");
+            Console.WriteLine("OnGracefulStop() Leave");
         }
 
         async Task IWorker.Atomic(string name)

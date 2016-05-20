@@ -97,7 +97,7 @@ namespace Akka.Interfaced.Tests
 
     public class RequestFilterOrder : Akka.TestKit.Xunit2.TestKit
     {
-        public static FilterLogBoard LogBoard = new FilterLogBoard();
+        public static LogBoard LogBoard = new LogBoard();
 
         public RequestFilterOrder(ITestOutputHelper output)
             : base(output: output)

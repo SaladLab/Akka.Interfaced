@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Akka.Interfaced.Tests
 {
-    public class FilterLogBoard
+    public class LogBoard
     {
         private ConcurrentQueue<string> _logs = new ConcurrentQueue<string>();
 

@@ -60,12 +60,12 @@ namespace Akka.Interfaced.Tests
 
     public class MessageFilterAsync : Akka.TestKit.Xunit2.TestKit
     {
-        public static FilterLogBoard LogBoard;
+        public static LogBoard LogBoard;
 
         public MessageFilterAsync(ITestOutputHelper output)
             : base(output: output)
         {
-            LogBoard = new FilterLogBoard();
+            LogBoard = new LogBoard();
         }
 
         [Fact]

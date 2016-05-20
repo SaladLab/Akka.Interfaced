@@ -17,11 +17,11 @@ namespace Akka.Interfaced.Tests
             _eventLog = eventLog;
         }
 
-        protected override async Task OnPreStop()
+        protected override async Task OnGracefulStop()
         {
-            _eventLog.Add("OnPreStop");
+            _eventLog.Add("OnGracefulStop");
             await Task.Delay(10);
-            _eventLog.Add("OnPreStop done");
+            _eventLog.Add("OnGracefulStop done");
         }
 
         async Task IWorker.Atomic(int id)
@@ -62,8 +62,8 @@ namespace Akka.Interfaced.Tests
                 "Atomic(1) done",
                 "Atomic(2)",
                 "Atomic(2) done",
-                "OnPreStop",
-                "OnPreStop done"
+                "OnGracefulStop",
+                "OnGracefulStop done"
             }, eventLog);
         }
 
@@ -85,8 +85,8 @@ namespace Akka.Interfaced.Tests
             }.SetEquals(new HashSet<string>(eventLog.Take(4))));
             Assert.Equal(new List<string>
             {
-                "OnPreStop",
-                "OnPreStop done"
+                "OnGracefulStop",
+                "OnGracefulStop done"
             }, eventLog.Skip(4));
         }
     }
