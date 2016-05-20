@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 
@@ -10,7 +11,9 @@ namespace Akka.Interfaced
         public IStash Stash { get; set; }
 
         private readonly InterfacedActorHandler _handler;
+        private CancellationTokenSource _cancellationTokenSource;
         private int _activeReentrantCount;
+        private HashSet<MessageHandleContext> _activeReentrantAsyncRequestSet;
         private MessageHandleContext _currentAtomicContext;
         private InterfacedActorRequestWaiter _requestWaiter;
         private InterfacedActorObserverMap _observerMap;
@@ -25,13 +28,16 @@ namespace Akka.Interfaced
             }
         }
 
+        // Return a token which will be cancelled when an actor stops or restarts.
+        protected CancellationToken CancellationToken => _cancellationTokenSource.Token;
+
         public InterfacedActor()
         {
             _handler = InterfacedActorHandlerTable.Get(GetType());
         }
 
         // Atomic async OnStart event (it will be called after OnStart)
-        protected virtual Task OnStart()
+        protected virtual Task OnStart(bool restarted)
         {
             return Task.FromResult(true);
         }
@@ -45,51 +51,96 @@ namespace Akka.Interfaced
 
         public override void AroundPreStart()
         {
-            if (_handler.PerInstanceFilterCreators.Count > 0)
-                _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, _handler.PerInstanceFilterCreators);
-
+            InitializeActorState();
             base.AroundPreStart();
-
-            InvokeOnStart();
+            InvokeOnStart(false);
         }
 
-        private void InvokeOnStart()
+        public override void AroundPostRestart(Exception cause, object message)
         {
-            var context = new MessageHandleContext { Self = Self, Sender = Sender };
+            InitializeActorState();
+            base.AroundPostRestart(cause, message);
+            InvokeOnStart(true);
+        }
+
+        private void InitializeActorState()
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+            _activeReentrantCount = 0;
+            _activeReentrantAsyncRequestSet = null;
+            _currentAtomicContext = null;
+            _requestWaiter = null;
+            _observerMap = null;
+
+            if (_handler.PerInstanceFilterCreators.Count > 0)
+                _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, _handler.PerInstanceFilterCreators);
+        }
+
+        private void InvokeOnStart(bool restarted)
+        {
+            var context = new MessageHandleContext { Self = Self, Sender = Sender, CancellationToken = CancellationToken };
             BecomeStacked(OnReceiveInAtomicTask);
             _currentAtomicContext = context;
 
             using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
             {
-                OnStart().ContinueWith(
-                    t =>
-                    {
-                        OnTaskCompleted(false);
-                        if (t.Exception != null)
-                            ((ActorCell)Context).InvokeFailure(t.Exception);
-                    },
+                OnStart(restarted).ContinueWith(
+                    t => OnTaskCompleted(t.Exception, false),
                     TaskContinuationOptions.ExecuteSynchronously);
             }
         }
 
         private void InvokeOnGracefulStop()
         {
-            var context = new MessageHandleContext { Self = Self };
+            var context = new MessageHandleContext { Self = Self, CancellationToken = CancellationToken };
             BecomeStacked(OnReceiveInAtomicTask);
             _currentAtomicContext = context;
 
             using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
             {
                 OnGracefulStop().ContinueWith(
-                    t =>
-                    {
-                        OnTaskCompleted(false);
-                        if (t.Exception != null)
-                            ((ActorCell)Context).InvokeFailure(t.Exception);
-                        else
-                            Context.Stop(Self);
-                    },
+                    t => OnTaskCompleted(t.Exception, false, stopOnCompleted: true),
                     TaskContinuationOptions.ExecuteSynchronously);
+            }
+        }
+
+        public override void AroundPreRestart(Exception cause, object message)
+        {
+            CancelAllTasks();
+            base.AroundPreRestart(cause, message);
+        }
+
+        public override void AroundPostStop()
+        {
+            CancelAllTasks();
+            base.AroundPostStop();
+        }
+
+        private void CancelAllTasks()
+        {
+            _cancellationTokenSource.Cancel();
+
+            // Send responses to requesters that waits for a reentrant async job
+
+            if (_activeReentrantAsyncRequestSet != null)
+            {
+                foreach (var i in _activeReentrantAsyncRequestSet)
+                {
+                    i.Sender.Tell(new ResponseMessage
+                    {
+                        RequestId = i.RequestId,
+                        Exception = new InterfacedRequestException()
+                    });
+                }
+            }
+
+            if (_currentAtomicContext != null && _currentAtomicContext.RequestId != 0)
+            {
+                _currentAtomicContext.Sender.Tell(new ResponseMessage
+                {
+                    RequestId = _currentAtomicContext.RequestId,
+                    Exception = new InterfacedRequestException()
+                });
             }
         }
 
@@ -176,18 +227,30 @@ namespace Akka.Interfaced
             {
                 // sync handle
 
-                var response = handlerItem.Handler(this, request, null);
-                if (request.RequestId != 0)
-                    sender.Tell(response);
+                handlerItem.Handler(this, request, (response, exception) =>
+                {
+                    if (request.RequestId != 0)
+                        sender.Tell(response);
+
+                    if (exception != null)
+                        ((ActorCell)Context).InvokeFailure(exception);
+                });
             }
             else
             {
                 // async handle
 
-                var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+                var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken, RequestId = request.RequestId };
                 if (handlerItem.IsReentrant)
                 {
                     _activeReentrantCount += 1;
+                    if (request.RequestId != 0)
+                    {
+                        if (_activeReentrantAsyncRequestSet == null)
+                            _activeReentrantAsyncRequestSet = new HashSet<MessageHandleContext>();
+
+                        _activeReentrantAsyncRequestSet.Add(context);
+                    }
                 }
                 else
                 {
@@ -199,11 +262,17 @@ namespace Akka.Interfaced
                 {
                     var requestId = request.RequestId;
                     var isReentrant = handlerItem.IsReentrant;
-                    handlerItem.AsyncHandler(this, request, response =>
+                    handlerItem.AsyncHandler(this, request, (response, exception) =>
                     {
                         if (requestId != 0)
+                        {
+                            if (isReentrant)
+                                _activeReentrantAsyncRequestSet.Remove(context);
+
                             sender.Tell(response);
-                        OnTaskCompleted(isReentrant);
+                        }
+
+                        OnTaskCompleted(exception, isReentrant);
                     });
                 }
             }
@@ -240,7 +309,7 @@ namespace Akka.Interfaced
                 {
                     // async handle
 
-                    var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+                    var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
                     if (handlerItem.IsReentrant)
                     {
                         _activeReentrantCount += 1;
@@ -254,7 +323,7 @@ namespace Akka.Interfaced
                     using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                     {
                         handlerItem.AsyncHandler(this, notification)
-                                   .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
+                                   .ContinueWith(t => OnTaskCompleted(t.Exception, handlerItem.IsReentrant),
                                                  TaskContinuationOptions.ExecuteSynchronously);
                     }
                 }
@@ -267,7 +336,7 @@ namespace Akka.Interfaced
 
         private void OnTaskRunMessage(TaskRunMessage taskRunMessage)
         {
-            var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+            var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
             if (taskRunMessage.IsReentrant)
             {
                 _activeReentrantCount += 1;
@@ -281,7 +350,7 @@ namespace Akka.Interfaced
             using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
             {
                 taskRunMessage.Function()
-                              .ContinueWith(t => OnTaskCompleted(taskRunMessage.IsReentrant),
+                              .ContinueWith(t => OnTaskCompleted(t.Exception, taskRunMessage.IsReentrant),
                                             TaskContinuationOptions.ExecuteSynchronously);
             }
         }
@@ -302,7 +371,7 @@ namespace Akka.Interfaced
         {
             if (handlerItem.AsyncHandler != null)
             {
-                var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+                var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
                 if (handlerItem.IsReentrant)
                 {
                     _activeReentrantCount += 1;
@@ -316,7 +385,7 @@ namespace Akka.Interfaced
                 using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                 {
                     handlerItem.AsyncHandler(this, message)
-                               .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
+                               .ContinueWith(t => OnTaskCompleted(t.Exception, handlerItem.IsReentrant),
                                              TaskContinuationOptions.ExecuteSynchronously);
                 }
             }
@@ -376,7 +445,7 @@ namespace Akka.Interfaced
             Stash.Stash();
         }
 
-        private void OnTaskCompleted(bool isReentrant)
+        private void OnTaskCompleted(Exception exception, bool isReentrant, bool stopOnCompleted = false)
         {
             if (isReentrant)
             {
@@ -387,6 +456,15 @@ namespace Akka.Interfaced
                 _currentAtomicContext = null;
                 UnbecomeStacked();
                 Stash.UnstashAll();
+            }
+
+            if (exception != null)
+            {
+                ((ActorCell)Context).InvokeFailure(exception);
+            }
+            else if (stopOnCompleted)
+            {
+                Context.Stop(Self);
             }
         }
 

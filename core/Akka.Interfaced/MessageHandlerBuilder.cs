@@ -86,6 +86,7 @@ namespace Akka.Interfaced
 
                 // Call PreFilters
 
+                var handled = false;
                 if (filterChain.PreFilterAccessors.Length > 0)
                 {
                     var context = new PreMessageFilterContext
@@ -98,11 +99,13 @@ namespace Akka.Interfaced
                         var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
                         ((IPreMessageFilter)filter).OnPreMessage(context);
                     }
+                    handled = context.Handled;
                 }
 
                 // Call Handler
 
-                handler(self, message);
+                if (handled == false)
+                    handler(self, message);
 
                 // Call PostFilters
 
@@ -111,7 +114,8 @@ namespace Akka.Interfaced
                     var context = new PostMessageFilterContext
                     {
                         Actor = self,
-                        Message = message
+                        Message = message,
+                        Handled = handled
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {

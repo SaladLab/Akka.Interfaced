@@ -82,7 +82,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExceptionHandle.cs" />
+    <Compile Include="ActorTaskCancellation.cs" />
+    <Compile Include="ExceptionHandle.Message.cs" />
+    <Compile Include="ExceptionHandle.Notification.cs" />
+    <Compile Include="ExceptionHandle.Request.cs" />
+    <Compile Include="ExceptionHandle.StartStop.cs" />
     <Compile Include="LogBoard.cs" />
     <Compile Include="MessageFilterAsync.cs" />
     <Compile Include="MessageFilterFactory.cs" />

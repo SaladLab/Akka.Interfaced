@@ -8,6 +8,8 @@ namespace Akka.Interfaced
     {
         public IActorRef Self { get; set; }
         public IActorRef Sender { get; set; }
+        public CancellationToken CancellationToken { get; set; }
+        public int RequestId { get; set; }
     }
 
     internal class ActorSynchronizationContext : SynchronizationContext
@@ -53,6 +55,9 @@ namespace Akka.Interfaced
                     s_currentAtomicContext = null;
                 }
             }
+
+            if (_context.CancellationToken.IsCancellationRequested)
+                return;
 
             _context.Self.Tell(
                 new TaskContinuationMessage

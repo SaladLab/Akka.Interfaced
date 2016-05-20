@@ -7,7 +7,7 @@ namespace Basic.Program
 {
     public class TestStartStopEvent : InterfacedActor, IWorker
     {
-        protected override async Task OnStart()
+        protected override async Task OnStart(bool restarted)
         {
             Console.WriteLine("OnStart() Enter");
             await Task.Delay(10);

@@ -26,6 +26,9 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
+            if (context.Handled)
+                return;
+
             RequestFilterPipeline.LogBoard.Log($"{_actorType.Name} Authorize.OnPreRequest");
 
             var actor = (RequestFilterPipelineActor)context.Actor;
@@ -60,6 +63,9 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
+            if (context.Handled)
+                return;
+
             RequestFilterPipeline.LogBoard.Log($"{_actorType.Name} FirstLog.OnPreRequest");
         }
 
@@ -88,6 +94,9 @@ namespace Akka.Interfaced.Tests
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
+            if (context.Handled)
+                return;
+
             RequestFilterPipeline.LogBoard.Log($"{_actorType.Name} LastLog.OnPreRequest");
         }
 
@@ -97,7 +106,7 @@ namespace Akka.Interfaced.Tests
         }
     }
 
-    [RequestFilterAuthorize, RequestFilterFirstLog, RequestFilterLastLog]
+    [RequestFilterAuthorize, RequestFilterFirstLog, RequestFilterLastLog, ResponsiveException(typeof(ArgumentException))]
     public class RequestFilterPipelineActor : InterfacedActor, IExtendedInterface<IWorker>
     {
         public int Permission { get; }

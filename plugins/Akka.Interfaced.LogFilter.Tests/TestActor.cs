@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace Akka.Interfaced.LogFilter.Tests
 {
-    [Log]
+    [Log, ResponsiveException(typeof(ArgumentNullException))]
     public class TestActor : InterfacedActor, ITest
     {
         private NLog.ILogger _logger;

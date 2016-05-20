@@ -196,6 +196,7 @@ namespace Akka.Interfaced
 
                 // Call PreFilters
 
+                var handled = false;
                 if (filterChain.PreFilterAccessors.Length > 0)
                 {
                     var context = new PreNotificationFilterContext
@@ -205,30 +206,16 @@ namespace Akka.Interfaced
                     };
                     foreach (var filterAccessor in filterChain.PreFilterAccessors)
                     {
-                        try
-                        {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
-                            ((IPreNotificationFilter)filter).OnPreNotification(context);
-                        }
-                        catch (Exception e)
-                        {
-                            // TODO: what if exception thrown ?
-                            Console.WriteLine(e);
-                        }
+                        var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
+                        ((IPreNotificationFilter)filter).OnPreNotification(context);
                     }
+                    handled = context.Handled;
                 }
 
                 // Call Handler
 
-                try
-                {
+                if (handled == false)
                     handler(self, notification.InvokePayload);
-                }
-                catch (Exception e)
-                {
-                    // TODO: Exception Handling
-                    Console.WriteLine(e);
-                }
 
                 // Call PostFilters
 
@@ -237,20 +224,13 @@ namespace Akka.Interfaced
                     var context = new PostNotificationFilterContext
                     {
                         Actor = self,
-                        Notification = notification
+                        Notification = notification,
+                        Handled = handled
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {
-                        try
-                        {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
-                            ((IPostNotificationFilter)filter).OnPostNotification(context);
-                        }
-                        catch (Exception e)
-                        {
-                            // TODO: what if exception thrown ?
-                            Console.WriteLine(e);
-                        }
+                        var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
+                        ((IPostNotificationFilter)filter).OnPostNotification(context);
                     }
                 }
             };
@@ -292,34 +272,18 @@ namespace Akka.Interfaced
                     };
                     foreach (var filterAccessor in filterChain.PreFilterAccessors)
                     {
-                        try
-                        {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
-                            var preFilter = filter as IPreNotificationFilter;
-                            if (preFilter != null)
-                                preFilter.OnPreNotification(context);
-                            else
-                                await ((IPreNotificationAsyncFilter)filter).OnPreNotificationAsync(context);
-                        }
-                        catch (Exception e)
-                        {
-                            // TODO: what if exception thrown ?
-                            Console.WriteLine(e);
-                        }
+                        var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
+                        var preFilter = filter as IPreNotificationFilter;
+                        if (preFilter != null)
+                            preFilter.OnPreNotification(context);
+                        else
+                            await ((IPreNotificationAsyncFilter)filter).OnPreNotificationAsync(context);
                     }
                 }
 
                 // Call Handler
 
-                try
-                {
-                    await handler(self, notification.InvokePayload);
-                }
-                catch (Exception e)
-                {
-                    // TODO: Exception Handling
-                    Console.WriteLine(e);
-                }
+                await handler(self, notification.InvokePayload);
 
                 // Call PostFilters
 
@@ -332,20 +296,12 @@ namespace Akka.Interfaced
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {
-                        try
-                        {
-                            var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
-                            var postFilter = filter as IPostNotificationFilter;
-                            if (postFilter != null)
-                                postFilter.OnPostNotification(context);
-                            else
-                                await ((IPostNotificationAsyncFilter)filter).OnPostNotificationAsync(context);
-                        }
-                        catch (Exception e)
-                        {
-                            // TODO: what if exception thrown ?
-                            Console.WriteLine(e);
-                        }
+                        var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
+                        var postFilter = filter as IPostNotificationFilter;
+                        if (postFilter != null)
+                            postFilter.OnPostNotification(context);
+                        else
+                            await ((IPostNotificationAsyncFilter)filter).OnPostNotificationAsync(context);
                     }
                 }
             };

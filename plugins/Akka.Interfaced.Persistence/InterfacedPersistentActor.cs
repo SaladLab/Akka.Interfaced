@@ -62,12 +62,7 @@ namespace Akka.Interfaced.Persistence
             using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
             {
                 OnStart().ContinueWith(
-                    t =>
-                    {
-                        OnTaskCompleted(false);
-                        if (t.Exception != null)
-                            ((ActorCell)Context).InvokeFailure(t.Exception);
-                    },
+                    t => OnTaskCompleted(t.Exception, false),
                     TaskContinuationOptions.ExecuteSynchronously);
             }
         }
@@ -81,14 +76,7 @@ namespace Akka.Interfaced.Persistence
             using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
             {
                 OnGracefulStop().ContinueWith(
-                    t =>
-                    {
-                        OnTaskCompleted(false);
-                        if (t.Exception != null)
-                            ((ActorCell)Context).InvokeFailure(t.Exception);
-                        else
-                            Context.Stop(Self);
-                    },
+                    t => OnTaskCompleted(t.Exception, false, stopOnCompleted: true),
                     TaskContinuationOptions.ExecuteSynchronously);
             }
         }
@@ -191,9 +179,14 @@ namespace Akka.Interfaced.Persistence
             {
                 // sync handle
 
-                var response = handlerItem.Handler(this, request, null);
-                if (request.RequestId != 0)
-                    sender.Tell(response);
+                handlerItem.Handler(this, request, (response, exception) =>
+                {
+                    if (request.RequestId != 0)
+                        sender.Tell(response);
+
+                    if (exception != null)
+                        ((ActorCell)Context).InvokeFailure(exception);
+                });
             }
             else
             {
@@ -214,11 +207,12 @@ namespace Akka.Interfaced.Persistence
                 {
                     var requestId = request.RequestId;
                     var isReentrant = handlerItem.IsReentrant;
-                    handlerItem.AsyncHandler(this, request, response =>
+                    handlerItem.AsyncHandler(this, request, (response, exception) =>
                     {
                         if (requestId != 0)
                             sender.Tell(response);
-                        OnTaskCompleted(isReentrant);
+
+                        OnTaskCompleted(exception, isReentrant);
                     });
                 }
             }
@@ -269,7 +263,7 @@ namespace Akka.Interfaced.Persistence
                     using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                     {
                         handlerItem.AsyncHandler(this, notification)
-                                   .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
+                                   .ContinueWith(t => OnTaskCompleted(t.Exception, handlerItem.IsReentrant),
                                                  TaskContinuationOptions.ExecuteSynchronously);
                     }
                 }
@@ -296,7 +290,7 @@ namespace Akka.Interfaced.Persistence
             using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
             {
                 taskRunMessage.Function()
-                              .ContinueWith(t => OnTaskCompleted(taskRunMessage.IsReentrant),
+                              .ContinueWith(t => OnTaskCompleted(t.Exception, taskRunMessage.IsReentrant),
                                             TaskContinuationOptions.ExecuteSynchronously);
             }
         }
@@ -331,7 +325,7 @@ namespace Akka.Interfaced.Persistence
                 using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
                 {
                     handlerItem.AsyncHandler(this, message)
-                               .ContinueWith(t => OnTaskCompleted(handlerItem.IsReentrant),
+                               .ContinueWith(t => OnTaskCompleted(t.Exception, handlerItem.IsReentrant),
                                              TaskContinuationOptions.ExecuteSynchronously);
                 }
             }
@@ -394,7 +388,7 @@ namespace Akka.Interfaced.Persistence
             Stash.Stash();
         }
 
-        private void OnTaskCompleted(bool isReentrant)
+        private void OnTaskCompleted(Exception exception, bool isReentrant, bool stopOnCompleted = false)
         {
             if (isReentrant)
             {
@@ -405,6 +399,15 @@ namespace Akka.Interfaced.Persistence
                 _currentAtomicContext = null;
                 UnbecomeStacked();
                 Stash.UnstashAll();
+            }
+
+            if (exception != null)
+            {
+                ((ActorCell)Context).InvokeFailure(exception);
+            }
+            else if (stopOnCompleted)
+            {
+                Context.Stop(Self);
             }
         }
 

@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace Akka.Interfaced
 {
-    public delegate ResponseMessage RequestHandler(object self, RequestMessage request, Action<ResponseMessage> onCompleted);
-    public delegate Task<ResponseMessage> RequestAsyncHandler(object self, RequestMessage request, Action<ResponseMessage> onCompleted);
+    public delegate ResponseMessage RequestHandler(object self, RequestMessage request, Action<ResponseMessage, Exception> onCompleted);
+    public delegate Task<ResponseMessage> RequestAsyncHandler(object self, RequestMessage request, Action<ResponseMessage, Exception> onCompleted);
 
     public class RequestHandlerItem
     {

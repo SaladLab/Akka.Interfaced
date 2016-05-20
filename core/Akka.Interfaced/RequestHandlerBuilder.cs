@@ -156,10 +156,8 @@ namespace Akka.Interfaced
         {
             var handler = RequestHandlerFuncBuilder.Build(targetType, invokePayloadType, returnPayloadType, method);
 
-            return delegate(object self, RequestMessage request, Action<ResponseMessage> onCompleted)
+            return delegate(object self, RequestMessage request, Action<ResponseMessage, Exception> onCompleted)
             {
-                ResponseMessage response = null;
-
                 var filterPerInstanceProvider = filterChain.PerInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
                 // Create PerRequest filters
@@ -176,12 +174,15 @@ namespace Akka.Interfaced
 
                 // Call PreFilters
 
+                ResponseMessage response = null;
+                Exception exception = null;
+
                 if (filterChain.PreFilterAccessors.Length > 0)
                 {
                     var context = new PreRequestFilterContext
                     {
                         Actor = self,
-                        Request = request
+                        Request = request,
                     };
                     foreach (var filterAccessor in filterChain.PreFilterAccessors)
                     {
@@ -189,23 +190,19 @@ namespace Akka.Interfaced
                         {
                             var filter = filterAccessor(filterPerInstanceProvider, filterPerRequests);
                             ((IPreRequestFilter)filter).OnPreRequest(context);
-                            if (context.Response != null)
-                            {
-                                response = context.Response;
-                                break;
-                            }
                         }
                         catch (Exception e)
                         {
-                            // TODO: what if exception thrown ?
-                            Console.WriteLine(e);
+                            context.Exception = e;
                         }
                     }
+                    response = context.Response;
+                    exception = context.Exception;
                 }
 
                 // Call Handler
 
-                if (response == null)
+                if (response == null && exception == null)
                 {
                     try
                     {
@@ -218,11 +215,7 @@ namespace Akka.Interfaced
                     }
                     catch (Exception e)
                     {
-                        response = new ResponseMessage
-                        {
-                            RequestId = request.RequestId,
-                            Exception = e
-                        };
+                        exception = e;
                     }
                 }
 
@@ -234,7 +227,8 @@ namespace Akka.Interfaced
                     {
                         Actor = self,
                         Request = request,
-                        Response = response
+                        Response = response,
+                        Exception = exception,
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {
@@ -245,14 +239,27 @@ namespace Akka.Interfaced
                         }
                         catch (Exception e)
                         {
-                            // TODO: what if exception thrown ?
-                            Console.WriteLine(e);
+                            context.Exception = e;
                         }
                     }
+                    response = context.Response;
+                    exception = context.Exception;
                 }
 
-                if (onCompleted != null)
-                    onCompleted(response);
+                // Build response for a thrown exception
+
+                if (exception != null && response == null)
+                {
+                    response = new ResponseMessage
+                    {
+                        RequestId = request.RequestId,
+                        Exception = new InterfacedRequestException()
+                    };
+                }
+
+                // Callback
+
+                onCompleted?.Invoke(response, exception);
 
                 return response;
             };
@@ -267,10 +274,8 @@ namespace Akka.Interfaced
                 : RequestHandlerSyncToAsyncBuilder.Build(targetType, invokePayloadType, returnPayloadType, method);
 
             // TODO: Optimize this function when without async filter
-            return async delegate(object self, RequestMessage request, Action<ResponseMessage> onCompleted)
+            return async delegate(object self, RequestMessage request, Action<ResponseMessage, Exception> onCompleted)
             {
-                ResponseMessage response = null;
-
                 var filterPerInstanceProvider = filterChain.PerInstanceFilterExists ? (IFilterPerInstanceProvider)self : null;
 
                 // Create PerRequest filters
@@ -286,6 +291,9 @@ namespace Akka.Interfaced
                 }
 
                 // Call PreFilters
+
+                ResponseMessage response = null;
+                Exception exception = null;
 
                 if (filterChain.PreFilterAccessors.Length > 0)
                 {
@@ -304,24 +312,19 @@ namespace Akka.Interfaced
                                 preFilter.OnPreRequest(context);
                             else
                                 await ((IPreRequestAsyncFilter)filter).OnPreRequestAsync(context);
-
-                            if (context.Response != null)
-                            {
-                                response = context.Response;
-                                break;
-                            }
                         }
                         catch (Exception e)
                         {
-                            // TODO: what if exception thrown ?
-                            Console.WriteLine(e);
+                            context.Exception = e;
                         }
                     }
+                    response = context.Response;
+                    exception = context.Exception;
                 }
 
                 // Call Handler
 
-                if (response == null)
+                if (response == null && exception == null)
                 {
                     try
                     {
@@ -334,11 +337,7 @@ namespace Akka.Interfaced
                     }
                     catch (Exception e)
                     {
-                        response = new ResponseMessage
-                        {
-                            RequestId = request.RequestId,
-                            Exception = e
-                        };
+                        exception = e;
                     }
                 }
 
@@ -350,7 +349,8 @@ namespace Akka.Interfaced
                     {
                         Actor = self,
                         Request = request,
-                        Response = response
+                        Response = response,
+                        Exception = exception,
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {
@@ -365,14 +365,27 @@ namespace Akka.Interfaced
                         }
                         catch (Exception e)
                         {
-                            // TODO: what if exception thrown ?
-                            Console.WriteLine(e);
+                            context.Exception = e;
                         }
                     }
+                    response = context.Response;
+                    exception = context.Exception;
                 }
 
-                if (onCompleted != null)
-                    onCompleted(response);
+                // Build response for a thrown exception
+
+                if (exception != null && response == null)
+                {
+                    response = new ResponseMessage
+                    {
+                        RequestId = request.RequestId,
+                        Exception = new InterfacedRequestException()
+                    };
+                }
+
+                // Callback
+
+                onCompleted?.Invoke(response, exception);
 
                 return response;
             };

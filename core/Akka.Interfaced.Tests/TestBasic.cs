@@ -7,6 +7,7 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
+    [ResponsiveException(typeof(ArgumentException))]
     public class BasicActor : InterfacedActor, IBasic
     {
         private List<object> _blackhole;

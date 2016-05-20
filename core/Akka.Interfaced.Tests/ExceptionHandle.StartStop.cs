@@ -4,16 +4,15 @@ using System.Threading.Tasks;
 using System.Threading;
 using Akka.Actor;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
-    public class ExceptionActor : InterfacedActor, IWorker
+    public class ExceptionActor_StartStop : InterfacedActor
     {
         private LogBoard _log;
         private string _tag;
 
-        public ExceptionActor(LogBoard log, string tag = null)
+        public ExceptionActor_StartStop(LogBoard log, string tag = null)
         {
             _log = log;
             _tag = tag;
@@ -30,7 +29,7 @@ namespace Akka.Interfaced.Tests
             base.PreStart();
         }
 
-        protected override async Task OnStart()
+        protected override async Task OnStart(bool restarted)
         {
             _log.Log("OnStart");
 
@@ -77,50 +76,11 @@ namespace Akka.Interfaced.Tests
             if (message == "E")
                 throw new Exception();
         }
-
-        async Task IWorker.Atomic(int id)
-        {
-            _log.Log($"Atomic({id})");
-
-            if (id == -1)
-                throw new Exception();
-            else if (id == 1)
-                throw new ArgumentException();
-
-            await Task.Yield();
-
-            if (id == -2)
-                throw new Exception();
-            else if (id == 2)
-                throw new ArgumentException();
-
-            _log.Log("Atomic({id}) Done");
-        }
-
-        [Reentrant]
-        async Task IWorker.Reentrant(int id)
-        {
-            _log.Log($"Reentrant({id})");
-
-            if (id == -1)
-                throw new Exception();
-            else if (id == 1)
-                throw new ArgumentException();
-
-            await Task.Yield();
-
-            if (id == -2)
-                throw new Exception();
-            else if (id == 2)
-                throw new ArgumentException();
-
-            _log.Log("Reentrant({id}) Done");
-        }
     }
 
-    public class ExceptionHandle : Akka.TestKit.Xunit2.TestKit
+    public class ExceptionHandle_StartStop : Akka.TestKit.Xunit2.TestKit
     {
-        public ExceptionHandle()
+        public ExceptionHandle_StartStop()
             : base("akka.actor.guardian-supervisor-strategy = \"Akka.Actor.StoppingSupervisorStrategy\"")
         {
         }
@@ -129,7 +89,7 @@ namespace Akka.Interfaced.Tests
         public void ExceptionThrown_At_PreStart()
         {
             var log = new LogBoard();
-            var actor = ActorOf(Props.Create(() => new ExceptionActor(log, "PreStart")));
+            var actor = ActorOf(Props.Create(() => new ExceptionActor_StartStop(log, "PreStart")));
 
             actor.Tell("");
 
@@ -148,7 +108,7 @@ namespace Akka.Interfaced.Tests
         public void ExceptionThrown_At_OnStart()
         {
             var log = new LogBoard();
-            var actor = ActorOf(Props.Create(() => new ExceptionActor(log, "OnStart")));
+            var actor = ActorOf(Props.Create(() => new ExceptionActor_StartStop(log, "OnStart")));
 
             actor.Tell("");
 
@@ -169,7 +129,7 @@ namespace Akka.Interfaced.Tests
         public void ExceptionThrown_At_OnStartDone()
         {
             var log = new LogBoard();
-            var actor = ActorOf(Props.Create(() => new ExceptionActor(log, "OnStart Done")));
+            var actor = ActorOf(Props.Create(() => new ExceptionActor_StartStop(log, "OnStart Done")));
 
             actor.Tell("");
 
@@ -188,33 +148,10 @@ namespace Akka.Interfaced.Tests
         }
 
         [Fact]
-        public void ExceptionThrown_At_MessageHandle()
-        {
-            var log = new LogBoard();
-            var actor = ActorOf(Props.Create(() => new ExceptionActor(log, null)));
-
-            actor.Tell("E");
-
-            Watch(actor);
-            ExpectTerminated(actor);
-            Assert.Equal(
-                new[]
-                {
-                    "ctor",
-                    "PreStart",
-                    "OnStart",
-                    "OnStart Done",
-                    "Handle(E)",
-                    "PostStop"
-                },
-                log.GetAndClearLogs());
-        }
-
-        [Fact]
         public void ExceptionThrown_At_OnGracefulStop()
         {
             var log = new LogBoard();
-            var actor = ActorOf(Props.Create(() => new ExceptionActor(log, "OnGracefulStop")));
+            var actor = ActorOf(Props.Create(() => new ExceptionActor_StartStop(log, "OnGracefulStop")));
 
             actor.Tell(InterfacedPoisonPill.Instance);
 
@@ -237,7 +174,7 @@ namespace Akka.Interfaced.Tests
         public void ExceptionThrown_At_OnGracefulStopDone()
         {
             var log = new LogBoard();
-            var actor = ActorOf(Props.Create(() => new ExceptionActor(log, "OnGracefulStop Done")));
+            var actor = ActorOf(Props.Create(() => new ExceptionActor_StartStop(log, "OnGracefulStop Done")));
 
             actor.Tell(InterfacedPoisonPill.Instance);
 
@@ -261,7 +198,7 @@ namespace Akka.Interfaced.Tests
         public void ExceptionThrown_At_PostStop()
         {
             var log = new LogBoard();
-            var actor = ActorOf(Props.Create(() => new ExceptionActor(log, "PostStop")));
+            var actor = ActorOf(Props.Create(() => new ExceptionActor_StartStop(log, "PostStop")));
 
             actor.Tell(InterfacedPoisonPill.Instance);
 
@@ -276,6 +213,29 @@ namespace Akka.Interfaced.Tests
                     "OnStart Done",
                     "OnGracefulStop",
                     "OnGracefulStop Done",
+                    "PostStop"
+                },
+                log.GetAndClearLogs());
+        }
+
+        [Fact]
+        public void ExceptionThrown_At_MessageHandle()
+        {
+            var log = new LogBoard();
+            var actor = ActorOf(Props.Create(() => new ExceptionActor_StartStop(log, null)));
+
+            actor.Tell("E");
+
+            Watch(actor);
+            ExpectTerminated(actor);
+            Assert.Equal(
+                new[]
+                {
+                    "ctor",
+                    "PreStart",
+                    "OnStart",
+                    "OnStart Done",
+                    "Handle(E)",
                     "PostStop"
                 },
                 log.GetAndClearLogs());

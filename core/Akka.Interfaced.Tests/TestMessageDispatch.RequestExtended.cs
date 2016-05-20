@@ -51,7 +51,7 @@ namespace Akka.Interfaced.Tests
             return Task.FromResult(value);
         }
 
-        [ExtendedHandler]
+        [ExtendedHandler, ResponsiveException(typeof(ArgumentException))]
         private Task<int> ThrowException(bool throwException)
         {
             _eventLog.Add($"ThrowException({throwException})");
@@ -103,7 +103,7 @@ namespace Akka.Interfaced.Tests
             return value;
         }
 
-        [ExtendedHandler]
+        [ExtendedHandler, ResponsiveException(typeof(ArgumentException))]
         private int ThrowException(bool throwException)
         {
             _eventLog.Add($"ThrowException({throwException})");
