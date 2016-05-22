@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Akka.Interfaced-Base\Exceptions.cs">
+      <Link>Exceptions.cs</Link>
+    </Compile>
     <Compile Include="..\Akka.Interfaced-Base\IInterfacedActor.cs">
       <Link>IInterfacedActor.cs</Link>
     </Compile>

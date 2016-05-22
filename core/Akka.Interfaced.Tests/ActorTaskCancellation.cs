@@ -84,7 +84,7 @@ namespace Akka.Interfaced.Tests
 
             var exceptionTask = Record.ExceptionAsync(() => worker.Reentrant(1));
             worker.Actor.Tell("E");
-            Assert.IsType<InterfacedRequestException>(await exceptionTask);
+            Assert.IsType<RequestHaltException>(await exceptionTask);
 
             Watch(worker.Actor);
             ExpectTerminated(worker.Actor);

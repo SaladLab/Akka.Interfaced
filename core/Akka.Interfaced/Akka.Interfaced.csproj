@@ -74,7 +74,6 @@
     <Compile Include="InterfacedObserver.cs" />
     <Compile Include="InterfacedActor.cs" />
     <Compile Include="InterfacedActorRef.cs" />
-    <Compile Include="InterfacedRequestException.cs" />
     <Compile Include="IRequestWaiter.cs" />
     <Compile Include="MessageHandler.cs" />
     <Compile Include="MessageHandlerAttribute.cs" />

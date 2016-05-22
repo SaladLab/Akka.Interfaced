@@ -36,6 +36,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions.cs" />
     <Compile Include="IInterfacedActor.cs" />
     <Compile Include="IInterfacedPayload.cs" />
     <Compile Include="IInterfacedObserver.cs" />

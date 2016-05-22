@@ -92,7 +92,7 @@ namespace Akka.Interfaced.Tests
             var dummy = new DummyRef(ActorOf(Props.Create(() => new ExceptionActor_Request(log, 0))));
 
             var exception = await Record.ExceptionAsync(() => dummy.Call("E"));
-            Assert.IsType<InterfacedRequestException>(exception);
+            Assert.IsType<RequestFaultException>(exception);
 
             Watch(dummy.Actor);
             ExpectTerminated(dummy.Actor);
@@ -120,7 +120,7 @@ namespace Akka.Interfaced.Tests
             var worker = new WorkerRef(ActorOf(Props.Create(() => new ExceptionActor_Request(log, 0))));
 
             var exception = await Record.ExceptionAsync(() => worker.Atomic(1));
-            Assert.IsType<InterfacedRequestException>(exception);
+            Assert.IsType<RequestFaultException>(exception);
 
             Watch(worker.Actor);
             ExpectTerminated(worker.Actor);
@@ -135,7 +135,7 @@ namespace Akka.Interfaced.Tests
             var worker = new WorkerRef(ActorOf(Props.Create(() => new ExceptionActor_Request(log, 0))));
 
             var exception = await Record.ExceptionAsync(() => worker.Atomic(2));
-            Assert.IsType<InterfacedRequestException>(exception);
+            Assert.IsType<RequestFaultException>(exception);
 
             Watch(worker.Actor);
             ExpectTerminated(worker.Actor);
@@ -150,7 +150,7 @@ namespace Akka.Interfaced.Tests
             var worker = new WorkerRef(ActorOf(Props.Create(() => new ExceptionActor_Request(log, 0))));
 
             var exception = await Record.ExceptionAsync(() => worker.Reentrant(1));
-            Assert.IsType<InterfacedRequestException>(exception);
+            Assert.IsType<RequestFaultException>(exception);
 
             Watch(worker.Actor);
             ExpectTerminated(worker.Actor);
@@ -165,7 +165,7 @@ namespace Akka.Interfaced.Tests
             var worker = new WorkerRef(ActorOf(Props.Create(() => new ExceptionActor_Request(log, 0))));
 
             var exception = await Record.ExceptionAsync(() => worker.Reentrant(2));
-            Assert.IsType<InterfacedRequestException>(exception);
+            Assert.IsType<RequestFaultException>(exception);
 
             Watch(worker.Actor);
             ExpectTerminated(worker.Actor);
@@ -181,7 +181,7 @@ namespace Akka.Interfaced.Tests
 
             var exceptionTask = Record.ExceptionAsync(() => worker.Atomic(10));
             worker.Actor.Tell(PoisonPill.Instance); // dangerous but for test
-            Assert.IsType<InterfacedRequestException>(await exceptionTask);
+            Assert.IsType<RequestHaltException>(await exceptionTask);
 
             Watch(worker.Actor);
             ExpectTerminated(worker.Actor);
@@ -198,9 +198,9 @@ namespace Akka.Interfaced.Tests
             var exceptionTask1 = Record.ExceptionAsync(() => worker.Reentrant(10));
             var exceptionTask2 = Record.ExceptionAsync(() => worker.Reentrant(11));
             var exception = await Record.ExceptionAsync(() => worker.Atomic(1));
-            Assert.IsType<InterfacedRequestException>(exception);
-            Assert.IsType<InterfacedRequestException>(await exceptionTask1);
-            Assert.IsType<InterfacedRequestException>(await exceptionTask2);
+            Assert.IsType<RequestFaultException>(exception);
+            Assert.IsType<RequestHaltException>(await exceptionTask1);
+            Assert.IsType<RequestHaltException>(await exceptionTask2);
 
             Watch(worker.Actor);
             ExpectTerminated(worker.Actor);

@@ -129,7 +129,7 @@ namespace Akka.Interfaced
                     i.Sender.Tell(new ResponseMessage
                     {
                         RequestId = i.RequestId,
-                        Exception = new InterfacedRequestException()
+                        Exception = new RequestHaltException()
                     });
                 }
             }
@@ -139,7 +139,7 @@ namespace Akka.Interfaced
                 _currentAtomicContext.Sender.Tell(new ResponseMessage
                 {
                     RequestId = _currentAtomicContext.RequestId,
-                    Exception = new InterfacedRequestException()
+                    Exception = new RequestHaltException()
                 });
             }
         }

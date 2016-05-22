@@ -27,7 +27,7 @@ namespace Akka.Interfaced
                     var response = new ResponseMessage
                     {
                         RequestId = request.RequestId,
-                        Exception = new InvalidOperationException("Actor not found")
+                        Exception = new RequestTargetException()
                     };
                     deadLetter.Sender.Tell(response);
                 }

@@ -253,7 +253,7 @@ namespace Akka.Interfaced
                     response = new ResponseMessage
                     {
                         RequestId = request.RequestId,
-                        Exception = new InterfacedRequestException()
+                        Exception = new RequestFaultException("", exception)
                     };
                 }
 
@@ -379,7 +379,7 @@ namespace Akka.Interfaced
                     response = new ResponseMessage
                     {
                         RequestId = request.RequestId,
-                        Exception = new InterfacedRequestException()
+                        Exception = new RequestFaultException("", exception)
                     };
                 }
 
