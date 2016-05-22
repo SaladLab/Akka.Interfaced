@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Persistence;
@@ -9,17 +10,14 @@ namespace Akka.Interfaced.Persistence
     public abstract class InterfacedPersistentActor : UntypedPersistentActor, IRequestWaiter, IFilterPerInstanceProvider
     {
         private readonly InterfacedActorHandler _handler;
+        private CancellationTokenSource _cancellationTokenSource;
         private int _activeReentrantCount;
+        private HashSet<MessageHandleContext> _activeReentrantAsyncRequestSet;
         private MessageHandleContext _currentAtomicContext;
         private InterfacedActorRequestWaiter _requestWaiter;
         private InterfacedActorObserverMap _observerMap;
         private InterfacedActorPerInstanceFilterList _perInstanceFilterList;
         private Dictionary<long, TaskCompletionSource<SnapshotMetadata>> _saveSnapshotTcsMap;
-
-        public InterfacedPersistentActor()
-        {
-            _handler = InterfacedActorHandlerTable.Get(GetType());
-        }
 
         protected new IActorRef Sender
         {
@@ -30,8 +28,16 @@ namespace Akka.Interfaced.Persistence
             }
         }
 
-        // Atomic async OnStart event (it will be called after PreStart)
-        protected virtual Task OnStart()
+        // Return a token which will be cancelled when an actor stops or restarts.
+        protected CancellationToken CancellationToken => _cancellationTokenSource.Token;
+
+        public InterfacedPersistentActor()
+        {
+            _handler = InterfacedActorHandlerTable.Get(GetType());
+        }
+
+        // Atomic async OnStart event (it will be called after PreStart, PostRestart)
+        protected virtual Task OnStart(bool restarted)
         {
             return Task.FromResult(true);
         }
@@ -45,23 +51,40 @@ namespace Akka.Interfaced.Persistence
 
         public override void AroundPreStart()
         {
-            if (_handler.PerInstanceFilterCreators.Count > 0)
-                _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, _handler.PerInstanceFilterCreators);
-
+            InitializeActorState();
             base.AroundPreStart();
-
-            InvokeOnStart();
+            InvokeOnStart(false);
         }
 
-        private void InvokeOnStart()
+        public override void AroundPostRestart(Exception cause, object message)
         {
-            var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+            InitializeActorState();
+            base.AroundPostRestart(cause, message);
+            InvokeOnStart(true);
+        }
+
+        private void InitializeActorState()
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+            _activeReentrantCount = 0;
+            _activeReentrantAsyncRequestSet = null;
+            _currentAtomicContext = null;
+            _requestWaiter = null;
+            _observerMap = null;
+
+            if (_handler.PerInstanceFilterCreators.Count > 0)
+                _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, _handler.PerInstanceFilterCreators);
+        }
+
+        private void InvokeOnStart(bool restarted)
+        {
+            var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
             BecomeStacked(OnReceiveInAtomicTask);
             _currentAtomicContext = context;
 
             using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
             {
-                OnStart().ContinueWith(
+                OnStart(restarted).ContinueWith(
                     t => OnTaskCompleted(t.Exception, false),
                     TaskContinuationOptions.ExecuteSynchronously);
             }
@@ -69,7 +92,7 @@ namespace Akka.Interfaced.Persistence
 
         private void InvokeOnGracefulStop()
         {
-            var context = new MessageHandleContext { Self = Self };
+            var context = new MessageHandleContext { Self = Self, CancellationToken = CancellationToken };
             BecomeStacked(OnReceiveInAtomicTask);
             _currentAtomicContext = context;
 
@@ -78,6 +101,46 @@ namespace Akka.Interfaced.Persistence
                 OnGracefulStop().ContinueWith(
                     t => OnTaskCompleted(t.Exception, false, stopOnCompleted: true),
                     TaskContinuationOptions.ExecuteSynchronously);
+            }
+        }
+
+        public override void AroundPreRestart(Exception cause, object message)
+        {
+            CancelAllTasks();
+            base.AroundPreRestart(cause, message);
+        }
+
+        public override void AroundPostStop()
+        {
+            CancelAllTasks();
+            base.AroundPostStop();
+        }
+
+        private void CancelAllTasks()
+        {
+            _cancellationTokenSource.Cancel();
+
+            // Send responses to requesters that waits for a reentrant async job
+
+            if (_activeReentrantAsyncRequestSet != null)
+            {
+                foreach (var i in _activeReentrantAsyncRequestSet)
+                {
+                    i.Sender.Tell(new ResponseMessage
+                    {
+                        RequestId = i.RequestId,
+                        Exception = new RequestHaltException()
+                    });
+                }
+            }
+
+            if (_currentAtomicContext != null && _currentAtomicContext.RequestId != 0)
+            {
+                _currentAtomicContext.Sender.Tell(new ResponseMessage
+                {
+                    RequestId = _currentAtomicContext.RequestId,
+                    Exception = new RequestHaltException()
+                });
             }
         }
 
@@ -192,10 +255,17 @@ namespace Akka.Interfaced.Persistence
             {
                 // async handle
 
-                var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+                var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken, RequestId = request.RequestId };
                 if (handlerItem.IsReentrant)
                 {
                     _activeReentrantCount += 1;
+                    if (request.RequestId != 0)
+                    {
+                        if (_activeReentrantAsyncRequestSet == null)
+                            _activeReentrantAsyncRequestSet = new HashSet<MessageHandleContext>();
+
+                        _activeReentrantAsyncRequestSet.Add(context);
+                    }
                 }
                 else
                 {
@@ -210,7 +280,12 @@ namespace Akka.Interfaced.Persistence
                     handlerItem.AsyncHandler(this, request, (response, exception) =>
                     {
                         if (requestId != 0)
+                        {
+                            if (isReentrant)
+                                _activeReentrantAsyncRequestSet.Remove(context);
+
                             sender.Tell(response);
+                        }
 
                         OnTaskCompleted(exception, isReentrant);
                     });
@@ -249,7 +324,7 @@ namespace Akka.Interfaced.Persistence
                 {
                     // async handle
 
-                    var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+                    var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
                     if (handlerItem.IsReentrant)
                     {
                         _activeReentrantCount += 1;
@@ -276,7 +351,7 @@ namespace Akka.Interfaced.Persistence
 
         private void OnTaskRunMessage(TaskRunMessage taskRunMessage)
         {
-            var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+            var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
             if (taskRunMessage.IsReentrant)
             {
                 _activeReentrantCount += 1;
@@ -311,7 +386,7 @@ namespace Akka.Interfaced.Persistence
         {
             if (handlerItem.AsyncHandler != null)
             {
-                var context = new MessageHandleContext { Self = Self, Sender = base.Sender };
+                var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
                 if (handlerItem.IsReentrant)
                 {
                     _activeReentrantCount += 1;

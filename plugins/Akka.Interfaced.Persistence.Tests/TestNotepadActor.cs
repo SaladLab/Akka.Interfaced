@@ -36,7 +36,7 @@ namespace Akka.Interfaced.Persistence.Tests
             _eventLog = eventLog;
         }
 
-        protected override Task OnStart()
+        protected override Task OnStart(bool restarted)
         {
             _state = new NotepadState { Document = new List<string>() };
             return Task.FromResult(0);

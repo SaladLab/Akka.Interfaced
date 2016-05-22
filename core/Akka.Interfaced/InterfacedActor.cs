@@ -36,7 +36,7 @@ namespace Akka.Interfaced
             _handler = InterfacedActorHandlerTable.Get(GetType());
         }
 
-        // Atomic async OnStart event (it will be called after OnStart)
+        // Atomic async OnStart event (it will be called after PreStart, PostRestart)
         protected virtual Task OnStart(bool restarted)
         {
             return Task.FromResult(true);
@@ -78,7 +78,7 @@ namespace Akka.Interfaced
 
         private void InvokeOnStart(bool restarted)
         {
-            var context = new MessageHandleContext { Self = Self, Sender = Sender, CancellationToken = CancellationToken };
+            var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
             BecomeStacked(OnReceiveInAtomicTask);
             _currentAtomicContext = context;
 
