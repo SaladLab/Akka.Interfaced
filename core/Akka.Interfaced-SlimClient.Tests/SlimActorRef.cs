@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Xunit;
 
 namespace Akka.Interfaced.SlimClient.Tests
@@ -31,6 +27,17 @@ namespace Akka.Interfaced.SlimClient.Tests
             var payload = (IBasic_PayloadTable.CallWithParameter_Invoke)requestWaiter.Requests[0].InvokePayload;
             Assert.NotNull(payload);
             Assert.Equal(1, payload.value);
+        }
+
+        [Fact]
+        public async Task CallWithReturn_FromActorRef_TransferedViaRequestWaiter()
+        {
+            var requestWaiter = new TestRequestWaiter();
+            requestWaiter.Responses.Enqueue(new IBasic_PayloadTable.CallWithReturn_Return { v = 10 });
+            var a = new BasicRef(null, requestWaiter, null);
+            var r = await a.CallWithReturn();
+
+            Assert.Equal(10, r);
         }
     }
 }
