@@ -115,7 +115,7 @@ namespace Akka.Interfaced
                     {
                         Actor = self,
                         Message = message,
-                        Handled = handled
+                        Intercepted = handled
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {
@@ -154,6 +154,7 @@ namespace Akka.Interfaced
 
                 // Call PreFilters
 
+                var handled = false;
                 if (filterChain.PreFilterAccessors.Length > 0)
                 {
                     var context = new PreMessageFilterContext
@@ -170,11 +171,13 @@ namespace Akka.Interfaced
                         else
                             await ((IPreMessageAsyncFilter)filter).OnPreMessageAsync(context);
                     }
+                    handled = context.Handled;
                 }
 
                 // Call Handler
 
-                await handler(self, message);
+                if (handled == false)
+                    await handler(self, message);
 
                 // Call PostFilters
 
@@ -184,6 +187,7 @@ namespace Akka.Interfaced
                     {
                         Actor = self,
                         Message = message,
+                        Intercepted = handled
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {

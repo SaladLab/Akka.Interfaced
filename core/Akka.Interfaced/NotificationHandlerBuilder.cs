@@ -225,7 +225,7 @@ namespace Akka.Interfaced
                     {
                         Actor = self,
                         Notification = notification,
-                        Handled = handled
+                        Intercepted = handled
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {
@@ -263,6 +263,7 @@ namespace Akka.Interfaced
 
                 // Call PreFilters
 
+                var handled = false;
                 if (filterChain.PreFilterAccessors.Length > 0)
                 {
                     var context = new PreNotificationFilterContext
@@ -279,11 +280,13 @@ namespace Akka.Interfaced
                         else
                             await ((IPreNotificationAsyncFilter)filter).OnPreNotificationAsync(context);
                     }
+                    handled = context.Handled;
                 }
 
                 // Call Handler
 
-                await handler(self, notification.InvokePayload);
+                if (handled == false)
+                    await handler(self, notification.InvokePayload);
 
                 // Call PostFilters
 
@@ -293,6 +296,7 @@ namespace Akka.Interfaced
                     {
                         Actor = self,
                         Notification = notification,
+                        Intercepted = handled
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {

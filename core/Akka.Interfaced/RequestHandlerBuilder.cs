@@ -202,7 +202,8 @@ namespace Akka.Interfaced
 
                 // Call Handler
 
-                if (response == null && exception == null)
+                var intercepted = response != null || exception != null;
+                if (intercepted == false)
                 {
                     try
                     {
@@ -229,6 +230,7 @@ namespace Akka.Interfaced
                         Request = request,
                         Response = response,
                         Exception = exception,
+                        Intercepted = intercepted
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {
@@ -324,7 +326,8 @@ namespace Akka.Interfaced
 
                 // Call Handler
 
-                if (response == null && exception == null)
+                var intercepted = response != null || exception != null;
+                if (intercepted == false)
                 {
                     try
                     {
@@ -351,6 +354,7 @@ namespace Akka.Interfaced
                         Request = request,
                         Response = response,
                         Exception = exception,
+                        Intercepted = intercepted
                     };
                     foreach (var filterAccessor in filterChain.PostFilterAccessors)
                     {

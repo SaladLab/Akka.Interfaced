@@ -37,6 +37,7 @@ namespace Akka.Interfaced
         public RequestMessage Request;
         public ResponseMessage Response;
         public Exception Exception;
+        public bool Intercepted;
     }
 
     public interface IPostRequestFilter : IFilter
@@ -74,7 +75,7 @@ namespace Akka.Interfaced
     {
         public object Actor;
         public NotificationMessage Notification;
-        public bool Handled;
+        public bool Intercepted;
     }
 
     public interface IPostNotificationFilter : IFilter
@@ -112,7 +113,7 @@ namespace Akka.Interfaced
     {
         public object Actor;
         public object Message;
-        public bool Handled;
+        public bool Intercepted;
     }
 
     public interface IPostMessageFilter : IFilter
