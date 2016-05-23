@@ -273,13 +273,18 @@ namespace Akka.Interfaced.TestKit.Tests
 
     public class UserObserver : InterfacedObserver, IUserObserver
     {
-        public UserObserver(IActorRef target, int observerId = 0)
-            : base(new ActorNotificationChannel(target), observerId)
+        public UserObserver()
+            : base(null, 0)
         {
         }
 
         public UserObserver(INotificationChannel channel, int observerId = 0)
             : base(channel, observerId)
+        {
+        }
+
+        public UserObserver(IActorRef target, int observerId = 0)
+            : base(new ActorNotificationChannel(target), observerId)
         {
         }
 

@@ -858,13 +858,18 @@ namespace Basic.Interface
 
     public class EventObserver : InterfacedObserver, IEventObserver
     {
-        public EventObserver(IActorRef target, int observerId = 0)
-            : base(new ActorNotificationChannel(target), observerId)
+        public EventObserver()
+            : base(null, 0)
         {
         }
 
         public EventObserver(INotificationChannel channel, int observerId = 0)
             : base(channel, observerId)
+        {
+        }
+
+        public EventObserver(IActorRef target, int observerId = 0)
+            : base(new ActorNotificationChannel(target), observerId)
         {
         }
 

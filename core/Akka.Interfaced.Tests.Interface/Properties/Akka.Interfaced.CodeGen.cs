@@ -1097,13 +1097,18 @@ namespace Akka.Interfaced.Tests
 
     public class Subject2Observer : InterfacedObserver, ISubject2Observer
     {
-        public Subject2Observer(IActorRef target, int observerId = 0)
-            : base(new ActorNotificationChannel(target), observerId)
+        public Subject2Observer()
+            : base(null, 0)
         {
         }
 
         public Subject2Observer(INotificationChannel channel, int observerId = 0)
             : base(channel, observerId)
+        {
+        }
+
+        public Subject2Observer(IActorRef target, int observerId = 0)
+            : base(new ActorNotificationChannel(target), observerId)
         {
         }
 
@@ -1154,13 +1159,18 @@ namespace Akka.Interfaced.Tests
 
     public class SubjectObserver : InterfacedObserver, ISubjectObserver
     {
-        public SubjectObserver(IActorRef target, int observerId = 0)
-            : base(new ActorNotificationChannel(target), observerId)
+        public SubjectObserver()
+            : base(null, 0)
         {
         }
 
         public SubjectObserver(INotificationChannel channel, int observerId = 0)
             : base(channel, observerId)
+        {
+        }
+
+        public SubjectObserver(IActorRef target, int observerId = 0)
+            : base(new ActorNotificationChannel(target), observerId)
         {
         }
 

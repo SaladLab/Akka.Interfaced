@@ -453,6 +453,11 @@ namespace Akka.Interfaced.SlimClient.Tests
 
     public class SubjectObserver : InterfacedObserver, ISubjectObserver
     {
+        public SubjectObserver()
+            : base(null, 0)
+        {
+        }
+
         public SubjectObserver(INotificationChannel channel, int observerId = 0)
             : base(channel, observerId)
         {

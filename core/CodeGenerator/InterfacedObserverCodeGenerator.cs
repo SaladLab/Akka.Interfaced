@@ -139,14 +139,11 @@ namespace CodeGen
                     }
                 }
 
-                // Constructor (IActorRef)
+                // Constructor
 
-                if (Options.UseSlimClient == false)
+                using (w.B($"public {className}()",
+                           $": base(null, 0)"))
                 {
-                    using (w.B($"public {className}(IActorRef target, int observerId = 0)",
-                               $": base(new ActorNotificationChannel(target), observerId)"))
-                    {
-                    }
                 }
 
                 // Constructor (INotificationChannel)
@@ -154,6 +151,16 @@ namespace CodeGen
                 using (w.B($"public {className}(INotificationChannel channel, int observerId = 0)",
                            $": base(channel, observerId)"))
                 {
+                }
+
+                // Constructor (IActorRef)
+
+                if (Options.UseSlimClient == false)
+                {
+                    using (w.B($"public {className}(IActorRef target, int observerId = 0)",
+                                $": base(new ActorNotificationChannel(target), observerId)"))
+                    {
+                    }
                 }
 
                 // Observer method messages

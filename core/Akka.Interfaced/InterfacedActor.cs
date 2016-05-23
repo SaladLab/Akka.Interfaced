@@ -16,7 +16,6 @@ namespace Akka.Interfaced
         private HashSet<MessageHandleContext> _activeReentrantAsyncRequestSet;
         private MessageHandleContext _currentAtomicContext;
         private InterfacedActorRequestWaiter _requestWaiter;
-        private InterfacedActorObserverMap _observerMap;
         private InterfacedActorPerInstanceFilterList _perInstanceFilterList;
 
         protected new IActorRef Sender
@@ -70,7 +69,6 @@ namespace Akka.Interfaced
             _activeReentrantAsyncRequestSet = null;
             _currentAtomicContext = null;
             _requestWaiter = null;
-            _observerMap = null;
 
             if (_handler.PerInstanceFilterCreators.Count > 0)
                 _perInstanceFilterList = new InterfacedActorPerInstanceFilterList(this, _handler.PerInstanceFilterCreators);
@@ -293,44 +291,43 @@ namespace Akka.Interfaced
 
         private void OnNotificationMessage(NotificationMessage notification)
         {
-            if (notification.ObserverId == 0)
+            if (notification.ObserverId != 0)
             {
-                var handlerItem = _handler.NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
-                if (handlerItem == null)
-                    return;
+                // TODO: log bad messages (actor doesn't use observerId)
+                return;
+            }
 
-                if (handlerItem.Handler != null)
-                {
-                    // sync handle
+            var handlerItem = _handler.NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
+            if (handlerItem == null)
+                return;
 
-                    handlerItem.Handler(this, notification);
-                }
-                else
-                {
-                    // async handle
+            if (handlerItem.Handler != null)
+            {
+                // sync handle
 
-                    var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
-                    if (handlerItem.IsReentrant)
-                    {
-                        _activeReentrantCount += 1;
-                    }
-                    else
-                    {
-                        BecomeStacked(OnReceiveInAtomicTask);
-                        _currentAtomicContext = context;
-                    }
-
-                    using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
-                    {
-                        handlerItem.AsyncHandler(this, notification)
-                                   .ContinueWith(t => OnTaskCompleted(t.Exception, handlerItem.IsReentrant),
-                                                 TaskContinuationOptions.ExecuteSynchronously);
-                    }
-                }
+                handlerItem.Handler(this, notification);
             }
             else
             {
-                _observerMap?.Notify(notification);
+                // async handle
+
+                var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
+                if (handlerItem.IsReentrant)
+                {
+                    _activeReentrantCount += 1;
+                }
+                else
+                {
+                    BecomeStacked(OnReceiveInAtomicTask);
+                    _currentAtomicContext = context;
+                }
+
+                using (new SynchronizationContextSwitcher(new ActorSynchronizationContext(context)))
+                {
+                    handlerItem.AsyncHandler(this, notification)
+                                .ContinueWith(t => OnTaskCompleted(t.Exception, handlerItem.IsReentrant),
+                                                TaskContinuationOptions.ExecuteSynchronously);
+                }
             }
         }
 
@@ -523,29 +520,12 @@ namespace Akka.Interfaced
 
         // observer support
 
-        private InterfacedActorObserverMap EnsureObserverMap()
+        protected TObserver CreateObserver<TObserver>()
+            where TObserver : InterfacedObserver, new()
         {
-            return _observerMap ?? (_observerMap = new InterfacedActorObserverMap());
-        }
-
-        protected int IssueObserverId()
-        {
-            return EnsureObserverMap().IssueId();
-        }
-
-        protected void AddObserver(int observerId, IInterfacedObserver observer)
-        {
-            EnsureObserverMap().Add(observerId, observer);
-        }
-
-        protected IInterfacedObserver GetObserver(int observerId)
-        {
-            return _observerMap?.Get(observerId);
-        }
-
-        protected bool RemoveObserver(int observerId)
-        {
-            return _observerMap?.Remove(observerId) ?? false;
+            var observer = new TObserver();
+            observer.Channel = new ActorNotificationChannel(Self);
+            return observer;
         }
 
         // PerInstance Filter related

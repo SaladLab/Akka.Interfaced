@@ -79,10 +79,9 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            var self = Self; // keep Self safely
-            await _subject.Subscribe(new SubjectObserver(self));
+            await _subject.Subscribe(CreateObserver<SubjectObserver>());
             await _subject.MakeEvent("A");
-            await _subject.Unsubscribe(new SubjectObserver(self));
+            await _subject.Unsubscribe(CreateObserver<SubjectObserver>());
             await _subject.MakeEvent("B");
             return null;
         }
@@ -107,10 +106,9 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            var self = Self; // keep Self safely
-            await _subject.Subscribe(new SubjectObserver(self));
+            await _subject.Subscribe(CreateObserver<SubjectObserver>());
             await _subject.MakeEvent("A");
-            await _subject.Unsubscribe(new SubjectObserver(self));
+            await _subject.Unsubscribe(CreateObserver<SubjectObserver>());
             await _subject.MakeEvent("B");
             return null;
         }
@@ -136,11 +134,10 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            var self = Self; // keep Self safely
-            await _subject.Subscribe(new SubjectObserver(self));
+            await _subject.Subscribe(CreateObserver<SubjectObserver>());
             await _subject.MakeEvent("A");
             await _subject.MakeEvent("B");
-            await _subject.Unsubscribe(new SubjectObserver(self));
+            await _subject.Unsubscribe(CreateObserver<SubjectObserver>());
             return null;
         }
 
@@ -167,11 +164,10 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            var self = Self; // keep Self safely
-            await _subject.Subscribe(new SubjectObserver(self));
+            await _subject.Subscribe(CreateObserver<SubjectObserver>());
             await _subject.MakeEvent("A");
             await _subject.MakeEvent("B");
-            await _subject.Unsubscribe(new SubjectObserver(self));
+            await _subject.Unsubscribe(CreateObserver<SubjectObserver>());
             return null;
         }
 
