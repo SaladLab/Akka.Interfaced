@@ -58,6 +58,12 @@
     <Compile Include="..\Akka.Interfaced-Base\INotificationChannel.cs">
       <Link>INotificationChannel.cs</Link>
     </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\InterfacedObserver.cs">
+      <Link>InterfacedObserver.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\IObserverOverridable.cs">
+      <Link>IObserverOverridable.cs</Link>
+    </Compile>
     <Compile Include="..\Akka.Interfaced-Base\ITagOverridable.cs">
       <Link>ITagOverridable.cs</Link>
     </Compile>

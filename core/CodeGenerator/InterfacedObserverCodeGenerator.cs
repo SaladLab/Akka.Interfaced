@@ -81,10 +81,15 @@ namespace CodeGen
                                 var attr = (Options.UseProtobuf) ? string.Format("[ProtoMember({0})] ", i + 1) : "";
                                 w._($"{attr}public {Utility.GetTypeName(parameter.ParameterType)} {parameter.Name};");
                             }
+                            if (parameters.Any())
+                                w._();
 
                             // GetInterfaceType
 
-                            w._($"public Type GetInterfaceType() {{ return typeof({type.Name}); }}");
+                            using (w.B("public Type GetInterfaceType()"))
+                            {
+                                w._($"return typeof({type.Name});");
+                            }
 
                             // Invoke
 
@@ -103,9 +108,6 @@ namespace CodeGen
             Type type, CodeWriter.CodeWriter w,
             MethodInfo[] methods, Dictionary<MethodInfo, string> method2PayloadTypeNameMap)
         {
-            if (Options.UseSlimClient)
-                return;
-
             var className = Utility.GetObserverClassName(type);
             var payloadTableClassName = Utility.GetPayloadTableClassName(type);
 
@@ -116,14 +118,16 @@ namespace CodeGen
             {
                 // Protobuf-net specialized
 
-                if (Options.UseProtobuf)
+                if (Options.UseProtobuf && Options.UseSlimClient == false)
                 {
                     using (w.B("[ProtoMember(1)] private ActorRefBase _actor"))
                     {
                         w._("get { return Channel != null ? (ActorRefBase)(((ActorNotificationChannel)Channel).Actor) : null; }",
                             "set { Channel = new ActorNotificationChannel(value); }");
                     }
-
+                }
+                if (Options.UseProtobuf)
+                {
                     using (w.B("[ProtoMember(2)] private int _observerId"))
                     {
                         w._("get { return ObserverId; }",
@@ -137,9 +141,12 @@ namespace CodeGen
 
                 // Constructor (IActorRef)
 
-                using (w.B($"public {className}(IActorRef target, int observerId = 0)",
-                           $": base(new ActorNotificationChannel(target), observerId)"))
+                if (Options.UseSlimClient == false)
                 {
+                    using (w.B($"public {className}(IActorRef target, int observerId = 0)",
+                               $": base(new ActorNotificationChannel(target), observerId)"))
+                    {
+                    }
                 }
 
                 // Constructor (INotificationChannel)

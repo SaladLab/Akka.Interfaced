@@ -70,7 +70,7 @@
     <Compile Include="InterfacedActor.PerInstanceFilterList.cs" />
     <Compile Include="InterfacedActor.RequestWaiter.cs" />
     <Compile Include="InterfacedActorHandler.cs" />
-    <Compile Include="InterfacedObserver.cs" />
+    <Compile Include="ActorNotificationChannel.cs" />
     <Compile Include="InterfacedActor.cs" />
     <Compile Include="InterfacedActorRef.cs" />
     <Compile Include="IRequestWaiter.cs" />

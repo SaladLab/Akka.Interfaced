@@ -69,6 +69,7 @@ namespace CodeGen
                 {
                     var payloadTypeName = method2PayloadTypeNameMap[method];
                     var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
+                    var observerParameters = method.GetParameters().Where(p => Utility.IsObserverInterface(p.ParameterType)).ToArray();
 
                     // Invoke payload
 
@@ -76,8 +77,9 @@ namespace CodeGen
                         w._("[ProtoContract, TypeAlias]");
 
                     var tagOverridable = tagName != null ? "ITagOverridable, " : "";
+                    var observerOverridable = observerParameters.Any() ? "IObserverOverridable, " : "";
                     using (w.B($"public class {payloadTypeName.Item1}",
-                               $": IInterfacedPayload, {tagOverridable}IAsyncInvokable"))
+                               $": IInterfacedPayload, {tagOverridable}{observerOverridable}IAsyncInvokable"))
                     {
                         // Parameters
 
@@ -105,25 +107,41 @@ namespace CodeGen
                             var typeName = Utility.GetTransportTypeName(parameter.ParameterType);
                             w._($"{attr}public {typeName} {parameter.Name}{defaultValueExpression};");
                         }
+                        if (parameters.Any())
+                            w._();
 
                         // GetInterfaceType
 
-                        w._($"public Type GetInterfaceType() {{ return typeof({type.Name}); }}");
+                        using (w.B($"public Type GetInterfaceType()"))
+                        {
+                            w._($"return typeof({type.Name});");
+                        }
 
                         // SetTag
 
                         if (tagName != null)
                         {
-                            var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
-                            if (tagParameter != null)
+                            using (w.B($"public void SetTag(object value)"))
                             {
-                                var typeName = Utility.GetTransportTypeName(tagParameter.ParameterType);
-                                var setStatement = $"{tagName} = ({typeName})value;";
-                                w._($"public void SetTag(object value) {{ {setStatement} }}");
+                                var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
+                                if (tagParameter != null)
+                                {
+                                    var typeName = Utility.GetTransportTypeName(tagParameter.ParameterType);
+                                    w._($"{tagName} = ({typeName})value;");
+                                }
                             }
-                            else
+                        }
+
+                        // SetObserverOverridable
+
+                        if (observerParameters.Any())
+                        {
+                            using (w.B("public void SetNotificationChannel(INotificationChannel notificationChannel)"))
                             {
-                                w._($"public void SetTag(object value) {{ }}");
+                                foreach (var parameter in observerParameters)
+                                {
+                                    w._($"{parameter.Name}.Channel = notificationChannel;");
+                                }
                             }
                         }
 
@@ -166,9 +184,18 @@ namespace CodeGen
                                    $": IInterfacedPayload, IValueGetable"))
                         {
                             var attr = (Options.UseProtobuf) ? "[ProtoMember(1)] " : "";
-                            w._($"{attr}public {Utility.GetTransportTypeName(returnType)} v;",
-                                $"public Type GetInterfaceType() {{ return typeof({type.Name}); }}",
-                                $"public object Value {{ get {{ return v; }} }}");
+                            w._($"{attr}public {Utility.GetTransportTypeName(returnType)} v;");
+                            w._();
+
+                            using (w.B("public Type GetInterfaceType()"))
+                            {
+                                w._($"return typeof({type.Name});");
+                            }
+
+                            using (w.B("public object Value"))
+                            {
+                                w._($"get {{ return v; }}");
+                            }
                         }
                     }
                 }

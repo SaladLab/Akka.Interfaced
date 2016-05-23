@@ -33,7 +33,11 @@ namespace Akka.Interfaced.Tests
         public class Call_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(IBasic); }
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IBasic)__target).Call();
@@ -45,7 +49,12 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Int32 value;
-            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IBasic)__target).CallWithParameter(value);
@@ -57,7 +66,12 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Int32 value;
-            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IBasic)__target).CallWithParameterAndReturn(value);
@@ -69,14 +83,26 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IBasic); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class CallWithReturn_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(IBasic); }
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IBasic)__target).CallWithReturn();
@@ -88,15 +114,28 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IBasic); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class ThrowException_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Boolean throwException;
-            public Type GetInterfaceType() { return typeof(IBasic); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IBasic)__target).ThrowException(throwException);
@@ -108,8 +147,16 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IBasic); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
     }
 
@@ -248,7 +295,12 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Object param;
-            public Type GetInterfaceType() { return typeof(IDummy); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IDummy);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IDummy)__target).Call(param);
@@ -260,8 +312,16 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.Object v;
-            public Type GetInterfaceType() { return typeof(IDummy); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IDummy);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
     }
 
@@ -335,7 +395,12 @@ namespace Akka.Interfaced.Tests
         {
             public System.Int32 a;
             public System.Int32 b;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IOverloaded)__target).Min(a, b);
@@ -347,8 +412,16 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class Min_2_Invoke
@@ -357,7 +430,12 @@ namespace Akka.Interfaced.Tests
             public System.Int32 a;
             public System.Int32 b;
             public System.Int32 c;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IOverloaded)__target).Min(a, b, c);
@@ -369,15 +447,28 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class Min_3_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Int32[] nums;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IOverloaded)__target).Min(nums);
@@ -389,8 +480,16 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
     }
 
@@ -497,7 +596,12 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String eventName;
-            public Type GetInterfaceType() { return typeof(ISubject); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ISubject)__target).MakeEvent(eventName);
@@ -506,10 +610,20 @@ namespace Akka.Interfaced.Tests
         }
 
         public class Subscribe_Invoke
-            : IInterfacedPayload, IAsyncInvokable
+            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
         {
             public Akka.Interfaced.Tests.SubjectObserver observer;
-            public Type GetInterfaceType() { return typeof(ISubject); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject);
+            }
+
+            public void SetNotificationChannel(INotificationChannel notificationChannel)
+            {
+                observer.Channel = notificationChannel;
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ISubject)__target).Subscribe(observer);
@@ -518,10 +632,20 @@ namespace Akka.Interfaced.Tests
         }
 
         public class Unsubscribe_Invoke
-            : IInterfacedPayload, IAsyncInvokable
+            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
         {
             public Akka.Interfaced.Tests.SubjectObserver observer;
-            public Type GetInterfaceType() { return typeof(ISubject); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject);
+            }
+
+            public void SetNotificationChannel(INotificationChannel notificationChannel)
+            {
+                observer.Channel = notificationChannel;
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ISubject)__target).Unsubscribe(observer);
@@ -634,7 +758,12 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String eventName;
-            public Type GetInterfaceType() { return typeof(ISubject2); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject2);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ISubject2)__target).MakeEvent(eventName);
@@ -646,7 +775,12 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String eventName;
-            public Type GetInterfaceType() { return typeof(ISubject2); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject2);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ISubject2)__target).MakeEvent2(eventName);
@@ -655,10 +789,20 @@ namespace Akka.Interfaced.Tests
         }
 
         public class Subscribe_Invoke
-            : IInterfacedPayload, IAsyncInvokable
+            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
         {
             public Akka.Interfaced.Tests.Subject2Observer observer;
-            public Type GetInterfaceType() { return typeof(ISubject2); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject2);
+            }
+
+            public void SetNotificationChannel(INotificationChannel notificationChannel)
+            {
+                observer.Channel = notificationChannel;
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ISubject2)__target).Subscribe(observer);
@@ -667,10 +811,20 @@ namespace Akka.Interfaced.Tests
         }
 
         public class Unsubscribe_Invoke
-            : IInterfacedPayload, IAsyncInvokable
+            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
         {
             public Akka.Interfaced.Tests.Subject2Observer observer;
-            public Type GetInterfaceType() { return typeof(ISubject2); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject2);
+            }
+
+            public void SetNotificationChannel(INotificationChannel notificationChannel)
+            {
+                observer.Channel = notificationChannel;
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ISubject2)__target).Unsubscribe(observer);
@@ -798,7 +952,12 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Int32 id;
-            public Type GetInterfaceType() { return typeof(IWorker); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IWorker);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IWorker)__target).Atomic(id);
@@ -810,7 +969,12 @@ namespace Akka.Interfaced.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Int32 id;
-            public Type GetInterfaceType() { return typeof(IWorker); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IWorker);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IWorker)__target).Reentrant(id);
@@ -903,7 +1067,12 @@ namespace Akka.Interfaced.Tests
         public class Event_Invoke : IInterfacedPayload, IInvokable
         {
             public System.String eventName;
-            public Type GetInterfaceType() { return typeof(ISubject2Observer); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject2Observer);
+            }
+
             public void Invoke(object __target)
             {
                 ((ISubject2Observer)__target).Event(eventName);
@@ -913,7 +1082,12 @@ namespace Akka.Interfaced.Tests
         public class Event2_Invoke : IInterfacedPayload, IInvokable
         {
             public System.String eventName;
-            public Type GetInterfaceType() { return typeof(ISubject2Observer); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject2Observer);
+            }
+
             public void Invoke(object __target)
             {
                 ((ISubject2Observer)__target).Event2(eventName);
@@ -965,7 +1139,12 @@ namespace Akka.Interfaced.Tests
         public class Event_Invoke : IInterfacedPayload, IInvokable
         {
             public System.String eventName;
-            public Type GetInterfaceType() { return typeof(ISubjectObserver); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubjectObserver);
+            }
+
             public void Invoke(object __target)
             {
                 ((ISubjectObserver)__target).Event(eventName);

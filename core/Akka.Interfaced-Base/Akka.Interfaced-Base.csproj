@@ -42,6 +42,8 @@
     <Compile Include="IInterfacedObserver.cs" />
     <Compile Include="IInvokable.cs" />
     <Compile Include="INotificationChannel.cs" />
+    <Compile Include="InterfacedObserver.cs" />
+    <Compile Include="IObserverOverridable.cs" />
     <Compile Include="ITagOverridable.cs" />
     <Compile Include="IValueGetable.cs" />
     <Compile Include="NotificationMessage.cs" />
