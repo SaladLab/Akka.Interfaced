@@ -30,7 +30,11 @@ namespace Akka.Interfaced.TestKit.Tests
         public class GetId_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(IUser); }
+            public Type GetInterfaceType()
+            {
+                return typeof(IUser);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IUser)__target).GetId();
@@ -42,15 +46,28 @@ namespace Akka.Interfaced.TestKit.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.String v;
-            public Type GetInterfaceType() { return typeof(IUser); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IUser);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class Say_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String message;
-            public Type GetInterfaceType() { return typeof(IUser); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IUser);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IUser)__target).Say(message);
@@ -145,7 +162,12 @@ namespace Akka.Interfaced.TestKit.Tests
             public System.String id;
             public System.String password;
             public System.Int32 observerId;
-            public Type GetInterfaceType() { return typeof(IUserLogin); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IUserLogin);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IUserLogin)__target).Login(id, password, observerId);
@@ -157,8 +179,16 @@ namespace Akka.Interfaced.TestKit.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IUserLogin); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IUserLogin);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
     }
 
@@ -228,7 +258,12 @@ namespace Akka.Interfaced.TestKit.Tests
         public class Say_Invoke : IInterfacedPayload, IInvokable
         {
             public System.String message;
-            public Type GetInterfaceType() { return typeof(IUserObserver); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IUserObserver);
+            }
+
             public void Invoke(object __target)
             {
                 ((IUserObserver)__target).Say(message);

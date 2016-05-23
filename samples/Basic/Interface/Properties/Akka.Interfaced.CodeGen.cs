@@ -32,7 +32,12 @@ namespace Basic.Interface
         {
             public System.String a;
             public System.String b;
-            public Type GetInterfaceType() { return typeof(ICalculator); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICalculator);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((ICalculator)__target).Concat(a, b);
@@ -44,8 +49,16 @@ namespace Basic.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.String v;
-            public Type GetInterfaceType() { return typeof(ICalculator); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICalculator);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class Sum_Invoke
@@ -53,7 +66,12 @@ namespace Basic.Interface
         {
             public System.Int32 a;
             public System.Int32 b;
-            public Type GetInterfaceType() { return typeof(ICalculator); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICalculator);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((ICalculator)__target).Sum(a, b);
@@ -65,8 +83,16 @@ namespace Basic.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(ICalculator); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICalculator);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
     }
 
@@ -154,7 +180,11 @@ namespace Basic.Interface
         public class GetCounter_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(ICounter); }
+            public Type GetInterfaceType()
+            {
+                return typeof(ICounter);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((ICounter)__target).GetCounter();
@@ -166,15 +196,28 @@ namespace Basic.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(ICounter); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICounter);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class IncCounter_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Int32 delta;
-            public Type GetInterfaceType() { return typeof(ICounter); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICounter);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ICounter)__target).IncCounter(delta);
@@ -271,7 +314,12 @@ namespace Basic.Interface
         {
             public System.String name;
             public System.Int32 price;
-            public Type GetInterfaceType() { return typeof(IEventGenerator); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IEventGenerator);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IEventGenerator)__target).Buy(name, price);
@@ -284,7 +332,12 @@ namespace Basic.Interface
         {
             public System.String name;
             public System.Int32 price;
-            public Type GetInterfaceType() { return typeof(IEventGenerator); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IEventGenerator);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IEventGenerator)__target).Sell(name, price);
@@ -293,10 +346,20 @@ namespace Basic.Interface
         }
 
         public class Subscribe_Invoke
-            : IInterfacedPayload, IAsyncInvokable
+            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
         {
             public Basic.Interface.EventObserver observer;
-            public Type GetInterfaceType() { return typeof(IEventGenerator); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IEventGenerator);
+            }
+
+            public void SetNotificationChannel(INotificationChannel notificationChannel)
+            {
+                observer.Channel = notificationChannel;
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IEventGenerator)__target).Subscribe(observer);
@@ -305,10 +368,20 @@ namespace Basic.Interface
         }
 
         public class Unsubscribe_Invoke
-            : IInterfacedPayload, IAsyncInvokable
+            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
         {
             public Basic.Interface.EventObserver observer;
-            public Type GetInterfaceType() { return typeof(IEventGenerator); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IEventGenerator);
+            }
+
+            public void SetNotificationChannel(INotificationChannel notificationChannel)
+            {
+                observer.Channel = notificationChannel;
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IEventGenerator)__target).Unsubscribe(observer);
@@ -438,7 +511,12 @@ namespace Basic.Interface
         {
             public System.Int32 a;
             public System.Int32 b;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IOverloaded)__target).Min(a, b);
@@ -450,8 +528,16 @@ namespace Basic.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class Min_2_Invoke
@@ -460,7 +546,12 @@ namespace Basic.Interface
             public System.Int32 a;
             public System.Int32 b;
             public System.Int32 c;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IOverloaded)__target).Min(a, b, c);
@@ -472,15 +563,28 @@ namespace Basic.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class Min_3_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Int32[] nums;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IOverloaded)__target).Min(nums);
@@ -492,8 +596,16 @@ namespace Basic.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IOverloaded); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloaded);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
     }
 
@@ -599,7 +711,12 @@ namespace Basic.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String name;
-            public Type GetInterfaceType() { return typeof(IWorker); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IWorker);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IWorker)__target).Atomic(name);
@@ -611,7 +728,12 @@ namespace Basic.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String name;
-            public Type GetInterfaceType() { return typeof(IWorker); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IWorker);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IWorker)__target).Reentrant(name);
@@ -705,7 +827,12 @@ namespace Basic.Interface
         {
             public System.String name;
             public System.Int32 price;
-            public Type GetInterfaceType() { return typeof(IEventObserver); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IEventObserver);
+            }
+
             public void Invoke(object __target)
             {
                 ((IEventObserver)__target).OnBuy(name, price);
@@ -716,7 +843,12 @@ namespace Basic.Interface
         {
             public System.String name;
             public System.Int32 price;
-            public Type GetInterfaceType() { return typeof(IEventObserver); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IEventObserver);
+            }
+
             public void Invoke(object __target)
             {
                 ((IEventObserver)__target).OnSell(name, price);

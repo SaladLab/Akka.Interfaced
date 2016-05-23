@@ -31,7 +31,12 @@ namespace SlimHttp.Interface
         {
             public System.String a;
             public System.String b;
-            public Type GetInterfaceType() { return typeof(ICalculator); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICalculator);
+            }
+
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
@@ -42,8 +47,16 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.String v;
-            public Type GetInterfaceType() { return typeof(ICalculator); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICalculator);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class Sum_Invoke
@@ -51,7 +64,12 @@ namespace SlimHttp.Interface
         {
             public System.Int32 a;
             public System.Int32 b;
-            public Type GetInterfaceType() { return typeof(ICalculator); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICalculator);
+            }
+
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
@@ -62,8 +80,16 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(ICalculator); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICalculator);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
     }
 
@@ -147,7 +173,11 @@ namespace SlimHttp.Interface
         public class GetCounter_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(ICounter); }
+            public Type GetInterfaceType()
+            {
+                return typeof(ICounter);
+            }
+
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
@@ -158,15 +188,28 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(ICounter); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICounter);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class IncCounter_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Int32 delta;
-            public Type GetInterfaceType() { return typeof(ICounter); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ICounter);
+            }
+
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
@@ -258,7 +301,11 @@ namespace SlimHttp.Interface
         public class TestCall_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(IPedantic); }
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
@@ -269,7 +316,12 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Nullable<System.Int32> value;
-            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
@@ -280,15 +332,28 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Nullable<System.Int32> v;
-            public Type GetInterfaceType() { return typeof(IPedantic); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class TestParams_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Int32[] values;
-            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
@@ -299,15 +364,28 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32[] v;
-            public Type GetInterfaceType() { return typeof(IPedantic); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class TestPassClass_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public SlimHttp.Interface.TestParam param;
-            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
@@ -318,8 +396,16 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.String v;
-            public Type GetInterfaceType() { return typeof(IPedantic); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class TestReturnClass_Invoke
@@ -327,7 +413,12 @@ namespace SlimHttp.Interface
         {
             public System.Int32 value;
             public System.Int32 offset;
-            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
@@ -338,15 +429,28 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IValueGetable
         {
             public SlimHttp.Interface.TestResult v;
-            public Type GetInterfaceType() { return typeof(IPedantic); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class TestTuple_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.Tuple<System.Int32, System.String> value;
-            public Type GetInterfaceType() { return typeof(IPedantic); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
@@ -357,8 +461,16 @@ namespace SlimHttp.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Tuple<System.Int32, System.String> v;
-            public Type GetInterfaceType() { return typeof(IPedantic); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IPedantic);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
     }
 

@@ -32,7 +32,11 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
         public class Clear_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(INotepad); }
+            public Type GetInterfaceType()
+            {
+                return typeof(INotepad);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((INotepad)__target).Clear();
@@ -43,7 +47,11 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
         public class FlushSnapshot_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(INotepad); }
+            public Type GetInterfaceType()
+            {
+                return typeof(INotepad);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((INotepad)__target).FlushSnapshot();
@@ -54,7 +62,11 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
         public class GetDocument_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(INotepad); }
+            public Type GetInterfaceType()
+            {
+                return typeof(INotepad);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((INotepad)__target).GetDocument();
@@ -66,15 +78,28 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Collections.Generic.IList<System.String> v;
-            public Type GetInterfaceType() { return typeof(INotepad); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(INotepad);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class Write_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String message;
-            public Type GetInterfaceType() { return typeof(INotepad); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(INotepad);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((INotepad)__target).Write(message);

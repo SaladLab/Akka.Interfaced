@@ -37,7 +37,12 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             [ProtoMember(1)] public System.Int32 a;
             [ProtoMember(2)] public System.Int32 b;
             [ProtoMember(3)] public System.String c;
-            public Type GetInterfaceType() { return typeof(IDefault); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IDefault);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IDefault)__target).Call(a, b, c);
@@ -52,7 +57,12 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             [ProtoMember(1), DefaultValue(1)] public System.Int32 a = 1;
             [ProtoMember(2), DefaultValue(2)] public System.Int32 b = 2;
             [ProtoMember(3), DefaultValue("Test")] public System.String c = "Test";
-            public Type GetInterfaceType() { return typeof(IDefault); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IDefault);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IDefault)__target).CallWithDefault(a, b, c);

@@ -33,7 +33,12 @@ namespace Akka.Interfaced.LogFilter.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String value;
-            public Type GetInterfaceType() { return typeof(ITest); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ITest);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ITest)__target).Call(value);
@@ -45,7 +50,12 @@ namespace Akka.Interfaced.LogFilter.Tests
             : IInterfacedPayload, IAsyncInvokable
         {
             public Akka.Interfaced.LogFilter.Tests.TestRef test;
-            public Type GetInterfaceType() { return typeof(ITest); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ITest);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ITest)__target).CallWithActor(test);
@@ -56,7 +66,11 @@ namespace Akka.Interfaced.LogFilter.Tests
         public class GetHelloCount_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(ITest); }
+            public Type GetInterfaceType()
+            {
+                return typeof(ITest);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((ITest)__target).GetHelloCount();
@@ -68,15 +82,28 @@ namespace Akka.Interfaced.LogFilter.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(ITest); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ITest);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class SayHello_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String name;
-            public Type GetInterfaceType() { return typeof(ITest); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ITest);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((ITest)__target).SayHello(name);
@@ -88,8 +115,16 @@ namespace Akka.Interfaced.LogFilter.Tests
             : IInterfacedPayload, IValueGetable
         {
             public System.String v;
-            public Type GetInterfaceType() { return typeof(ITest); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ITest);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
     }
 

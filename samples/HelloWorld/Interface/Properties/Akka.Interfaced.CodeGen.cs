@@ -30,7 +30,11 @@ namespace HelloWorld.Interface
         public class GetHelloCount_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Type GetInterfaceType() { return typeof(IHelloWorld); }
+            public Type GetInterfaceType()
+            {
+                return typeof(IHelloWorld);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IHelloWorld)__target).GetHelloCount();
@@ -42,15 +46,28 @@ namespace HelloWorld.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
-            public Type GetInterfaceType() { return typeof(IHelloWorld); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IHelloWorld);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
 
         public class SayHello_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String name;
-            public Type GetInterfaceType() { return typeof(IHelloWorld); }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IHelloWorld);
+            }
+
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IHelloWorld)__target).SayHello(name);
@@ -62,8 +79,16 @@ namespace HelloWorld.Interface
             : IInterfacedPayload, IValueGetable
         {
             public System.String v;
-            public Type GetInterfaceType() { return typeof(IHelloWorld); }
-            public object Value { get { return v; } }
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IHelloWorld);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
         }
     }
 
