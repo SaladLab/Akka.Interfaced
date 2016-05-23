@@ -55,11 +55,17 @@
     <Compile Include="..\Akka.Interfaced-Base\IInvokable.cs">
       <Link>IInvokable.cs</Link>
     </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\INotificationChannel.cs">
+      <Link>INotificationChannel.cs</Link>
+    </Compile>
     <Compile Include="..\Akka.Interfaced-Base\ITagOverridable.cs">
       <Link>ITagOverridable.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\IValueGetable.cs">
       <Link>IValueGetable.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\NotificationMessage.cs">
+      <Link>NotificationMessage.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\PayloadTableAttribute.cs">
       <Link>PayloadTableAttribute.cs</Link>
@@ -69,6 +75,12 @@
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\Properties\AssemblyInfoGenerated.cs">
       <Link>Properties\AssemblyInfoGenerated.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\RequestMessage.cs">
+      <Link>RequestMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\ResponseMessage.cs">
+      <Link>ResponseMessage.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\TagOverridableAttribute.cs">
       <Link>TagOverridableAttribute.cs</Link>

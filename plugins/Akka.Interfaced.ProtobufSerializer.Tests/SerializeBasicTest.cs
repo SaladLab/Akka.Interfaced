@@ -12,12 +12,17 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
     public class SerializeBasicTest
     {
         [ProtoContract, TypeAlias]
-        public class TestInvokableMessage : IAsyncInvokable
+        public class TestInvokableMessage : IInterfacedPayload, IAsyncInvokable
         {
             [ProtoMember(1)]
             public string a;
             [ProtoMember(2)]
             public string b;
+
+            public Type GetInterfaceType()
+            {
+                return null;
+            }
 
             public Task<IValueGetable> InvokeAsync(object target)
             {

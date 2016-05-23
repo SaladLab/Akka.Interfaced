@@ -52,20 +52,11 @@
     <Compile Include="..\Akka.Interfaced-SlimClient\IRequestWaiter.cs">
       <Link>IRequestWaiter.cs</Link>
     </Compile>
-    <Compile Include="..\Akka.Interfaced-SlimClient\NotificationMessage.cs">
-      <Link>NotificationMessage.cs</Link>
-    </Compile>
     <Compile Include="..\Akka.Interfaced-SlimClient\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-SlimClient\Properties\AssemblyInfoGenerated.cs">
       <Link>Properties\AssemblyInfoGenerated.cs</Link>
-    </Compile>
-    <Compile Include="..\Akka.Interfaced-SlimClient\RequestMessage.cs">
-      <Link>RequestMessage.cs</Link>
-    </Compile>
-    <Compile Include="..\Akka.Interfaced-SlimClient\ResponseMessage.cs">
-      <Link>ResponseMessage.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-SlimClient\Task.cs">
       <Link>Task.cs</Link>

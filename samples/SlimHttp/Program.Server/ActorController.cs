@@ -36,7 +36,7 @@ namespace SlimHttp.Program.Server
         {
             // Get Message
 
-            IAsyncInvokable message;
+            IInterfacedPayload message;
             try
             {
                 var jsonText = await Request.Content.ReadAsStringAsync();
@@ -50,7 +50,7 @@ namespace SlimHttp.Program.Server
                         "Cannot find message type: " + request.MessageType);
                 }
 
-                message = (IAsyncInvokable)Activator.CreateInstance(type);
+                message = (IInterfacedPayload)Activator.CreateInstance(type);
                 JsonConvert.PopulateObject(request.MessageData.ToString(), message);
 
                 Console.WriteLine("* Actor({0}) <- {1} {2}", id, type.Name, request.MessageData.ToString(Formatting.None));

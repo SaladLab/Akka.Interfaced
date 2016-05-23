@@ -217,7 +217,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                         try
                         {
                             AkkaSurrogate.CurrentSystem = system;
-                            requestMessage.InvokePayload = (IAsyncInvokable)_typeModel.Deserialize(ms, message, messageType);
+                            requestMessage.InvokePayload = (IInterfacedPayload)_typeModel.Deserialize(ms, message, messageType);
                         }
                         finally
                         {

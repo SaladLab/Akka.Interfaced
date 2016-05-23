@@ -4,6 +4,6 @@
     public class RequestMessage
     {
         public int RequestId;
-        public IAsyncInvokable InvokePayload;
+        public IInterfacedPayload InvokePayload;
     }
 }

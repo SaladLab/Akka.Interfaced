@@ -65,7 +65,6 @@
     <Compile Include="IAsyncInvokable.cs" />
     <Compile Include="IFilter.cs" />
     <Compile Include="IFilterFactory.cs" />
-    <Compile Include="INotificationChannel.cs" />
     <Compile Include="IExtendedInterface.cs" />
     <Compile Include="InterfacedActor.ObserverMap.cs" />
     <Compile Include="InterfacedActor.PerInstanceFilterList.cs" />
@@ -84,7 +83,6 @@
     <Compile Include="NotificationDispatcher.cs" />
     <Compile Include="NotificationHandler.cs" />
     <Compile Include="NotificationHandlerBuilder.cs" />
-    <Compile Include="NotificationMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfoGenerated.cs" />
     <Compile Include="ReentrantAttribute.cs" />
@@ -92,8 +90,6 @@
     <Compile Include="RequestHandler.cs" />
     <Compile Include="RequestHandlerBuilder.cs" />
     <Compile Include="RequestHandlerBuilderInternalHelpers.cs" />
-    <Compile Include="ResponseMessage.cs" />
-    <Compile Include="RequestMessage.cs" />
     <Compile Include="InterfacedPoisonPill.cs" />
     <Compile Include="ResponsiveExceptionFilter.cs" />
     <Compile Include="SynchronizationContextSwitcher.cs" />
