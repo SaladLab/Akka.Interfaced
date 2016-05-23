@@ -129,6 +129,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeVerifier.Tests", "core\CodeVerifier.Tests\CodeVerifier.Tests.csproj", "{2137109B-6ACF-43CC-834A-19064FD784B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-SlimClient.Tests", "core\Akka.Interfaced-SlimClient.Tests\Akka.Interfaced-SlimClient.Tests.csproj", "{369AB21A-A234-4672-9B7F-E958A93531C0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6F020F23-FC16-4567-99BB-10A06F20F9D6} = {6F020F23-FC16-4567-99BB-10A06F20F9D6}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced-SlimClient.Tests.Interface", "core\Akka.Interfaced-SlimClient.Tests.Interface\Akka.Interfaced-SlimClient.Tests.Interface.csproj", "{6F020F23-FC16-4567-99BB-10A06F20F9D6}"
 	ProjectSection(ProjectDependencies) = postProject
