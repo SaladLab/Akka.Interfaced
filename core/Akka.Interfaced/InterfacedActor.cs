@@ -521,11 +521,11 @@ namespace Akka.Interfaced
         // observer support
 
         protected TObserver CreateObserver<TObserver>()
-            where TObserver : InterfacedObserver, new()
+            where TObserver : IInterfacedObserver
         {
-            var observer = new TObserver();
-            observer.Channel = new ActorNotificationChannel(Self);
-            return observer;
+            var proxy = InterfacedObserver.Create(typeof(TObserver));
+            proxy.Channel = new ActorNotificationChannel(Self);
+            return (TObserver)(object)proxy;
         }
 
         // PerInstance Filter related

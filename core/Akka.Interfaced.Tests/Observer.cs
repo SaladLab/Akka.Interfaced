@@ -79,9 +79,9 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            await _subject.Subscribe(CreateObserver<SubjectObserver>());
+            await _subject.Subscribe(CreateObserver<ISubjectObserver>());
             await _subject.MakeEvent("A");
-            await _subject.Unsubscribe(CreateObserver<SubjectObserver>());
+            await _subject.Unsubscribe(CreateObserver<ISubjectObserver>());
             await _subject.MakeEvent("B");
             return null;
         }
@@ -106,9 +106,9 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            await _subject.Subscribe(CreateObserver<SubjectObserver>());
+            await _subject.Subscribe(CreateObserver<ISubjectObserver>());
             await _subject.MakeEvent("A");
-            await _subject.Unsubscribe(CreateObserver<SubjectObserver>());
+            await _subject.Unsubscribe(CreateObserver<ISubjectObserver>());
             await _subject.MakeEvent("B");
             return null;
         }
@@ -134,10 +134,10 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            await _subject.Subscribe(CreateObserver<SubjectObserver>());
+            await _subject.Subscribe(CreateObserver<ISubjectObserver>());
             await _subject.MakeEvent("A");
             await _subject.MakeEvent("B");
-            await _subject.Unsubscribe(CreateObserver<SubjectObserver>());
+            await _subject.Unsubscribe(CreateObserver<ISubjectObserver>());
             return null;
         }
 
@@ -164,10 +164,10 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            await _subject.Subscribe(CreateObserver<SubjectObserver>());
+            await _subject.Subscribe(CreateObserver<ISubjectObserver>());
             await _subject.MakeEvent("A");
             await _subject.MakeEvent("B");
-            await _subject.Unsubscribe(CreateObserver<SubjectObserver>());
+            await _subject.Unsubscribe(CreateObserver<ISubjectObserver>());
             return null;
         }
 

@@ -1,4 +1,6 @@
-﻿namespace Akka.Interfaced
+﻿using System;
+
+namespace Akka.Interfaced
 {
     public abstract class InterfacedObserver
     {
@@ -28,6 +30,34 @@
         public override int GetHashCode()
         {
             return (Channel.GetHashCode() * 17) + ObserverId;
+        }
+
+        public static InterfacedObserver Create(Type type)
+        {
+            if (type.IsInterface)
+            {
+                // Namespace.IExampleObserver -> Namespace.ExampleObserver
+                var proxyTypeName = type.FullName.Substring(0, type.FullName.Length - type.Name.Length) + type.Name.Substring(1);
+                var proxyType = type.Assembly.GetType(proxyTypeName);
+                if (proxyType == null || proxyType.BaseType != typeof(InterfacedObserver))
+                    throw new ArgumentException("Cannot resolve the observer type from " + type.FullName);
+
+                var proxy = Activator.CreateInstance(proxyType);
+                return (InterfacedObserver)proxy;
+            }
+            else if (type.IsClass)
+            {
+                // Namespace.ExampleObserver
+                if (type.BaseType != typeof(InterfacedObserver))
+                    throw new ArgumentException("Cannot create observer with " + type.FullName);
+
+                var proxy = Activator.CreateInstance(type);
+                return (InterfacedObserver)proxy;
+            }
+            else
+            {
+                throw new ArgumentException("Cannot create observer from " + type.FullName);
+            }
         }
     }
 }
