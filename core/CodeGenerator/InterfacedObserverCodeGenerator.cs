@@ -133,10 +133,6 @@ namespace CodeGen
                         w._("get { return ObserverId; }",
                             "set { ObserverId = value; }");
                     }
-
-                    using (w.B($"private {className}() : base(null, 0)"))
-                    {
-                    }
                 }
 
                 // Constructor
