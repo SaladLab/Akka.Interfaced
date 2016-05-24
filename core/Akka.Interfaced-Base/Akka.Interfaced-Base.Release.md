@@ -1,3 +1,7 @@
+## 0.3.0 (Released 2016/05/26)
+
+* Sync with Akka.Interfaced 0.3.0
+
 ## 0.2.1 (Released 2016/04/25)
 
 * Update Akka.NET 1.0.7

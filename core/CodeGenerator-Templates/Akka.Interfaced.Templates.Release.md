@@ -1,3 +1,7 @@
+## 0.3.0 (Released 2016/05/26)
+
+* Sync with Akka.Interfaced 0.3.0
+
 ## 0.2.3 (Released 2016/05/04)
 
 * Rename a target argument of Whatever_Invoke.InvokeAsync.
