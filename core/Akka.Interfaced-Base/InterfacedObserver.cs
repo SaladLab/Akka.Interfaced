@@ -2,10 +2,11 @@
 
 namespace Akka.Interfaced
 {
-    public abstract class InterfacedObserver
+    public abstract class InterfacedObserver : IDisposable
     {
         public INotificationChannel Channel { get; set; }
         public int ObserverId { get; set; }
+        public Action Disposed { get; set; }
 
         protected InterfacedObserver(INotificationChannel channel, int observerId)
         {
@@ -30,6 +31,24 @@ namespace Akka.Interfaced
         public override int GetHashCode()
         {
             return (Channel.GetHashCode() * 17) + ObserverId;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            Channel = null;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (Disposed != null)
+                {
+                    Disposed();
+                    Disposed = null;
+                }
+            }
         }
 
         public static InterfacedObserver Create(Type type)
