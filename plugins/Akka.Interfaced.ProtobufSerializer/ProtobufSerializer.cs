@@ -21,7 +21,7 @@ namespace Akka.Interfaced.ProtobufSerializer
 
         public static TypeModel CreateTypeModel()
         {
-            RuntimeTypeModel typeModel = RuntimeTypeModel.Create();
+            RuntimeTypeModel typeModel = TypeModel.Create();
             AkkaSurrogate.Register(typeModel);
             AutoSurrogate.Register(typeModel);
             return typeModel;
