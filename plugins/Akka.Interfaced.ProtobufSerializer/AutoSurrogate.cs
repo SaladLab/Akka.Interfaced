@@ -76,8 +76,8 @@ namespace Akka.Interfaced.ProtobufSerializer
                 var parameters = m.GetParameters();
                 if (parameters.Length == 1 && m.ReturnType.Name != "Void" && m.ReturnType != type)
                 {
-                    // if (Attribute.GetCustomAttribute(m, typeof(ProtoBuf.ProtoConverterAttribute)) != null)
-                    //     return m.ReturnType;
+                    if (Attribute.GetCustomAttribute(m, typeof(ProtoBuf.ProtoConverterAttribute)) != null)
+                        return m.ReturnType;
                     if (m.Name == "op_Implicit" || m.Name == "op_Explicit")
                         return m.ReturnType;
                 }
