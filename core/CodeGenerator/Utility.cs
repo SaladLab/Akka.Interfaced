@@ -69,7 +69,12 @@ namespace CodeGen
 
         public static string GetSurrogateClassName(Type type)
         {
-            return "SurrogateFor" + type.Name;
+            return GetSurrogateClassName(type.Name);
+        }
+
+        public static string GetSurrogateClassName(string typeName)
+        {
+            return "SurrogateFor" + typeName;
         }
 
         public static string GetParameterDeclaration(ParameterInfo pi, bool includeDefaultExpression)

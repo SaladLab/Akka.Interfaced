@@ -26,10 +26,10 @@ namespace Akka.Interfaced
             throw new InvalidOperationException("ActorBoundProxyActorRef cannot tell.");
         }
 
-        public T Create<T>(int boundActorId)
-            where T : InterfacedActorRef, new()
+        public static TRef Create<TRef>(int boundActorId)
+            where TRef : InterfacedActorRef, new()
         {
-            var a = new T();
+            var a = new TRef();
             InterfacedActorRefModifier.SetActor(a, new BoundActorRef(boundActorId));
             return a;
         }

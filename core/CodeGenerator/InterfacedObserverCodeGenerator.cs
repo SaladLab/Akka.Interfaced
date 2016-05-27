@@ -2,18 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using CodeWriter;
 
 namespace CodeGen
 {
     public class InterfacedObserverCodeGenerator
     {
+        private bool _surrogateForINotificationChannelGenerated;
+
         public Options Options { get; set; }
 
         public void GenerateCode(Type type, CodeWriter.CodeWriter w)
         {
             Console.WriteLine("GenerateCode: " + type.FullName);
+
+            if (Options.UseProtobuf && Options.UseSlimClient)
+                EnsureSurrogateForINotificationChannel(type, w);
 
             w._($"#region {type.FullName}");
             w._();
@@ -36,6 +40,45 @@ namespace CodeGen
 
             w._();
             w._($"#endregion");
+        }
+
+        private void EnsureSurrogateForINotificationChannel(Type callerType, CodeWriter.CodeWriter w)
+        {
+            if (_surrogateForINotificationChannelGenerated)
+                return;
+
+            var namespaceHandle = (string.IsNullOrEmpty(callerType.Namespace) == false)
+                ? w.B($"namespace {callerType.Namespace}")
+                : null;
+
+            var surrogateClassName = Utility.GetSurrogateClassName("INotificationChannel");
+
+            w._($"#region {surrogateClassName}");
+            w._();
+
+            w._("[ProtoContract]");
+            using (w.B($"public class {surrogateClassName}"))
+            {
+                w._("[ProtoConverter]");
+                using (w.B($"public static {surrogateClassName} Convert(INotificationChannel value)"))
+                {
+                    w._($"if (value == null) return null;");
+                    w._($"return new {surrogateClassName}();");
+                }
+
+                w._("[ProtoConverter]");
+                using (w.B($"public static INotificationChannel Convert({surrogateClassName} value)"))
+                {
+                    w._($"return null;");
+                }
+            }
+
+            namespaceHandle?.Dispose();
+
+            w._();
+            w._($"#endregion");
+
+            _surrogateForINotificationChannelGenerated = true;
         }
 
         private void GeneratePayloadCode(

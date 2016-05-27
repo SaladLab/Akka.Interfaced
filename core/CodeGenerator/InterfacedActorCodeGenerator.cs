@@ -10,11 +10,16 @@ namespace CodeGen
 {
     public class InterfacedActorCodeGenerator
     {
+        private bool _surrogateForIActorRefGenerated;
+
         public Options Options { get; set; }
 
         public void GenerateCode(Type type, CodeWriter.CodeWriter w)
         {
             Console.WriteLine("GenerateCode: " + type.FullName);
+
+            if (Options.UseProtobuf && Options.UseSlimClient)
+                EnsureSurrogateForIActorRef(type, w);
 
             w._($"#region {type.FullName}");
             w._();
@@ -37,6 +42,50 @@ namespace CodeGen
 
             w._();
             w._($"#endregion");
+        }
+
+        private void EnsureSurrogateForIActorRef(Type callerType, CodeWriter.CodeWriter w)
+        {
+            if (_surrogateForIActorRefGenerated)
+                return;
+
+            var namespaceHandle = (string.IsNullOrEmpty(callerType.Namespace) == false)
+                ? w.B($"namespace {callerType.Namespace}")
+                : null;
+
+            var surrogateClassName = Utility.GetSurrogateClassName("IActorRef");
+
+            w._($"#region {surrogateClassName}");
+            w._();
+
+            w._("[ProtoContract]");
+            using (w.B($"public class {surrogateClassName}"))
+            {
+                w._($"[ProtoMember(1)] public int Id;");
+                w._();
+
+                w._("[ProtoConverter]");
+                using (w.B($"public static {surrogateClassName} Convert(IActorRef value)"))
+                {
+                    w._($"if (value == null) return null;");
+                    w._($"var actor = ((BoundActorRef)value);");
+                    w._($"return new {surrogateClassName} {{ Id = actor.Id }};");
+                }
+
+                w._("[ProtoConverter]");
+                using (w.B($"public static IActorRef Convert({surrogateClassName} value)"))
+                {
+                    w._($"if (value == null) return null;");
+                    w._($"return new BoundActorRef(value.Id);");
+                }
+            }
+
+            namespaceHandle?.Dispose();
+
+            w._();
+            w._($"#endregion");
+
+            _surrogateForIActorRefGenerated = true;
         }
 
         private void GeneratePayloadCode(
@@ -265,6 +314,10 @@ namespace CodeGen
             using (w.B($"public class {refClassName} : InterfacedActorRef, {type.Name}, {noReplyInterfaceName}"))
             {
                 // Constructors
+
+                using (w.B($"public {refClassName}() : base(null)"))
+                {
+                }
 
                 using (w.B($"public {refClassName}(IActorRef actor) : base(actor)"))
                 {
