@@ -346,18 +346,13 @@ namespace Basic.Interface
         }
 
         public class Subscribe_Invoke
-            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Basic.Interface.EventObserver observer;
+            public Basic.Interface.IEventObserver observer;
 
             public Type GetInterfaceType()
             {
                 return typeof(IEventGenerator);
-            }
-
-            public void SetNotificationChannel(INotificationChannel notificationChannel)
-            {
-                observer.Channel = notificationChannel;
             }
 
             public async Task<IValueGetable> InvokeAsync(object __target)
@@ -365,27 +360,38 @@ namespace Basic.Interface
                 await ((IEventGenerator)__target).Subscribe(observer);
                 return null;
             }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
+            }
         }
 
         public class Unsubscribe_Invoke
-            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Basic.Interface.EventObserver observer;
+            public Basic.Interface.IEventObserver observer;
 
             public Type GetInterfaceType()
             {
                 return typeof(IEventGenerator);
             }
 
-            public void SetNotificationChannel(INotificationChannel notificationChannel)
-            {
-                observer.Channel = notificationChannel;
-            }
-
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((IEventGenerator)__target).Unsubscribe(observer);
                 return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
             }
         }
     }
@@ -442,7 +448,7 @@ namespace Basic.Interface
         public Task Subscribe(Basic.Interface.IEventObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -450,7 +456,7 @@ namespace Basic.Interface
         public Task Unsubscribe(Basic.Interface.IEventObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -474,7 +480,7 @@ namespace Basic.Interface
         void IEventGenerator_NoReply.Subscribe(Basic.Interface.IEventObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = observer }
             };
             SendRequest(requestMessage);
         }
@@ -482,7 +488,7 @@ namespace Basic.Interface
         void IEventGenerator_NoReply.Unsubscribe(Basic.Interface.IEventObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = (Basic.Interface.EventObserver)observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = observer }
             };
             SendRequest(requestMessage);
         }

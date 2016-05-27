@@ -105,19 +105,8 @@ namespace Protobuf.Interface
         void SayHello(System.String name);
     }
 
-    [ProtoContract, TypeAlias]
     public class HelloWorldRef : InterfacedActorRef, IHelloWorld, IHelloWorld_NoReply
     {
-        [ProtoMember(1)] private ActorRefBase _actor
-        {
-            get { return (ActorRefBase)Actor; }
-            set { Actor = value; }
-        }
-
-        private HelloWorldRef() : base(null)
-        {
-        }
-
         public HelloWorldRef(IActorRef actor) : base(actor)
         {
         }
@@ -173,6 +162,26 @@ namespace Protobuf.Interface
             SendRequest(requestMessage);
         }
     }
+
+    [ProtoContract]
+    public class SurrogateForIHelloWorld
+    {
+        [ProtoMember(1)] private ActorRefBase _actor;
+
+        [ProtoAfterDeserialization] // ProtoConverter
+        public static SurrogateForIHelloWorld From(IHelloWorld value)
+        {
+            if (value == null) return null;
+            return new SurrogateForIHelloWorld { _actor = (ActorRefBase)((HelloWorldRef)value).Actor };
+        }
+
+        [ProtoAfterDeserialization] // ProtoConverter
+        public static IHelloWorld To(SurrogateForIHelloWorld value)
+        {
+            if (value == null) return null;
+            return new HelloWorldRef(value._actor);
+        }
+    }
 }
 
 #endregion
@@ -225,7 +234,7 @@ namespace Protobuf.Interface
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IPedantic)__target).TestOptional(value);
-                return (IValueGetable)(new TestOptional_Return { v = (System.Nullable<System.Int32>)__v });
+                return (IValueGetable)(new TestOptional_Return { v = __v });
             }
         }
 
@@ -366,7 +375,7 @@ namespace Protobuf.Interface
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IPedantic)__target).TestTuple(value);
-                return (IValueGetable)(new TestTuple_Return { v = (System.Tuple<System.Int32, System.String>)__v });
+                return (IValueGetable)(new TestTuple_Return { v = __v });
             }
         }
 
@@ -398,19 +407,8 @@ namespace Protobuf.Interface
         void TestTuple(System.Tuple<System.Int32, System.String> value);
     }
 
-    [ProtoContract, TypeAlias]
     public class PedanticRef : InterfacedActorRef, IPedantic, IPedantic_NoReply
     {
-        [ProtoMember(1)] private ActorRefBase _actor
-        {
-            get { return (ActorRefBase)Actor; }
-            set { Actor = value; }
-        }
-
-        private PedanticRef() : base(null)
-        {
-        }
-
         public PedanticRef(IActorRef actor) : base(actor)
         {
         }
@@ -445,7 +443,7 @@ namespace Protobuf.Interface
         public Task<System.Nullable<System.Int32>> TestOptional(System.Nullable<System.Int32> value)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = (System.Nullable<System.Int32>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = value }
             };
             return SendRequestAndReceive<System.Nullable<System.Int32>>(requestMessage);
         }
@@ -477,7 +475,7 @@ namespace Protobuf.Interface
         public Task<System.Tuple<System.Int32, System.String>> TestTuple(System.Tuple<System.Int32, System.String> value)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = value }
             };
             return SendRequestAndReceive<System.Tuple<System.Int32, System.String>>(requestMessage);
         }
@@ -493,7 +491,7 @@ namespace Protobuf.Interface
         void IPedantic_NoReply.TestOptional(System.Nullable<System.Int32> value)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = (System.Nullable<System.Int32>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = value }
             };
             SendRequest(requestMessage);
         }
@@ -525,9 +523,29 @@ namespace Protobuf.Interface
         void IPedantic_NoReply.TestTuple(System.Tuple<System.Int32, System.String> value)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = value }
             };
             SendRequest(requestMessage);
+        }
+    }
+
+    [ProtoContract]
+    public class SurrogateForIPedantic
+    {
+        [ProtoMember(1)] private ActorRefBase _actor;
+
+        [ProtoAfterDeserialization] // ProtoConverter
+        public static SurrogateForIPedantic From(IPedantic value)
+        {
+            if (value == null) return null;
+            return new SurrogateForIPedantic { _actor = (ActorRefBase)((PedanticRef)value).Actor };
+        }
+
+        [ProtoAfterDeserialization] // ProtoConverter
+        public static IPedantic To(SurrogateForIPedantic value)
+        {
+            if (value == null) return null;
+            return new PedanticRef(value._actor);
         }
     }
 }
@@ -660,19 +678,8 @@ namespace Protobuf.Interface
         void GetSelf();
     }
 
-    [ProtoContract, TypeAlias]
     public class SurrogateRef : InterfacedActorRef, ISurrogate, ISurrogate_NoReply
     {
-        [ProtoMember(1)] private ActorRefBase _actor
-        {
-            get { return (ActorRefBase)Actor; }
-            set { Actor = value; }
-        }
-
-        private SurrogateRef() : base(null)
-        {
-        }
-
         public SurrogateRef(IActorRef actor) : base(actor)
         {
         }
@@ -742,6 +749,26 @@ namespace Protobuf.Interface
                 InvokePayload = new ISurrogate_PayloadTable.GetSelf_Invoke {  }
             };
             SendRequest(requestMessage);
+        }
+    }
+
+    [ProtoContract]
+    public class SurrogateForISurrogate
+    {
+        [ProtoMember(1)] private ActorRefBase _actor;
+
+        [ProtoAfterDeserialization] // ProtoConverter
+        public static SurrogateForISurrogate From(ISurrogate value)
+        {
+            if (value == null) return null;
+            return new SurrogateForISurrogate { _actor = (ActorRefBase)((SurrogateRef)value).Actor };
+        }
+
+        [ProtoAfterDeserialization] // ProtoConverter
+        public static ISurrogate To(SurrogateForISurrogate value)
+        {
+            if (value == null) return null;
+            return new SurrogateRef(value._actor);
         }
     }
 }

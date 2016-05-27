@@ -9,6 +9,7 @@ using Protobuf.Interface;
 
 namespace Protobuf.Program
 {
+    [ResponsiveException(typeof(ArgumentException))]
     public class HelloWorldActor : InterfacedActor, IHelloWorld
     {
         private int _helloCount;

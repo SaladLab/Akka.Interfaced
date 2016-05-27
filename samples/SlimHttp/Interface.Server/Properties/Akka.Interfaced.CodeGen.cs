@@ -339,7 +339,7 @@ namespace SlimHttp.Interface
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IPedantic)__target).TestOptional(value);
-                return (IValueGetable)(new TestOptional_Return { v = (System.Nullable<System.Int32>)__v });
+                return (IValueGetable)(new TestOptional_Return { v = __v });
             }
         }
 
@@ -472,7 +472,7 @@ namespace SlimHttp.Interface
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((IPedantic)__target).TestTuple(value);
-                return (IValueGetable)(new TestTuple_Return { v = (System.Tuple<System.Int32, System.String>)__v });
+                return (IValueGetable)(new TestTuple_Return { v = __v });
             }
         }
 
@@ -539,7 +539,7 @@ namespace SlimHttp.Interface
         public Task<System.Nullable<System.Int32>> TestOptional(System.Nullable<System.Int32> value)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = (System.Nullable<System.Int32>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = value }
             };
             return SendRequestAndReceive<System.Nullable<System.Int32>>(requestMessage);
         }
@@ -571,7 +571,7 @@ namespace SlimHttp.Interface
         public Task<System.Tuple<System.Int32, System.String>> TestTuple(System.Tuple<System.Int32, System.String> value)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = value }
             };
             return SendRequestAndReceive<System.Tuple<System.Int32, System.String>>(requestMessage);
         }
@@ -587,7 +587,7 @@ namespace SlimHttp.Interface
         void IPedantic_NoReply.TestOptional(System.Nullable<System.Int32> value)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = (System.Nullable<System.Int32>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = value }
             };
             SendRequest(requestMessage);
         }
@@ -619,7 +619,7 @@ namespace SlimHttp.Interface
         void IPedantic_NoReply.TestTuple(System.Tuple<System.Int32, System.String> value)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = (System.Tuple<System.Int32, System.String>)value }
+                InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = value }
             };
             SendRequest(requestMessage);
         }
