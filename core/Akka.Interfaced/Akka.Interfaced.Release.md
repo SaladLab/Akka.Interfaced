@@ -1,4 +1,4 @@
-## 0.3.0 (Released 2016/05/26)
+## 0.3.0 (Released 2016/05/27)
 
 * Enhance the readability of code setting observer. #15
 * Let observer handler work with ExtendedHandler and Filter like Interfaced handler. #16
@@ -7,7 +7,7 @@
 * Rename a target argument of Whatever_Invoke.InvokeAsync #19
 * Change InterfacedActor<T> to InterfacedActor. #20
 * Exception policy for handling request, notification and message. #21
-* Synchronous request handler instead of asynchronous one by default. #22
+* Concise way for retrieving InterfacedActorRef on slim-client. #23
 
 ## 0.2.2 (Released 2016/05/03)
 

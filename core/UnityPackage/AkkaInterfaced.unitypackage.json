@@ -1,6 +1,6 @@
 {
   "id": "AkkaInterfaced",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "authors": [ "Esun Kim" ],
   "owners": [ "Esun Kim" ],
   "description": "Akka.Interfaced SlimClient for Unity3D",
