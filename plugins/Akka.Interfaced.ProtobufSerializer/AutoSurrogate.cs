@@ -12,44 +12,49 @@ namespace Akka.Interfaced.ProtobufSerializer
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                foreach (var type in GetTypesSafely(assembly))
+                Register(typeModel, assembly);
+            }
+        }
+
+        public static void Register(RuntimeTypeModel typeModel, Assembly assembly)
+        {
+            foreach (var type in GetTypesSafely(assembly))
+            {
+                if (type.IsClass == false && type.IsValueType == false)
+                    continue;
+
+                if (Attribute.GetCustomAttribute(type, typeof(ProtoBuf.ProtoContractAttribute)) == null)
+                    continue;
+
+                var loweredTypeName = type.Name.ToLower();
+                if (loweredTypeName.Contains("surrogatedirectives"))
                 {
-                    if (type.IsClass == false && type.IsValueType == false)
-                        continue;
-
-                    if (Attribute.GetCustomAttribute(type, typeof(ProtoBuf.ProtoContractAttribute)) == null)
-                        continue;
-
-                    var loweredTypeName = type.Name.ToLower();
-                    if (loweredTypeName.Contains("surrogatedirectives"))
+                    foreach (var field in type.GetFields())
                     {
-                        foreach (var field in type.GetFields())
-                        {
-                            var sourceType = FindSurrogateSourceType(field.FieldType);
-                            if (sourceType != null)
-                            {
-                                try
-                                {
-                                    typeModel.Add(sourceType, false).SetSurrogate(field.FieldType);
-                                }
-                                catch (InvalidOperationException)
-                                {
-                                }
-                            }
-                        }
-                    }
-                    else if (type.Name.ToLower().Contains("surrogate"))
-                    {
-                        var sourceType = FindSurrogateSourceType(type);
+                        var sourceType = FindSurrogateSourceType(field.FieldType);
                         if (sourceType != null)
                         {
                             try
                             {
-                                typeModel.Add(sourceType, false).SetSurrogate(type);
+                                typeModel.Add(sourceType, false).SetSurrogate(field.FieldType);
                             }
                             catch (InvalidOperationException)
                             {
                             }
+                        }
+                    }
+                }
+                else if (type.Name.ToLower().Contains("surrogate"))
+                {
+                    var sourceType = FindSurrogateSourceType(type);
+                    if (sourceType != null)
+                    {
+                        try
+                        {
+                            typeModel.Add(sourceType, false).SetSurrogate(type);
+                        }
+                        catch (InvalidOperationException)
+                        {
                         }
                     }
                 }
@@ -68,7 +73,7 @@ namespace Akka.Interfaced.ProtobufSerializer
             }
         }
 
-        private static Type FindSurrogateSourceType(Type type)
+        public static Type FindSurrogateSourceType(Type type)
         {
             var flags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
             foreach (var m in type.GetMethods(flags))

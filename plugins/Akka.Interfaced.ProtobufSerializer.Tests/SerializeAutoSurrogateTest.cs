@@ -1,7 +1,5 @@
 ﻿using System;
-using Akka.Actor;
 using ProtoBuf;
-using TypeAlias;
 using Xunit;
 
 namespace Akka.Interfaced.ProtobufSerializer.Tests
@@ -20,12 +18,14 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
             [ProtoMember(1)] public string Data;
 
-            public static implicit operator SourceSurrogate(Source source)
+            [ProtoConverter]
+            public static SourceSurrogate Convert(Source source)
             {
                 return new SourceSurrogate { Data = source.Data };
             }
 
-            public static implicit operator Source(SourceSurrogate surrogate)
+            [ProtoConverter]
+            public static Source Convert(SourceSurrogate surrogate)
             {
                 return new Source { Data = surrogate.Data };
             }
@@ -60,19 +60,21 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             [ProtoMember(1)]
             public string Data;
 
-            public static implicit operator Source2_(Source2 source)
+            [ProtoConverter]
+            public static Source2_ Convert(Source2 source)
             {
                 return new Source2_ { Data = source.Data };
             }
 
-            public static implicit operator Source2(Source2_ surrogate)
+            [ProtoConverter]
+            public static Source2 Convert(Source2_ surrogate)
             {
                 return new Source2 { Data = surrogate.Data };
             }
         }
 
         [ProtoContract]
-        internal class ProtobufSurrogateDirectives
+        public class ProtobufSurrogateDirectives
         {
             public Source2_ T1;
         }

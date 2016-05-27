@@ -10,16 +10,11 @@ namespace CodeGen
 {
     public class InterfacedActorCodeGenerator
     {
-        private bool _surrogateForBoundActorRefGenerated;
-
         public Options Options { get; set; }
 
         public void GenerateCode(Type type, CodeWriter.CodeWriter w)
         {
             Console.WriteLine("GenerateCode: " + type.FullName);
-
-            if (Options.UseProtobuf && Options.UseSlimClient)
-                EnsureSurrogateForBoundActorRef(w);
 
             w._($"#region {type.FullName}");
             w._();
@@ -42,43 +37,6 @@ namespace CodeGen
 
             w._();
             w._($"#endregion");
-        }
-
-        private void EnsureSurrogateForBoundActorRef(CodeWriter.CodeWriter w)
-        {
-            if (_surrogateForBoundActorRefGenerated)
-                return;
-
-            w._($"#region SurrogateForBoundActorRef");
-            w._();
-
-            var surrogateClassName = Utility.GetSurrogateClassName(typeof(BoundActorRef));
-
-            w._("[ProtoContract]");
-            using (w.B($"public class {surrogateClassName}"))
-            {
-                w._($"[ProtoMember(1)] public int Id;");
-                w._();
-
-                w._("[ProtoConverter]");
-                using (w.B($"public static {surrogateClassName} Convert(BoundActorRef value)"))
-                {
-                    w._($"if (value == null) return null;");
-                    w._($"return new {surrogateClassName} {{ Id = value.Id }};");
-                }
-
-                w._("[ProtoConverter]");
-                using (w.B($"public static BoundActorRef Convert({surrogateClassName} value)"))
-                {
-                    w._($"if (value == null) return null;");
-                    w._($"return new BoundActorRef(value.Id);");
-                }
-            }
-
-            w._();
-            w._($"#endregion");
-
-            _surrogateForBoundActorRefGenerated = true;
         }
 
         private void GeneratePayloadCode(

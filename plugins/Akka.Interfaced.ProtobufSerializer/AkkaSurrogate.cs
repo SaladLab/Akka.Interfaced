@@ -105,6 +105,7 @@ namespace Akka.Interfaced.ProtobufSerializer
             {
                 if (value == null)
                     return null;
+
                 var actor = ((ActorNotificationChannel)value).Actor;
                 return new SurrogateForINotificationChannel { Actor = actor };
             }
@@ -114,6 +115,7 @@ namespace Akka.Interfaced.ProtobufSerializer
             {
                 if (value == null)
                     return null;
+
                 return new ActorNotificationChannel(value.Actor);
             }
         }
