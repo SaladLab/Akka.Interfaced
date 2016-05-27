@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Akka.Interfaced;
-using Newtonsoft.Json;
 using SlimHttp.Interface;
 
 namespace SlimHttp.Program.Server
 {
+    [ResponsiveException(typeof(ArgumentOutOfRangeException))]
     public class CounterActor : InterfacedActor, ICounter
     {
         private int _counter = 0;

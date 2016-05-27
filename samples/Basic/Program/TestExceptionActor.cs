@@ -5,6 +5,7 @@ using Basic.Interface;
 
 namespace Basic.Program
 {
+    [ResponsiveException(typeof(ArgumentException), typeof(InvalidOperationException))]
     public class TestExceptionActor : InterfacedActor, ICounter
     {
         private int _counter;
