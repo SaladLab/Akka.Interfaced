@@ -138,20 +138,20 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
     [ProtoContract]
     public class SurrogateForIDefault
     {
-        [ProtoMember(1)] private ActorRefBase _actor;
+        [ProtoMember(1)] public IActorRef Actor;
 
-        [ProtoAfterDeserialization] // ProtoConverter
+        [ProtoConverter]
         public static SurrogateForIDefault From(IDefault value)
         {
             if (value == null) return null;
-            return new SurrogateForIDefault { _actor = (ActorRefBase)((DefaultRef)value).Actor };
+            return new SurrogateForIDefault { Actor = ((DefaultRef)value).Actor };
         }
 
-        [ProtoAfterDeserialization] // ProtoConverter
+        [ProtoConverter]
         public static IDefault To(SurrogateForIDefault value)
         {
             if (value == null) return null;
-            return new DefaultRef(value._actor);
+            return new DefaultRef(value.Actor);
         }
     }
 }

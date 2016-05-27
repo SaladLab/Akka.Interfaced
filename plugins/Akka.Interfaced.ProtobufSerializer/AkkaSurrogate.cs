@@ -11,95 +11,119 @@ namespace Akka.Interfaced.ProtobufSerializer
         internal static ActorSystem CurrentSystem;
 
         [ProtoContract]
-        public class ActorPath
+        public class SurrogateForActorPath
         {
             [ProtoMember(1)] public string Path;
 
-            public static readonly Type Target = typeof(Akka.Actor.ActorPath);
-
-            public static implicit operator ActorPath(Akka.Actor.ActorPath value)
+            [ProtoConverter]
+            public static SurrogateForActorPath Convert(ActorPath value)
             {
                 if (value == null)
                     return null;
-                var path = ((Akka.Actor.ActorPath.Surrogate)value.ToSurrogate(CurrentSystem)).Path;
-                return new ActorPath { Path = path };
+
+                var path = ((ActorPath.Surrogate)value.ToSurrogate(CurrentSystem)).Path;
+                return new SurrogateForActorPath { Path = path };
             }
 
-            public static implicit operator Akka.Actor.ActorPath(ActorPath surrogate)
+            [ProtoConverter]
+            public static ActorPath Convert(SurrogateForActorPath value)
             {
-                if (surrogate == null)
+                if (value == null)
                     return null;
-                var obj = ((new Akka.Actor.ActorPath.Surrogate(surrogate.Path)).FromSurrogate(CurrentSystem));
-                return (Akka.Actor.ActorPath)obj;
+
+                var obj = ((new ActorPath.Surrogate(value.Path)).FromSurrogate(CurrentSystem));
+                return (ActorPath)obj;
             }
         }
 
         [ProtoContract]
-        public class Address
+        public class SurrogateForAddress
         {
             [ProtoMember(1)] public string Protocol;
             [ProtoMember(2)] public string System;
             [ProtoMember(3)] public string Host;
             [ProtoMember(4)] public int? Port;
 
-            public static readonly Type Target = typeof(Akka.Actor.Address);
-
-            public static implicit operator Address(Akka.Actor.Address value)
+            [ProtoConverter]
+            public static SurrogateForAddress Convert(Address value)
             {
                 if (value == null)
                     return null;
-                var obj = new Address
+
+                return new SurrogateForAddress
                 {
                     Protocol = value.Protocol,
                     System = value.System,
                     Host = value.Host,
                     Port = value.Port,
                 };
-                return obj;
             }
 
-            public static implicit operator Akka.Actor.Address(Address surrogate)
-            {
-                if (surrogate == null)
-                    return null;
-                var obj = new Akka.Actor.Address(surrogate.Protocol, surrogate.System, surrogate.Host, surrogate.Port);
-                return obj;
-            }
-        }
-
-        // At first I want to create a type for surrogating IActorRef.
-        // But unfortunately implicit operator conversion doesn't support object to interface conversion.
-        // Therefore ActorRefBase was chosen to workaround this limit.
-
-        [ProtoContract]
-        public class ActorRefBase
-        {
-            [ProtoMember(1)] public string Path;
-
-            public static readonly Type Target = typeof(Akka.Actor.ActorRefBase);
-
-            public static implicit operator ActorRefBase(Akka.Actor.ActorRefBase value)
+            [ProtoConverter]
+            public static Address Convert(SurrogateForAddress value)
             {
                 if (value == null)
                     return null;
-                var path = ((Akka.Actor.ActorRefBase.Surrogate)value.ToSurrogate(CurrentSystem)).Path;
-                return new ActorRefBase { Path = path };
+
+                return new Address(value.Protocol, value.System, value.Host, value.Port);
+            }
+        }
+
+        [ProtoContract]
+        public class SurrogateForIActorRef
+        {
+            [ProtoMember(1)] public string Path;
+
+            [ProtoConverter]
+            public static SurrogateForIActorRef Convert(IActorRef value)
+            {
+                if (value == null)
+                    return null;
+
+                var path = ((ActorRefBase.Surrogate)value.ToSurrogate(CurrentSystem)).Path;
+                return new SurrogateForIActorRef { Path = path };
             }
 
-            public static implicit operator Akka.Actor.ActorRefBase(ActorRefBase surrogate)
+            [ProtoConverter]
+            public static IActorRef Convert(SurrogateForIActorRef value)
             {
-                if (surrogate == null)
+                if (value == null)
                     return null;
-                var obj = ((new Akka.Actor.ActorRefBase.Surrogate(surrogate.Path)).FromSurrogate(CurrentSystem));
-                return (Akka.Actor.ActorRefBase)obj;
+
+                var obj = ((new ActorRefBase.Surrogate(value.Path)).FromSurrogate(CurrentSystem));
+                return (IActorRef)obj;
+            }
+        }
+
+        [ProtoContract]
+        public class SurrogateForINotificationChannel
+        {
+            [ProtoMember(1)] public IActorRef Actor;
+
+            [ProtoConverter]
+            public static SurrogateForINotificationChannel Convert(INotificationChannel value)
+            {
+                if (value == null)
+                    return null;
+                var actor = ((ActorNotificationChannel)value).Actor;
+                return new SurrogateForINotificationChannel { Actor = actor };
+            }
+
+            [ProtoConverter]
+            public static INotificationChannel Convert(SurrogateForINotificationChannel value)
+            {
+                if (value == null)
+                    return null;
+                return new ActorNotificationChannel(value.Actor);
             }
         }
 
         public static void Register(RuntimeTypeModel typeModel)
         {
-            typeModel.Add(ActorPath.Target, false).SetSurrogate(typeof(ActorPath));
-            typeModel.Add(Address.Target, false).SetSurrogate(typeof(Address));
-            typeModel.Add(ActorRefBase.Target, false).SetSurrogate(typeof(ActorRefBase));
+            typeModel.Add(typeof(ActorPath), false).SetSurrogate(typeof(SurrogateForActorPath));
+            typeModel.Add(typeof(Address), false).SetSurrogate(typeof(SurrogateForAddress));
+            typeModel.Add(typeof(IActorRef), false).SetSurrogate(typeof(SurrogateForIActorRef));
+            typeModel.Add(typeof(INotificationChannel), false).SetSurrogate(typeof(SurrogateForINotificationChannel));
         }
     }
 }

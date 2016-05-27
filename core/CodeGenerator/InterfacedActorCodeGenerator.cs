@@ -61,14 +61,14 @@ namespace CodeGen
                 w._();
 
                 w._("[ProtoConverter]");
-                using (w.B($"public static {surrogateClassName} From(BoundActorRef value)"))
+                using (w.B($"public static {surrogateClassName} Convert(BoundActorRef value)"))
                 {
                     w._($"if (value == null) return null;");
                     w._($"return new {surrogateClassName} {{ Id = value.Id }};");
                 }
 
                 w._("[ProtoConverter]");
-                using (w.B($"public static BoundActorRef To({surrogateClassName} value)"))
+                using (w.B($"public static BoundActorRef Convert({surrogateClassName} value)"))
                 {
                     w._($"if (value == null) return null;");
                     w._($"return new BoundActorRef(value.Id);");
@@ -396,19 +396,18 @@ namespace CodeGen
                 w._("[ProtoContract]");
                 using (w.B($"public class {surrogateClassName}"))
                 {
-                    var transportType = Options.UseSlimClient ? "BoundActorRef" : "ActorRefBase";
-                    w._($"[ProtoMember(1)] public {transportType} Actor;");
+                    w._($"[ProtoMember(1)] public IActorRef Actor;");
                     w._();
 
                     w._("[ProtoConverter]");
-                    using (w.B($"public static {surrogateClassName} From({type.Name} value)"))
+                    using (w.B($"public static {surrogateClassName} Convert({type.Name} value)"))
                     {
                         w._($"if (value == null) return null;");
-                        w._($"return new {surrogateClassName} {{ Actor = ({transportType})(({refClassName})value).Actor }};");
+                        w._($"return new {surrogateClassName} {{ Actor = (({refClassName})value).Actor }};");
                     }
 
                     w._("[ProtoConverter]");
-                    using (w.B($"public static {type.Name} To({surrogateClassName} value)"))
+                    using (w.B($"public static {type.Name} Convert({surrogateClassName} value)"))
                     {
                         w._($"if (value == null) return null;");
                         w._($"return new {refClassName}(value.Actor);");

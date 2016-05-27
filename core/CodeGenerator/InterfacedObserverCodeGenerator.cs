@@ -167,31 +167,23 @@ namespace CodeGen
                 w._("[ProtoContract]");
                 using (w.B($"public class {surrogateClassName}"))
                 {
-                    if (Options.UseSlimClient == false)
-                        w._("[ProtoMember(1)] public ActorRefBase Actor;");
+                    w._("[ProtoMember(1)] public INotificationChannel Channel;");
                     w._("[ProtoMember(2)] public int ObserverId;");
                     w._();
 
                     w._("[ProtoConverter]");
-                    using (w.B($"public static {surrogateClassName} From({type.Name} value)"))
+                    using (w.B($"public static {surrogateClassName} Convert({type.Name} value)"))
                     {
                         w._($"if (value == null) return null;");
                         w._($"var o = ({className})value;");
-                        var setActor = Options.UseSlimClient
-                            ? ""
-                            : "Actor = (o.Channel != null ? (ActorRefBase)(((ActorNotificationChannel)o.Channel).Actor) : null), ";
-
-                        w._($"return new {surrogateClassName} {{ {setActor}ObserverId = o.ObserverId }};");
+                        w._($"return new {surrogateClassName} {{ Channel = o.Channel, ObserverId = o.ObserverId }};");
                     }
 
                     w._("[ProtoConverter]");
-                    using (w.B($"public static {type.Name} To({surrogateClassName} value)"))
+                    using (w.B($"public static {type.Name} Convert({surrogateClassName} value)"))
                     {
                         w._($"if (value == null) return null;");
-                        var channel = Options.UseSlimClient
-                            ? "null"
-                            : "new ActorNotificationChannel(value.Actor)";
-                        w._($"return new {className}({channel}, value.ObserverId);");
+                        w._($"return new {className}(value.Channel, value.ObserverId);");
                     }
                 }
             }
