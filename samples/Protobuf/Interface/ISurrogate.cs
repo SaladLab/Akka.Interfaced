@@ -13,6 +13,6 @@ namespace Protobuf.Interface
     {
         Task<ActorPath> GetPath(ActorPath path);
         Task<Address> GetAddress(Address address);
-        Task<ActorRefBase> GetSelf();
+        Task<ISurrogate> GetSelf();
     }
 }

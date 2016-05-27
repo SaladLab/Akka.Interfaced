@@ -166,20 +166,20 @@ namespace Protobuf.Interface
     [ProtoContract]
     public class SurrogateForIHelloWorld
     {
-        [ProtoMember(1)] private ActorRefBase _actor;
+        [ProtoMember(1)] public IActorRef Actor;
 
-        [ProtoAfterDeserialization] // ProtoConverter
-        public static SurrogateForIHelloWorld From(IHelloWorld value)
+        [ProtoConverter]
+        public static SurrogateForIHelloWorld Convert(IHelloWorld value)
         {
             if (value == null) return null;
-            return new SurrogateForIHelloWorld { _actor = (ActorRefBase)((HelloWorldRef)value).Actor };
+            return new SurrogateForIHelloWorld { Actor = ((HelloWorldRef)value).Actor };
         }
 
-        [ProtoAfterDeserialization] // ProtoConverter
-        public static IHelloWorld To(SurrogateForIHelloWorld value)
+        [ProtoConverter]
+        public static IHelloWorld Convert(SurrogateForIHelloWorld value)
         {
             if (value == null) return null;
-            return new HelloWorldRef(value._actor);
+            return new HelloWorldRef(value.Actor);
         }
     }
 }
@@ -532,20 +532,20 @@ namespace Protobuf.Interface
     [ProtoContract]
     public class SurrogateForIPedantic
     {
-        [ProtoMember(1)] private ActorRefBase _actor;
+        [ProtoMember(1)] public IActorRef Actor;
 
-        [ProtoAfterDeserialization] // ProtoConverter
-        public static SurrogateForIPedantic From(IPedantic value)
+        [ProtoConverter]
+        public static SurrogateForIPedantic Convert(IPedantic value)
         {
             if (value == null) return null;
-            return new SurrogateForIPedantic { _actor = (ActorRefBase)((PedanticRef)value).Actor };
+            return new SurrogateForIPedantic { Actor = ((PedanticRef)value).Actor };
         }
 
-        [ProtoAfterDeserialization] // ProtoConverter
-        public static IPedantic To(SurrogateForIPedantic value)
+        [ProtoConverter]
+        public static IPedantic Convert(SurrogateForIPedantic value)
         {
             if (value == null) return null;
-            return new PedanticRef(value._actor);
+            return new PedanticRef(value.Actor);
         }
     }
 }
@@ -655,9 +655,9 @@ namespace Protobuf.Interface
 
         [ProtoContract, TypeAlias]
         public class GetSelf_Return
-            : IInterfacedPayload, IValueGetable
+            : IInterfacedPayload, IValueGetable, IPayloadActorRefUpdatable
         {
-            [ProtoMember(1)] public Akka.Actor.ActorRefBase v;
+            [ProtoMember(1)] public Protobuf.Interface.ISurrogate v;
 
             public Type GetInterfaceType()
             {
@@ -667,6 +667,14 @@ namespace Protobuf.Interface
             public object Value
             {
                 get { return v; }
+            }
+
+            void IPayloadActorRefUpdatable.Update(Action<object> updater)
+            {
+                if (v != null)
+                {
+                    updater(v); 
+                }
             }
         }
     }
@@ -719,12 +727,12 @@ namespace Protobuf.Interface
             return SendRequestAndReceive<Akka.Actor.ActorPath>(requestMessage);
         }
 
-        public Task<Akka.Actor.ActorRefBase> GetSelf()
+        public Task<Protobuf.Interface.ISurrogate> GetSelf()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISurrogate_PayloadTable.GetSelf_Invoke {  }
             };
-            return SendRequestAndReceive<Akka.Actor.ActorRefBase>(requestMessage);
+            return SendRequestAndReceive<Protobuf.Interface.ISurrogate>(requestMessage);
         }
 
         void ISurrogate_NoReply.GetAddress(Akka.Actor.Address address)
@@ -755,20 +763,20 @@ namespace Protobuf.Interface
     [ProtoContract]
     public class SurrogateForISurrogate
     {
-        [ProtoMember(1)] private ActorRefBase _actor;
+        [ProtoMember(1)] public IActorRef Actor;
 
-        [ProtoAfterDeserialization] // ProtoConverter
-        public static SurrogateForISurrogate From(ISurrogate value)
+        [ProtoConverter]
+        public static SurrogateForISurrogate Convert(ISurrogate value)
         {
             if (value == null) return null;
-            return new SurrogateForISurrogate { _actor = (ActorRefBase)((SurrogateRef)value).Actor };
+            return new SurrogateForISurrogate { Actor = ((SurrogateRef)value).Actor };
         }
 
-        [ProtoAfterDeserialization] // ProtoConverter
-        public static ISurrogate To(SurrogateForISurrogate value)
+        [ProtoConverter]
+        public static ISurrogate Convert(SurrogateForISurrogate value)
         {
             if (value == null) return null;
-            return new SurrogateRef(value._actor);
+            return new SurrogateRef(value.Actor);
         }
     }
 }

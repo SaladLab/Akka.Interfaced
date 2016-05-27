@@ -108,7 +108,7 @@ namespace Protobuf.Program
 
             Console.WriteLine(await surrogate.GetPath(clientActor.Path));
             Console.WriteLine(await surrogate.GetAddress(clientActor.Path.Address));
-            Console.WriteLine((await surrogate.GetSelf()).Path);
+            Console.WriteLine(((SurrogateRef)await surrogate.GetSelf()).Actor.Path);
         }
 
         private async static Task TestPedantic(ActorSystem serverSystem, ActorSystem clientSystem)

@@ -21,10 +21,10 @@ namespace Protobuf.Program
             return Task.FromResult(address);
         }
 
-        Task<ActorRefBase> ISurrogate.GetSelf()
+        Task<ISurrogate> ISurrogate.GetSelf()
         {
             Console.WriteLine("GetSelf return {0}", Self.Path);
-            return Task.FromResult((ActorRefBase)Self);
+            return Task.FromResult((ISurrogate)new SurrogateRef(Self)); // BE CAREFUL: DON'T DO just "this"
         }
     }
 }
