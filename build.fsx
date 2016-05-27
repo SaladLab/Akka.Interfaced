@@ -28,9 +28,10 @@ let solution =
           { emptyProject with Name = "Akka.Interfaced.Templates-Protobuf"
                               Folder = "./core/CodeGenerator-Templates"
                               Template = true
+                              PackagePrerelease = "beta"
                               Dependencies = 
                                   [ ("Akka.Interfaced", "")
-                                    ("protobuf-net", "2.0.0.668")
+                                    ("protobuf-net", "2.1.0-alpha-1")
                                     ("TypeAlias", "1.1.2") ] }
           { emptyProject with Name = "Akka.Interfaced-SlimClient.Templates"
                               Folder = "./core/CodeGenerator-Templates"
@@ -39,9 +40,10 @@ let solution =
           { emptyProject with Name = "Akka.Interfaced-SlimClient.Templates-Protobuf"
                               Folder = "./core/CodeGenerator-Templates"
                               Template = true
+                              PackagePrerelease = "beta"
                               Dependencies = 
                                   [ ("Akka.Interfaced-SlimClient", "")
-                                    ("protobuf-net", "2.0.0.668")
+                                    ("protobuf-net", "2.1.0-alpha-1")
                                     ("TypeAlias", "1.1.2") ] }
           { // CodeVerifier
             emptyProject with Name = "Akka.Interfaced.CodeVerifier"
@@ -63,6 +65,7 @@ let solution =
                                     ("Akka.Persistence", "") ] }
           { emptyProject with Name = "Akka.Interfaced.ProtobufSerializer"
                               Folder = "./plugins/Akka.Interfaced.ProtobufSerializer"
+                              PackagePrerelease = "beta"
                               Dependencies = 
                                   [ ("Akka.Interfaced", "")
                                     ("protobuf-net", "")
