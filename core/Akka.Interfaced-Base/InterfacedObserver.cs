@@ -36,7 +36,7 @@ namespace Akka.Interfaced
         public void Dispose()
         {
             Dispose(true);
-            Channel = null;
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -48,6 +48,7 @@ namespace Akka.Interfaced
                     Disposed();
                     Disposed = null;
                 }
+                Channel = null;
             }
         }
 
