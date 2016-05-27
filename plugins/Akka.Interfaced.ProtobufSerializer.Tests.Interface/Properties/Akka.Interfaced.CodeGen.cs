@@ -79,6 +79,10 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
 
     public class DefaultRef : InterfacedActorRef, IDefault, IDefault_NoReply
     {
+        public DefaultRef() : base(null)
+        {
+        }
+
         public DefaultRef(IActorRef actor) : base(actor)
         {
         }
@@ -141,14 +145,14 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         [ProtoMember(1)] public IActorRef Actor;
 
         [ProtoConverter]
-        public static SurrogateForIDefault From(IDefault value)
+        public static SurrogateForIDefault Convert(IDefault value)
         {
             if (value == null) return null;
             return new SurrogateForIDefault { Actor = ((DefaultRef)value).Actor };
         }
 
         [ProtoConverter]
-        public static IDefault To(SurrogateForIDefault value)
+        public static IDefault Convert(SurrogateForIDefault value)
         {
             if (value == null) return null;
             return new DefaultRef(value.Actor);

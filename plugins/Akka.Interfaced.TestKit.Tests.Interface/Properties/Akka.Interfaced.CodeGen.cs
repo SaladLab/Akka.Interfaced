@@ -84,6 +84,10 @@ namespace Akka.Interfaced.TestKit.Tests
 
     public class UserRef : InterfacedActorRef, IUser, IUser_NoReply
     {
+        public UserRef() : base(null)
+        {
+        }
+
         public UserRef(IActorRef actor) : base(actor)
         {
         }
@@ -199,6 +203,10 @@ namespace Akka.Interfaced.TestKit.Tests
 
     public class UserLoginRef : InterfacedActorRef, IUserLogin, IUserLogin_NoReply
     {
+        public UserLoginRef() : base(null)
+        {
+        }
+
         public UserLoginRef(IActorRef actor) : base(actor)
         {
         }

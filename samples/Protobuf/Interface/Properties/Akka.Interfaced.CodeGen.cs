@@ -107,6 +107,10 @@ namespace Protobuf.Interface
 
     public class HelloWorldRef : InterfacedActorRef, IHelloWorld, IHelloWorld_NoReply
     {
+        public HelloWorldRef() : base(null)
+        {
+        }
+
         public HelloWorldRef(IActorRef actor) : base(actor)
         {
         }
@@ -409,6 +413,10 @@ namespace Protobuf.Interface
 
     public class PedanticRef : InterfacedActorRef, IPedantic, IPedantic_NoReply
     {
+        public PedanticRef() : base(null)
+        {
+        }
+
         public PedanticRef(IActorRef actor) : base(actor)
         {
         }
@@ -688,6 +696,10 @@ namespace Protobuf.Interface
 
     public class SurrogateRef : InterfacedActorRef, ISurrogate, ISurrogate_NoReply
     {
+        public SurrogateRef() : base(null)
+        {
+        }
+
         public SurrogateRef(IActorRef actor) : base(actor)
         {
         }

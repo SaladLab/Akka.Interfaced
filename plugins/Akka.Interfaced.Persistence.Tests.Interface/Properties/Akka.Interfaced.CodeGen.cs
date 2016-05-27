@@ -118,6 +118,10 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
 
     public class NotepadRef : InterfacedActorRef, INotepad, INotepad_NoReply
     {
+        public NotepadRef() : base(null)
+        {
+        }
+
         public NotepadRef(IActorRef actor) : base(actor)
         {
         }

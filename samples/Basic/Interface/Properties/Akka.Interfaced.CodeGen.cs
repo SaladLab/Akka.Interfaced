@@ -104,6 +104,10 @@ namespace Basic.Interface
 
     public class CalculatorRef : InterfacedActorRef, ICalculator, ICalculator_NoReply
     {
+        public CalculatorRef() : base(null)
+        {
+        }
+
         public CalculatorRef(IActorRef actor) : base(actor)
         {
         }
@@ -234,6 +238,10 @@ namespace Basic.Interface
 
     public class CounterRef : InterfacedActorRef, ICounter, ICounter_NoReply
     {
+        public CounterRef() : base(null)
+        {
+        }
+
         public CounterRef(IActorRef actor) : base(actor)
         {
         }
@@ -406,6 +414,10 @@ namespace Basic.Interface
 
     public class EventGeneratorRef : InterfacedActorRef, IEventGenerator, IEventGenerator_NoReply
     {
+        public EventGeneratorRef() : base(null)
+        {
+        }
+
         public EventGeneratorRef(IActorRef actor) : base(actor)
         {
         }
@@ -624,6 +636,10 @@ namespace Basic.Interface
 
     public class OverloadedRef : InterfacedActorRef, IOverloaded, IOverloaded_NoReply
     {
+        public OverloadedRef() : base(null)
+        {
+        }
+
         public OverloadedRef(IActorRef actor) : base(actor)
         {
         }
@@ -756,6 +772,10 @@ namespace Basic.Interface
 
     public class WorkerRef : InterfacedActorRef, IWorker, IWorker_NoReply
     {
+        public WorkerRef() : base(null)
+        {
+        }
+
         public WorkerRef(IActorRef actor) : base(actor)
         {
         }

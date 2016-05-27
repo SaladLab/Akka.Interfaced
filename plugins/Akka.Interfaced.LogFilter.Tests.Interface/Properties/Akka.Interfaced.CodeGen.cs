@@ -138,6 +138,10 @@ namespace Akka.Interfaced.LogFilter.Tests
 
     public class TestRef : InterfacedActorRef, ITest, ITest_NoReply
     {
+        public TestRef() : base(null)
+        {
+        }
+
         public TestRef(IActorRef actor) : base(actor)
         {
         }

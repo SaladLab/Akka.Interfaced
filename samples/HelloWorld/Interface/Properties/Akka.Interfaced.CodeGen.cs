@@ -100,6 +100,10 @@ namespace HelloWorld.Interface
 
     public class HelloWorldRef : InterfacedActorRef, IHelloWorld, IHelloWorld_NoReply
     {
+        public HelloWorldRef() : base(null)
+        {
+        }
+
         public HelloWorldRef(IActorRef actor) : base(actor)
         {
         }

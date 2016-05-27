@@ -171,6 +171,10 @@ namespace Akka.Interfaced.Tests
 
     public class BasicRef : InterfacedActorRef, IBasic, IBasic_NoReply
     {
+        public BasicRef() : base(null)
+        {
+        }
+
         public BasicRef(IActorRef actor) : base(actor)
         {
         }
@@ -332,6 +336,10 @@ namespace Akka.Interfaced.Tests
 
     public class DummyRef : InterfacedActorRef, IDummy, IDummy_NoReply
     {
+        public DummyRef() : base(null)
+        {
+        }
+
         public DummyRef(IActorRef actor) : base(actor)
         {
         }
@@ -502,6 +510,10 @@ namespace Akka.Interfaced.Tests
 
     public class OverloadedRef : InterfacedActorRef, IOverloaded, IOverloaded_NoReply
     {
+        public OverloadedRef() : base(null)
+        {
+        }
+
         public OverloadedRef(IActorRef actor) : base(actor)
         {
         }
@@ -669,6 +681,10 @@ namespace Akka.Interfaced.Tests
 
     public class SubjectRef : InterfacedActorRef, ISubject, ISubject_NoReply
     {
+        public SubjectRef() : base(null)
+        {
+        }
+
         public SubjectRef(IActorRef actor) : base(actor)
         {
         }
@@ -855,6 +871,10 @@ namespace Akka.Interfaced.Tests
 
     public class Subject2Ref : InterfacedActorRef, ISubject2, ISubject2_NoReply
     {
+        public Subject2Ref() : base(null)
+        {
+        }
+
         public Subject2Ref(IActorRef actor) : base(actor)
         {
         }
@@ -1003,6 +1023,10 @@ namespace Akka.Interfaced.Tests
 
     public class WorkerRef : InterfacedActorRef, IWorker, IWorker_NoReply
     {
+        public WorkerRef() : base(null)
+        {
+        }
+
         public WorkerRef(IActorRef actor) : base(actor)
         {
         }
