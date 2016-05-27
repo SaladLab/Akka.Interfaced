@@ -101,6 +101,10 @@ namespace SlimHttp.Interface
 
     public class CalculatorRef : InterfacedActorRef, ICalculator, ICalculator_NoReply
     {
+        public CalculatorRef() : base(null)
+        {
+        }
+
         public CalculatorRef(IActorRef actor) : base(actor)
         {
         }
@@ -229,6 +233,10 @@ namespace SlimHttp.Interface
 
     public class CounterRef : InterfacedActorRef, ICounter, ICounter_NoReply
     {
+        public CounterRef() : base(null)
+        {
+        }
+
         public CounterRef(IActorRef actor) : base(actor)
         {
         }
@@ -494,6 +502,10 @@ namespace SlimHttp.Interface
 
     public class PedanticRef : InterfacedActorRef, IPedantic, IPedantic_NoReply
     {
+        public PedanticRef() : base(null)
+        {
+        }
+
         public PedanticRef(IActorRef actor) : base(actor)
         {
         }

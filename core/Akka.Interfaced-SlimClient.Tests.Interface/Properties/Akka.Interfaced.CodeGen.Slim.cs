@@ -205,6 +205,10 @@ namespace Akka.Interfaced.SlimClient.Tests
 
     public class BasicRef : InterfacedActorRef, IBasic, IBasic_NoReply
     {
+        public BasicRef() : base(null)
+        {
+        }
+
         public BasicRef(IActorRef actor) : base(actor)
         {
         }
@@ -417,6 +421,10 @@ namespace Akka.Interfaced.SlimClient.Tests
 
     public class SubjectRef : InterfacedActorRef, ISubject, ISubject_NoReply
     {
+        public SubjectRef() : base(null)
+        {
+        }
+
         public SubjectRef(IActorRef actor) : base(actor)
         {
         }
