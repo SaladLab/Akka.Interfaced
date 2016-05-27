@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Akka.Interfaced.SlimClient.Tests
 {
@@ -9,5 +10,6 @@ namespace Akka.Interfaced.SlimClient.Tests
         Task<int> CallWithReturn();
         Task<int> CallWithParameterAndReturn(int value);
         Task<int> ThrowException(bool throwException);
+        Task<IBasic> GetSelf();
     }
 }

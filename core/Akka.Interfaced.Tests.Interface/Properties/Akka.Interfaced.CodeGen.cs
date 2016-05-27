@@ -610,18 +610,13 @@ namespace Akka.Interfaced.Tests
         }
 
         public class Subscribe_Invoke
-            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Akka.Interfaced.Tests.SubjectObserver observer;
+            public Akka.Interfaced.Tests.ISubjectObserver observer;
 
             public Type GetInterfaceType()
             {
                 return typeof(ISubject);
-            }
-
-            public void SetNotificationChannel(INotificationChannel notificationChannel)
-            {
-                observer.Channel = notificationChannel;
             }
 
             public async Task<IValueGetable> InvokeAsync(object __target)
@@ -629,27 +624,38 @@ namespace Akka.Interfaced.Tests
                 await ((ISubject)__target).Subscribe(observer);
                 return null;
             }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
+            }
         }
 
         public class Unsubscribe_Invoke
-            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Akka.Interfaced.Tests.SubjectObserver observer;
+            public Akka.Interfaced.Tests.ISubjectObserver observer;
 
             public Type GetInterfaceType()
             {
                 return typeof(ISubject);
             }
 
-            public void SetNotificationChannel(INotificationChannel notificationChannel)
-            {
-                observer.Channel = notificationChannel;
-            }
-
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ISubject)__target).Unsubscribe(observer);
                 return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
             }
         }
     }
@@ -697,7 +703,7 @@ namespace Akka.Interfaced.Tests
         public Task Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -705,7 +711,7 @@ namespace Akka.Interfaced.Tests
         public Task Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -721,7 +727,7 @@ namespace Akka.Interfaced.Tests
         void ISubject_NoReply.Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = observer }
             };
             SendRequest(requestMessage);
         }
@@ -729,7 +735,7 @@ namespace Akka.Interfaced.Tests
         void ISubject_NoReply.Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (Akka.Interfaced.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = observer }
             };
             SendRequest(requestMessage);
         }
@@ -789,18 +795,13 @@ namespace Akka.Interfaced.Tests
         }
 
         public class Subscribe_Invoke
-            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Akka.Interfaced.Tests.Subject2Observer observer;
+            public Akka.Interfaced.Tests.ISubject2Observer observer;
 
             public Type GetInterfaceType()
             {
                 return typeof(ISubject2);
-            }
-
-            public void SetNotificationChannel(INotificationChannel notificationChannel)
-            {
-                observer.Channel = notificationChannel;
             }
 
             public async Task<IValueGetable> InvokeAsync(object __target)
@@ -808,27 +809,38 @@ namespace Akka.Interfaced.Tests
                 await ((ISubject2)__target).Subscribe(observer);
                 return null;
             }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
+            }
         }
 
         public class Unsubscribe_Invoke
-            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Akka.Interfaced.Tests.Subject2Observer observer;
+            public Akka.Interfaced.Tests.ISubject2Observer observer;
 
             public Type GetInterfaceType()
             {
                 return typeof(ISubject2);
             }
 
-            public void SetNotificationChannel(INotificationChannel notificationChannel)
-            {
-                observer.Channel = notificationChannel;
-            }
-
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 await ((ISubject2)__target).Unsubscribe(observer);
                 return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
             }
         }
     }
@@ -885,7 +897,7 @@ namespace Akka.Interfaced.Tests
         public Task Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = (Akka.Interfaced.Tests.Subject2Observer)observer }
+                InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -893,7 +905,7 @@ namespace Akka.Interfaced.Tests
         public Task Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = (Akka.Interfaced.Tests.Subject2Observer)observer }
+                InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -917,7 +929,7 @@ namespace Akka.Interfaced.Tests
         void ISubject2_NoReply.Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = (Akka.Interfaced.Tests.Subject2Observer)observer }
+                InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = observer }
             };
             SendRequest(requestMessage);
         }
@@ -925,7 +937,7 @@ namespace Akka.Interfaced.Tests
         void ISubject2_NoReply.Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = (Akka.Interfaced.Tests.Subject2Observer)observer }
+                InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = observer }
             };
             SendRequest(requestMessage);
         }

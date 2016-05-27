@@ -10,11 +10,16 @@ namespace CodeGen
 {
     public class InterfacedActorCodeGenerator
     {
+        private bool _surrogateForBoundActorRefGenerated;
+
         public Options Options { get; set; }
 
         public void GenerateCode(Type type, CodeWriter.CodeWriter w)
         {
             Console.WriteLine("GenerateCode: " + type.FullName);
+
+            if (Options.UseProtobuf && Options.UseSlimClient)
+                EnsureSurrogateForBoundActorRef(w);
 
             w._($"#region {type.FullName}");
             w._();
@@ -37,6 +42,43 @@ namespace CodeGen
 
             w._();
             w._($"#endregion");
+        }
+
+        private void EnsureSurrogateForBoundActorRef(CodeWriter.CodeWriter w)
+        {
+            if (_surrogateForBoundActorRefGenerated)
+                return;
+
+            w._($"#region SurrogateForBoundActorRef");
+            w._();
+
+            var surrogateClassName = Utility.GetSurrogateClassName(typeof(BoundActorRef));
+
+            w._("[ProtoContract]");
+            using (w.B($"public class {surrogateClassName}"))
+            {
+                w._($"[ProtoMember(1)] public int Id;");
+                w._();
+
+                w._("[ProtoConverter]");
+                using (w.B($"public static {surrogateClassName} From(BoundActorRef value)"))
+                {
+                    w._($"if (value == null) return null;");
+                    w._($"return new {surrogateClassName} {{ Id = value.Id }};");
+                }
+
+                w._("[ProtoConverter]");
+                using (w.B($"public static BoundActorRef To({surrogateClassName} value)"))
+                {
+                    w._($"if (value == null) return null;");
+                    w._($"return new BoundActorRef(value.Id);");
+                }
+            }
+
+            w._();
+            w._($"#endregion");
+
+            _surrogateForBoundActorRefGenerated = true;
         }
 
         private void GeneratePayloadCode(
@@ -69,17 +111,20 @@ namespace CodeGen
                 {
                     var payloadTypeName = method2PayloadTypeNameMap[method];
                     var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
-                    var observerParameters = method.GetParameters().Where(p => Utility.IsObserverInterface(p.ParameterType)).ToArray();
+                    var observerParameters = method.GetParameters()
+                        .Select(p => Tuple.Create(p, Utility.GetReachableMemebers(p.ParameterType, Utility.IsObserverInterface).ToArray()))
+                        .Where(i => i.Item2.Length > 0)
+                        .ToArray();
 
                     // Invoke payload
 
                     if (Options.UseProtobuf)
                         w._("[ProtoContract, TypeAlias]");
 
-                    var tagOverridable = tagName != null ? "ITagOverridable, " : "";
-                    var observerOverridable = observerParameters.Any() ? "IObserverOverridable, " : "";
+                    var tagOverridable = tagName != null ? ", IPayloadTagOverridable" : "";
+                    var observerUpdatable = observerParameters.Any() ? ", IPayloadObserverUpdatable" : "";
                     using (w.B($"public class {payloadTypeName.Item1}",
-                               $": IInterfacedPayload, {tagOverridable}{observerOverridable}IAsyncInvokable"))
+                               $": IInterfacedPayload, IAsyncInvokable{tagOverridable}{observerUpdatable}"))
                     {
                         // Parameters
 
@@ -104,7 +149,7 @@ namespace CodeGen
                                 }
                             }
 
-                            var typeName = Utility.GetTransportTypeName(parameter.ParameterType);
+                            var typeName = Utility.GetTypeName(parameter.ParameterType);
                             w._($"{attr}public {typeName} {parameter.Name}{defaultValueExpression};");
                         }
                         if (parameters.Any())
@@ -115,34 +160,6 @@ namespace CodeGen
                         using (w.B($"public Type GetInterfaceType()"))
                         {
                             w._($"return typeof({type.Name});");
-                        }
-
-                        // SetTag
-
-                        if (tagName != null)
-                        {
-                            using (w.B($"public void SetTag(object value)"))
-                            {
-                                var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
-                                if (tagParameter != null)
-                                {
-                                    var typeName = Utility.GetTransportTypeName(tagParameter.ParameterType);
-                                    w._($"{tagName} = ({typeName})value;");
-                                }
-                            }
-                        }
-
-                        // SetObserverOverridable
-
-                        if (observerParameters.Any())
-                        {
-                            using (w.B("public void SetNotificationChannel(INotificationChannel notificationChannel)"))
-                            {
-                                foreach (var parameter in observerParameters)
-                                {
-                                    w._($"{parameter.Name}.Channel = notificationChannel;");
-                                }
-                            }
                         }
 
                         // InvokeAsync
@@ -162,12 +179,49 @@ namespace CodeGen
                                 if (returnType != null)
                                 {
                                     w._($"var __v = await (({type.Name})__target).{method.Name}({parameterNames});",
-                                        $"return (IValueGetable)(new {payloadTypeName.Item2} {{ v = {Utility.GetTransportTypeCasting(returnType)}__v }});");
+                                        $"return (IValueGetable)(new {payloadTypeName.Item2} {{ v = __v }});");
                                 }
                                 else
                                 {
                                     w._($"await (({type.Name})__target).{method.Name}({parameterNames});",
                                         $"return null;");
+                                }
+                            }
+                        }
+
+                        // IPayloadTagOverridable.SetTag
+
+                        if (tagName != null)
+                        {
+                            using (w.B($"void IPayloadTagOverridable.SetTag(object value)"))
+                            {
+                                var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
+                                if (tagParameter != null)
+                                {
+                                    var typeName = Utility.GetTypeName(tagParameter.ParameterType);
+                                    w._($"{tagName} = ({typeName})value;");
+                                }
+                            }
+                        }
+
+                        // IPayloadObserverUpdatable.Update
+
+                        if (observerParameters.Any())
+                        {
+                            using (w.B("void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)"))
+                            {
+                                foreach (var p in observerParameters)
+                                {
+                                    using (w.b($"if ({p.Item1.Name} != null)"))
+                                    {
+                                        foreach (var m in p.Item2)
+                                        {
+                                            if (m == "")
+                                                w._($"updater({p.Item1.Name});");
+                                            else
+                                                w._($"if ({p.Item1.Name}.{m} != null) updater({p.Item1.Name}.{m});");
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -177,24 +231,50 @@ namespace CodeGen
 
                     if (returnType != null)
                     {
+                        var actorRefs = Utility.GetReachableMemebers(returnType, Utility.IsActorInterface).ToArray();
+
                         if (Options.UseProtobuf)
                             w._("[ProtoContract, TypeAlias]");
 
+                        var actorRefUpdatable = actorRefs.Any() ? ", IPayloadActorRefUpdatable" : "";
                         using (w.B($"public class {payloadTypeName.Item2}",
-                                   $": IInterfacedPayload, IValueGetable"))
+                                   $": IInterfacedPayload, IValueGetable{actorRefUpdatable}"))
                         {
                             var attr = (Options.UseProtobuf) ? "[ProtoMember(1)] " : "";
-                            w._($"{attr}public {Utility.GetTransportTypeName(returnType)} v;");
+                            w._($"{attr}public {Utility.GetTypeName(returnType)} v;");
                             w._();
+
+                            // GetInterfaceType
 
                             using (w.B("public Type GetInterfaceType()"))
                             {
                                 w._($"return typeof({type.Name});");
                             }
 
+                            // IValueGetable.Value
+
                             using (w.B("public object Value"))
                             {
                                 w._($"get {{ return v; }}");
+                            }
+
+                            // IPayloadActorRefUpdatable.Update
+
+                            if (actorRefs.Any())
+                            {
+                                using (w.B("void IPayloadActorRefUpdatable.Update(Action<object> updater)"))
+                                {
+                                    using (w.b($"if (v != null)"))
+                                    {
+                                        foreach (var m in actorRefs)
+                                        {
+                                            if (m == "")
+                                                w._($"updater(v); ");
+                                            else
+                                                w._($"if (v.{m} != null) updater(v.{m});");
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -224,56 +304,29 @@ namespace CodeGen
             var noReplyInterfaceName = Utility.GetNoReplyInterfaceName(type);
             var payloadTableClassName = Utility.GetPayloadTableClassName(type);
 
-            if (Options.UseProtobuf && Options.UseSlimClient == false)
-                w._("[ProtoContract, TypeAlias]");
-
             using (w.B($"public class {refClassName} : InterfacedActorRef, {type.Name}, {noReplyInterfaceName}"))
             {
-                // Protobuf-net specialized
+                // Constructors
 
-                if (Options.UseProtobuf && Options.UseSlimClient == false)
+                using (w.B($"public {refClassName}(IActorRef actor) : base(actor)"))
                 {
-                    using (w.B("[ProtoMember(1)] private ActorRefBase _actor"))
-                    {
-                        w._("get { return (ActorRefBase)Actor; }",
-                            "set { Actor = value; }");
-                    }
-
-                    using (w.B($"private {refClassName}() : base(null)"))
-                    {
-                    }
                 }
-
-                // Constructor
-
-                if (Options.UseSlimClient == false)
-                {
-                    using (w.B($"public {refClassName}(IActorRef actor) : base(actor)"))
-                    {
-                    }
-                }
-
-                // Constructor (detailed one)
 
                 using (w.B($"public {refClassName}(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)"))
                 {
                 }
 
-                // WithNoReply
+                // With Helpers
 
                 using (w.B($"public {noReplyInterfaceName} WithNoReply()"))
                 {
                     w._("return this;");
                 }
 
-                // WithRequestWaiter
-
                 using (w.B($"public {refClassName} WithRequestWaiter(IRequestWaiter requestWaiter)"))
                 {
                     w._($"return new {refClassName}(Actor, requestWaiter, Timeout);");
                 }
-
-                // WithTimeout
 
                 using (w.B($"public {refClassName} WithTimeout(TimeSpan? timeout)"))
                 {
@@ -288,7 +341,7 @@ namespace CodeGen
                     var parameters = method.GetParameters();
 
                     var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
-                    var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + Utility.GetTransportTypeCasting(p.ParameterType) + p.Name));
+                    var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + p.Name));
                     var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
 
                     // Request Methods
@@ -319,7 +372,7 @@ namespace CodeGen
                     var parameters = method.GetParameters();
 
                     var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, false)));
-                    var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + Utility.GetTransportTypeCasting(p.ParameterType) + p.Name));
+                    var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + p.Name));
 
                     // Request Methods
 
@@ -330,6 +383,35 @@ namespace CodeGen
                             w._($"InvokePayload = new {payloadTableClassName}.{messageName.Item1} {{ {parameterInits} }}");
                         }
                         w._("SendRequest(requestMessage);");
+                    }
+                }
+            }
+
+            // Protobuf-net specialized
+
+            if (Options.UseProtobuf)
+            {
+                var surrogateClassName = Utility.GetSurrogateClassName(type);
+
+                w._("[ProtoContract]");
+                using (w.B($"public class {surrogateClassName}"))
+                {
+                    var transportType = Options.UseSlimClient ? "BoundActorRef" : "ActorRefBase";
+                    w._($"[ProtoMember(1)] public {transportType} Actor;");
+                    w._();
+
+                    w._("[ProtoConverter]");
+                    using (w.B($"public static {surrogateClassName} From({type.Name} value)"))
+                    {
+                        w._($"if (value == null) return null;");
+                        w._($"return new {surrogateClassName} {{ Actor = ({transportType})(({refClassName})value).Actor }};");
+                    }
+
+                    w._("[ProtoConverter]");
+                    using (w.B($"public static {type.Name} To({surrogateClassName} value)"))
+                    {
+                        w._($"if (value == null) return null;");
+                        w._($"return new {refClassName}(value.Actor);");
                     }
                 }
             }

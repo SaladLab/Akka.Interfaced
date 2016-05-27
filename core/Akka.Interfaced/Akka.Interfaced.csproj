@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoundActorRef.cs" />
     <Compile Include="ActorBoundSession.cs" />
     <Compile Include="ActorBoundSessionMessage.cs" />
     <Compile Include="ActorFaultExtentions.cs" />

@@ -77,19 +77,8 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         void CallWithDefault(System.Int32 a = 1, System.Int32 b = 2, System.String c = "Test");
     }
 
-    [ProtoContract, TypeAlias]
     public class DefaultRef : InterfacedActorRef, IDefault, IDefault_NoReply
     {
-        [ProtoMember(1)] private ActorRefBase _actor
-        {
-            get { return (ActorRefBase)Actor; }
-            set { Actor = value; }
-        }
-
-        private DefaultRef() : base(null)
-        {
-        }
-
         public DefaultRef(IActorRef actor) : base(actor)
         {
         }
@@ -143,6 +132,26 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
                 InvokePayload = new IDefault_PayloadTable.CallWithDefault_Invoke { a = a, b = b, c = c }
             };
             SendRequest(requestMessage);
+        }
+    }
+
+    [ProtoContract]
+    public class SurrogateForIDefault
+    {
+        [ProtoMember(1)] private ActorRefBase _actor;
+
+        [ProtoAfterDeserialization] // ProtoConverter
+        public static SurrogateForIDefault From(IDefault value)
+        {
+            if (value == null) return null;
+            return new SurrogateForIDefault { _actor = (ActorRefBase)((DefaultRef)value).Actor };
+        }
+
+        [ProtoAfterDeserialization] // ProtoConverter
+        public static IDefault To(SurrogateForIDefault value)
+        {
+            if (value == null) return null;
+            return new DefaultRef(value._actor);
         }
     }
 }

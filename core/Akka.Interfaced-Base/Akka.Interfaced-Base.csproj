@@ -37,14 +37,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions.cs" />
+    <Compile Include="IPayloadActorRefUpdatable.cs" />
     <Compile Include="IInterfacedActor.cs" />
     <Compile Include="IInterfacedPayload.cs" />
     <Compile Include="IInterfacedObserver.cs" />
     <Compile Include="IInvokable.cs" />
     <Compile Include="INotificationChannel.cs" />
     <Compile Include="InterfacedObserver.cs" />
-    <Compile Include="IObserverOverridable.cs" />
-    <Compile Include="ITagOverridable.cs" />
+    <Compile Include="IPayloadObserverUpdatable.cs" />
+    <Compile Include="IPayloadTagOverridable.cs" />
     <Compile Include="IValueGetable.cs" />
     <Compile Include="NotificationMessage.cs" />
     <Compile Include="PayloadTableAttribute.cs" />

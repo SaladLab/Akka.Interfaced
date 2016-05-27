@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Akka.Interfaced-SlimClient\BoundActorRef.cs">
+      <Link>BoundActorRef.cs</Link>
+    </Compile>
     <Compile Include="..\Akka.Interfaced-SlimClient\IActorRef.cs">
       <Link>IActorRef.cs</Link>
     </Compile>

@@ -111,30 +111,8 @@ namespace CodeGen
             var className = Utility.GetObserverClassName(type);
             var payloadTableClassName = Utility.GetPayloadTableClassName(type);
 
-            if (Options.UseProtobuf)
-                w._("[ProtoContract, TypeAlias]");
-
             using (w.B($"public class {className} : InterfacedObserver, {type.Name}"))
             {
-                // Protobuf-net specialized
-
-                if (Options.UseProtobuf && Options.UseSlimClient == false)
-                {
-                    using (w.B("[ProtoMember(1)] private ActorRefBase _actor"))
-                    {
-                        w._("get { return Channel != null ? (ActorRefBase)(((ActorNotificationChannel)Channel).Actor) : null; }",
-                            "set { Channel = new ActorNotificationChannel(value); }");
-                    }
-                }
-                if (Options.UseProtobuf)
-                {
-                    using (w.B("[ProtoMember(2)] private int _observerId"))
-                    {
-                        w._("get { return ObserverId; }",
-                            "set { ObserverId = value; }");
-                    }
-                }
-
                 // Constructor
 
                 using (w.B($"public {className}()",
@@ -176,6 +154,44 @@ namespace CodeGen
                     {
                         w._($"var payload = new {payloadTableClassName}.{messageName} {{ {parameterInits} }};",
                             $"Notify(payload);");
+                    }
+                }
+            }
+
+            // Protobuf-net specialized
+
+            if (Options.UseProtobuf)
+            {
+                var surrogateClassName = Utility.GetSurrogateClassName(type);
+
+                w._("[ProtoContract]");
+                using (w.B($"public class {surrogateClassName}"))
+                {
+                    if (Options.UseSlimClient == false)
+                        w._("[ProtoMember(1)] public ActorRefBase Actor;");
+                    w._("[ProtoMember(2)] public int ObserverId;");
+                    w._();
+
+                    w._("[ProtoConverter]");
+                    using (w.B($"public static {surrogateClassName} From({type.Name} value)"))
+                    {
+                        w._($"if (value == null) return null;");
+                        w._($"var o = ({className})value;");
+                        var setActor = Options.UseSlimClient
+                            ? ""
+                            : "Actor = (o.Channel != null ? (ActorRefBase)(((ActorNotificationChannel)o.Channel).Actor) : null), ";
+
+                        w._($"return new {surrogateClassName} {{ {setActor}ObserverId = o.ObserverId }};");
+                    }
+
+                    w._("[ProtoConverter]");
+                    using (w.B($"public static {type.Name} To({surrogateClassName} value)"))
+                    {
+                        w._($"if (value == null) return null;");
+                        var channel = Options.UseSlimClient
+                            ? "null"
+                            : "new ActorNotificationChannel(value.Actor)";
+                        w._($"return new {className}({channel}, value.ObserverId);");
                     }
                 }
             }

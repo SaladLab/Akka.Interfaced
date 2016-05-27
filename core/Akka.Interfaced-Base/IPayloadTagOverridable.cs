@@ -1,6 +1,6 @@
 ﻿namespace Akka.Interfaced
 {
-    public interface ITagOverridable
+    public interface IPayloadTagOverridable
     {
         void SetTag(object value);
     }

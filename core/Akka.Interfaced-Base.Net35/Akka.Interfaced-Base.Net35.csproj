@@ -61,11 +61,14 @@
     <Compile Include="..\Akka.Interfaced-Base\InterfacedObserver.cs">
       <Link>InterfacedObserver.cs</Link>
     </Compile>
-    <Compile Include="..\Akka.Interfaced-Base\IObserverOverridable.cs">
-      <Link>IObserverOverridable.cs</Link>
+    <Compile Include="..\Akka.Interfaced-Base\IPayloadActorRefUpdatable.cs">
+      <Link>IPayloadActorRefUpdatable.cs</Link>
     </Compile>
-    <Compile Include="..\Akka.Interfaced-Base\ITagOverridable.cs">
-      <Link>ITagOverridable.cs</Link>
+    <Compile Include="..\Akka.Interfaced-Base\IPayloadObserverUpdatable.cs">
+      <Link>IPayloadObserverUpdatable.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\IPayloadTagOverridable.cs">
+      <Link>IPayloadTagOverridable.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\IValueGetable.cs">
       <Link>IValueGetable.cs</Link>

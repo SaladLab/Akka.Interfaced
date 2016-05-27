@@ -128,7 +128,7 @@ namespace Akka.Interfaced.TestKit
         {
             if (a.IsTagOverridable)
             {
-                var msg = (ITagOverridable)requestMessage.InvokePayload;
+                var msg = (IPayloadTagOverridable)requestMessage.InvokePayload;
                 msg.SetTag(a.TagValue);
             }
 

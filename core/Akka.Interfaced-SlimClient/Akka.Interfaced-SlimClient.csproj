@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoundActorRef.cs" />
     <Compile Include="IAsyncInvokable.cs" />
     <Compile Include="IActorRef.cs" />
     <Compile Include="InterfacedActorRef.cs" />

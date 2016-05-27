@@ -49,7 +49,7 @@ namespace Akka.Interfaced.LogFilter.Tests
         public class CallWithActor_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public Akka.Interfaced.LogFilter.Tests.TestRef test;
+            public Akka.Interfaced.LogFilter.Tests.ITest test;
 
             public Type GetInterfaceType()
             {
@@ -172,7 +172,7 @@ namespace Akka.Interfaced.LogFilter.Tests
         public Task CallWithActor(Akka.Interfaced.LogFilter.Tests.ITest test)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ITest_PayloadTable.CallWithActor_Invoke { test = (Akka.Interfaced.LogFilter.Tests.TestRef)test }
+                InvokePayload = new ITest_PayloadTable.CallWithActor_Invoke { test = test }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -204,7 +204,7 @@ namespace Akka.Interfaced.LogFilter.Tests
         void ITest_NoReply.CallWithActor(Akka.Interfaced.LogFilter.Tests.ITest test)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ITest_PayloadTable.CallWithActor_Invoke { test = (Akka.Interfaced.LogFilter.Tests.TestRef)test }
+                InvokePayload = new ITest_PayloadTable.CallWithActor_Invoke { test = test }
             };
             SendRequest(requestMessage);
         }

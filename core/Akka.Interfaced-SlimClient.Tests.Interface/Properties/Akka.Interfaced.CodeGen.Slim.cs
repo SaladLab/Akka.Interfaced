@@ -25,6 +25,7 @@ namespace Akka.Interfaced.SlimClient.Tests
                 { typeof(CallWithParameter_Invoke), null },
                 { typeof(CallWithParameterAndReturn_Invoke), typeof(CallWithParameterAndReturn_Return) },
                 { typeof(CallWithReturn_Invoke), typeof(CallWithReturn_Return) },
+                { typeof(GetSelf_Invoke), typeof(GetSelf_Return) },
                 { typeof(ThrowException_Invoke), typeof(ThrowException_Return) },
             };
         }
@@ -121,6 +122,44 @@ namespace Akka.Interfaced.SlimClient.Tests
             }
         }
 
+        public class GetSelf_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic);
+            }
+
+            public Task<IValueGetable> InvokeAsync(object __target)
+            {
+                return null;
+            }
+        }
+
+        public class GetSelf_Return
+            : IInterfacedPayload, IValueGetable, IPayloadActorRefUpdatable
+        {
+            public Akka.Interfaced.SlimClient.Tests.IBasic v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+
+            void IPayloadActorRefUpdatable.Update(Action<object> updater)
+            {
+                if (v != null)
+                {
+                    updater(v); 
+                }
+            }
+        }
+
         public class ThrowException_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
@@ -160,11 +199,16 @@ namespace Akka.Interfaced.SlimClient.Tests
         void CallWithParameter(System.Int32 value);
         void CallWithParameterAndReturn(System.Int32 value);
         void CallWithReturn();
+        void GetSelf();
         void ThrowException(System.Boolean throwException);
     }
 
     public class BasicRef : InterfacedActorRef, IBasic, IBasic_NoReply
     {
+        public BasicRef(IActorRef actor) : base(actor)
+        {
+        }
+
         public BasicRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
         {
         }
@@ -216,6 +260,14 @@ namespace Akka.Interfaced.SlimClient.Tests
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
 
+        public Task<Akka.Interfaced.SlimClient.Tests.IBasic> GetSelf()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable.GetSelf_Invoke {  }
+            };
+            return SendRequestAndReceive<Akka.Interfaced.SlimClient.Tests.IBasic>(requestMessage);
+        }
+
         public Task<System.Int32> ThrowException(System.Boolean throwException)
         {
             var requestMessage = new RequestMessage {
@@ -252,6 +304,14 @@ namespace Akka.Interfaced.SlimClient.Tests
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IBasic_PayloadTable.CallWithReturn_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IBasic_NoReply.GetSelf()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable.GetSelf_Invoke {  }
             };
             SendRequest(requestMessage);
         }
@@ -300,44 +360,50 @@ namespace Akka.Interfaced.SlimClient.Tests
         }
 
         public class Subscribe_Invoke
-            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Akka.Interfaced.SlimClient.Tests.SubjectObserver observer;
+            public Akka.Interfaced.SlimClient.Tests.ISubjectObserver observer;
 
             public Type GetInterfaceType()
             {
                 return typeof(ISubject);
             }
 
-            public void SetNotificationChannel(INotificationChannel notificationChannel)
-            {
-                observer.Channel = notificationChannel;
-            }
-
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
             }
         }
 
         public class Unsubscribe_Invoke
-            : IInterfacedPayload, IObserverOverridable, IAsyncInvokable
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Akka.Interfaced.SlimClient.Tests.SubjectObserver observer;
+            public Akka.Interfaced.SlimClient.Tests.ISubjectObserver observer;
 
             public Type GetInterfaceType()
             {
                 return typeof(ISubject);
             }
 
-            public void SetNotificationChannel(INotificationChannel notificationChannel)
-            {
-                observer.Channel = notificationChannel;
-            }
-
             public Task<IValueGetable> InvokeAsync(object __target)
             {
                 return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
             }
         }
     }
@@ -351,6 +417,10 @@ namespace Akka.Interfaced.SlimClient.Tests
 
     public class SubjectRef : InterfacedActorRef, ISubject, ISubject_NoReply
     {
+        public SubjectRef(IActorRef actor) : base(actor)
+        {
+        }
+
         public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
         {
         }
@@ -381,7 +451,7 @@ namespace Akka.Interfaced.SlimClient.Tests
         public Task Subscribe(Akka.Interfaced.SlimClient.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (Akka.Interfaced.SlimClient.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -389,7 +459,7 @@ namespace Akka.Interfaced.SlimClient.Tests
         public Task Unsubscribe(Akka.Interfaced.SlimClient.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (Akka.Interfaced.SlimClient.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -405,7 +475,7 @@ namespace Akka.Interfaced.SlimClient.Tests
         void ISubject_NoReply.Subscribe(Akka.Interfaced.SlimClient.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (Akka.Interfaced.SlimClient.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = observer }
             };
             SendRequest(requestMessage);
         }
@@ -413,7 +483,7 @@ namespace Akka.Interfaced.SlimClient.Tests
         void ISubject_NoReply.Unsubscribe(Akka.Interfaced.SlimClient.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (Akka.Interfaced.SlimClient.Tests.SubjectObserver)observer }
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = observer }
             };
             SendRequest(requestMessage);
         }

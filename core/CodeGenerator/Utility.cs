@@ -22,28 +22,6 @@ namespace CodeGen
             }
         }
 
-        public static string GetTransportTypeName(Type type)
-        {
-            if (IsActorInterface(type))
-                return type.Namespace + "." + GetActorRefClassName(type);
-            else if (IsObserverInterface(type))
-                return type.Namespace + "." + GetObserverClassName(type);
-            else
-                return GetTypeName(type);
-        }
-
-        // return "(CounterRef)" when type is ICounter
-        // but return "" when type is CounterRef
-        public static string GetTransportTypeCasting(Type type)
-        {
-            var typeName = type.FullName;
-            var transportTypeName = Utility.GetTransportTypeName(type);
-
-            return typeName == transportTypeName
-                ? ""
-                : string.Format("({0})", transportTypeName);
-        }
-
         public static bool IsActorInterface(Type type)
         {
             return type.IsInterface &&
@@ -89,6 +67,11 @@ namespace CodeGen
             return (string)pi.GetValue(attr);
         }
 
+        public static string GetSurrogateClassName(Type type)
+        {
+            return "SurrogateFor" + type.Name;
+        }
+
         public static string GetParameterDeclaration(ParameterInfo pi, bool includeDefaultExpression)
         {
             var defaultValue = pi.HasDefaultValue ? GetValueLiteral(pi.DefaultValue) : "";
@@ -124,6 +107,31 @@ namespace CodeGen
                 return string.Format("'{0}'", value);
 
             return string.Format("{0}", value);
+        }
+
+        public static IEnumerable<string> GetReachableMemebers(Type type, Func<Type, bool> filter)
+        {
+            // itself
+
+            if (filter(type))
+                yield return "";
+
+            // members
+
+            if (type.IsPrimitive)
+                yield break;
+
+            foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (filter(field.FieldType))
+                    yield return field.Name;
+            }
+
+            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (filter(property.PropertyType) && property.GetGetMethod(false) != null)
+                    yield return property.Name;
+            }
         }
     }
 }

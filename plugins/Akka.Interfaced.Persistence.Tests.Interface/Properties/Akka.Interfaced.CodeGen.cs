@@ -70,7 +70,7 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
                 var __v = await ((INotepad)__target).GetDocument();
-                return (IValueGetable)(new GetDocument_Return { v = (System.Collections.Generic.IList<System.String>)__v });
+                return (IValueGetable)(new GetDocument_Return { v = __v });
             }
         }
 
