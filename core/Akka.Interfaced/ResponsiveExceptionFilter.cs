@@ -4,19 +4,16 @@ using System.Linq;
 namespace Akka.Interfaced
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public class ResponsiveException
-        : Attribute, IFilterPerClassFactory, IPostRequestFilter
+    public class ResponsiveExceptionAttribute : Attribute, IFilterPerClassFactory
     {
         private Func<Exception, bool> _filter;
 
-        int IFilter.Order => 0;
-
-        public ResponsiveException(Func<Exception, bool> filter)
+        public ResponsiveExceptionAttribute(Func<Exception, bool> filter)
         {
             _filter = filter;
         }
 
-        public ResponsiveException(params Type[] exceptionTypes)
+        public ResponsiveExceptionAttribute(params Type[] exceptionTypes)
         {
             _filter = e => exceptionTypes.Any(t => e.GetType() == t);
         }
@@ -27,7 +24,19 @@ namespace Akka.Interfaced
 
         IFilter IFilterPerClassFactory.CreateInstance()
         {
-            return this;
+            return new ResponsiveExceptionFilter(_filter);
+        }
+    }
+
+    public class ResponsiveExceptionFilter : IPostRequestFilter
+    {
+        private Func<Exception, bool> _filter;
+
+        int IFilter.Order => 0;
+
+        public ResponsiveExceptionFilter(Func<Exception, bool> filter)
+        {
+            _filter = filter;
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
