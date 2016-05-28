@@ -10,39 +10,38 @@ namespace Akka.Interfaced
         public FilterItem(IFilterFactory factory, IFilter referenceFilter, FilterAccessor accessor, int perInvokeIndex = -1)
         {
             Factory = factory;
+            ReferenceFilter = referenceFilter;
             Accessor = accessor;
-
-            Order = referenceFilter.Order;
-
-            IsAsync = referenceFilter is IPreRequestAsyncFilter || referenceFilter is IPostRequestAsyncFilter ||
-                      referenceFilter is IPreNotificationAsyncFilter || referenceFilter is IPostNotificationAsyncFilter ||
-                      referenceFilter is IPreMessageAsyncFilter || referenceFilter is IPostMessageAsyncFilter;
-
-            IsPreFilter = referenceFilter is IPreRequestFilter || referenceFilter is IPreRequestAsyncFilter ||
-                          referenceFilter is IPreNotificationFilter || referenceFilter is IPreNotificationAsyncFilter ||
-                          referenceFilter is IPreMessageFilter || referenceFilter is IPreMessageAsyncFilter;
-
-            IsPostFilter = referenceFilter is IPostRequestFilter || referenceFilter is IPostRequestAsyncFilter ||
-                           referenceFilter is IPostNotificationFilter || referenceFilter is IPostNotificationAsyncFilter ||
-                           referenceFilter is IPostMessageFilter || referenceFilter is IPostMessageAsyncFilter;
-
-            IsPerInstance = factory is IFilterPerInstanceFactory ||
-                            factory is IFilterPerInstanceMethodFactory;
-
-            IsPerInvoke = factory is IFilterPerInvokeFactory;
-
             PerInvokeIndex = perInvokeIndex;
         }
 
         public IFilterFactory Factory { get; }
+        public IFilter ReferenceFilter { get; }
         public FilterAccessor Accessor { get; }
-        public int Order { get; }
-        public bool IsAsync { get; }
-        public bool IsPreFilter { get; }
-        public bool IsPostFilter { get; }
-        public bool IsPerInstance { get; }
-        public bool IsPerInvoke { get; }
         public int PerInvokeIndex { get; }
+
+        public int Order => ReferenceFilter.Order;
+
+        public bool IsAsync =>
+            ReferenceFilter is IPreRequestAsyncFilter || ReferenceFilter is IPostRequestAsyncFilter ||
+            ReferenceFilter is IPreNotificationAsyncFilter || ReferenceFilter is IPostNotificationAsyncFilter ||
+            ReferenceFilter is IPreMessageAsyncFilter || ReferenceFilter is IPostMessageAsyncFilter;
+
+        public bool IsPreFilter =>
+            ReferenceFilter is IPreRequestFilter || ReferenceFilter is IPreRequestAsyncFilter ||
+            ReferenceFilter is IPreNotificationFilter || ReferenceFilter is IPreNotificationAsyncFilter ||
+            ReferenceFilter is IPreMessageFilter || ReferenceFilter is IPreMessageAsyncFilter;
+
+        public bool IsPostFilter =>
+            ReferenceFilter is IPostRequestFilter || ReferenceFilter is IPostRequestAsyncFilter ||
+            ReferenceFilter is IPostNotificationFilter || ReferenceFilter is IPostNotificationAsyncFilter ||
+                           ReferenceFilter is IPostMessageFilter || ReferenceFilter is IPostMessageAsyncFilter;
+
+        public bool IsPerInstance =>
+            Factory is IFilterPerInstanceFactory ||
+            Factory is IFilterPerInstanceMethodFactory;
+
+        public bool IsPerInvoke => Factory is IFilterPerInvokeFactory;
     }
 
     internal class FilterChain
@@ -119,6 +118,10 @@ namespace Akka.Interfaced
                             _perClassFilterItemTable.Add(factoryType, filterItem);
                         }
                     }
+                    else if (CheckFilterKind(filterItem.ReferenceFilter, kind) == false)
+                    {
+                        filterItem = null;
+                    }
                 }
                 else if (filterFactory is IFilterPerClassMethodFactory)
                 {
@@ -146,6 +149,10 @@ namespace Akka.Interfaced
                                                         (provider, _) => provider.GetFilter(arrayIndex));
                             _perInstanceFilterItemTable.Add(factoryType, filterItem);
                         }
+                    }
+                    else if (CheckFilterKind(filterItem.ReferenceFilter, kind) == false)
+                    {
+                        filterItem = null;
                     }
                 }
                 else if (filterFactory is IFilterPerInstanceMethodFactory)
