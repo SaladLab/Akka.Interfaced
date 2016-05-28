@@ -4,6 +4,6 @@ namespace Akka.Interfaced.TestKit.Tests
 {
     public interface IUserLogin : IInterfacedActor
     {
-        Task<int> Login(string id, string password, int observerId);
+        Task<IUser> Login(string id, string password, IUserObserver observer);
     }
 }

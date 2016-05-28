@@ -14,7 +14,7 @@ namespace Akka.Interfaced.TestKit.Tests
             _actorBoundSession = actorBoundSession;
         }
 
-        public async Task<int> Login(string id, string password, int observerId)
+        public async Task<IUser> Login(string id, string password, IUserObserver observer)
         {
             if (id == null)
                 throw new ArgumentNullException(nameof(id));
@@ -29,13 +29,12 @@ namespace Akka.Interfaced.TestKit.Tests
 
             // Make UserActor and bind it
 
-            var observer = new UserObserver(_actorBoundSession, observerId);
             var user = Context.System.ActorOf(Props.Create(() => new UserActor(id, observer)));
 
             var reply = await _actorBoundSession.Ask<ActorBoundSessionMessage.BindReply>(
                 new ActorBoundSessionMessage.Bind(user, typeof(IUser), null));
 
-            return reply.ActorId;
+            return BoundActorRef.Create<UserRef>(reply.ActorId);
         }
 
         private bool CheckAccount(string id, string password)

@@ -57,7 +57,7 @@
     <Compile Include="Properties\AssemblyInfoGenerated.cs" />
     <Compile Include="TestActorBoundSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestObserver.cs" />
+    <Compile Include="TestNotificationChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">

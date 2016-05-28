@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 
 namespace Akka.Interfaced.TestKit
 {
-    public class TestActorBoundSession : ActorBoundSession
+    public class TestActorBoundSession : ActorBoundSession, IRequestWaiter
     {
         private readonly IActorRef _self;
         private readonly Func<IActorContext, Tuple<IActorRef, Type>[]> _initialActorFactory;
@@ -16,8 +17,29 @@ namespace Akka.Interfaced.TestKit
             new ConcurrentDictionary<int, Action<ResponseMessage>>();
 
         private int _lastObserverId;
-        private readonly ConcurrentDictionary<int, IInterfacedObserver> _observerMap =
-            new ConcurrentDictionary<int, IInterfacedObserver>();
+        private readonly ConcurrentDictionary<int, InterfacedObserver> _observerMap =
+            new ConcurrentDictionary<int, InterfacedObserver>();
+
+        private bool _notificationMessagePendingEnabled;
+        private readonly ConcurrentQueue<NotificationMessage> _notificationQueue =
+            new ConcurrentQueue<NotificationMessage>();
+
+        public bool NotificationMessagePendingEnabled
+        {
+            get
+            {
+                return _notificationMessagePendingEnabled;
+            }
+            set
+            {
+                if (_notificationMessagePendingEnabled == value)
+                    return;
+
+                _notificationMessagePendingEnabled = value;
+                if (value == false)
+                    ProcessNotificationMessages();
+            }
+        }
 
         public TestActorBoundSession(Func<IActorContext, Tuple<IActorRef, Type>[]> initialActorFactory)
         {
@@ -42,38 +64,60 @@ namespace Akka.Interfaced.TestKit
             return GetBoundActor(id)?.Actor;
         }
 
-        public IRequestWaiter GetRequestWaiter(int actorId)
+        public IActorRef GetBoundActorRef(InterfacedActorRef actor)
         {
-            return new RequestWaiter(this, actorId);
+            var boundRef = actor.Actor as BoundActorRef;
+            return boundRef != null
+                ? GetBoundActorRef(boundRef.Id)
+                : null;
         }
 
-        public int IssueObserverId()
+        public TRef CreateRef<TRef>(int actorId = 1)
+            where TRef : InterfacedActorRef, new()
+        {
+            var actorRef = new TRef();
+            InterfacedActorRefModifier.SetActor(actorRef, new BoundActorRef(actorId));
+            InterfacedActorRefModifier.SetRequestWaiter(actorRef, this);
+            return actorRef;
+        }
+
+        public TObserver CreateObserver<TObserver>(TObserver observer, IList<NotificationMessage> messages = null)
+            where TObserver : IInterfacedObserver
+        {
+            var observerId = IssueObserverId();
+
+            var local = InterfacedObserver.Create(typeof(TObserver));
+            local.ObserverId = observerId;
+            local.Channel = new TestNotificationChannel { Observer = observer, Messages = messages };
+            local.Disposed = () => { RemoveObserver(observerId); };
+            AddObserver(observerId, local);
+
+            // duplicate an observer for passing to the actor because
+            // proxy observer will be updated via IPayloadObserverUpdatable.
+            var proxy = InterfacedObserver.Create(typeof(TObserver));
+            proxy.ObserverId = observerId;
+            return (TObserver)(object)proxy;
+        }
+
+        private int IssueObserverId()
         {
             return Interlocked.Increment(ref _lastObserverId);
         }
 
-        public void AddObserver(int observerId, IInterfacedObserver observer)
+        private void AddObserver(int observerId, InterfacedObserver observer)
         {
             _observerMap.TryAdd(observerId, observer);
         }
 
-        public TestObserver AddTestObserver()
+        private void RemoveObserver(int observerId)
         {
-            var id = IssueObserverId();
-            var observer = new TestObserver(id);
-            AddObserver(id, observer);
-            return observer;
-        }
-
-        public void RemoveObserver(int observerId)
-        {
-            IInterfacedObserver observer;
+            InterfacedObserver observer;
             _observerMap.TryRemove(observerId, out observer);
         }
 
-        public IInterfacedObserver GetObserver(int observerId)
+        private InterfacedObserver GetObserver(int observerId)
         {
-            IInterfacedObserver observer;
+            InterfacedObserver observer;
             return _observerMap.TryGetValue(observerId, out observer)
                        ? observer
                        : null;
@@ -81,19 +125,10 @@ namespace Akka.Interfaced.TestKit
 
         protected override void OnNotificationMessage(NotificationMessage message)
         {
-            var observer = GetObserver(message.ObserverId);
-            if (observer == null)
-            {
-                throw new InvalidOperationException(
-                    $"Notification didn't find observer. " +
-                    $"(ObserverId={message.ObserverId}, Message={message.InvokePayload.GetType().Name})");
-            }
-
-            var testObserver = observer as TestObserver;
-            if (testObserver != null)
-                testObserver.Notify(message.InvokePayload);
+            if (NotificationMessagePendingEnabled)
+                _notificationQueue.Enqueue(message);
             else
-                message.InvokePayload.Invoke(observer);
+                InvokeNotificationMessage(message);
         }
 
         protected override void OnResponseMessage(ResponseMessage message)
@@ -102,18 +137,26 @@ namespace Akka.Interfaced.TestKit
             if (_requestMap.TryRemove(message.RequestId, out handler) == false)
                 return;
 
+            var actorRefUpdatable = message.ReturnPayload as IPayloadActorRefUpdatable;
+            if (actorRefUpdatable != null)
+            {
+                actorRefUpdatable.Update(a =>
+                    InterfacedActorRefModifier.SetRequestWaiter((InterfacedActorRef)a, this));
+            }
+
             handler(message);
         }
 
-        private BoundActor BeginSendRequest(int actorId, RequestMessage requestMessage)
+        private BoundActor BeginSendRequest(IActorRef actor, RequestMessage requestMessage)
         {
+            var actorId = ((BoundActorRef)actor).Id;
             var a = GetBoundActor(actorId);
             if (a == null)
                 throw new InvalidOperationException($"No Actor! (Id={actorId})");
 
             if (a.InterfaceType != null)
             {
-                var msg = (IInterfacedPayload)requestMessage.InvokePayload;
+                var msg = requestMessage.InvokePayload;
                 if (msg == null || msg.GetInterfaceType() != a.InterfaceType)
                 {
                     throw new InvalidOperationException("Wrong interface type! " +
@@ -132,6 +175,12 @@ namespace Akka.Interfaced.TestKit
                 msg.SetTag(a.TagValue);
             }
 
+            var observerUpdatable = requestMessage.InvokePayload as IPayloadObserverUpdatable;
+            if (observerUpdatable != null)
+            {
+                observerUpdatable.Update(o => ((InterfacedObserver)o).Channel = new ActorNotificationChannel(_self));
+            }
+
             a.Actor.Tell(new RequestMessage
             {
                 RequestId = requestMessage.RequestId,
@@ -139,15 +188,15 @@ namespace Akka.Interfaced.TestKit
             }, _self);
         }
 
-        private void SendRequest(int actorId, RequestMessage requestMessage)
+        void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
         {
-            var a = BeginSendRequest(actorId, requestMessage);
+            var a = BeginSendRequest(target, requestMessage);
             EndSendRequest(a, requestMessage);
         }
 
-        private Task SendRequestAndWait(int actorId, RequestMessage requestMessage, TimeSpan? timeout)
+        Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
         {
-            var a = BeginSendRequest(actorId, requestMessage);
+            var a = BeginSendRequest(target, requestMessage);
 
             var tcs = new TaskCompletionSource<bool>();
             lock (_requestMap)
@@ -170,10 +219,9 @@ namespace Akka.Interfaced.TestKit
             return tcs.Task;
         }
 
-        private Task<TReturn> SendRequestAndReceive<TReturn>(int actorId, RequestMessage requestMessage,
-                                                             TimeSpan? timeout)
+        Task<TReturn> IRequestWaiter.SendRequestAndReceive<TReturn>(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
         {
-            var a = BeginSendRequest(actorId, requestMessage);
+            var a = BeginSendRequest(target, requestMessage);
 
             var tcs = new TaskCompletionSource<TReturn>();
             lock (_requestMap)
@@ -201,32 +249,29 @@ namespace Akka.Interfaced.TestKit
             return tcs.Task;
         }
 
-        public class RequestWaiter : IRequestWaiter
+        public void ProcessNotificationMessages()
         {
-            private readonly TestActorBoundSession _session;
-            private readonly int _actorId;
-
-            public RequestWaiter(TestActorBoundSession session, int actorId)
+            while (true)
             {
-                _session = session;
-                _actorId = actorId;
+                NotificationMessage message;
+                if (_notificationQueue.TryDequeue(out message) == false)
+                    break;
+
+                InvokeNotificationMessage(message);
+            }
+        }
+
+        private void InvokeNotificationMessage(NotificationMessage message)
+        {
+            var observer = GetObserver(message.ObserverId);
+            if (observer == null)
+            {
+                throw new InvalidOperationException(
+                    $"Notification didn't find observer. " +
+                    $"(ObserverId={message.ObserverId}, Message={message.InvokePayload.GetType().Name})");
             }
 
-            void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
-            {
-                _session.SendRequest(_actorId, requestMessage);
-            }
-
-            Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
-            {
-                return _session.SendRequestAndWait(_actorId, requestMessage, timeout);
-            }
-
-            Task<TReturn> IRequestWaiter.SendRequestAndReceive<TReturn>(IActorRef target, RequestMessage requestMessage,
-                                                                        TimeSpan? timeout)
-            {
-                return _session.SendRequestAndReceive<TReturn>(_actorId, requestMessage, timeout);
-            }
+            observer.Channel.Notify(message);
         }
     }
 }

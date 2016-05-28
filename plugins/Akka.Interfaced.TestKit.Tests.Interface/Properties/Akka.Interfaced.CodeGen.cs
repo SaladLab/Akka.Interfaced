@@ -161,11 +161,11 @@ namespace Akka.Interfaced.TestKit.Tests
         }
 
         public class Login_Invoke
-            : IInterfacedPayload, IAsyncInvokable
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
             public System.String id;
             public System.String password;
-            public System.Int32 observerId;
+            public Akka.Interfaced.TestKit.Tests.IUserObserver observer;
 
             public Type GetInterfaceType()
             {
@@ -174,15 +174,23 @@ namespace Akka.Interfaced.TestKit.Tests
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IUserLogin)__target).Login(id, password, observerId);
+                var __v = await ((IUserLogin)__target).Login(id, password, observer);
                 return (IValueGetable)(new Login_Return { v = __v });
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
             }
         }
 
         public class Login_Return
-            : IInterfacedPayload, IValueGetable
+            : IInterfacedPayload, IValueGetable, IPayloadActorRefUpdatable
         {
-            public System.Int32 v;
+            public Akka.Interfaced.TestKit.Tests.IUser v;
 
             public Type GetInterfaceType()
             {
@@ -193,12 +201,20 @@ namespace Akka.Interfaced.TestKit.Tests
             {
                 get { return v; }
             }
+
+            void IPayloadActorRefUpdatable.Update(Action<object> updater)
+            {
+                if (v != null)
+                {
+                    updater(v); 
+                }
+            }
         }
     }
 
     public interface IUserLogin_NoReply
     {
-        void Login(System.String id, System.String password, System.Int32 observerId);
+        void Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer);
     }
 
     public class UserLoginRef : InterfacedActorRef, IUserLogin, IUserLogin_NoReply
@@ -230,18 +246,18 @@ namespace Akka.Interfaced.TestKit.Tests
             return new UserLoginRef(Actor, RequestWaiter, timeout);
         }
 
-        public Task<System.Int32> Login(System.String id, System.String password, System.Int32 observerId)
+        public Task<Akka.Interfaced.TestKit.Tests.IUser> Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observerId = observerId }
+                InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observer = observer }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<Akka.Interfaced.TestKit.Tests.IUser>(requestMessage);
         }
 
-        void IUserLogin_NoReply.Login(System.String id, System.String password, System.Int32 observerId)
+        void IUserLogin_NoReply.Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observerId = observerId }
+                InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observer = observer }
             };
             SendRequest(requestMessage);
         }
