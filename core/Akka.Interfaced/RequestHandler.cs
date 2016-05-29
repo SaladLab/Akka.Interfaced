@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace Akka.Interfaced
 {
-    public delegate ResponseMessage RequestHandler(object self, RequestMessage request, Action<ResponseMessage, Exception> onCompleted);
-    public delegate Task<ResponseMessage> RequestAsyncHandler(object self, RequestMessage request, Action<ResponseMessage, Exception> onCompleted);
+    internal delegate ResponseMessage RequestHandler(object self, RequestMessage request, Action<ResponseMessage, Exception> onCompleted);
+    internal delegate Task<ResponseMessage> RequestAsyncHandler(object self, RequestMessage request, Action<ResponseMessage, Exception> onCompleted);
 
-    public class RequestHandlerItem
+    internal class RequestHandlerItem
     {
         public Type InterfaceType;
         public bool IsReentrant;

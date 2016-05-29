@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 namespace Akka.Interfaced
 {
-    public class InterfacedActorHandler
+    internal class InterfacedActorHandler
     {
         public readonly RequestDispatcher RequestDispatcher;
         public readonly NotificationDispatcher NotificationDispatcher;
@@ -31,7 +31,7 @@ namespace Akka.Interfaced
         }
     }
 
-    public static class InterfacedActorHandlerTable
+    internal static class InterfacedActorHandlerTable
     {
         private static ConcurrentDictionary<Type, InterfacedActorHandler> s_table =
             new ConcurrentDictionary<Type, InterfacedActorHandler>();

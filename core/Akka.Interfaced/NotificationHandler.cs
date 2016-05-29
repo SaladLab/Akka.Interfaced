@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace Akka.Interfaced
 {
-    public delegate void NotificationHandler(object self, NotificationMessage message);
-    public delegate Task NotificationAsyncHandler(object self, NotificationMessage message);
+    internal delegate void NotificationHandler(object self, NotificationMessage message);
+    internal delegate Task NotificationAsyncHandler(object self, NotificationMessage message);
 
-    public class NotificationHandlerItem
+    internal class NotificationHandlerItem
     {
         public Type InterfaceType;
         public bool IsReentrant;

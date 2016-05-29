@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Akka.Interfaced
 {
-    public class NotificationDispatcher
+    internal class NotificationDispatcher
     {
         private readonly Dictionary<Type, NotificationHandlerItem> _handlerTable;
 

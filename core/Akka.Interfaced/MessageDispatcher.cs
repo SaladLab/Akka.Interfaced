@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Akka.Interfaced
 {
-    public class MessageDispatcher
+    internal class MessageDispatcher
     {
         private readonly Dictionary<Type, MessageHandlerItem> _handlerTable;
 
