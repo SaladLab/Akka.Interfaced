@@ -205,7 +205,7 @@ namespace Akka.Interfaced
                 sender.Tell(new ResponseMessage
                 {
                     RequestId = request.RequestId,
-                    Exception = new InvalidMessageException("Empty payload")
+                    Exception = new RequestMessageException("Empty payload")
                 });
                 return;
             }
@@ -216,7 +216,7 @@ namespace Akka.Interfaced
                 sender.Tell(new ResponseMessage
                 {
                     RequestId = request.RequestId,
-                    Exception = new InvalidMessageException("Cannot find handler")
+                    Exception = new RequestMessageException("Cannot find handler")
                 });
                 return;
             }

@@ -18,6 +18,21 @@ namespace Akka.Interfaced
     }
 
     /// <summary>
+    /// This exception is thrown when a request message has something wrong.
+    /// </summary>
+    public class RequestMessageException : AkkaInterfacedException
+    {
+        public RequestMessageException()
+        {
+        }
+
+        public RequestMessageException(string message, Exception innerException = null)
+            : base(message, innerException)
+        {
+        }
+    }
+
+    /// <summary>
     /// This exception is thrown when the actor which have a request is not found.
     /// </summary>
     public class RequestTargetException : AkkaInterfacedException
