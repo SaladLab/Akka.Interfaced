@@ -106,7 +106,7 @@ namespace Akka.Interfaced.Tests
         }
 
         [Fact]
-        public async Task FilterOrder_Work()
+        public void FilterOrder_Work()
         {
             var actor = ActorOfAsTestActorRef<MessageFilterOrderActor>();
             actor.Tell("A");
