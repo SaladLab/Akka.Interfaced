@@ -1,3 +1,8 @@
+## 0.3.1 (Released 2016/05/29)
+
+* Fix bug that filters can be used in wrong situation.
+* Use RequestMessageException instead of InvalidMessageException.
+
 ## 0.3.0 (Released 2016/05/27)
 
 * Enhance the readability of code setting observer. #15
