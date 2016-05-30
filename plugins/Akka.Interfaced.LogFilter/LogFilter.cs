@@ -6,9 +6,10 @@ using Newtonsoft.Json;
 
 namespace Akka.Interfaced.LogFilter
 {
-    internal class LogFilter : IPreRequestFilter, IPostRequestFilter
+    internal class LogFilter : IPreRequestFilter, IPostRequestFilter, IPreMessageFilter, IPreNotificationFilter
     {
         private static readonly JsonSerializerSettings _settings;
+        private readonly LogFilterTarget _target;
         private readonly int _filterOrder;
         private readonly ILogProxy _logProxy;
         private readonly string _methodShortName;
@@ -22,8 +23,9 @@ namespace Akka.Interfaced.LogFilter
             };
         }
 
-        public LogFilter(int filterOrder, ILogProxy logProxy, MethodInfo method)
+        public LogFilter(LogFilterTarget target, int filterOrder, ILogProxy logProxy, MethodInfo method)
         {
+            _target = target;
             _filterOrder = filterOrder;
             _logProxy = logProxy;
             _methodShortName = method.Name.Split('.').Last();
@@ -38,35 +40,77 @@ namespace Akka.Interfaced.LogFilter
 
         void IPreRequestFilter.OnPreRequest(PreRequestFilterContext context)
         {
-            if (_logProxy.IsEnabled(context.Actor) == false)
+            if (_target.HasFlag(LogFilterTarget.Request) == false || _logProxy.IsEnabled(context.Actor) == false)
                 return;
 
             var invokeJson = GetValueString(context.Request.InvokePayload);
-            _logProxy.Log(context.Actor,
-                        $"#{context.Request.RequestId} -> {_methodShortName} {invokeJson}");
+            _logProxy.Log(
+                context.Actor,
+                $"<- (#{context.Request.RequestId}) {_methodShortName} {invokeJson}");
         }
 
         void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
         {
-            if (_logProxy.IsEnabled(context.Actor) == false)
+            if (_target.HasFlag(LogFilterTarget.Request) == false || _logProxy.IsEnabled(context.Actor) == false)
                 return;
 
-            if (context.Response.Exception != null)
+            if (context.Exception != null)
             {
-                _logProxy.Log(context.Actor,
-                            $"#{context.Request.RequestId} <- {_methodShortName} Exception: {context.Response.Exception}");
+                _logProxy.Log(
+                    context.Actor,
+                    $"-> (#{context.Request.RequestId}) {_methodShortName} Fault: {context.Exception}");
             }
-            else if (context.Response.ReturnPayload != null)
+            else if (context.Response != null)
             {
-                var value = GetValueString(context.Response.ReturnPayload.Value);
-                _logProxy.Log(context.Actor,
-                            $"#{context.Request.RequestId} <- {_methodShortName} {value}");
+                var r = context.Response;
+                if (r.Exception != null)
+                {
+                    _logProxy.Log(
+                        context.Actor,
+                        $"-> (#{context.Request.RequestId}) {_methodShortName} Exception: {r.Exception}");
+                }
+                else if (r.ReturnPayload != null)
+                {
+                    var value = GetValueString(r.ReturnPayload.Value);
+                    _logProxy.Log(
+                        context.Actor,
+                        $"-> (#{context.Request.RequestId}) {_methodShortName} {value}");
+                }
+                else
+                {
+                    _logProxy.Log(
+                        context.Actor,
+                        $"-> (#{context.Request.RequestId}) {_methodShortName} <void>");
+                }
             }
             else
             {
-                _logProxy.Log(context.Actor,
-                            $"#{context.Request.RequestId} <- {_methodShortName} <void>");
+                _logProxy.Log(
+                    context.Actor,
+                    $"-> (#{context.Request.RequestId}) {_methodShortName} <null>");
             }
+        }
+
+        void IPreMessageFilter.OnPreMessage(PreMessageFilterContext context)
+        {
+            if (_target.HasFlag(LogFilterTarget.Message) == false || _logProxy.IsEnabled(context.Actor) == false)
+                return;
+
+            var invokeJson = GetValueString(context.Message);
+            _logProxy.Log(
+                context.Actor,
+                $"<- {_methodShortName} {context.Message.GetType().Name}({invokeJson})");
+        }
+
+        void IPreNotificationFilter.OnPreNotification(PreNotificationFilterContext context)
+        {
+            if (_target.HasFlag(LogFilterTarget.Notification) == false || _logProxy.IsEnabled(context.Actor) == false)
+                return;
+
+            var invokeJson = GetValueString(context.Notification.InvokePayload);
+            _logProxy.Log(
+                context.Actor,
+                $"<- {_methodShortName} {invokeJson}");
         }
     }
 }
