@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CodeWriter;
+using Akka.Interfaced;
 
 namespace CodeGen
 {
@@ -238,7 +239,7 @@ namespace CodeGen
             var wrongMethods = methods.Where(m => m.ReturnType.Name.StartsWith("Void") == false).ToArray();
             if (wrongMethods.Any())
                 throw new Exception(string.Format("All methods of {0} should return void instead of {1}", type.FullName, wrongMethods[0].ReturnType.Name));
-            return methods;
+            return methods.OrderBy(m => m, new MethodInfoComparer()).ToArray();
         }
 
         private Dictionary<MethodInfo, string> GetPayloadTypeNames(Type type, MethodInfo[] methods)
