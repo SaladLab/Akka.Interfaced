@@ -297,6 +297,12 @@ namespace Akka.Interfaced
                 return;
             }
 
+            if (notification.InvokePayload == null)
+            {
+                // TODO: log bad message (missing payload)
+                return;
+            }
+
             var handlerItem = _handler.NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
             if (handlerItem == null)
                 return;
