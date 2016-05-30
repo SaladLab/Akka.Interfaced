@@ -41,9 +41,9 @@ namespace Akka.Interfaced.LogFilter.Tests
 
             var logs = GetLogs();
             Assert.Equal(3, logs.Count);
-            Assert.Equal("#-1 -> Call {\"value\":\"Test\"}", logs[0]);
+            Assert.Equal("<- (#-1) Call {\"value\":\"Test\"}", logs[0]);
             Assert.Equal("Call(Test)", logs[1]);
-            Assert.Equal("#-1 <- Call <void>", logs[2]);
+            Assert.Equal("-> (#-1) Call <void>", logs[2]);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace Akka.Interfaced.LogFilter.Tests
             Assert.Equal(3, logs.Count);
             // ignore logs[0] because too verbose
             Assert.Equal("CallWithActor(akka://test/user/TA)", logs[1]);
-            Assert.Equal("#-1 <- CallWithActor <void>", logs[2]);
+            Assert.Equal("-> (#-1) CallWithActor <void>", logs[2]);
         }
 
         [Fact]
@@ -74,9 +74,9 @@ namespace Akka.Interfaced.LogFilter.Tests
 
             var logs = GetLogs();
             Assert.Equal(3, logs.Count);
-            Assert.Equal("#-1 -> GetHelloCount {}", logs[0]);
+            Assert.Equal("<- (#-1) GetHelloCount {}", logs[0]);
             Assert.Equal("GetHelloCount()", logs[1]);
-            Assert.Equal("#-1 <- GetHelloCount 0", logs[2]);
+            Assert.Equal("-> (#-1) GetHelloCount 0", logs[2]);
         }
 
         [Fact]
@@ -93,8 +93,8 @@ namespace Akka.Interfaced.LogFilter.Tests
 
             var logs = GetLogs();
             Assert.Equal(2, logs.Count);
-            Assert.Equal("#-1 -> Call {}", logs[0]);
-            Assert.True(logs[1].StartsWith("#-1 <- Call Exception: System.ArgumentNullException:"));
+            Assert.Equal("<- (#-1) Call {}", logs[0]);
+            Assert.True(logs[1].StartsWith("-> (#-1) Call Exception: System.ArgumentNullException:"));
         }
 
         [Fact]
@@ -109,9 +109,9 @@ namespace Akka.Interfaced.LogFilter.Tests
 
             var logs = GetLogs();
             Assert.Equal(3, logs.Count);
-            Assert.Equal("#-1 -> SayHello {\"name\":\"World\"}", logs[0]);
+            Assert.Equal("<- (#-1) SayHello {\"name\":\"World\"}", logs[0]);
             Assert.Equal("SayHello(World)", logs[1]);
-            Assert.Equal("#-1 <- SayHello \"Hello World\"", logs[2]);
+            Assert.Equal("-> (#-1) SayHello \"Hello World\"", logs[2]);
         }
     }
 }
