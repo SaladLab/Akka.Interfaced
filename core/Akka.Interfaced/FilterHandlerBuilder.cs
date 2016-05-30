@@ -7,14 +7,16 @@ namespace Akka.Interfaced
 {
     internal class FilterItem
     {
-        public FilterItem(IFilterFactory factory, IFilter referenceFilter, FilterAccessor accessor, int perInvokeIndex = -1)
+        public FilterItem(FilterChainKind kind, IFilterFactory factory, IFilter referenceFilter, FilterAccessor accessor, int perInvokeIndex = -1)
         {
+            Kind = kind;
             Factory = factory;
             ReferenceFilter = referenceFilter;
             Accessor = accessor;
             PerInvokeIndex = perInvokeIndex;
         }
 
+        public FilterChainKind Kind { get; }
         public IFilterFactory Factory { get; }
         public IFilter ReferenceFilter { get; }
         public FilterAccessor Accessor { get; }
@@ -23,19 +25,19 @@ namespace Akka.Interfaced
         public int Order => ReferenceFilter.Order;
 
         public bool IsAsync =>
-            ReferenceFilter is IPreRequestAsyncFilter || ReferenceFilter is IPostRequestAsyncFilter ||
-            ReferenceFilter is IPreNotificationAsyncFilter || ReferenceFilter is IPostNotificationAsyncFilter ||
-            ReferenceFilter is IPreMessageAsyncFilter || ReferenceFilter is IPostMessageAsyncFilter;
+            (Kind == FilterChainKind.Request && (ReferenceFilter is IPreRequestAsyncFilter || ReferenceFilter is IPostRequestAsyncFilter)) ||
+            (Kind == FilterChainKind.Notification && (ReferenceFilter is IPreNotificationAsyncFilter || ReferenceFilter is IPostNotificationAsyncFilter)) ||
+            (Kind == FilterChainKind.Message && (ReferenceFilter is IPreMessageAsyncFilter || ReferenceFilter is IPostMessageAsyncFilter));
 
         public bool IsPreFilter =>
-            ReferenceFilter is IPreRequestFilter || ReferenceFilter is IPreRequestAsyncFilter ||
-            ReferenceFilter is IPreNotificationFilter || ReferenceFilter is IPreNotificationAsyncFilter ||
-            ReferenceFilter is IPreMessageFilter || ReferenceFilter is IPreMessageAsyncFilter;
+            (Kind == FilterChainKind.Request && (ReferenceFilter is IPreRequestFilter || ReferenceFilter is IPreRequestAsyncFilter)) ||
+            (Kind == FilterChainKind.Notification && (ReferenceFilter is IPreNotificationFilter || ReferenceFilter is IPreNotificationAsyncFilter)) ||
+            (Kind == FilterChainKind.Message && (ReferenceFilter is IPreMessageFilter || ReferenceFilter is IPreMessageAsyncFilter));
 
         public bool IsPostFilter =>
-            ReferenceFilter is IPostRequestFilter || ReferenceFilter is IPostRequestAsyncFilter ||
-            ReferenceFilter is IPostNotificationFilter || ReferenceFilter is IPostNotificationAsyncFilter ||
-                           ReferenceFilter is IPostMessageFilter || ReferenceFilter is IPostMessageAsyncFilter;
+            (Kind == FilterChainKind.Request && (ReferenceFilter is IPostRequestFilter || ReferenceFilter is IPostRequestAsyncFilter)) ||
+            (Kind == FilterChainKind.Notification && (ReferenceFilter is IPostNotificationFilter || ReferenceFilter is IPostNotificationAsyncFilter)) ||
+            (Kind == FilterChainKind.Message && (ReferenceFilter is IPostMessageFilter || ReferenceFilter is IPostMessageAsyncFilter));
 
         public bool IsPerInstance =>
             Factory is IFilterPerInstanceFactory ||
@@ -81,12 +83,12 @@ namespace Akka.Interfaced
 
             return new FilterChain
             {
-                PreFilterAccessors = filterItems.Where(f => f.IsPreFilter).Select(f => f.Accessor).ToArray(),
-                PostFilterAccessors = filterItems.Where(f => f.IsPostFilter).Select(f => f.Accessor).Reverse().ToArray(),
+                PreFilterAccessors = filterItems.Where(f => f.IsPreFilter).Select(f => f.Accessor).ToArray(), // pre + kind
+                PostFilterAccessors = filterItems.Where(f => f.IsPostFilter).Select(f => f.Accessor).Reverse().ToArray(), // post + kind
                 PerInvokeFilterFactories = filterItems.Where(f => f.IsPerInvoke).GroupBy(f => f.PerInvokeIndex)
                                                       .OrderBy(g => g.Key).Select(g => (IFilterPerInvokeFactory)g.Last().Factory).ToArray(),
                 Empty = filterItems.Any() == false,
-                AsyncFilterExists = filterItems.Any(f => f.IsAsync),
+                AsyncFilterExists = filterItems.Any(f => f.IsAsync), // async + kind
                 PerInstanceFilterExists = filterItems.Any(f => f.IsPerInstance),
             };
         }
@@ -114,11 +116,11 @@ namespace Akka.Interfaced
                         var filter = factory.CreateInstance();
                         if (CheckFilterKind(filter, kind))
                         {
-                            filterItem = new FilterItem(filterFactory, filter, (_, x) => filter);
+                            filterItem = new FilterItem(kind, filterFactory, filter, (_, x) => filter);
                             _perClassFilterItemTable.Add(factoryType, filterItem);
                         }
                     }
-                    else if (CheckFilterKind(filterItem.ReferenceFilter, kind) == false)
+                    else if (filterItem.Kind != kind)
                     {
                         filterItem = null;
                     }
@@ -130,7 +132,7 @@ namespace Akka.Interfaced
                     var filter = factory.CreateInstance();
                     if (CheckFilterKind(filter, kind))
                     {
-                        filterItem = new FilterItem(filterFactory, filter, (_, x) => filter);
+                        filterItem = new FilterItem(kind, filterFactory, filter, (_, x) => filter);
                     }
                 }
                 else if (filterFactory is IFilterPerInstanceFactory)
@@ -145,12 +147,12 @@ namespace Akka.Interfaced
                         {
                             var arrayIndex = _perInstanceFilterCreators.Count;
                             _perInstanceFilterCreators.Add(a => factory.CreateInstance(a));
-                            filterItem = new FilterItem(filterFactory, filter,
+                            filterItem = new FilterItem(kind, filterFactory, filter,
                                                         (provider, _) => provider.GetFilter(arrayIndex));
                             _perInstanceFilterItemTable.Add(factoryType, filterItem);
                         }
                     }
-                    else if (CheckFilterKind(filterItem.ReferenceFilter, kind) == false)
+                    else if (filterItem.Kind != kind)
                     {
                         filterItem = null;
                     }
@@ -164,7 +166,7 @@ namespace Akka.Interfaced
                     {
                         var arrayIndex = _perInstanceFilterCreators.Count;
                         _perInstanceFilterCreators.Add(a => factory.CreateInstance(a));
-                        filterItem = new FilterItem(filterFactory, filter,
+                        filterItem = new FilterItem(kind, filterFactory, filter,
                                                     (provider, _) => provider.GetFilter(arrayIndex));
                     }
                 }
@@ -176,7 +178,7 @@ namespace Akka.Interfaced
                     if (CheckFilterKind(filter, kind))
                     {
                         var arrayIndex = filterPerInvokeIndex++;
-                        filterItem = new FilterItem(filterFactory, filter,
+                        filterItem = new FilterItem(kind, filterFactory, filter,
                                                     (_, filters) => filters[arrayIndex], filterPerInvokeIndex);
                     }
                 }
@@ -188,7 +190,7 @@ namespace Akka.Interfaced
             return filterItems;
         }
 
-        private bool CheckFilterKind(IFilter filter, FilterChainKind kind)
+        private static bool CheckFilterKind(IFilter filter, FilterChainKind kind)
         {
             switch (kind)
             {
