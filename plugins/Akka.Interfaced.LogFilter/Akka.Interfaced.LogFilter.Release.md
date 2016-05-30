@@ -1,3 +1,8 @@
+## 0.3.2 (Released 2016/05/30)
+
+* Sync with Akka.Interfaced 0.3.2
+* Make log filter cover message and notification.
+
 ## 0.3.1 (Released 2016/05/29)
 
 * Sync with Akka.Interfaced 0.3.1

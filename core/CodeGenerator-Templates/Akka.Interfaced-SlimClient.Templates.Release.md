@@ -1,3 +1,8 @@
+## 0.3.2 (Released 2016/05/30)
+
+* Sync with Akka.Interfaced 0.3.2
+* Fix generated observer payload classes to follow correct method order.
+
 ## 0.3.1 (Released 2016/05/29)
 
 * Sync with Akka.Interfaced 0.3.1

@@ -1,3 +1,8 @@
+## 0.3.2 (Released 2016/05/30)
+
+* Add filter-order option to ResponsiveExceptionFilter.
+* Fix another bug that filters can be used in wrong situation.
+
 ## 0.3.1 (Released 2016/05/29)
 
 * Fix bug that filters can be used in wrong situation.
