@@ -83,12 +83,12 @@ namespace Akka.Interfaced
 
             return new FilterChain
             {
-                PreFilterAccessors = filterItems.Where(f => f.IsPreFilter).Select(f => f.Accessor).ToArray(), // pre + kind
-                PostFilterAccessors = filterItems.Where(f => f.IsPostFilter).Select(f => f.Accessor).Reverse().ToArray(), // post + kind
+                PreFilterAccessors = filterItems.Where(f => f.IsPreFilter).Select(f => f.Accessor).ToArray(),
+                PostFilterAccessors = filterItems.Where(f => f.IsPostFilter).Select(f => f.Accessor).Reverse().ToArray(),
                 PerInvokeFilterFactories = filterItems.Where(f => f.IsPerInvoke).GroupBy(f => f.PerInvokeIndex)
                                                       .OrderBy(g => g.Key).Select(g => (IFilterPerInvokeFactory)g.Last().Factory).ToArray(),
                 Empty = filterItems.Any() == false,
-                AsyncFilterExists = filterItems.Any(f => f.IsAsync), // async + kind
+                AsyncFilterExists = filterItems.Any(f => f.IsAsync),
                 PerInstanceFilterExists = filterItems.Any(f => f.IsPerInstance),
             };
         }
