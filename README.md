@@ -6,6 +6,8 @@
 [![Coverity Status](https://scan.coverity.com/projects/8460/badge.svg?flat=1)](https://scan.coverity.com/projects/saladlab-akka-interfaced)
 
 Akka.Interfaced provides the type-safe and declarative way for actor communicating on Akka.NET.
+This project is influenced by [WCF Contract](https://msdn.microsoft.com/en-us/library/ff183866.aspx) and
+[Orleans](http://dotnet.github.io/orleans/).
 
 ## Example
 
