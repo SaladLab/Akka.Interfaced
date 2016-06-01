@@ -83,6 +83,7 @@
     <Compile Include="NotificationDispatcher.cs" />
     <Compile Include="NotificationHandler.cs" />
     <Compile Include="NotificationHandlerBuilder.cs" />
+    <Compile Include="ObjectNotificationChannel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfoGenerated.cs" />
     <Compile Include="ReentrantAttribute.cs" />
