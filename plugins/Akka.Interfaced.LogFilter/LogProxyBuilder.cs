@@ -70,7 +70,7 @@ namespace Akka.Interfaced.LogFilter
                     $"Cannot find Is{logLevel}Enabled property from {loggerType.FullName}");
             }
 
-            // Find method whose signature is "void {logLevel}(string/object message)"
+            // Find method whose signature is "void {logLevel}(string or object)"
 
             var logMi = loggerType.GetMethods(bindingFlags).FirstOrDefault(
                 m => m.Name == logLevel &&
