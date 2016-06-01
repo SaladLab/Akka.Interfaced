@@ -5,169 +5,82 @@
 [![Coverage Status](https://coveralls.io/repos/github/SaladLab/Akka.Interfaced/badge.svg?branch=master)](https://coveralls.io/github/SaladLab/Akka.Interfaced?branch=master)
 [![Coverity Status](https://scan.coverity.com/projects/8460/badge.svg?flat=1)](https://scan.coverity.com/projects/saladlab-akka-interfaced)
 
-Akka.Interfaced provides the interfaced way for actor messaging in Akka.NET
+Akka.Interfaced provides the type-safe and declarative way for actor communicating on Akka.NET.
 
-## HelloWorld Example
+## Example
 
-For the first time, we need to design the interface of HelloWorld actor.
-HelloWorld actor can say hello and it can count how much it say hellow.
-Defining the interface IHelloWorld to show the way the actor communicate is natural for C# programmers.
+For the first time, we need to design the interface of a greeting actor.
+Greeting actor can greet and it can count how much it say hello.
+Defining the interface IGreeter to show the way the actor communicate is natural for C# programmers.
 
 ```csharp
-public interface IHelloWorld : IInterfacedActor
+public interface IGreeter : IInterfacedActor
 {
-	Task<string> SayHello(string name);
-	Task<int> GetHelloCount();
+    Task<string> Greet(string name);
+    Task<int> GetCount();
 }
 ```
 
-After defining interface, it's time to define the class implementing IHelloWorld, HelloWorldActor.
-It should inherit InterfacedActor\<HelloWorldActor\> because it's an Akka.NET actor. Implementing IHelloWorld interface is a bit simple.
+After defining interface, it's time to define the class implementing IGreeter, GreetingActor.
+It should inherit InterfacedActor because it's an Akka.NET actor.
+Implementing IGreeter interface is a bit simple.
 
 ```csharp
-public class HelloWorldActor : InterfacedActor, IHelloWorld
+public class GreetingActor : InterfacedActor, IGreeter
 {
-	private int _helloCount;
+    private int _count;
 
-	async Task<string> IHelloWorld.SayHello(string name)
-	{
-		await Task.Delay(100);
-		_helloCount += 1;
-		return string.Format("Hello {0}!", name);
-	}
+    Task<string> IGreeter.Greet(string name)
+    {
+        _count += 1;
+        return Task.FromResult($"Hello {name}!");
+    }
 
-	Task<int> IHelloWorld.GetHelloCount()
-	{
-		return Task.FromResult(_helloCount);
-	}
+    Task<int> IGreeter.GetCount()
+    {
+        return Task.FromResult(_count);
+    }
 }
 ```
 
 We designed interface and implemented the actor.
-Finally we can send a message to and get a reply from HelloWorld actor by using HelloWorldRef.
-HelloWorldRef implements IHelloWorld, you can get IHelloWorld instance from HelloWorldRef and use it as a regular C# interface.
+Finally we can send a message to and get a reply from GreetingActor actor by using GreeterRef.
+GreeterRef implements IGreeter, you can get IGreeter instance from GreeterRef and use it as a regular C# interface.
 
 ```csharp
-static void Test()
+async Task TestAsync(ActorSystem system)
 {
-	var system = ActorSystem.Create("MySystem");
-	DeadRequestProcessingActor.Install(system);
+    // Create GreetingActor and make a reference pointing to an actor.
+    var actor = system.ActorOf<GreetingActor>();
+    var greeter = new GreeterRef(actor);
 
-	// Create HelloWorldActor and get it's ref object
-	var actor = system.ActorOf<HelloWorldActor>();
-	var helloWorld = new HelloWorldRef(actor);
-
-	// Make some noise
-	Console.WriteLine(helloWorld.SayHello("World").Result);  // Hello World!
-	Console.WriteLine(helloWorld.SayHello("Dlrow").Result);  // Hello Dlrow!
-	Console.WriteLine(helloWorld.GetHelloCount().Result);    // 2
+    // Make some noise
+    Console.WriteLine(await greeter.Greet("World")); // Output: Hello World!
+    Console.WriteLine(await greeter.Greet("Actor")); // Output: Hello Actor!
+    Console.WriteLine(await greeter.GetCount());     // Output: 2
 }
 ```
 
-## Exception
+## Where can I get it?
 
-When an actor process a message it can throw an exception and it propagate to caller.
-TestActor.IncCounter will throw an ArgumentException if delta is not positive.
+Common projects using Akka.Interfaceds consist of at least two projects.
+One is interface project defining interfaces such as previous `IGreeter` and
+the other is actor project defining actor classes such as previous `GreetingActor`.
 
-```csharp
-public class TestActor : InterfacedActor, ICounter
-{
-	async Task ICounter.IncCounter(int delta)
-	{
-		if (delta <= 0)
-			throw new ArgumentException("Delta should be positive");
+For interface project:
 
-		_counter += delta;
-	}
-	
-	...
-}
+```
+PM> Install-Package Akka.Interfaced.Templates
 ```
 
-This time we call IncCounter with delta = -1. The actor will throw an exception and 
-try-catch block in call-site will catch this exception.
+For actor project:
 
-```csharp
-static async Task Test()
-{
-	var actor = System.ActorOf<TestActor>();
-	var c = new CounterRef(actor);
-
-	try
-	{
-		await c.IncCounter(-1);
-	}
-	catch (Exception e)
-	{
-		// 
-		Console.WriteLine("! " + e);
-	}
-}
+```
+PM> Install-Package Akka.Interfaced
 ```
 
-## Atomic and reentrant async handler
+For a detailed explanation, read [Project configuration](./Configuration.md).
 
-TODO
+## Manual
 
-```csharp
-public class TestActor : InterfacedActor, IWorker
-{
-	async Task IWorker.Atomic(string name)
-	{
-		Console.WriteLine("Atomic({0}) Enter", name);
-		await Task.Delay(10);
-		Console.WriteLine("Atomic({0}) Mid", name);
-		await Task.Delay(10);
-		Console.WriteLine("Atomic({0}) Leave", name);
-	}
-
-	[Reentrant]
-	async Task IWorker.Reentrant(string name)
-	{
-		Console.WriteLine("Reentrant({0}) Enter", name);
-		await Task.Delay(10);
-		Console.WriteLine("Reentrant({0}) Mid", name);
-		await Task.Delay(10);
-		Console.WriteLine("Reentrant({0}) Leave", name);
-	}
-}
-```
-
-```csharp
-static async Task Test(IActorRef actor)
-{
-	var w = new WorkerRef(actor);
-
-	await Task.WhenAll(
-		w.Atomic("A"),
-		w.Atomic("B"));
-
-	await Task.WhenAll(
-		w.Reentrant("A"),
-		w.Reentrant("B"));
-}
-```
-
-## InterfacedObserver
-
-TODO
-
-## Protobuf-net
-
-TODO
-
-## CodeGeneration
-
-TODO
-
-## Message Handler Decorator
-
-TODO
-
-## Ask without temporary actor
-
-TODO
-
-## SlimClient
-
-TODO
+Comprehensive manual for using Akka.Interfaced: [Manual](./docs/Manual.md)

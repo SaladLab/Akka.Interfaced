@@ -1,9 +1,5 @@
 ﻿# 해야 할 일
 
-## Actor
-  - Observer Service 가 있어야 하네
-    - CodeGeneration 때 Channel 이 ActorNotificationChannel 가 아니면 디지게 하는 처리가 필요하다!
-
 ## StopMessage 의 문제
   - RoomDirectory 와 같이 Child Actor 를 관리하는 Actor 들은
     Child 가 모두 죽을 때까지 Stop 될 수 없다. 그래서 보통 다음과 같이 구현한다.
@@ -40,14 +36,6 @@
     }
     ```
 
-## ETC
-  - 주석좀
-  - 코딩 컨벤션 붙여서 코드 정리! 으갸으갸
-  - 여러 프레임웍 지원하는 프로젝트 구조도 잡아보자.
-    - 당장 .NET 3.5 와 2.0 지원을 넣어서 잘 정리해 보는게?
-    - 솔루션이 커졌는데 예제는 분리할까?
-      local nuget 이 가능하면 굳이 core 랑 example 이 같이 있을 필요는 없다
-
 ## SlimUnity
   - 일단 Communicator!
     - 이거 대충 돌아만 가도록 만들어 뒀는데 requirement 정리해서 잘 구현하자.
@@ -59,7 +47,7 @@
     - ClientSession, ClientGateway 와 UserActor, UserAuthenticator 를 잘 붙여보자.
 
 # 아이디어
- 
+
 ## Akka.net 에 .NET 4, 3.5 지원 얘기가 있다
   https://github.com/akkadotnet/akka.net/issues/1313
 
@@ -80,8 +68,11 @@
   - 예를 들어 rpc 인자 ICounter 타입을 메시지 클래스에서는 CounterRef 로 바꿔 보내느데
     이런건 함수 매개변수로만 가능하고 클래스로 한번 wrapping 하면 그냥 오류난다.
     polymorphism 혹은 상속 지원 surrogate 가 있어야 해결 가능
+    - 예로 든 문제는 현재 해결되었다. 예전에는 protobuf-net 가 올바르게
+      전송하라고 인터페이스를 클래스로 바꿔 노출시켰는데 이를 surrogate 를
+      사용하면서 바꿔 노출하는 코드를 제거했음. 때문에 클래스로 wrapping 해도 잘 동작.
 
-## cluster sharding 
+## cluster sharding
   - 현재 akka.net 1.0.4 에는 cluster sharding 이 없다.
   - 없어서 그냥 노드중 하나가 directory 서비스를 지원하도록 되어 있다. (SPOF)
-  - 나중에 sharding 들어가면 거기에 잘 얹어 보자.
+  - 나중에 sharding 들어가면 거기에 잘 얹어 보자. or 분산 테이블 구축.
