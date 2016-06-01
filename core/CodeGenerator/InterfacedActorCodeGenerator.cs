@@ -323,7 +323,7 @@ namespace CodeGen
                 {
                 }
 
-                using (w.B($"public {refClassName}(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)"))
+                using (w.B($"public {refClassName}(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)"))
                 {
                 }
 
@@ -352,7 +352,7 @@ namespace CodeGen
                     var parameters = method.GetParameters();
 
                     var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
-                    var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + p.Name));
+                    var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
                     var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
 
                     // Request Methods
@@ -383,7 +383,7 @@ namespace CodeGen
                     var parameters = method.GetParameters();
 
                     var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, false)));
-                    var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + p.Name));
+                    var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
 
                     // Request Methods
 

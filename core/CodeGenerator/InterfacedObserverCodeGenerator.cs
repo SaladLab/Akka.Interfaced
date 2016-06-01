@@ -190,7 +190,7 @@ namespace CodeGen
 
                     var parameterNames = string.Join(", ", parameters.Select(p => p.Name));
                     var parameterTypeNames = string.Join(", ", parameters.Select(p => (p.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") + Utility.GetTypeName(p.ParameterType) + " " + p.Name));
-                    var parameterInits = string.Join(", ", parameters.Select(p => p.Name + " = " + p.Name));
+                    var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
 
                     // Request Methods
 

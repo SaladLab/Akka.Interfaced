@@ -85,6 +85,15 @@ namespace CodeGen
                    (includeDefaultExpression && defaultValue != "" ? " = " + defaultValue : "");
         }
 
+        public static string GetParameterAssignment(ParameterInfo pi)
+        {
+            // for observer, add type check code to ensure that a parameter is an instance of concrete interfaced observer.
+            if (IsObserverInterface(pi.ParameterType))
+                return $"{pi.Name} = ({GetObserverClassName(pi.ParameterType)}){pi.Name}";
+            else
+                return $"{pi.Name} = {pi.Name}";
+        }
+
         public static bool HasNonTrivialDefaultValue(this ParameterInfo pi)
         {
             if (pi.HasDefaultValue == false || pi.DefaultValue == null)
