@@ -11,7 +11,7 @@ Akka.Interfaced provides the type-safe and declarative way for actor communicati
 
 For the first time, we need to design the interface of a greeting actor.
 Greeting actor can greet and it can count how much it say hello.
-Defining the interface IGreeter to show the way the actor communicate is natural for C# programmers.
+Defining the interface `IGreeter` to show the way the actor communicate is natural for C# programmers.
 
 ```csharp
 public interface IGreeter : IInterfacedActor
@@ -21,9 +21,9 @@ public interface IGreeter : IInterfacedActor
 }
 ```
 
-After defining interface, it's time to define the class implementing IGreeter, GreetingActor.
-It should inherit InterfacedActor because it's an Akka.NET actor.
-Implementing IGreeter interface is a bit simple.
+After defining interface, it's time to define the class implementing `IGreeter`, `GreetingActor`.
+It should inherit `InterfacedActor` because it's an Akka.NET actor.
+Implementing `IGreeter` interface is a bit simple.
 
 ```csharp
 public class GreetingActor : InterfacedActor, IGreeter
@@ -44,8 +44,8 @@ public class GreetingActor : InterfacedActor, IGreeter
 ```
 
 We designed interface and implemented the actor.
-Finally we can send a message to and get a reply from GreetingActor actor by using GreeterRef.
-GreeterRef implements IGreeter, you can get IGreeter instance from GreeterRef and use it as a regular C# interface.
+Finally we can send a message to and get a reply from `GreetingActor` actor by using `GreeterRef`.
+`GreeterRef` implements `IGreeter`, you can get `IGreeter` instance from `GreeterRef` and use it as a regular C# interface.
 
 ```csharp
 async Task TestAsync(ActorSystem system)
