@@ -207,6 +207,9 @@ namespace Akka.Interfaced
                     RequestId = request.RequestId,
                     Exception = new RequestMessageException("Empty payload")
                 });
+                Context.System.EventStream.Publish(new Event.Warning(
+                    Self.Path.ToString(), GetType(),
+                    $"Receives a bad request without payload from {Sender}"));
                 return;
             }
 
@@ -218,6 +221,9 @@ namespace Akka.Interfaced
                     RequestId = request.RequestId,
                     Exception = new RequestMessageException("Cannot find handler")
                 });
+                Context.System.EventStream.Publish(new Event.Warning(
+                    Self.Path.ToString(), GetType(),
+                    $"Cannot find a handler for request {request.InvokePayload.GetType()} from {Sender}"));
                 return;
             }
 
@@ -293,19 +299,28 @@ namespace Akka.Interfaced
         {
             if (notification.ObserverId != 0)
             {
-                // TODO: log bad messages (actor doesn't use observerId)
+                Context.System.EventStream.Publish(new Event.Warning(
+                    Self.Path.ToString(), GetType(),
+                    $"Receives a bad notification with non-zero observerId from {Sender}"));
                 return;
             }
 
             if (notification.InvokePayload == null)
             {
-                // TODO: log bad message (missing payload)
+                Context.System.EventStream.Publish(new Event.Warning(
+                    Self.Path.ToString(), GetType(),
+                    $"Receives a bad notification with no payload from {Sender}"));
                 return;
             }
 
             var handlerItem = _handler.NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
             if (handlerItem == null)
+            {
+                Context.System.EventStream.Publish(new Event.Warning(
+                    Self.Path.ToString(), GetType(),
+                    $"Cannot find a handler for notification {notification.InvokePayload.GetType()} from {Sender}"));
                 return;
+            }
 
             if (handlerItem.Handler != null)
             {
@@ -540,10 +555,5 @@ namespace Akka.Interfaced
         {
             return _perInstanceFilterList.Get(index);
         }
-    }
-
-    [Obsolete("Use non generic version of InterfacedActor.")]
-    public abstract class InterfacedActor<T> : InterfacedActor
-    {
     }
 }
