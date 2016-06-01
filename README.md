@@ -64,16 +64,16 @@ async Task TestAsync(ActorSystem system)
 ## Where can I get it?
 
 Common projects using Akka.Interfaceds consist of at least two projects.
-One is interface project defining interfaces such as previous `IGreeter` and
-the other is actor project defining actor classes such as previous `GreetingActor`.
+One is an interface project defining interfaces such as previous `IGreeter` and
+the other is a main project defining the rest such as previous `GreetingActor`.
 
-For interface project:
+For an interface project:
 
 ```
 PM> Install-Package Akka.Interfaced.Templates
 ```
 
-For actor project:
+For a main project:
 
 ```
 PM> Install-Package Akka.Interfaced
