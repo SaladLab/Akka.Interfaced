@@ -126,7 +126,7 @@ namespace Akka.Interfaced.Persistence.Tests.Interface
         {
         }
 
-        public NotepadRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public NotepadRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 

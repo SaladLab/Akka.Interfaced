@@ -92,7 +92,7 @@ namespace Akka.Interfaced.TestKit.Tests
         {
         }
 
-        public UserRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public UserRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -227,7 +227,7 @@ namespace Akka.Interfaced.TestKit.Tests
         {
         }
 
-        public UserLoginRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public UserLoginRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -249,7 +249,7 @@ namespace Akka.Interfaced.TestKit.Tests
         public Task<Akka.Interfaced.TestKit.Tests.IUser> Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observer = observer }
+                InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observer = (UserObserver)observer }
             };
             return SendRequestAndReceive<Akka.Interfaced.TestKit.Tests.IUser>(requestMessage);
         }
@@ -257,7 +257,7 @@ namespace Akka.Interfaced.TestKit.Tests
         void IUserLogin_NoReply.Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observer = observer }
+                InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observer = (UserObserver)observer }
             };
             SendRequest(requestMessage);
         }

@@ -87,7 +87,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
         }
 
-        public DefaultRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public DefaultRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 

@@ -146,7 +146,7 @@ namespace Akka.Interfaced.LogFilter.Tests
         {
         }
 
-        public TestRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public TestRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 

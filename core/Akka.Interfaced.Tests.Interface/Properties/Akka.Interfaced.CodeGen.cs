@@ -179,7 +179,7 @@ namespace Akka.Interfaced.Tests
         {
         }
 
-        public BasicRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public BasicRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -344,7 +344,7 @@ namespace Akka.Interfaced.Tests
         {
         }
 
-        public DummyRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public DummyRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -518,7 +518,7 @@ namespace Akka.Interfaced.Tests
         {
         }
 
-        public OverloadedRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public OverloadedRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -689,7 +689,7 @@ namespace Akka.Interfaced.Tests
         {
         }
 
-        public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -719,7 +719,7 @@ namespace Akka.Interfaced.Tests
         public Task Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (SubjectObserver)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -727,7 +727,7 @@ namespace Akka.Interfaced.Tests
         public Task Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (SubjectObserver)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -743,7 +743,7 @@ namespace Akka.Interfaced.Tests
         void ISubject_NoReply.Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (SubjectObserver)observer }
             };
             SendRequest(requestMessage);
         }
@@ -751,7 +751,7 @@ namespace Akka.Interfaced.Tests
         void ISubject_NoReply.Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (SubjectObserver)observer }
             };
             SendRequest(requestMessage);
         }
@@ -879,7 +879,7 @@ namespace Akka.Interfaced.Tests
         {
         }
 
-        public Subject2Ref(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public Subject2Ref(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -917,7 +917,7 @@ namespace Akka.Interfaced.Tests
         public Task Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = (Subject2Observer)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -925,7 +925,7 @@ namespace Akka.Interfaced.Tests
         public Task Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = (Subject2Observer)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -949,7 +949,7 @@ namespace Akka.Interfaced.Tests
         void ISubject2_NoReply.Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = (Subject2Observer)observer }
             };
             SendRequest(requestMessage);
         }
@@ -957,7 +957,7 @@ namespace Akka.Interfaced.Tests
         void ISubject2_NoReply.Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = (Subject2Observer)observer }
             };
             SendRequest(requestMessage);
         }
@@ -1031,7 +1031,7 @@ namespace Akka.Interfaced.Tests
         {
         }
 
-        public WorkerRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public WorkerRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 

@@ -112,7 +112,7 @@ namespace Basic.Interface
         {
         }
 
-        public CalculatorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public CalculatorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -246,7 +246,7 @@ namespace Basic.Interface
         {
         }
 
-        public CounterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public CounterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -422,7 +422,7 @@ namespace Basic.Interface
         {
         }
 
-        public EventGeneratorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public EventGeneratorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -460,7 +460,7 @@ namespace Basic.Interface
         public Task Subscribe(Basic.Interface.IEventObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = (EventObserver)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -468,7 +468,7 @@ namespace Basic.Interface
         public Task Unsubscribe(Basic.Interface.IEventObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = (EventObserver)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -492,7 +492,7 @@ namespace Basic.Interface
         void IEventGenerator_NoReply.Subscribe(Basic.Interface.IEventObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Subscribe_Invoke { observer = (EventObserver)observer }
             };
             SendRequest(requestMessage);
         }
@@ -500,7 +500,7 @@ namespace Basic.Interface
         void IEventGenerator_NoReply.Unsubscribe(Basic.Interface.IEventObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = observer }
+                InvokePayload = new IEventGenerator_PayloadTable.Unsubscribe_Invoke { observer = (EventObserver)observer }
             };
             SendRequest(requestMessage);
         }
@@ -644,7 +644,7 @@ namespace Basic.Interface
         {
         }
 
-        public OverloadedRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public OverloadedRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -780,7 +780,7 @@ namespace Basic.Interface
         {
         }
 
-        public WorkerRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public WorkerRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 

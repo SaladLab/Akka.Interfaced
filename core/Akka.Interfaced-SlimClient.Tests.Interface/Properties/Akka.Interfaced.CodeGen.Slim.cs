@@ -213,7 +213,7 @@ namespace Akka.Interfaced.SlimClient.Tests
         {
         }
 
-        public BasicRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public BasicRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -429,7 +429,7 @@ namespace Akka.Interfaced.SlimClient.Tests
         {
         }
 
-        public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout) : base(actor, requestWaiter, timeout)
+        public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
@@ -459,7 +459,7 @@ namespace Akka.Interfaced.SlimClient.Tests
         public Task Subscribe(Akka.Interfaced.SlimClient.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (SubjectObserver)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -467,7 +467,7 @@ namespace Akka.Interfaced.SlimClient.Tests
         public Task Unsubscribe(Akka.Interfaced.SlimClient.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (SubjectObserver)observer }
             };
             return SendRequestAndWait(requestMessage);
         }
@@ -483,7 +483,7 @@ namespace Akka.Interfaced.SlimClient.Tests
         void ISubject_NoReply.Subscribe(Akka.Interfaced.SlimClient.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (SubjectObserver)observer }
             };
             SendRequest(requestMessage);
         }
@@ -491,7 +491,7 @@ namespace Akka.Interfaced.SlimClient.Tests
         void ISubject_NoReply.Unsubscribe(Akka.Interfaced.SlimClient.Tests.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = observer }
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (SubjectObserver)observer }
             };
             SendRequest(requestMessage);
         }
