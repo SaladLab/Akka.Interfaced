@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Interfaced;
 using HelloWorld.Interface;
@@ -11,15 +12,19 @@ namespace HelloWorld.Program
         {
             var system = ActorSystem.Create("MySystem");
             DeadRequestProcessingActor.Install(system);
+            TestAsync(system).Wait();
+        }
 
-            // Create HelloWorldActor and get it's ref object
-            var actor = system.ActorOf<HelloWorldActor>();
-            var helloWorld = new HelloWorldRef(actor);
+        private static async Task TestAsync(ActorSystem system)
+        {
+            // Create GreetingActor and make a reference pointing to an actor.
+            var actor = system.ActorOf<GreetingActor>();
+            var helloWorld = new GreeterRef(actor);
 
             // Make some noise
-            Console.WriteLine(helloWorld.SayHello("World").Result);
-            Console.WriteLine(helloWorld.SayHello("Dlrow").Result);
-            Console.WriteLine(helloWorld.GetHelloCount().Result);
+            Console.WriteLine(await helloWorld.Greet("World"));
+            Console.WriteLine(await helloWorld.Greet("Actor"));
+            Console.WriteLine(await helloWorld.GetCount());
         }
     }
 }

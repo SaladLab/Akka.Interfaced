@@ -12,44 +12,44 @@ using System.Threading.Tasks;
 using Akka.Interfaced;
 using Akka.Actor;
 
-#region HelloWorld.Interface.IHelloWorld
+#region HelloWorld.Interface.IGreeter
 
 namespace HelloWorld.Interface
 {
-    [PayloadTable(typeof(IHelloWorld), PayloadTableKind.Request)]
-    public static class IHelloWorld_PayloadTable
+    [PayloadTable(typeof(IGreeter), PayloadTableKind.Request)]
+    public static class IGreeter_PayloadTable
     {
         public static Type[,] GetPayloadTypes()
         {
             return new Type[,] {
-                { typeof(GetHelloCount_Invoke), typeof(GetHelloCount_Return) },
-                { typeof(SayHello_Invoke), typeof(SayHello_Return) },
+                { typeof(GetCount_Invoke), typeof(GetCount_Return) },
+                { typeof(Greet_Invoke), typeof(Greet_Return) },
             };
         }
 
-        public class GetHelloCount_Invoke
+        public class GetCount_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public Type GetInterfaceType()
             {
-                return typeof(IHelloWorld);
+                return typeof(IGreeter);
             }
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IHelloWorld)__target).GetHelloCount();
-                return (IValueGetable)(new GetHelloCount_Return { v = __v });
+                var __v = await ((IGreeter)__target).GetCount();
+                return (IValueGetable)(new GetCount_Return { v = __v });
             }
         }
 
-        public class GetHelloCount_Return
+        public class GetCount_Return
             : IInterfacedPayload, IValueGetable
         {
             public System.Int32 v;
 
             public Type GetInterfaceType()
             {
-                return typeof(IHelloWorld);
+                return typeof(IGreeter);
             }
 
             public object Value
@@ -58,31 +58,31 @@ namespace HelloWorld.Interface
             }
         }
 
-        public class SayHello_Invoke
+        public class Greet_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
             public System.String name;
 
             public Type GetInterfaceType()
             {
-                return typeof(IHelloWorld);
+                return typeof(IGreeter);
             }
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IHelloWorld)__target).SayHello(name);
-                return (IValueGetable)(new SayHello_Return { v = __v });
+                var __v = await ((IGreeter)__target).Greet(name);
+                return (IValueGetable)(new Greet_Return { v = __v });
             }
         }
 
-        public class SayHello_Return
+        public class Greet_Return
             : IInterfacedPayload, IValueGetable
         {
             public System.String v;
 
             public Type GetInterfaceType()
             {
-                return typeof(IHelloWorld);
+                return typeof(IGreeter);
             }
 
             public object Value
@@ -92,69 +92,69 @@ namespace HelloWorld.Interface
         }
     }
 
-    public interface IHelloWorld_NoReply
+    public interface IGreeter_NoReply
     {
-        void GetHelloCount();
-        void SayHello(System.String name);
+        void GetCount();
+        void Greet(System.String name);
     }
 
-    public class HelloWorldRef : InterfacedActorRef, IHelloWorld, IHelloWorld_NoReply
+    public class GreeterRef : InterfacedActorRef, IGreeter, IGreeter_NoReply
     {
-        public HelloWorldRef() : base(null)
+        public GreeterRef() : base(null)
         {
         }
 
-        public HelloWorldRef(IActorRef actor) : base(actor)
+        public GreeterRef(IActorRef actor) : base(actor)
         {
         }
 
-        public HelloWorldRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public GreeterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
         {
         }
 
-        public IHelloWorld_NoReply WithNoReply()
+        public IGreeter_NoReply WithNoReply()
         {
             return this;
         }
 
-        public HelloWorldRef WithRequestWaiter(IRequestWaiter requestWaiter)
+        public GreeterRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new HelloWorldRef(Actor, requestWaiter, Timeout);
+            return new GreeterRef(Actor, requestWaiter, Timeout);
         }
 
-        public HelloWorldRef WithTimeout(TimeSpan? timeout)
+        public GreeterRef WithTimeout(TimeSpan? timeout)
         {
-            return new HelloWorldRef(Actor, RequestWaiter, timeout);
+            return new GreeterRef(Actor, RequestWaiter, timeout);
         }
 
-        public Task<System.Int32> GetHelloCount()
+        public Task<System.Int32> GetCount()
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IHelloWorld_PayloadTable.GetHelloCount_Invoke {  }
+                InvokePayload = new IGreeter_PayloadTable.GetCount_Invoke {  }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
 
-        public Task<System.String> SayHello(System.String name)
+        public Task<System.String> Greet(System.String name)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
+                InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
             };
             return SendRequestAndReceive<System.String>(requestMessage);
         }
 
-        void IHelloWorld_NoReply.GetHelloCount()
+        void IGreeter_NoReply.GetCount()
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IHelloWorld_PayloadTable.GetHelloCount_Invoke {  }
+                InvokePayload = new IGreeter_PayloadTable.GetCount_Invoke {  }
             };
             SendRequest(requestMessage);
         }
 
-        void IHelloWorld_NoReply.SayHello(System.String name)
+        void IGreeter_NoReply.Greet(System.String name)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
+                InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
             };
             SendRequest(requestMessage);
         }
