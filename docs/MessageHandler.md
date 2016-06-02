@@ -1,30 +1,54 @@
-** WRITING IN PROCESS **
-
 ## Message handler
 
-In addition to interfaced request, interfaced actor can handle a regular message in a declarative way.
-If you attach `[MessageHandler]` attribute to method and incoming message
-whose type is same with type of first argument of handler, handler processes it.
+An actor can handle a messages. Actor that inherits `[ReceiveActor]` can define which handler processes which message.
+
+For example, following `MyActor` can handle a message whose type is
+`string` or `int`.  
 
 ```csharp
-public class GreetingActor : InterfacedActor, IGreeter
+public class MyActor : ReceiveActor
 {
-    [MessageHandler] // handle string type message
+    public MyActor()
+    {
+        Receive<string>(message =>
+        {
+            Console.WriteLine($"HandleString({message})");
+        });
+        Receive<int>(message =>
+        {
+            Console.WriteLine($"HandleInt({message})");
+        });
+    }
+}
+
+actor.Tell("Hello");  // Output: HandleString(Hello)
+actor.Tell(1);        // Output: HandleInt(1)
+```
+
+In addition to a interfaced request, an interfaced actor can handle
+this regular message in a declarative way.
+If you attach `[MessageHandler]` attribute to a method and an incoming message
+whose type is same with the type of first argument of handler,
+this method handles it.
+
+```csharp
+public class MyActor : InterfacedActor, ...
+{
+    [MessageHandler]
     private void Handle(string message)
     {
         Console.WriteLine($"HandleString({message})");
     }
 
-    [MessageHandler] // handle int type message
+    [MessageHandler]
     private void Handle(int message)
     {
         Console.WriteLine($"HandleInt({message})");
     }
 }
-```
 
-```csharp
-IActorRef actor = GetOrCreateActorRef<GreetingActor>();
 actor.Tell("Hello");  // Output: HandleString(Hello)
 actor.Tell(1);        // Output: HandleInt(1)
 ```
+
+Message handler can be asynchronous and have `[Reentrant]` attribute.
