@@ -97,10 +97,10 @@ public class GreetingActor : InterfacedActor, IExtendedInterface<IGreeter>
 }
 ```
 
-If you want to ensure compiled-time type-safety,
+If you want to ensure compile-time type-safety,
 `Akka.Interfaced.CodeVerifier` can help you.
-It scans all classes in a project and validate interface contract.
-With previous `GreetingActor` class, verifier reports following error.
+It scans all classes in a project and validates interface contracts.
+For `GreetingActor` class, verifier reports following errors.
 
 ```
 ! Cannot find handler for HelloWorld.Interface.IGreeter.Greet

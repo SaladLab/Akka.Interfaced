@@ -1,40 +1,106 @@
-** WRITING IN PROCESS **
-
 ## Communicating with an actor
 
-### How to use
+For every interface, `*Ref` class is generated and you can
+send and receive a message from an interfaced actor with this reference
+class. For example, `GreeterRef` is generated for interface `IGreeter`.
 
 ```csharp
-IActorRef actor = CreateOrGetActorRef<GreetingActor>();
+public class GreeterRef : InterfacedActorRef, IGreeter
+{
+    public GreeterRef(IActorRef actor) { ... }
+    public Task<string> Greet(string name) { ... }
+    public Task<int> GetCount() { ... }
+    ...
+}
+```
+
+This is a proxy reference and when you call a method of interface,
+it packs all parameter into a message, sends it to an target actor and
+waits for a response. You can use it as following:
+
+```csharp
 var greeter = new GreeterRef(actor);
+var hello = await greeter.Greet("Actor");  // send Greet and waits for a response
+var count = await greeter.GetCount();      // send GetCount and waits for a response
 ```
 
+#### RequestWaitor
+
+`Ref` class needs a `RequestWaitor` which is a request context
+for receiving a response.
+Default one is `AkkaAskRequestWaiter` which uses `Ask` method for `IActorRef`.
+
 ```csharp
-var hello = await greeter.Greet("Actor");
-var count = await greeter.GetCount();
+var greeter = new GreeterRef(a);       // RequestWaitor is AkkaAskRequestWaiter
+await greeter.Greet("Actor");          // create a temporary actor and
+                                       // waits for a response with it
 ```
 
-### RequestWaitor
-
-- Default one is based on akka Ask method.
-- In interfaced actor, it's better that RequestWaitor is set to `this`.
-  - No temporary actor for waiting response Message
-
-### Timeout
-
-- Actor whom you sent request could be busy or terminated.
-- To handle this situation, timeout helps.
+Because `Ask` always creates a temporary actor for waiting for a response,
+it is better for an interfaced actor to have its own request context.
 
 ```csharp
-greeter.WithTimeout(TimeSpan.FromSeconds(3)).Greet("Actor");
+var greeter = new GreeterRef(a, this); // RequestWaitor is this
+await greeter.Greet("Actor");          // does not create a temporary actor and
+                                       // waits for a response with this
 ```
 
-### WithNoReply
-
-- Whenever you request to actor, you wait for response.
-- For void return type, waiting is necessary because it notices request is successfully handled without an exception.
-- But sometime, you want fire-and-forget.
+So when you get `Ref` and will use in an interfaced actor, it's a good idea to
+set `RequestWaitor`as this like following:
 
 ```csharp
+var greeter = GetActorFromSomewhere();
+greeter = greeter.WithRequestWaiter(this);
+```
+
+#### Timeout
+
+Target actor can be busy or hosting server can be down. Without timeout, you
+need to wait long time or indefinitely in vain.
+
+```csharp
+var greeter = new GreeterRef(actor);   // actor goes wrong
+await greeter.Greet("Actor");          // waits indefinitely
+```
+
+Timeout can be set with constructor or `WithTimeout`.
+
+```csharp
+// create Ref with 3 seconds timeout
+var greeter = new GreeterRef(actor, this, TimeSpan.FromSeconds(3));
+// send a Greet request with 1 second timeout
+await greeter.WithTimeout(TimeSpan.FromSeconds(1)).Greet("Actor");
+```
+
+When a request hits timeout, `TaskCanceledException` is thrown.
+
+```csharp
+var greeter = new GreeterRef(actor, this, TimeSpan.FromSeconds(3));
+await greeter.Greet("Actor"); // TaskCanceledException is thrown at timeout
+```
+
+#### Fire-and-Forget
+
+Sending a request always requires you to wait for a response even when the
+return type of method is `void`. When you get response of void, you can safely
+assume that target actor gets a request and handles it successfully.
+
+Sometimes you just only want to send a request like following but a compiler
+starts to complain it.
+
+```csharp
+var greeter = new GreeterRef(actor);
+greeter.Greet("Actor");
+// warning CS4014:
+//   Because this call is not awaited, execution of the current method continues
+//   before the call is completed. Consider applying the 'await' operator to the result of the call.
+```
+
+Instead of depressing `CS4014` warning, you can use `WithNoReply` method.
+
+```csharp
+var greeter = new GreeterRef(actor);
 greeter.WithNoReply().Greet("Actor");
 ```
+
+It just sends a request message and moves on.
