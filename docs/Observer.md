@@ -2,7 +2,19 @@
 
 ## Observer
 
-Define observer interface:
+When two actors are communicating with each other,
+one has a client role which sends a request and waits for a response and
+the other has a server-role which receives a request and reply a response.
+
+But sometimes a server actor wants to send a notification message to a client.
+In this case, `Observer` can be used.
+
+#### Greeter with Observer
+
+`GreetingActor` was a passive server actor. Let's add a notification that will
+be sent to client whenever it gets a `Greet` request.
+
+First of all, observer interface `IGreetObserver` need to be defined.
 
 ```csharp
 public interface IGreetObserver : IInterfacedObserver
@@ -11,13 +23,16 @@ public interface IGreetObserver : IInterfacedObserver
 }
 ```
 
-Define new `IGreeter` using `IGreetObserver`.
+And modify `IGreeter` interface to make use of `IGreetObserver`.
 
 ```csharp
 public interface IGreeter : IInterfacedActor
 {
+    // add an observer which receives a notification message whenever Greet request comes in
     Task Subscribe(IGreetObserver observer);
+    // remove an observer
     Task Unsubscribe(IGreetObserver observer);
+
     Task<string> Greet(string name);
 }
 ```
@@ -25,7 +40,7 @@ public interface IGreeter : IInterfacedActor
 Define new `GreetingActor` using `IGreetObserver`.
 
 ```csharp
-public interface IGreeter : InterfacedActor, IGreeter
+public class GreetingActor : InterfacedActor, IGreeter
 {
     List<IGreetObserver> _observers = new List<IGreetObserver>();
 
@@ -47,12 +62,29 @@ public interface IGreeter : InterfacedActor, IGreeter
         _observers.ForEach(o => o.Event($"Greet({name})"))
         return Task.FromResult($"Hello {name}!");
     }
-
 }
 ```
 
-Define a test actor which can receive notification with observer and
-start test.
+Ok. Everything is ready.
+
+#### Using an observer
+
+```csharp
+var greeter = new GreeterRef(actor);
+await greeter.Subscribe(/* CreateObserver<IGreetObserver>() */);
+await greeter.Greet("World");
+```
+
+##### Raw observer
+
+`ObjectNotificationChannel`
+
+##### Actor observer
+
+`ActorNotificationChannel`
+
+Test actor is necessary for testing `GreetingActor` with an observer
+because observer have to receive a notification meessage.
 
 ```csharp
 public class TestActor : InterfacedActor, IGreetObserver
@@ -62,7 +94,8 @@ public class TestActor : InterfacedActor, IGreetObserver
     {
         var greeter = new GreeterRef(Context.ActorOf<GreetingActor>());
         greeter.Subscribe(CreateObserver<IGreetObserver>());
-        var hello = await greeter.Greet("World"); // Output: Event: Greet(World)
+        var hello = await greeter.Greet("World");
+        // Output: Event: Greet(World)
     }
 
     void IGreetObserver.Event(string message)
@@ -72,4 +105,6 @@ public class TestActor : InterfacedActor, IGreetObserver
 }
 ```
 
-- Notification order
+##### SlimClient observer
+
+`ObserverEventDispatcher`
