@@ -24,14 +24,14 @@ var hello = await greeter.Greet("Actor");  // send Greet and waits for a respons
 var count = await greeter.GetCount();      // send GetCount and waits for a response
 ```
 
-#### RequestWaitor
+#### RequestWaiter
 
-`Ref` class needs a `RequestWaitor` which is a request context
+`Ref` class needs a `RequestWaiter` which is a request context
 for receiving a response.
 Default one is `AkkaAskRequestWaiter` which uses `Ask` method for `IActorRef`.
 
 ```csharp
-var greeter = new GreeterRef(a);       // RequestWaitor is AkkaAskRequestWaiter
+var greeter = new GreeterRef(a);       // RequestWaiter is AkkaAskRequestWaiter
 await greeter.Greet("Actor");          // create a temporary actor and
                                        // waits for a response with it
 ```
@@ -40,13 +40,13 @@ Because `Ask` always creates a temporary actor for waiting for a response,
 it is better for an interfaced actor to have its own request context.
 
 ```csharp
-var greeter = new GreeterRef(a, this); // RequestWaitor is this
+var greeter = new GreeterRef(a, this); // RequestWaiter is this
 await greeter.Greet("Actor");          // does not create a temporary actor and
                                        // waits for a response with this
 ```
 
 So when you get `Ref` and will use in an interfaced actor, it's a good idea to
-set `RequestWaitor`as this like following:
+set `RequestWaiter`as this like following:
 
 ```csharp
 var greeter = GetActorFromSomewhere();
