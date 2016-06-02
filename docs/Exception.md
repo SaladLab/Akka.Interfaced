@@ -56,5 +56,4 @@ it will be propagated to caller and goes on.
 ```csharp
 await greeter.Greet(null);  // don't cause GreetingActor restart
                             // ArgumentException is thrown
-}
 ```
