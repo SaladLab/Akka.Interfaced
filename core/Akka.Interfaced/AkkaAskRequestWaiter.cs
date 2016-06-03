@@ -16,6 +16,11 @@ namespace Akka.Interfaced
             requestMessage.RequestId = -1;
             return target.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
             {
+                if (t.IsCanceled)
+                    throw new TaskCanceledException();
+                if (t.IsFaulted)
+                    throw t.Exception;
+
                 var response = t.Result;
                 if (response.Exception != null)
                 {
@@ -30,6 +35,11 @@ namespace Akka.Interfaced
             requestMessage.RequestId = -1;
             return target.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
             {
+                if (t.IsCanceled)
+                    throw new TaskCanceledException();
+                if (t.IsFaulted)
+                    throw t.Exception;
+
                 var response = t.Result;
                 if (response.Exception != null)
                 {
