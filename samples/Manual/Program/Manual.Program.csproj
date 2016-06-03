@@ -59,10 +59,14 @@
   <ItemGroup>
     <Compile Include="DemoActor.cs" />
     <Compile Include="DemoException.cs" />
+    <Compile Include="DemoFilter.cs" />
+    <Compile Include="DemoLogFilter.cs" />
     <Compile Include="DemoMessageHandler.cs" />
     <Compile Include="DemoObserver.cs" />
     <Compile Include="DemoReentrantHandler.cs" />
     <Compile Include="DemoRunTask.cs" />
+    <Compile Include="DemoStartEvent.cs" />
+    <Compile Include="DemoStopActor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
