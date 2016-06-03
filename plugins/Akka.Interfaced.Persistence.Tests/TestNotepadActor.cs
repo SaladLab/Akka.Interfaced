@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Akka.Interfaced;
-using Akka.Interfaced.Persistence.Tests.Interface;
 using Akka.Interfaced.Persistence;
 using Akka.Persistence;
 

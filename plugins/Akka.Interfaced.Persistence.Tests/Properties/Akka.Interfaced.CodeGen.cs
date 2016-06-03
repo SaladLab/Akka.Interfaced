@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 using Akka.Interfaced;
 using Akka.Actor;
 
-#region Akka.Interfaced.Persistence.Tests.Interface.INotepad
+#region Akka.Interfaced.Persistence.Tests.INotepad
 
-namespace Akka.Interfaced.Persistence.Tests.Interface
+namespace Akka.Interfaced.Persistence.Tests
 {
     [PayloadTable(typeof(INotepad), PayloadTableKind.Request)]
     public static class INotepad_PayloadTable

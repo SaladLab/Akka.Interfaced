@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Akka.Actor;
-using Akka.Interfaced.Persistence.Tests.Interface;
 using Xunit;
 using Akka.Configuration;
 using Xunit.Abstractions;
