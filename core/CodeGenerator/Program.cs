@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Akka.Interfaced;
 using CommandLine;
@@ -59,7 +60,7 @@ namespace CodeGen
                 // Resolve options
 
                 var basePath = Path.GetFullPath(options.Path ?? ".");
-                var sources = options.Sources.Where(p => string.IsNullOrWhiteSpace(p) == false && p.ToLower().IndexOf("akka.interfaced.codegen") == -1).Select(p => MakeFullPath(p, basePath)).ToArray();
+                var sources = options.Sources.Where(p => string.IsNullOrWhiteSpace(p) == false && FilterSource(options, p)).Select(p => MakeFullPath(p, basePath)).ToArray();
                 var references = options.References.Where(p => string.IsNullOrWhiteSpace(p) == false).Select(p => MakeFullPath(p, basePath)).ToArray();
                 var targetDefaultPath = options.UseSlimClient
                     ? @".\Properties\Akka.Interfaced.CodeGen.Slim.cs"
@@ -148,6 +149,30 @@ namespace CodeGen
                 Console.WriteLine($"GetTypesSafely({assembly.GetName()}) got ReflectionTypeLoadException");
                 return ex.Types.Where(x => x != null);
             }
+        }
+
+        private static bool FilterSource(Options options, string path)
+        {
+            if (path.ToLower().IndexOf("akka.interfaced.codegen") != -1)
+                return false;
+
+            foreach (var exclude in options.Excludes)
+            {
+                if (Regex.IsMatch(path, exclude, RegexOptions.IgnoreCase))
+                    return false;
+            }
+
+            if (options.Includes.Any())
+            {
+                foreach (var include in options.Includes)
+                {
+                    if (Regex.IsMatch(path, include, RegexOptions.IgnoreCase))
+                        return true;
+                }
+                return false;
+            }
+
+            return true;
         }
 
         private static string MakeFullPath(string path, string basePath)

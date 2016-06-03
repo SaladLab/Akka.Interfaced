@@ -54,6 +54,8 @@
     <WriteLinesToFile File="$(ArgsFile)" Lines="--target=$(AkkaInterfacedTarget)" Condition="$(AkkaInterfacedTarget) != ''"/>
     <WriteLinesToFile File="$(ArgsFile)" Lines="--slimclient=$(AkkaInterfacedSlimClient)" Condition="$(AkkaInterfacedSlimClient) != ''"/>
     <WriteLinesToFile File="$(ArgsFile)" Lines="--protobuf=$(AkkaInterfacedProtobuf)" Condition="$(AkkaInterfacedProtobuf) != ''"/>
+    <WriteLinesToFile File="$(ArgsFile)" Lines="--include=$(AkkaInterfacedSourceInclude)" Condition="$(AkkaInterfacedSourceInclude) != ''"/>
+    <WriteLinesToFile File="$(ArgsFile)" Lines="--exclude=$(AkkaInterfacedSourceExclude)" Condition="$(AkkaInterfacedSourceExclude) != ''"/>
     <Exec Command='"$(AkkaInterfacedCodeGenToolExe)" "@$(ArgsFile)"' />
   </Target>
 

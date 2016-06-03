@@ -32,5 +32,11 @@ namespace CodeGen
 
         [Option('c', "protobuf", HelpText = "Use protobuf-net for serializing generated message type.")]
         public bool UseProtobuf { get; set; }
+
+        [Option("include", Separator = ';', HelpText = "Source include regular expression filter.")]
+        public IEnumerable<string> Includes { get; set; }
+
+        [Option("exclude", Separator = ';', HelpText = "Source exclude regular expression filter.")]
+        public IEnumerable<string> Excludes { get; set; }
     }
 }
