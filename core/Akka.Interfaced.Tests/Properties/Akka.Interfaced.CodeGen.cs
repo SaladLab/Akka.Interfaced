@@ -382,6 +382,389 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
+#region Akka.Interfaced.Tests.IDummyEx
+
+namespace Akka.Interfaced.Tests
+{
+    [PayloadTable(typeof(IDummyEx), PayloadTableKind.Request)]
+    public static class IDummyEx_PayloadTable
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(CallEx_Invoke), typeof(CallEx_Return) },
+            };
+        }
+
+        public class CallEx_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.Object param;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IDummyEx);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IDummyEx)__target).CallEx(param);
+                return (IValueGetable)(new CallEx_Return { v = __v });
+            }
+        }
+
+        public class CallEx_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public System.Object v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IDummyEx);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+    }
+
+    public interface IDummyEx_NoReply : IDummy_NoReply
+    {
+        void CallEx(System.Object param);
+    }
+
+    public class DummyExRef : InterfacedActorRef, IDummyEx, IDummyEx_NoReply
+    {
+        public DummyExRef() : base(null)
+        {
+        }
+
+        public DummyExRef(IActorRef actor) : base(actor)
+        {
+        }
+
+        public DummyExRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        {
+        }
+
+        public IDummyEx_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public DummyExRef WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new DummyExRef(Actor, requestWaiter, Timeout);
+        }
+
+        public DummyExRef WithTimeout(TimeSpan? timeout)
+        {
+            return new DummyExRef(Actor, RequestWaiter, timeout);
+        }
+
+        public Task<System.Object> CallEx(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
+            };
+            return SendRequestAndReceive<System.Object>(requestMessage);
+        }
+
+        public Task<System.Object> Call(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
+            };
+            return SendRequestAndReceive<System.Object>(requestMessage);
+        }
+
+        void IDummyEx_NoReply.CallEx(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IDummy_NoReply.Call(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+}
+
+#endregion
+#region Akka.Interfaced.Tests.IDummyEx2
+
+namespace Akka.Interfaced.Tests
+{
+    [PayloadTable(typeof(IDummyEx2), PayloadTableKind.Request)]
+    public static class IDummyEx2_PayloadTable
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(CallEx2_Invoke), typeof(CallEx2_Return) },
+            };
+        }
+
+        public class CallEx2_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.Object param;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IDummyEx2);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IDummyEx2)__target).CallEx2(param);
+                return (IValueGetable)(new CallEx2_Return { v = __v });
+            }
+        }
+
+        public class CallEx2_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public System.Object v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IDummyEx2);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+    }
+
+    public interface IDummyEx2_NoReply : IDummy_NoReply
+    {
+        void CallEx2(System.Object param);
+    }
+
+    public class DummyEx2Ref : InterfacedActorRef, IDummyEx2, IDummyEx2_NoReply
+    {
+        public DummyEx2Ref() : base(null)
+        {
+        }
+
+        public DummyEx2Ref(IActorRef actor) : base(actor)
+        {
+        }
+
+        public DummyEx2Ref(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        {
+        }
+
+        public IDummyEx2_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public DummyEx2Ref WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new DummyEx2Ref(Actor, requestWaiter, Timeout);
+        }
+
+        public DummyEx2Ref WithTimeout(TimeSpan? timeout)
+        {
+            return new DummyEx2Ref(Actor, RequestWaiter, timeout);
+        }
+
+        public Task<System.Object> CallEx2(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
+            };
+            return SendRequestAndReceive<System.Object>(requestMessage);
+        }
+
+        public Task<System.Object> Call(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
+            };
+            return SendRequestAndReceive<System.Object>(requestMessage);
+        }
+
+        void IDummyEx2_NoReply.CallEx2(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IDummy_NoReply.Call(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+}
+
+#endregion
+#region Akka.Interfaced.Tests.IDummyExFinal
+
+namespace Akka.Interfaced.Tests
+{
+    [PayloadTable(typeof(IDummyExFinal), PayloadTableKind.Request)]
+    public static class IDummyExFinal_PayloadTable
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(CallExFinal_Invoke), typeof(CallExFinal_Return) },
+            };
+        }
+
+        public class CallExFinal_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.Object param;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IDummyExFinal);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IDummyExFinal)__target).CallExFinal(param);
+                return (IValueGetable)(new CallExFinal_Return { v = __v });
+            }
+        }
+
+        public class CallExFinal_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public System.Object v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IDummyExFinal);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+    }
+
+    public interface IDummyExFinal_NoReply : IDummyEx_NoReply, IDummy_NoReply, IDummyEx2_NoReply
+    {
+        void CallExFinal(System.Object param);
+    }
+
+    public class DummyExFinalRef : InterfacedActorRef, IDummyExFinal, IDummyExFinal_NoReply
+    {
+        public DummyExFinalRef() : base(null)
+        {
+        }
+
+        public DummyExFinalRef(IActorRef actor) : base(actor)
+        {
+        }
+
+        public DummyExFinalRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        {
+        }
+
+        public IDummyExFinal_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public DummyExFinalRef WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new DummyExFinalRef(Actor, requestWaiter, Timeout);
+        }
+
+        public DummyExFinalRef WithTimeout(TimeSpan? timeout)
+        {
+            return new DummyExFinalRef(Actor, RequestWaiter, timeout);
+        }
+
+        public Task<System.Object> CallExFinal(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummyExFinal_PayloadTable.CallExFinal_Invoke { param = param }
+            };
+            return SendRequestAndReceive<System.Object>(requestMessage);
+        }
+
+        public Task<System.Object> CallEx(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
+            };
+            return SendRequestAndReceive<System.Object>(requestMessage);
+        }
+
+        public Task<System.Object> Call(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
+            };
+            return SendRequestAndReceive<System.Object>(requestMessage);
+        }
+
+        public Task<System.Object> CallEx2(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
+            };
+            return SendRequestAndReceive<System.Object>(requestMessage);
+        }
+
+        void IDummyExFinal_NoReply.CallExFinal(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummyExFinal_PayloadTable.CallExFinal_Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IDummyEx_NoReply.CallEx(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IDummy_NoReply.Call(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IDummyEx2_NoReply.CallEx2(System.Object param)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+}
+
+#endregion
 #region Akka.Interfaced.Tests.IOverloaded
 
 namespace Akka.Interfaced.Tests
@@ -1157,6 +1540,68 @@ namespace Akka.Interfaced.Tests
         public void Event2(System.String eventName)
         {
             var payload = new ISubject2Observer_PayloadTable.Event2_Invoke { eventName = eventName };
+            Notify(payload);
+        }
+    }
+}
+
+#endregion
+#region Akka.Interfaced.Tests.ISubjectExObserver
+
+namespace Akka.Interfaced.Tests
+{
+    [PayloadTable(typeof(ISubjectExObserver), PayloadTableKind.Notification)]
+    public static class ISubjectExObserver_PayloadTable
+    {
+        public static Type[] GetPayloadTypes()
+        {
+            return new Type[] {
+                typeof(EventEx_Invoke),
+            };
+        }
+
+        public class EventEx_Invoke : IInterfacedPayload, IInvokable
+        {
+            public System.String eventName;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubjectExObserver);
+            }
+
+            public void Invoke(object __target)
+            {
+                ((ISubjectExObserver)__target).EventEx(eventName);
+            }
+        }
+    }
+
+    public class SubjectExObserver : InterfacedObserver, ISubjectExObserver
+    {
+        public SubjectExObserver()
+            : base(null, 0)
+        {
+        }
+
+        public SubjectExObserver(INotificationChannel channel, int observerId = 0)
+            : base(channel, observerId)
+        {
+        }
+
+        public SubjectExObserver(IActorRef target, int observerId = 0)
+            : base(new ActorNotificationChannel(target), observerId)
+        {
+        }
+
+        public void EventEx(System.String eventName)
+        {
+            var payload = new ISubjectExObserver_PayloadTable.EventEx_Invoke { eventName = eventName };
+            Notify(payload);
+        }
+
+        public void Event(System.String eventName)
+        {
+            var payload = new ISubjectObserver_PayloadTable.Event_Invoke { eventName = eventName };
             Notify(payload);
         }
     }

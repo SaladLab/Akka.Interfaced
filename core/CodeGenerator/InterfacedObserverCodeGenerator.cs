@@ -27,15 +27,20 @@ namespace CodeGen
                 ? w.B($"namespace {type.Namespace}")
                 : null;
 
-            // Collect Method and make message name for each one
+            // Collect all methods and make payload type name for each one
 
-            var methods = GetEventMethods(type);
-            var method2PayloadTypeNameMap = GetPayloadTypeNames(type, methods);
+            var baseTypes = type.GetInterfaces().Where(t => t.FullName != "Akka.Interfaced.IInterfacedActor").ToArray();
+            var infos = new List<Tuple<Type, List<Tuple<MethodInfo, string>>>>();
+            foreach (var t in new[] { type }.Concat(baseTypes))
+            {
+                var methods = GetEventMethods(t);
+                infos.Add(Tuple.Create(t, GetPayloadTypeNames(t, methods)));
+            }
 
             // Generate all
 
-            GeneratePayloadCode(type, w, methods, method2PayloadTypeNameMap);
-            GenerateObserverCode(type, w, methods, method2PayloadTypeNameMap);
+            GeneratePayloadCode(type, w, infos.First().Item2);
+            GenerateObserverCode(type, w, baseTypes, infos.ToArray());
 
             namespaceHandle?.Dispose();
 
@@ -84,7 +89,7 @@ namespace CodeGen
 
         private void GeneratePayloadCode(
             Type type, CodeWriter.CodeWriter w,
-            MethodInfo[] methods, Dictionary<MethodInfo, string> method2PayloadTypeNameMap)
+            List<Tuple<MethodInfo, string>> method2PayloadTypeNames)
         {
             w._($"[PayloadTable(typeof({type.Name}), PayloadTableKind.Notification)]");
             using (w.B($"public static class {Utility.GetPayloadTableClassName(type)}"))
@@ -95,19 +100,19 @@ namespace CodeGen
                 {
                     using (w.i("return new Type[] {", "};"))
                     {
-                        foreach (var method in methods)
+                        foreach (var m in method2PayloadTypeNames)
                         {
-                            var typeName = method2PayloadTypeNameMap[method];
-                            w._($"typeof({typeName}),");
+                            w._($"typeof({m.Item2}),");
                         }
                     }
                 }
 
                 // generate payload classes for all methods
 
-                foreach (var method in methods)
+                foreach (var m in method2PayloadTypeNames)
                 {
-                    var payloadTypeName = method2PayloadTypeNameMap[method];
+                    var method = m.Item1;
+                    var payloadTypeName = m.Item2;
 
                     // Invoke payload
                     {
@@ -149,11 +154,10 @@ namespace CodeGen
         }
 
         private void GenerateObserverCode(
-            Type type, CodeWriter.CodeWriter w,
-            MethodInfo[] methods, Dictionary<MethodInfo, string> method2PayloadTypeNameMap)
+            Type type, CodeWriter.CodeWriter w, Type[] baseTypes,
+            Tuple<Type, List<Tuple<MethodInfo, string>>>[] typeInfos)
         {
             var className = Utility.GetObserverClassName(type);
-            var payloadTableClassName = Utility.GetPayloadTableClassName(type);
 
             using (w.B($"public class {className} : InterfacedObserver, {type.Name}"))
             {
@@ -183,21 +187,27 @@ namespace CodeGen
 
                 // Observer method messages
 
-                foreach (var method in methods)
+                foreach (var t in typeInfos)
                 {
-                    var messageName = method2PayloadTypeNameMap[method];
-                    var parameters = method.GetParameters();
+                    var payloadTableClassName = Utility.GetPayloadTableClassName(t.Item1);
 
-                    var parameterNames = string.Join(", ", parameters.Select(p => p.Name));
-                    var parameterTypeNames = string.Join(", ", parameters.Select(p => (p.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") + Utility.GetTypeName(p.ParameterType) + " " + p.Name));
-                    var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
-
-                    // Request Methods
-
-                    using (w.B($"public void {method.Name}({parameterTypeNames})"))
+                    foreach (var m in t.Item2)
                     {
-                        w._($"var payload = new {payloadTableClassName}.{messageName} {{ {parameterInits} }};",
-                            $"Notify(payload);");
+                        var method = m.Item1;
+                        var payloadType = m.Item2;
+                        var parameters = method.GetParameters();
+
+                        var parameterNames = string.Join(", ", parameters.Select(p => p.Name));
+                        var parameterTypeNames = string.Join(", ", parameters.Select(p => (p.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") + Utility.GetTypeName(p.ParameterType) + " " + p.Name));
+                        var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
+
+                        // Request Methods
+
+                        using (w.B($"public void {method.Name}({parameterTypeNames})"))
+                        {
+                            w._($"var payload = new {payloadTableClassName}.{payloadType} {{ {parameterInits} }};",
+                                $"Notify(payload);");
+                        }
                     }
                 }
             }
@@ -242,19 +252,20 @@ namespace CodeGen
             return methods.OrderBy(m => m, new MethodInfoComparer()).ToArray();
         }
 
-        private Dictionary<MethodInfo, string> GetPayloadTypeNames(Type type, MethodInfo[] methods)
+        private List<Tuple<MethodInfo, string>> GetPayloadTypeNames(Type type, MethodInfo[] methods)
         {
-            var method2PayloadTypeNameMap = new Dictionary<MethodInfo, string>();
+            var method2PayloadTypeNames = new List<Tuple<MethodInfo, string>>();
             for (var i = 0; i < methods.Length; i++)
             {
                 var method = methods[i];
                 var ordinal = methods.Take(i).Count(m => m.Name == method.Name) + 1;
                 var ordinalStr = (ordinal <= 1) ? "" : string.Format("_{0}", ordinal);
 
-                method2PayloadTypeNameMap[method] = string.Format(
-                    "{0}{1}_Invoke", method.Name, ordinalStr);
+                method2PayloadTypeNames.Add(Tuple.Create(
+                    method,
+                    string.Format("{0}{1}_Invoke", method.Name, ordinalStr)));
             }
-            return method2PayloadTypeNameMap;
+            return method2PayloadTypeNames;
         }
     }
 }

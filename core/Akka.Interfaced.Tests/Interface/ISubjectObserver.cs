@@ -12,4 +12,9 @@ namespace Akka.Interfaced.Tests
         void Event(string eventName);
         void Event2(string eventName);
     }
+
+    public interface ISubjectExObserver : ISubjectObserver
+    {
+        void EventEx(string eventName);
+    }
 }

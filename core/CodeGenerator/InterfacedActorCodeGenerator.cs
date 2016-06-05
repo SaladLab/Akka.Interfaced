@@ -30,13 +30,19 @@ namespace CodeGen
 
             // Collect all methods and make payload type name for each one
 
-            var methods = GetInvokableMethods(type);
-            var method2PayloadTypeNameMap = GetPayloadTypeNames(type, methods);
+            var baseTypes = type.GetInterfaces().Where(t => t.FullName != "Akka.Interfaced.IInterfacedActor").ToArray();
+            var infos = new List<Tuple<Type, List<Tuple<MethodInfo, Tuple<string, string>>>>>();
+            foreach (var t in new[] { type }.Concat(baseTypes))
+            {
+                var methods = GetInvokableMethods(t);
+                var method2PayloadTypeNameMap = GetPayloadTypeNames(t, methods);
+                infos.Add(Tuple.Create(t, GetPayloadTypeNames(t, methods)));
+            }
 
             // Generate all
 
-            GeneratePayloadCode(type, w, methods, method2PayloadTypeNameMap);
-            GenerateRefCode(type, w, methods, method2PayloadTypeNameMap);
+            GeneratePayloadCode(type, w, infos.First().Item2);
+            GenerateRefCode(type, w, baseTypes, infos.ToArray());
 
             namespaceHandle?.Dispose();
 
@@ -90,7 +96,7 @@ namespace CodeGen
 
         private void GeneratePayloadCode(
             Type type, CodeWriter.CodeWriter w,
-            MethodInfo[] methods, Dictionary<MethodInfo, Tuple<string, string>> method2PayloadTypeNameMap)
+            List<Tuple<MethodInfo, Tuple<string, string>>> method2PayloadTypeNames)
         {
             var tagName = Utility.GetActorInterfaceTagName(type);
 
@@ -103,20 +109,21 @@ namespace CodeGen
                 {
                     using (w.i("return new Type[,] {", "};"))
                     {
-                        foreach (var method in methods)
+                        foreach (var m in method2PayloadTypeNames)
                         {
-                            var typeName = method2PayloadTypeNameMap[method];
-                            var returnType = typeName.Item2 != "" ? $"typeof({typeName.Item2})" : "null";
-                            w._($"{{ typeof({typeName.Item1}), {returnType} }},");
+                            var payloadTypes = m.Item2;
+                            var returnType = payloadTypes.Item2 != "" ? $"typeof({payloadTypes.Item2})" : "null";
+                            w._($"{{ typeof({payloadTypes.Item1}), {returnType} }},");
                         }
                     }
                 }
 
                 // generate payload classes for all methods
 
-                foreach (var method in methods)
+                foreach (var m in method2PayloadTypeNames)
                 {
-                    var payloadTypeName = method2PayloadTypeNameMap[method];
+                    var method = m.Item1;
+                    var payloadTypes = m.Item2;
                     var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
                     var observerParameters = method.GetParameters()
                         .Select(p => Tuple.Create(p, Utility.GetReachableMemebers(p.ParameterType, Utility.IsObserverInterface).ToArray()))
@@ -130,7 +137,7 @@ namespace CodeGen
 
                     var tagOverridable = tagName != null ? ", IPayloadTagOverridable" : "";
                     var observerUpdatable = observerParameters.Any() ? ", IPayloadObserverUpdatable" : "";
-                    using (w.B($"public class {payloadTypeName.Item1}",
+                    using (w.B($"public class {payloadTypes.Item1}",
                                $": IInterfacedPayload, IAsyncInvokable{tagOverridable}{observerUpdatable}"))
                     {
                         // Parameters
@@ -186,7 +193,7 @@ namespace CodeGen
                                 if (returnType != null)
                                 {
                                     w._($"var __v = await (({type.Name})__target).{method.Name}({parameterNames});",
-                                        $"return (IValueGetable)(new {payloadTypeName.Item2} {{ v = __v }});");
+                                        $"return (IValueGetable)(new {payloadTypes.Item2} {{ v = __v }});");
                                 }
                                 else
                                 {
@@ -221,12 +228,12 @@ namespace CodeGen
                                 {
                                     using (w.b($"if ({p.Item1.Name} != null)"))
                                     {
-                                        foreach (var m in p.Item2)
+                                        foreach (var o in p.Item2)
                                         {
-                                            if (m == "")
+                                            if (o == "")
                                                 w._($"updater({p.Item1.Name});");
                                             else
-                                                w._($"if ({p.Item1.Name}.{m} != null) updater({p.Item1.Name}.{m});");
+                                                w._($"if ({p.Item1.Name}.{o} != null) updater({p.Item1.Name}.{o});");
                                         }
                                     }
                                 }
@@ -244,7 +251,7 @@ namespace CodeGen
                             w._("[ProtoContract, TypeAlias]");
 
                         var actorRefUpdatable = actorRefs.Any() ? ", IPayloadActorRefUpdatable" : "";
-                        using (w.B($"public class {payloadTypeName.Item2}",
+                        using (w.B($"public class {payloadTypes.Item2}",
                                    $": IInterfacedPayload, IValueGetable{actorRefUpdatable}"))
                         {
                             var attr = (Options.UseProtobuf) ? "[ProtoMember(1)] " : "";
@@ -273,12 +280,12 @@ namespace CodeGen
                                 {
                                     using (w.b($"if (v != null)"))
                                     {
-                                        foreach (var m in actorRefs)
+                                        foreach (var r in actorRefs)
                                         {
-                                            if (m == "")
+                                            if (r == "")
                                                 w._($"updater(v); ");
                                             else
-                                                w._($"if (v.{m} != null) updater(v.{m});");
+                                                w._($"if (v.{r} != null) updater(v.{r});");
                                         }
                                     }
                                 }
@@ -290,15 +297,21 @@ namespace CodeGen
         }
 
         private void GenerateRefCode(
-            Type type, CodeWriter.CodeWriter w,
-            MethodInfo[] methods, Dictionary<MethodInfo, Tuple<string, string>> method2PayloadTypeNameMap)
+            Type type, CodeWriter.CodeWriter w, Type[] baseTypes,
+            Tuple<Type, List<Tuple<MethodInfo, Tuple<string, string>>>>[] typeInfos)
         {
+            if (type.Name == "IDummyExFinal")
+                Console.WriteLine(type);
+
             // NoReply Interface
 
-            using (w.B($"public interface {Utility.GetNoReplyInterfaceName(type)}"))
+            var baseNoReplys = baseTypes.Select(t => Utility.GetNoReplyInterfaceName(t));
+            var baseNoReplysInherit = baseNoReplys.Any() ? " : " + string.Join(", ", baseNoReplys) : "";
+            using (w.B($"public interface {Utility.GetNoReplyInterfaceName(type)}{baseNoReplysInherit}"))
             {
-                foreach (var method in methods)
+                foreach (var m in typeInfos.First().Item2)
                 {
+                    var method = m.Item1;
                     var parameters = method.GetParameters();
                     var paramStr = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
                     w._($"void {method.Name}({paramStr});");
@@ -309,7 +322,6 @@ namespace CodeGen
 
             var refClassName = Utility.GetActorRefClassName(type);
             var noReplyInterfaceName = Utility.GetNoReplyInterfaceName(type);
-            var payloadTableClassName = Utility.GetPayloadTableClassName(type);
 
             using (w.B($"public class {refClassName} : InterfacedActorRef, {type.Name}, {noReplyInterfaceName}"))
             {
@@ -346,54 +358,67 @@ namespace CodeGen
 
                 // IInterface message methods
 
-                foreach (var method in methods)
+                foreach (var t in typeInfos)
                 {
-                    var messageName = method2PayloadTypeNameMap[method];
-                    var parameters = method.GetParameters();
+                    var payloadTableClassName = Utility.GetPayloadTableClassName(t.Item1);
 
-                    var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
-                    var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
-                    var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
-
-                    // Request Methods
-
-                    var prototype = (returnType != null)
-                        ? $"public Task<{Utility.GetTypeName(returnType)}> {method.Name}({parameterTypeNames})"
-                        : $"public Task {method.Name}({parameterTypeNames})";
-
-                    using (w.B(prototype))
+                    foreach (var m in t.Item2)
                     {
-                        using (w.i("var requestMessage = new RequestMessage {", "};"))
-                        {
-                            w._($"InvokePayload = new {payloadTableClassName}.{messageName.Item1} {{ {parameterInits} }}");
-                        }
+                        var method = m.Item1;
+                        var payloadTypes = m.Item2;
+                        var parameters = method.GetParameters();
 
-                        if (returnType != null)
-                            w._($"return SendRequestAndReceive<{Utility.GetTypeName(returnType)}>(requestMessage);");
-                        else
-                            w._($"return SendRequestAndWait(requestMessage);");
+                        var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
+                        var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
+                        var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
+
+                        // Request Methods
+
+                        var prototype = (returnType != null)
+                            ? $"public Task<{Utility.GetTypeName(returnType)}> {method.Name}({parameterTypeNames})"
+                            : $"public Task {method.Name}({parameterTypeNames})";
+
+                        using (w.B(prototype))
+                        {
+                            using (w.i("var requestMessage = new RequestMessage {", "};"))
+                            {
+                                w._($"InvokePayload = new {payloadTableClassName}.{payloadTypes.Item1} {{ {parameterInits} }}");
+                            }
+
+                            if (returnType != null)
+                                w._($"return SendRequestAndReceive<{Utility.GetTypeName(returnType)}>(requestMessage);");
+                            else
+                                w._($"return SendRequestAndWait(requestMessage);");
+                        }
                     }
                 }
 
                 // IInterface_NoReply message methods
 
-                foreach (var method in methods)
+                foreach (var t in typeInfos)
                 {
-                    var messageName = method2PayloadTypeNameMap[method];
-                    var parameters = method.GetParameters();
+                    var interfaceName = Utility.GetNoReplyInterfaceName(t.Item1);
+                    var payloadTableClassName = Utility.GetPayloadTableClassName(t.Item1);
 
-                    var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, false)));
-                    var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
-
-                    // Request Methods
-
-                    using (w.B($"void {noReplyInterfaceName}.{method.Name}({parameterTypeNames})"))
+                    foreach (var m in t.Item2)
                     {
-                        using (w.i("var requestMessage = new RequestMessage {", "};"))
+                        var method = m.Item1;
+                        var payloadTypes = m.Item2;
+                        var parameters = method.GetParameters();
+
+                        var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, false)));
+                        var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
+
+                        // Request Methods
+
+                        using (w.B($"void {interfaceName}.{method.Name}({parameterTypeNames})"))
                         {
-                            w._($"InvokePayload = new {payloadTableClassName}.{messageName.Item1} {{ {parameterInits} }}");
+                            using (w.i("var requestMessage = new RequestMessage {", "};"))
+                            {
+                                w._($"InvokePayload = new {payloadTableClassName}.{payloadTypes.Item1} {{ {parameterInits} }}");
+                            }
+                            w._("SendRequest(requestMessage);");
                         }
-                        w._("SendRequest(requestMessage);");
                     }
                 }
             }
@@ -435,9 +460,9 @@ namespace CodeGen
             return methods.OrderBy(m => m, new MethodInfoComparer()).ToArray();
         }
 
-        private Dictionary<MethodInfo, Tuple<string, string>> GetPayloadTypeNames(Type type, MethodInfo[] methods)
+        private List<Tuple<MethodInfo, Tuple<string, string>>> GetPayloadTypeNames(Type type, MethodInfo[] methods)
         {
-            var method2PayloadTypeNameMap = new Dictionary<MethodInfo, Tuple<string, string>>();
+            var method2PayloadTypeNames = new List<Tuple<MethodInfo, Tuple<string, string>>>();
             for (var i = 0; i < methods.Length; i++)
             {
                 var method = methods[i];
@@ -445,13 +470,13 @@ namespace CodeGen
                 var ordinal = methods.Take(i).Count(m => m.Name == method.Name) + 1;
                 var ordinalStr = (ordinal <= 1) ? "" : string.Format("_{0}", ordinal);
 
-                method2PayloadTypeNameMap[method] = Tuple.Create(
+                method2PayloadTypeNames.Add(Tuple.Create(method, Tuple.Create(
                     string.Format("{0}{1}_Invoke", method.Name, ordinalStr),
                     returnType != null
                         ? string.Format("{0}{1}_Return", method.Name, ordinalStr)
-                        : "");
+                        : "")));
             }
-            return method2PayloadTypeNameMap;
+            return method2PayloadTypeNames;
         }
     }
 }

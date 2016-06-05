@@ -89,6 +89,7 @@
     <Compile Include="ExceptionHandle.Notification.cs" />
     <Compile Include="ExceptionHandle.Request.cs" />
     <Compile Include="ExceptionHandle.StartStop.cs" />
+    <Compile Include="Inheritance.cs" />
     <Compile Include="Interface\IBasic.cs" />
     <Compile Include="Interface\IDummy.cs" />
     <Compile Include="Interface\IOverloaded.cs" />
