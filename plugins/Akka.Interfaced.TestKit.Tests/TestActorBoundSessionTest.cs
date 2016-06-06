@@ -28,13 +28,13 @@ namespace Akka.Interfaced.TestKit.Tests
             _actorBoundSession = a.UnderlyingActor;
         }
 
-        private Tuple<IActorRef, Type>[] CreateInitialActor(IActorContext context)
+        private Tuple<IActorRef, ActorBoundSessionMessage.InterfaceType[]>[] CreateInitialActor(IActorContext context)
         {
             return new[]
             {
                 Tuple.Create(
                     context.ActorOf(Props.Create(() => new UserLoginActor(context.Self))),
-                    typeof(IUserLogin))
+                    new[] { new ActorBoundSessionMessage.InterfaceType(typeof(IUserLogin)) })
             };
         }
 

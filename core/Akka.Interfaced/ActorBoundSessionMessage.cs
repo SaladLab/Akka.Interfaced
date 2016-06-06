@@ -5,17 +5,38 @@ namespace Akka.Interfaced
 {
     public static class ActorBoundSessionMessage
     {
+        public class InterfaceType
+        {
+            public Type Type { get; }
+            public object TagValue { get; }
+
+            public InterfaceType(Type type, object tagValue = null)
+            {
+                Type = type;
+                TagValue = tagValue;
+            }
+        }
+
         public class Bind
         {
             public IActorRef Actor { get; }
-            public Type InterfaceType { get; }
-            public object TagValue { get; }
+            public InterfaceType[] Types { get; }
 
-            public Bind(IActorRef actor, Type interfaceType, object tagValue)
+            public Bind(IActorRef actor, Type type, object tagValue = null)
+                : this(actor, new InterfaceType(type, tagValue))
+            {
+            }
+
+            public Bind(IActorRef actor, InterfaceType type)
             {
                 Actor = actor;
-                InterfaceType = interfaceType;
-                TagValue = tagValue;
+                Types = new[] { type };
+            }
+
+            public Bind(IActorRef actor, InterfaceType[] types)
+            {
+                Actor = actor;
+                Types = types;
             }
         }
 
@@ -32,16 +53,46 @@ namespace Akka.Interfaced
         public class Unbind
         {
             public IActorRef Actor;
-            public int ActorId;
 
             public Unbind(IActorRef actor)
             {
                 Actor = actor;
             }
+        }
 
-            public Unbind(int actorId)
+        public class AddType
+        {
+            public IActorRef Actor { get; }
+            public InterfaceType[] Types { get; }
+
+            public AddType(IActorRef actor, InterfaceType type)
             {
-                ActorId = actorId;
+                Actor = actor;
+                Types = new[] { type };
+            }
+
+            public AddType(IActorRef actor, InterfaceType[] types)
+            {
+                Actor = actor;
+                Types = types;
+            }
+        }
+
+        public class RemoveType
+        {
+            public IActorRef Actor { get; }
+            public Type[] Types { get; }
+
+            public RemoveType(IActorRef actor, Type type)
+            {
+                Actor = actor;
+                Types = new[] { type };
+            }
+
+            public RemoveType(IActorRef actor, Type[] types)
+            {
+                Actor = actor;
+                Types = types;
             }
         }
 

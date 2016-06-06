@@ -84,6 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActorBoundSessionTest.cs" />
     <Compile Include="ActorTaskCancellation.cs" />
     <Compile Include="ExceptionHandle.Message.cs" />
     <Compile Include="ExceptionHandle.Notification.cs" />

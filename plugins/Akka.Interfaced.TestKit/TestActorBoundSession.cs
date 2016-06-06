@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using Akka.Actor;
 
 namespace Akka.Interfaced.TestKit
@@ -10,7 +11,7 @@ namespace Akka.Interfaced.TestKit
     public class TestActorBoundSession : ActorBoundSession, IRequestWaiter
     {
         private readonly IActorRef _self;
-        private readonly Func<IActorContext, Tuple<IActorRef, Type>[]> _initialActorFactory;
+        private readonly Func<IActorContext, Tuple<IActorRef, ActorBoundSessionMessage.InterfaceType[]>[]> _initialActorFactory;
 
         private int _lastRequestId;
         private readonly ConcurrentDictionary<int, Action<ResponseMessage>> _requestMap =
@@ -41,7 +42,7 @@ namespace Akka.Interfaced.TestKit
             }
         }
 
-        public TestActorBoundSession(Func<IActorContext, Tuple<IActorRef, Type>[]> initialActorFactory)
+        public TestActorBoundSession(Func<IActorContext, Tuple<IActorRef, ActorBoundSessionMessage.InterfaceType[]>[]> initialActorFactory)
         {
             _self = Self;
             _initialActorFactory = initialActorFactory;
@@ -55,7 +56,7 @@ namespace Akka.Interfaced.TestKit
             if (actors != null)
             {
                 foreach (var actor in actors)
-                    BindActor(actor.Item1, actor.Item2);
+                    BindActor(actor.Item1, actor.Item2.Select(ToBoundType));
             }
         }
 
@@ -147,32 +148,31 @@ namespace Akka.Interfaced.TestKit
             handler(message);
         }
 
-        private BoundActor BeginSendRequest(IActorRef actor, RequestMessage requestMessage)
+        private Tuple<IActorRef, BoundType> BeginSendRequest(IActorRef actor, RequestMessage requestMessage)
         {
             var actorId = ((BoundActorRef)actor).Id;
             var a = GetBoundActor(actorId);
             if (a == null)
-                throw new InvalidOperationException($"No Actor! (Id={actorId})");
+                throw new InvalidOperationException($"No Actor. (Id={actorId})");
 
-            if (a.InterfaceType != null)
+            var msg = requestMessage.InvokePayload;
+            var interfaceType = msg.GetInterfaceType();
+
+            foreach (var t in a.DerivedTypes)
             {
-                var msg = requestMessage.InvokePayload;
-                if (msg == null || msg.GetInterfaceType() != a.InterfaceType)
-                {
-                    throw new InvalidOperationException("Wrong interface type! " +
-                                                        $"(Id={actorId}, Interface={a.InterfaceType})");
-                }
+                if (t.Type == interfaceType)
+                    return Tuple.Create(a.Actor, t);
             }
 
-            return a;
+            throw new InvalidOperationException($"No bound type. (Id={actorId}, Interface={interfaceType})");
         }
 
-        private void EndSendRequest(BoundActor a, RequestMessage requestMessage)
+        private void EndSendRequest(Tuple<IActorRef, BoundType> target, RequestMessage requestMessage)
         {
-            if (a.IsTagOverridable)
+            if (target.Item2.IsTagOverridable)
             {
                 var msg = (IPayloadTagOverridable)requestMessage.InvokePayload;
-                msg.SetTag(a.TagValue);
+                msg.SetTag(target.Item2.TagValue);
             }
 
             var observerUpdatable = requestMessage.InvokePayload as IPayloadObserverUpdatable;
@@ -181,7 +181,7 @@ namespace Akka.Interfaced.TestKit
                 observerUpdatable.Update(o => ((InterfacedObserver)o).Channel = new ActorNotificationChannel(_self));
             }
 
-            a.Actor.Tell(new RequestMessage
+            target.Item1.Tell(new RequestMessage
             {
                 RequestId = requestMessage.RequestId,
                 InvokePayload = requestMessage.InvokePayload

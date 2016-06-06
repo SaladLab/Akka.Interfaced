@@ -32,7 +32,7 @@ namespace Akka.Interfaced.TestKit.Tests
             var user = Context.System.ActorOf(Props.Create(() => new UserActor(id, observer)));
 
             var reply = await _actorBoundSession.Ask<ActorBoundSessionMessage.BindReply>(
-                new ActorBoundSessionMessage.Bind(user, typeof(IUser), null));
+                new ActorBoundSessionMessage.Bind(user, typeof(IUser)));
 
             return BoundActorRef.Create<UserRef>(reply.ActorId);
         }
