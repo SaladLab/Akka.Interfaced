@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     public interface IBasic : IInterfacedActor
     {

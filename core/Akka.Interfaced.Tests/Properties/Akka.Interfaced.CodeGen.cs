@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 using Akka.Interfaced;
 using Akka.Actor;
 
-#region Akka.Interfaced.Tests.IBasic
+#region Akka.Interfaced.IBasic
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(IBasic), PayloadTableKind.Request)]
     public static class IBasic_PayloadTable
@@ -291,9 +291,9 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
-#region Akka.Interfaced.Tests.IDummy
+#region Akka.Interfaced.IDummy
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(IDummy), PayloadTableKind.Request)]
     public static class IDummy_PayloadTable
@@ -398,9 +398,9 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
-#region Akka.Interfaced.Tests.IDummyEx
+#region Akka.Interfaced.IDummyEx
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(IDummyEx), PayloadTableKind.Request)]
     public static class IDummyEx_PayloadTable
@@ -521,9 +521,9 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
-#region Akka.Interfaced.Tests.IDummyEx2
+#region Akka.Interfaced.IDummyEx2
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(IDummyEx2), PayloadTableKind.Request)]
     public static class IDummyEx2_PayloadTable
@@ -644,9 +644,9 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
-#region Akka.Interfaced.Tests.IDummyExFinal
+#region Akka.Interfaced.IDummyExFinal
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(IDummyExFinal), PayloadTableKind.Request)]
     public static class IDummyExFinal_PayloadTable
@@ -799,9 +799,9 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
-#region Akka.Interfaced.Tests.IDummyWithTag
+#region Akka.Interfaced.IDummyWithTag
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(IDummyWithTag), PayloadTableKind.Request)]
     public static class IDummyWithTag_PayloadTable
@@ -912,9 +912,9 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
-#region Akka.Interfaced.Tests.IOverloaded
+#region Akka.Interfaced.IOverloaded
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(IOverloaded), PayloadTableKind.Request)]
     public static class IOverloaded_PayloadTable
@@ -1126,9 +1126,9 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
-#region Akka.Interfaced.Tests.ISubject
+#region Akka.Interfaced.ISubject
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(ISubject), PayloadTableKind.Request)]
     public static class ISubject_PayloadTable
@@ -1162,7 +1162,7 @@ namespace Akka.Interfaced.Tests
         public class Subscribe_Invoke
             : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Akka.Interfaced.Tests.ISubjectObserver observer;
+            public Akka.Interfaced.ISubjectObserver observer;
 
             public Type GetInterfaceType()
             {
@@ -1187,7 +1187,7 @@ namespace Akka.Interfaced.Tests
         public class Unsubscribe_Invoke
             : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Akka.Interfaced.Tests.ISubjectObserver observer;
+            public Akka.Interfaced.ISubjectObserver observer;
 
             public Type GetInterfaceType()
             {
@@ -1213,8 +1213,8 @@ namespace Akka.Interfaced.Tests
     public interface ISubject_NoReply
     {
         void MakeEvent(System.String eventName);
-        void Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer);
-        void Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer);
+        void Subscribe(Akka.Interfaced.ISubjectObserver observer);
+        void Unsubscribe(Akka.Interfaced.ISubjectObserver observer);
     }
 
     public class SubjectRef : InterfacedActorRef, ISubject, ISubject_NoReply
@@ -1254,7 +1254,7 @@ namespace Akka.Interfaced.Tests
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
+        public Task Subscribe(Akka.Interfaced.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (SubjectObserver)observer }
@@ -1262,7 +1262,7 @@ namespace Akka.Interfaced.Tests
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
+        public Task Unsubscribe(Akka.Interfaced.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (SubjectObserver)observer }
@@ -1278,7 +1278,7 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
 
-        void ISubject_NoReply.Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
+        void ISubject_NoReply.Subscribe(Akka.Interfaced.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (SubjectObserver)observer }
@@ -1286,7 +1286,7 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
 
-        void ISubject_NoReply.Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer)
+        void ISubject_NoReply.Unsubscribe(Akka.Interfaced.ISubjectObserver observer)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (SubjectObserver)observer }
@@ -1299,15 +1299,15 @@ namespace Akka.Interfaced.Tests
     public interface ISubjectSync : IInterfacedActor
     {
         void MakeEvent(System.String eventName);
-        void Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer);
-        void Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer);
+        void Subscribe(Akka.Interfaced.ISubjectObserver observer);
+        void Unsubscribe(Akka.Interfaced.ISubjectObserver observer);
     }
 }
 
 #endregion
-#region Akka.Interfaced.Tests.ISubject2
+#region Akka.Interfaced.ISubject2
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(ISubject2), PayloadTableKind.Request)]
     public static class ISubject2_PayloadTable
@@ -1359,7 +1359,7 @@ namespace Akka.Interfaced.Tests
         public class Subscribe_Invoke
             : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Akka.Interfaced.Tests.ISubject2Observer observer;
+            public Akka.Interfaced.ISubject2Observer observer;
 
             public Type GetInterfaceType()
             {
@@ -1384,7 +1384,7 @@ namespace Akka.Interfaced.Tests
         public class Unsubscribe_Invoke
             : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public Akka.Interfaced.Tests.ISubject2Observer observer;
+            public Akka.Interfaced.ISubject2Observer observer;
 
             public Type GetInterfaceType()
             {
@@ -1411,8 +1411,8 @@ namespace Akka.Interfaced.Tests
     {
         void MakeEvent(System.String eventName);
         void MakeEvent2(System.String eventName);
-        void Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer);
-        void Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer);
+        void Subscribe(Akka.Interfaced.ISubject2Observer observer);
+        void Unsubscribe(Akka.Interfaced.ISubject2Observer observer);
     }
 
     public class Subject2Ref : InterfacedActorRef, ISubject2, ISubject2_NoReply
@@ -1460,7 +1460,7 @@ namespace Akka.Interfaced.Tests
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
+        public Task Subscribe(Akka.Interfaced.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = (Subject2Observer)observer }
@@ -1468,7 +1468,7 @@ namespace Akka.Interfaced.Tests
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
+        public Task Unsubscribe(Akka.Interfaced.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = (Subject2Observer)observer }
@@ -1492,7 +1492,7 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
 
-        void ISubject2_NoReply.Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
+        void ISubject2_NoReply.Subscribe(Akka.Interfaced.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject2_PayloadTable.Subscribe_Invoke { observer = (Subject2Observer)observer }
@@ -1500,7 +1500,7 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
 
-        void ISubject2_NoReply.Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer)
+        void ISubject2_NoReply.Unsubscribe(Akka.Interfaced.ISubject2Observer observer)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject2_PayloadTable.Unsubscribe_Invoke { observer = (Subject2Observer)observer }
@@ -1514,15 +1514,15 @@ namespace Akka.Interfaced.Tests
     {
         void MakeEvent(System.String eventName);
         void MakeEvent2(System.String eventName);
-        void Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer);
-        void Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer);
+        void Subscribe(Akka.Interfaced.ISubject2Observer observer);
+        void Unsubscribe(Akka.Interfaced.ISubject2Observer observer);
     }
 }
 
 #endregion
-#region Akka.Interfaced.Tests.IWorker
+#region Akka.Interfaced.IWorker
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(IWorker), PayloadTableKind.Request)]
     public static class IWorker_PayloadTable
@@ -1647,9 +1647,9 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
-#region Akka.Interfaced.Tests.ISubject2Observer
+#region Akka.Interfaced.ISubject2Observer
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(ISubject2Observer), PayloadTableKind.Notification)]
     public static class ISubject2Observer_PayloadTable
@@ -1732,9 +1732,9 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
-#region Akka.Interfaced.Tests.ISubjectExObserver
+#region Akka.Interfaced.ISubjectExObserver
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(ISubjectExObserver), PayloadTableKind.Notification)]
     public static class ISubjectExObserver_PayloadTable
@@ -1800,9 +1800,9 @@ namespace Akka.Interfaced.Tests
 }
 
 #endregion
-#region Akka.Interfaced.Tests.ISubjectObserver
+#region Akka.Interfaced.ISubjectObserver
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
     [PayloadTable(typeof(ISubjectObserver), PayloadTableKind.Notification)]
     public static class ISubjectObserver_PayloadTable

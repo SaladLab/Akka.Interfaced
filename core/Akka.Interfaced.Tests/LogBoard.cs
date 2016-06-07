@@ -2,22 +2,20 @@
 using System.Collections.Concurrent;
 using System.Linq;
 
-namespace Akka.Interfaced.Tests
+namespace Akka.Interfaced
 {
-    public class LogBoard
+    public class LogBoard<T>
     {
-        private ConcurrentQueue<string> _logs = new ConcurrentQueue<string>();
+        private ConcurrentQueue<T> _logs = new ConcurrentQueue<T>();
 
-        public void Log(string log)
+        public void Log(T log)
         {
             _logs.Enqueue(log);
         }
 
-        public List<string> GetAndClearLogs()
+        public List<T> GetLogs()
         {
-            var logs = _logs;
-            _logs = new ConcurrentQueue<string>();
-            return logs.ToList();
+            return _logs.ToList();
         }
     }
 }

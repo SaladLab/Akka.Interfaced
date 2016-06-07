@@ -7,9 +7,9 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced
 {
-    public class ActorBoundSessionTest : TestKit.Xunit2.TestKit
+    public class ObserverFilterTest : TestKit.Xunit2.TestKit
     {
-        public ActorBoundSessionTest(ITestOutputHelper output)
+        public ObserverFilterTest(ITestOutputHelper output)
             : base(output: output)
         {
         }

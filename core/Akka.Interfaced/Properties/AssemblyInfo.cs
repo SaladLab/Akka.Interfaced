@@ -24,6 +24,7 @@ using System.Security;
 [assembly: Guid("5930bb18-32d9-4d38-b574-6b9f8f9449ed")]
 
 // Friends
+[assembly: InternalsVisibleTo("Akka.Interfaced.Tests")]
 [assembly: InternalsVisibleTo("Akka.Interfaced.Persistence")]
 
 /*
