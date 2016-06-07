@@ -39,6 +39,18 @@
       <HintPath>..\..\..\packages\Akka.1.0.8\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Akka.Persistence, Version=1.0.8.25, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Akka.Persistence.1.0.8.25-beta\lib\net45\Akka.Persistence.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers, Version=2.4.1.555, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers.Serialization, Version=2.4.1.555, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -63,6 +75,7 @@
     <Compile Include="DemoLogFilter.cs" />
     <Compile Include="DemoMessageHandler.cs" />
     <Compile Include="DemoObserver.cs" />
+    <Compile Include="DemoPersistentActor.cs" />
     <Compile Include="DemoReentrantHandler.cs" />
     <Compile Include="DemoRunTask.cs" />
     <Compile Include="DemoStartEvent.cs" />
@@ -82,6 +95,10 @@
     <ProjectReference Include="..\..\..\core\Akka.Interfaced\Akka.Interfaced.csproj">
       <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>
       <Name>Akka.Interfaced</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\plugins\Akka.Interfaced.Persistence\Akka.Interfaced.Persistence.csproj">
+      <Project>{6364051d-a683-4239-bbbe-88412a8f4e8b}</Project>
+      <Name>Akka.Interfaced.Persistence</Name>
     </ProjectReference>
     <ProjectReference Include="..\Interface\Manual.Interface.csproj">
       <Project>{9eecbf54-7b2d-4a41-bbde-cbfbb344a142}</Project>

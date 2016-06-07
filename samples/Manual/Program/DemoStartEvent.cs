@@ -65,7 +65,7 @@ namespace Manual
             }
 
             [MessageHandler]
-            protected async Task Handle(string message)
+            protected Task Handle(string message)
             {
                 Console.WriteLine($"Handle({message}) Throw");
                 throw new InvalidOperationException(message);
