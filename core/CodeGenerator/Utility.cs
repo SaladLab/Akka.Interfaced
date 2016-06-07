@@ -34,6 +34,12 @@ namespace CodeGen
                    type.GetInterfaces().Any(i => i.FullName == "Akka.Interfaced.IInterfacedObserver");
         }
 
+        // Naming generated type guideline:
+        // - if user will not type a type, use underscore to avoid a conflict with user types.
+        //   (e.g. *_PayloadTable, *_NoReply)
+        // - if user will type a type, no underscore.
+        //   (e.g. *Ref, *Sync)
+
         public static string GetPayloadTableClassName(Type type)
         {
             return type.Name + "_PayloadTable";
@@ -46,12 +52,14 @@ namespace CodeGen
 
         public static string GetActorRefClassName(Type type)
         {
+            // because user will type this type, no _ prefix.
             return type.Name.Substring(1) + "Ref";
         }
 
         public static string GetActorSyncInterfaceName(Type type)
         {
-            return type.Name + "_Sync";
+            // because user will type this type, no _ prefix.
+            return type.Name + "Sync";
         }
 
         public static string GetObserverClassName(Type type)
@@ -61,7 +69,8 @@ namespace CodeGen
 
         public static string GetObserverAsyncInterfaceName(Type type)
         {
-            return type.Name + "_Async";
+            // because user will type this type, no _ prefix.
+            return type.Name + "Async";
         }
 
         public static string GetActorInterfaceTagName(Type type)
