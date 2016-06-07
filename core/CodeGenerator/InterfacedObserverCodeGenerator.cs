@@ -29,7 +29,7 @@ namespace CodeGen
 
             // Collect all methods and make payload type name for each one
 
-            var baseTypes = type.GetInterfaces().Where(t => t.FullName != "Akka.Interfaced.IInterfacedActor").ToArray();
+            var baseTypes = type.GetInterfaces().Where(t => t.FullName != "Akka.Interfaced.IInterfacedObserver").ToArray();
             var infos = new List<Tuple<Type, List<Tuple<MethodInfo, string>>>>();
             foreach (var t in new[] { type }.Concat(baseTypes))
             {
@@ -41,6 +41,8 @@ namespace CodeGen
 
             GeneratePayloadCode(type, w, infos.First().Item2);
             GenerateObserverCode(type, w, baseTypes, infos.ToArray());
+            if (Options.UseSlimClient == false)
+                GenerateAsyncCode(type, w, baseTypes, infos.ToArray());
 
             namespaceHandle?.Dispose();
 
@@ -239,6 +241,27 @@ namespace CodeGen
                         w._($"if (value == null) return null;");
                         w._($"return new {className}(value.Channel, value.ObserverId);");
                     }
+                }
+            }
+        }
+
+        private void GenerateAsyncCode(
+            Type type, CodeWriter.CodeWriter w, Type[] baseTypes,
+            Tuple<Type, List<Tuple<MethodInfo, string>>>[] typeInfos)
+        {
+            // NoReply Interface
+
+            var baseSynces = baseTypes.Select(t => Utility.GetObserverAsyncInterfaceName(t));
+            var baseSyncesInherit = baseSynces.Any() ? string.Join(", ", baseSynces) : "IInterfacedObserver";
+            w._($"[AlternativeInterface(typeof({type.Name}))]");
+            using (w.B($"public interface {Utility.GetObserverAsyncInterfaceName(type)} : {baseSyncesInherit}"))
+            {
+                foreach (var m in typeInfos.First().Item2)
+                {
+                    var method = m.Item1;
+                    var parameters = method.GetParameters();
+                    var paramStr = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
+                    w._($"Task {method.Name}({paramStr});");
                 }
             }
         }

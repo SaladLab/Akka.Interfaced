@@ -33,11 +33,14 @@ namespace Akka.Interfaced
                 if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedActor)))
                     continue;
 
+                var alternativeInterfaceAttribute = ifs.GetCustomAttribute<AlternativeInterfaceAttribute>();
+                var primaryInterface = alternativeInterfaceAttribute != null ? alternativeInterfaceAttribute.Type : ifs;
+
                 var interfaceMap = _type.GetInterfaceMap(ifs);
                 var methodItems = interfaceMap.InterfaceMethods.Zip(interfaceMap.TargetMethods, Tuple.Create)
                                               .OrderBy(p => p.Item1, new MethodInfoComparer())
                                               .ToArray();
-                var payloadTypeTable = GetInterfacePayloadTypeTable(ifs);
+                var payloadTypeTable = GetInterfacePayloadTypeTable(primaryInterface);
 
                 for (var i = 0; i < methodItems.Length; i++)
                 {
@@ -45,14 +48,25 @@ namespace Akka.Interfaced
                     var invokePayloadType = payloadTypeTable[i, 0];
                     var returnPayloadType = payloadTypeTable[i, 1];
                     var filterChain = _filterHandlerBuilder.Build(targetMethod, FilterChainKind.Request);
-                    var asyncHandler = BuildAsyncHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain);
 
-                    _table.Add(invokePayloadType, new RequestHandlerItem
+                    if (alternativeInterfaceAttribute == null || filterChain.AsyncFilterExists)
                     {
-                        InterfaceType = ifs,
-                        IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
-                        AsyncHandler = asyncHandler
-                    });
+                        _table.Add(invokePayloadType, new RequestHandlerItem
+                        {
+                            InterfaceType = ifs,
+                            IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
+                            AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
+                        });
+                    }
+                    else
+                    {
+                        _table.Add(invokePayloadType, new RequestHandlerItem
+                        {
+                            InterfaceType = ifs,
+                            IsReentrant = false,
+                            Handler = BuildHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
+                        });
+                    }
                 }
             }
         }

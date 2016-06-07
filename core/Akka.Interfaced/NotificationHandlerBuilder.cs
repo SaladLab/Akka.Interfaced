@@ -33,11 +33,14 @@ namespace Akka.Interfaced
                 if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedObserver)))
                     continue;
 
+                var alternativeInterfaceAttribute = ifs.GetCustomAttribute<AlternativeInterfaceAttribute>();
+                var primaryInterface = alternativeInterfaceAttribute != null ? alternativeInterfaceAttribute.Type : ifs;
+
                 var interfaceMap = _type.GetInterfaceMap(ifs);
                 var methodItems = interfaceMap.InterfaceMethods.Zip(interfaceMap.TargetMethods, Tuple.Create)
                                               .OrderBy(p => p.Item1, new MethodInfoComparer())
                                               .ToArray();
-                var payloadTypeTable = GetInterfacePayloadTypeTable(ifs);
+                var payloadTypeTable = GetInterfacePayloadTypeTable(primaryInterface);
 
                 // build a decorated handler for each method.
 
@@ -47,7 +50,7 @@ namespace Akka.Interfaced
                     var invokePayloadType = payloadTypeTable[i];
                     var filterChain = _filterHandlerBuilder.Build(targetMethod, FilterChainKind.Notification);
 
-                    if (filterChain.AsyncFilterExists)
+                    if (alternativeInterfaceAttribute != null || filterChain.AsyncFilterExists)
                     {
                         // async handler
 

@@ -49,9 +49,19 @@ namespace CodeGen
             return type.Name.Substring(1) + "Ref";
         }
 
+        public static string GetActorSyncInterfaceName(Type type)
+        {
+            return type.Name + "_Sync";
+        }
+
         public static string GetObserverClassName(Type type)
         {
             return type.Name.Substring(1);
+        }
+
+        public static string GetObserverAsyncInterfaceName(Type type)
+        {
+            return type.Name + "_Async";
         }
 
         public static string GetActorInterfaceTagName(Type type)

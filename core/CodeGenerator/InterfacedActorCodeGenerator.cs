@@ -43,6 +43,8 @@ namespace CodeGen
 
             GeneratePayloadCode(type, w, infos.First().Item2);
             GenerateRefCode(type, w, baseTypes, infos.ToArray());
+            if (Options.UseSlimClient == false)
+                GenerateSyncCode(type, w, baseTypes, infos.ToArray());
 
             namespaceHandle?.Dispose();
 
@@ -300,9 +302,6 @@ namespace CodeGen
             Type type, CodeWriter.CodeWriter w, Type[] baseTypes,
             Tuple<Type, List<Tuple<MethodInfo, Tuple<string, string>>>>[] typeInfos)
         {
-            if (type.Name == "IDummyExFinal")
-                Console.WriteLine(type);
-
             // NoReply Interface
 
             var baseNoReplys = baseTypes.Select(t => Utility.GetNoReplyInterfaceName(t));
@@ -448,6 +447,29 @@ namespace CodeGen
                         w._($"if (value == null) return null;");
                         w._($"return new {refClassName}(value.Actor);");
                     }
+                }
+            }
+        }
+
+        private void GenerateSyncCode(
+            Type type, CodeWriter.CodeWriter w, Type[] baseTypes,
+            Tuple<Type, List<Tuple<MethodInfo, Tuple<string, string>>>>[] typeInfos)
+        {
+            // NoReply Interface
+
+            var baseSynces = baseTypes.Select(t => Utility.GetActorSyncInterfaceName(t));
+            var baseSyncesInherit = baseSynces.Any() ? string.Join(", ", baseSynces) : "IInterfacedActor";
+            w._($"[AlternativeInterface(typeof({type.Name}))]");
+            using (w.B($"public interface {Utility.GetActorSyncInterfaceName(type)} : {baseSyncesInherit}"))
+            {
+                foreach (var m in typeInfos.First().Item2)
+                {
+                    var method = m.Item1;
+                    var parameters = method.GetParameters();
+                    var paramStr = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
+                    var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
+                    var returnTypeLiteral = (returnType != null) ? Utility.GetTypeName(returnType) : "void";
+                    w._($"{returnTypeLiteral} {method.Name}({paramStr});");
                 }
             }
         }
