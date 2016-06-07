@@ -48,6 +48,21 @@ namespace Akka.Interfaced
     }
 
     /// <summary>
+    /// This exception is thrown when the actor doesn't have a handler for a request.
+    /// </summary>
+    public class RequestHandlerNotFoundException : AkkaInterfacedException
+    {
+        public RequestHandlerNotFoundException()
+        {
+        }
+
+        public RequestHandlerNotFoundException(string message, Exception innerException = null)
+            : base(message, innerException)
+        {
+        }
+    }
+
+    /// <summary>
     /// This exception is thrown when there is an unhandled exception in processing a request.
     /// </summary>
     public class RequestFaultException : AkkaInterfacedException

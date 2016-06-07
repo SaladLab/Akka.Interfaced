@@ -219,7 +219,7 @@ namespace Akka.Interfaced
                 sender.Tell(new ResponseMessage
                 {
                     RequestId = request.RequestId,
-                    Exception = new RequestMessageException("Cannot find handler")
+                    Exception = new RequestHandlerNotFoundException()
                 });
                 Context.System.EventStream.Publish(new Event.Warning(
                     Self.Path.ToString(), GetType(),

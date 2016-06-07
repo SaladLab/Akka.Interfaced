@@ -234,7 +234,7 @@ namespace Akka.Interfaced.Persistence
                 sender.Tell(new ResponseMessage
                 {
                     RequestId = request.RequestId,
-                    Exception = new RequestMessageException("Cannot find handler")
+                    Exception = new RequestHandlerNotFoundException("Cannot find handler")
                 });
                 Context.System.EventStream.Publish(new Event.Warning(
                     Self.Path.ToString(), GetType(),
