@@ -65,6 +65,11 @@ namespace Akka.Interfaced
             public IActorRef Actor { get; }
             public InterfaceType[] Types { get; }
 
+            public AddType(IActorRef actor, Type type, object tagValue = null)
+                : this(actor, new InterfaceType(type, tagValue))
+            {
+            }
+
             public AddType(IActorRef actor, InterfaceType type)
             {
                 Actor = actor;

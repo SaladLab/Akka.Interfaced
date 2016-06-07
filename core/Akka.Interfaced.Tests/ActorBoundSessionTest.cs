@@ -39,10 +39,10 @@ namespace Akka.Interfaced.Tests
                 return;
             }
 
-            var boundType = GetBoundType(boundActor, message.InvokePayload);
+            var boundType = boundActor.FindBoundType(message.InvokePayload.GetInterfaceType());
             if (boundType == null)
             {
-                Sender.Tell(new ResponseMessage { RequestId = message.RequestId, Exception = new RequestMessageException() });
+                Sender.Tell(new ResponseMessage { RequestId = message.RequestId, Exception = new RequestHandlerNotFoundException() });
                 return;
             }
 
@@ -65,22 +65,9 @@ namespace Akka.Interfaced.Tests
         protected override void OnNotificationMessage(NotificationMessage message)
         {
         }
-
-        private BoundType GetBoundType(BoundActor boundActor, IInterfacedPayload payload)
-        {
-            var interfaceType = payload.GetInterfaceType();
-
-            foreach (var t in boundActor.DerivedTypes)
-            {
-                if (t.Type == interfaceType)
-                    return t;
-            }
-
-            return null;
-        }
     }
 
-    public class DummyWorkerActor : InterfacedActor, IDummyExFinal, IWorker
+    public class DummyWorkerActor : InterfacedActor, IDummyExFinal, IDummyWithTag
     {
         public DummyWorkerActor()
         {
@@ -106,14 +93,9 @@ namespace Akka.Interfaced.Tests
             return Task.FromResult<object>("CallExFinal:" + param);
         }
 
-        Task IWorker.Atomic(int id)
+        Task<object> IDummyWithTag.CallWithTag(object param, string id)
         {
-            throw new NotImplementedException();
-        }
-
-        Task IWorker.Reentrant(int id)
-        {
-            throw new NotImplementedException();
+            return Task.FromResult<object>("CallWithTag:" + param + ":" + id);
         }
     }
 
@@ -125,7 +107,7 @@ namespace Akka.Interfaced.Tests
         }
 
         [Fact]
-        private async Task Test_Work()
+        private async Task Test_RequestToBoundActor_Response()
         {
             var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
             var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
@@ -134,7 +116,7 @@ namespace Akka.Interfaced.Tests
 
             var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
             {
-                ActorId = 1,
+                ActorId = r.ActorId,
                 Message = new RequestMessage
                 {
                     RequestId = 1,
@@ -143,6 +125,134 @@ namespace Akka.Interfaced.Tests
             });
             Assert.Equal(1, r2.RequestId);
             Assert.Equal("Call:Test", r2.ReturnPayload.Value);
+        }
+
+        [Fact]
+        private async Task Test_RequestToBoundActorWithTag_Response()
+        {
+            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
+            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyWithTag), "ID"));
+            Assert.NotEqual(0, r.ActorId);
+
+            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            {
+                ActorId = r.ActorId,
+                Message = new RequestMessage
+                {
+                    RequestId = 1,
+                    InvokePayload = new IDummyWithTag_PayloadTable.CallWithTag_Invoke { param = "Test" }
+                }
+            });
+            Assert.Equal(1, r2.RequestId);
+            Assert.Equal("CallWithTag:Test:ID", r2.ReturnPayload.Value);
+        }
+
+        [Fact]
+        private async Task Test_RequestToUnboundActor_Exception()
+        {
+            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
+
+            var r = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            {
+                ActorId = 1,
+                Message = new RequestMessage
+                {
+                    RequestId = 1,
+                    InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = "Test" }
+                }
+            });
+            Assert.Equal(1, r.RequestId);
+            Assert.IsType<RequestTargetException>(r.Exception);
+        }
+
+        [Fact]
+        private async Task Test_RequestOnUnboundType_Exception()
+        {
+            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
+            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyEx)));
+            Assert.NotEqual(0, r.ActorId);
+
+            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            {
+                ActorId = r.ActorId,
+                Message = new RequestMessage
+                {
+                    RequestId = 1,
+                    InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = "Test" }
+                }
+            });
+            Assert.Equal(1, r2.RequestId);
+            Assert.IsType<RequestHandlerNotFoundException>(r2.Exception);
+        }
+
+        [Fact]
+        private async Task Test_UnbindActor_And_RequestToUnboundActor_Exception()
+        {
+            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
+            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyEx)));
+            Assert.NotEqual(0, r.ActorId);
+            session.Tell(new ActorBoundSessionMessage.Unbind(dummy));
+
+            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            {
+                ActorId = r.ActorId,
+                Message = new RequestMessage
+                {
+                    RequestId = 1,
+                    InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = "Test" }
+                }
+            });
+            Assert.Equal(1, r2.RequestId);
+            Assert.IsType<RequestTargetException>(r2.Exception);
+        }
+
+        [Fact]
+        private async Task Test_AddTypeToBoundActor_And_RequestToBoundActor_Response()
+        {
+            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
+            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyEx)));
+            Assert.NotEqual(0, r.ActorId);
+            session.Tell(new ActorBoundSessionMessage.AddType(dummy, typeof(IDummyEx2)));
+
+            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            {
+                ActorId = r.ActorId,
+                Message = new RequestMessage
+                {
+                    RequestId = 1,
+                    InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = "Test" }
+                }
+            });
+            Assert.Equal(1, r2.RequestId);
+            Assert.Equal("CallEx2:Test", r2.ReturnPayload.Value);
+        }
+
+        [Fact]
+        private async Task Test_RemoveTypeToBoundActor_And_RequestOnUnboundType_Exception()
+        {
+            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
+            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyEx)));
+            Assert.NotEqual(0, r.ActorId);
+            session.Tell(new ActorBoundSessionMessage.AddType(dummy, typeof(IDummyEx2)));
+            session.Tell(new ActorBoundSessionMessage.RemoveType(dummy, typeof(IDummyEx2)));
+
+            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            {
+                ActorId = r.ActorId,
+                Message = new RequestMessage
+                {
+                    RequestId = 1,
+                    InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = "Test" }
+                }
+            });
+            Assert.Equal(1, r2.RequestId);
+            Assert.IsType<RequestHandlerNotFoundException>(r2.Exception);
         }
     }
 }

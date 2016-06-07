@@ -56,7 +56,7 @@ namespace Akka.Interfaced.TestKit
             if (actors != null)
             {
                 foreach (var actor in actors)
-                    BindActor(actor.Item1, actor.Item2.Select(ToBoundType));
+                    BindActor(actor.Item1, actor.Item2.Select(t => new BoundType(t)));
             }
         }
 
@@ -153,18 +153,15 @@ namespace Akka.Interfaced.TestKit
             var actorId = ((BoundActorRef)actor).Id;
             var a = GetBoundActor(actorId);
             if (a == null)
-                throw new InvalidOperationException($"No Actor. (Id={actorId})");
+                throw new InvalidOperationException($"No actor. (Id={actorId})");
 
             var msg = requestMessage.InvokePayload;
             var interfaceType = msg.GetInterfaceType();
+            var boundType = a.FindBoundType(interfaceType);
+            if (boundType == null)
+                throw new InvalidOperationException($"No bound type. (Id={actorId}, Interface={interfaceType})");
 
-            foreach (var t in a.DerivedTypes)
-            {
-                if (t.Type == interfaceType)
-                    return Tuple.Create(a.Actor, t);
-            }
-
-            throw new InvalidOperationException($"No bound type. (Id={actorId}, Interface={interfaceType})");
+            return Tuple.Create(a.Actor, boundType);
         }
 
         private void EndSendRequest(Tuple<IActorRef, BoundType> target, RequestMessage requestMessage)

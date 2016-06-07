@@ -21,4 +21,10 @@ namespace Akka.Interfaced.Tests
     {
         Task<object> CallExFinal(object param);
     }
+
+    [TagOverridable("id")]
+    public interface IDummyWithTag : IInterfacedActor
+    {
+        Task<object> CallWithTag(object param, string id = null);
+    }
 }

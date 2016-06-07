@@ -14,6 +14,11 @@ namespace Akka.Interfaced
             public bool IsChildActor;
             public List<BoundType> Types;
             public List<BoundType> DerivedTypes;
+
+            public BoundType FindBoundType(Type type)
+            {
+                return DerivedTypes.FirstOrDefault(b => b.Type == type);
+            }
         }
 
         protected class BoundType
@@ -21,6 +26,16 @@ namespace Akka.Interfaced
             public Type Type;
             public bool IsTagOverridable;
             public object TagValue;
+
+            public BoundType()
+            {
+            }
+
+            public BoundType(ActorBoundSessionMessage.InterfaceType type)
+            {
+                Type = type.Type;
+                TagValue = type.TagValue;
+            }
         }
 
         private readonly object _boundActorLock = new object();
@@ -28,11 +43,11 @@ namespace Akka.Interfaced
         private readonly Dictionary<IActorRef, int> _boundActorInverseMap = new Dictionary<IActorRef, int>();
         private int _lastBoundActorId;
 
-        // When NotificationMessage received
-        protected abstract void OnNotificationMessage(NotificationMessage message);
-
         // When OnResponseMessage received
         protected abstract void OnResponseMessage(ResponseMessage message);
+
+        // When NotificationMessage received
+        protected abstract void OnNotificationMessage(NotificationMessage message);
 
         protected override void PostStop()
         {
@@ -50,12 +65,7 @@ namespace Akka.Interfaced
 
         protected override void OnReceive(object message)
         {
-            var notificationMessage = message as NotificationMessage;
-            if (notificationMessage != null)
-            {
-                OnNotificationMessage(notificationMessage);
-                return;
-            }
+            // Messages from bound actors
 
             var responseMessage = message as ResponseMessage;
             if (responseMessage != null)
@@ -64,12 +74,21 @@ namespace Akka.Interfaced
                 return;
             }
 
+            var notificationMessage = message as NotificationMessage;
+            if (notificationMessage != null)
+            {
+                OnNotificationMessage(notificationMessage);
+                return;
+            }
+
+            // ActorBound messages
+
             var bindMessage = message as ActorBoundSessionMessage.Bind;
             if (bindMessage != null)
             {
                 var actorId = BindActor(
                     bindMessage.Actor,
-                    bindMessage.Types.Select(ToBoundType));
+                    bindMessage.Types.Select(t => new BoundType(t)));
                 Sender.Tell(new ActorBoundSessionMessage.BindReply(actorId));
                 return;
             }
@@ -87,7 +106,7 @@ namespace Akka.Interfaced
             {
                 AddType(
                     addTypeMessage.Actor,
-                    addTypeMessage.Types.Select(ToBoundType));
+                    addTypeMessage.Types.Select(t => new BoundType(t)));
                 return;
             }
 
@@ -191,15 +210,6 @@ namespace Akka.Interfaced
                 }
                 boundActor.DerivedTypes = GetDerivedBoundTypes(boundActor.Types);
             }
-        }
-
-        protected static BoundType ToBoundType(ActorBoundSessionMessage.InterfaceType type)
-        {
-            return new BoundType
-            {
-                Type = type.Type,
-                TagValue = type.TagValue
-            };
         }
 
         private static List<BoundType> GetDerivedBoundTypes(IEnumerable<BoundType> boundTypes)
