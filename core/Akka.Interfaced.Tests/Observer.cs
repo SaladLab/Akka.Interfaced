@@ -79,16 +79,19 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            await _subject.Subscribe(CreateObserver<ISubjectObserver>());
+            var observer = CreateObserver<ISubjectObserver>(param);
+            await _subject.Subscribe(observer);
             await _subject.MakeEvent("A");
-            await _subject.Unsubscribe(CreateObserver<ISubjectObserver>());
+            await _subject.Unsubscribe(observer);
             await _subject.MakeEvent("B");
+            RemoveObserver(observer);
             return null;
         }
 
         void ISubjectObserver.Event(string eventName)
         {
-            _eventLog.Add(eventName);
+            var c = ObserverContext != null ? ObserverContext + ":" : "";
+            _eventLog.Add(c + eventName);
         }
     }
 
@@ -106,17 +109,20 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            await _subject.Subscribe(CreateObserver<ISubjectObserver>());
+            var observer = CreateObserver<ISubjectObserver>(param);
+            await _subject.Subscribe(observer);
             await _subject.MakeEvent("A");
-            await _subject.Unsubscribe(CreateObserver<ISubjectObserver>());
+            await _subject.Unsubscribe(observer);
             await _subject.MakeEvent("B");
+            RemoveObserver(observer);
             return null;
         }
 
         [ExtendedHandler]
         private void Event(string eventName)
         {
-            _eventLog.Add(eventName);
+            var c = ObserverContext != null ? ObserverContext + ":" : "";
+            _eventLog.Add(c + eventName);
         }
     }
 
@@ -134,19 +140,25 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            await _subject.Subscribe(CreateObserver<ISubjectObserver>());
+            var observer = CreateObserver<ISubjectObserver>(param);
+            await _subject.Subscribe(observer);
             await _subject.MakeEvent("A");
             await _subject.MakeEvent("B");
-            await _subject.Unsubscribe(CreateObserver<ISubjectObserver>());
+            await _subject.Unsubscribe(observer);
+            RemoveObserver(observer);
             return null;
         }
 
         [ExtendedHandler]
         private async Task Event(string eventName)
         {
-            _eventLog.Add(eventName + ":1");
+            var c = ObserverContext != null ? ObserverContext + ":" : "";
+            _eventLog.Add(c + eventName + ":1");
+
             await Task.Delay(10);
-            _eventLog.Add(eventName + ":2");
+
+            var contextMessage2 = ObserverContext != null ? ObserverContext + ":" : "";
+            _eventLog.Add(contextMessage2 + eventName + ":2");
         }
     }
 
@@ -164,19 +176,25 @@ namespace Akka.Interfaced.Tests
         [Reentrant]
         async Task<object> IDummy.Call(object param)
         {
-            await _subject.Subscribe(CreateObserver<ISubjectObserver>());
+            var observer = CreateObserver<ISubjectObserver>(param);
+            await _subject.Subscribe(observer);
             await _subject.MakeEvent("A");
             await _subject.MakeEvent("B");
-            await _subject.Unsubscribe(CreateObserver<ISubjectObserver>());
+            await _subject.Unsubscribe(observer);
+            RemoveObserver(observer);
             return null;
         }
 
         [ExtendedHandler, Reentrant]
         private async Task Event(string eventName)
         {
-            _eventLog.Add(eventName + ":1");
+            var c = ObserverContext != null ? ObserverContext + ":" : "";
+            _eventLog.Add(c + eventName + ":1");
+
             await Task.Delay(100);
-            _eventLog.Add(eventName + ":2");
+
+            var contextMessage2 = ObserverContext != null ? ObserverContext + ":" : "";
+            _eventLog.Add(contextMessage2 + eventName + ":2");
         }
     }
 
@@ -187,8 +205,8 @@ namespace Akka.Interfaced.Tests
         {
         }
 
-        [Fact]
-        public async Task BasicActor_ObserveSubject()
+        [Theory, InlineData(null), InlineData("CTX")]
+        public async Task BasicActor_ObserveSubject(object context)
         {
             // Arrange
             var eventLog = new List<string>();
@@ -199,14 +217,15 @@ namespace Akka.Interfaced.Tests
             var observer = new DummyRef(observerActor);
 
             // Act
-            await observer.Call(null);
+            await observer.Call(context);
 
             // Assert
-            Assert.Equal(new[] { "A" }, eventLog);
+            var c = context != null ? context + ":" : "";
+            Assert.Equal(new[] { $"{c}A" }, eventLog);
         }
 
-        [Fact]
-        public async Task ExtendedActor_ObserveSubject()
+        [Theory, InlineData(null), InlineData("CTX")]
+        public async Task ExtendedActor_ObserveSubject(object context)
         {
             // Arrange
             var eventLog = new List<string>();
@@ -217,14 +236,15 @@ namespace Akka.Interfaced.Tests
             var observer = new DummyRef(observerActor);
 
             // Act
-            await observer.Call(null);
+            await observer.Call(context);
 
             // Assert
-            Assert.Equal(new[] { "A" }, eventLog);
+            var c = context != null ? context + ":" : "";
+            Assert.Equal(new[] { $"{c}A" }, eventLog);
         }
 
-        [Fact]
-        public async Task ExtendedAsyncActor_ObserveSubject()
+        [Theory, InlineData(null), InlineData("CTX")]
+        public async Task ExtendedAsyncActor_ObserveSubject(object context)
         {
             // Arrange
             var eventLog = new List<string>();
@@ -235,14 +255,15 @@ namespace Akka.Interfaced.Tests
             var observer = new DummyRef(observerActor);
 
             // Act
-            await observer.Call(null);
+            await observer.Call(context);
 
             // Assert
-            Assert.Equal(new[] { "A:1", "A:2", "B:1", "B:2" }, eventLog);
+            var c = context != null ? context + ":" : "";
+            Assert.Equal(new[] { $"{c}A:1", $"{c}A:2", $"{c}B:1", $"{c}B:2" }, eventLog);
         }
 
-        [Fact]
-        public async Task ExtendedAsyncReentrantActor_ObserveSubject()
+        [Theory, InlineData(null), InlineData("CTX")]
+        public async Task ExtendedAsyncReentrantActor_ObserveSubject(object context)
         {
             // Arrange
             var eventLog = new List<string>();
@@ -253,12 +274,13 @@ namespace Akka.Interfaced.Tests
             var observer = new DummyRef(observerActor);
 
             // Act
-            await observer.Call(null);
+            await observer.Call(context);
             await Task.Delay(200);
 
             // Assert
-            Assert.Equal(new[] { "A:1", "A:2" }, eventLog.Where(x => x.StartsWith("A")));
-            Assert.Equal(new[] { "B:1", "B:2" }, eventLog.Where(x => x.StartsWith("B")));
+            var c = context != null ? context + ":" : "";
+            Assert.Equal(new[] { $"{c}A:1", $"{c}A:2" }, eventLog.Where(x => x.StartsWith($"{c}A")));
+            Assert.Equal(new[] { $"{c}B:1", $"{c}B:2" }, eventLog.Where(x => x.StartsWith($"{c}B")));
         }
     }
 }

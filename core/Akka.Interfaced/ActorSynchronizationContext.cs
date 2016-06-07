@@ -10,6 +10,7 @@ namespace Akka.Interfaced
         public IActorRef Sender { get; set; }
         public CancellationToken CancellationToken { get; set; }
         public int RequestId { get; set; }
+        public object ObserverContext { get; set; }
     }
 
     internal class ActorSynchronizationContext : SynchronizationContext
