@@ -186,6 +186,13 @@ namespace Protobuf.Interface
             return new HelloWorldRef(value.Actor);
         }
     }
+
+    [AlternativeInterface(typeof(IHelloWorld))]
+    public interface IHelloWorldSync : IInterfacedActor
+    {
+        System.Int32 GetHelloCount();
+        System.String SayHello(System.String name);
+    }
 }
 
 #endregion
@@ -556,6 +563,17 @@ namespace Protobuf.Interface
             return new PedanticRef(value.Actor);
         }
     }
+
+    [AlternativeInterface(typeof(IPedantic))]
+    public interface IPedanticSync : IInterfacedActor
+    {
+        void TestCall();
+        System.Nullable<System.Int32> TestOptional(System.Nullable<System.Int32> value);
+        System.Int32[] TestParams(params System.Int32[] values);
+        System.String TestPassClass(Protobuf.Interface.TestParam param);
+        Protobuf.Interface.TestResult TestReturnClass(System.Int32 value, System.Int32 offset);
+        System.Tuple<System.Int32, System.String> TestTuple(System.Tuple<System.Int32, System.String> value);
+    }
 }
 
 #endregion
@@ -790,6 +808,14 @@ namespace Protobuf.Interface
             if (value == null) return null;
             return new SurrogateRef(value.Actor);
         }
+    }
+
+    [AlternativeInterface(typeof(ISurrogate))]
+    public interface ISurrogateSync : IInterfacedActor
+    {
+        Akka.Actor.Address GetAddress(Akka.Actor.Address address);
+        Akka.Actor.ActorPath GetPath(Akka.Actor.ActorPath path);
+        Protobuf.Interface.ISurrogate GetSelf();
     }
 }
 

@@ -159,6 +159,13 @@ namespace Manual
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IGreeter))]
+    public interface IGreeterSync : IInterfacedActor
+    {
+        System.Int32 GetCount();
+        System.String Greet(System.String name);
+    }
 }
 
 #endregion
@@ -395,6 +402,15 @@ namespace Manual
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IGreeterWithObserver))]
+    public interface IGreeterWithObserverSync : IInterfacedActor
+    {
+        System.Int32 GetCount();
+        System.String Greet(System.String name);
+        void Subscribe(Manual.IGreetObserver observer);
+        void Unsubscribe(Manual.IGreetObserver observer);
+    }
 }
 
 #endregion
@@ -450,6 +466,12 @@ namespace Manual
             var payload = new IGreetObserver_PayloadTable.Event_Invoke { message = message };
             Notify(payload);
         }
+    }
+
+    [AlternativeInterface(typeof(IGreetObserver))]
+    public interface IGreetObserverAsync : IInterfacedObserver
+    {
+        Task Event(System.String message);
     }
 }
 

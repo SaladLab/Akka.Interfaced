@@ -159,6 +159,13 @@ namespace HelloWorld.Interface
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IGreeter))]
+    public interface IGreeterSync : IInterfacedActor
+    {
+        System.Int32 GetCount();
+        System.String Greet(System.String name);
+    }
 }
 
 #endregion

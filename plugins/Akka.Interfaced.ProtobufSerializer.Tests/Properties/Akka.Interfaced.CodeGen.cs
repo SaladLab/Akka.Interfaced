@@ -158,6 +158,13 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             return new DefaultRef(value.Actor);
         }
     }
+
+    [AlternativeInterface(typeof(IDefault))]
+    public interface IDefaultSync : IInterfacedActor
+    {
+        void Call(System.Int32 a, System.Int32 b, System.String c);
+        void CallWithDefault(System.Int32 a = 1, System.Int32 b = 2, System.String c = "Test");
+    }
 }
 
 #endregion

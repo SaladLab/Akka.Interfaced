@@ -278,6 +278,16 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IBasic))]
+    public interface IBasicSync : IInterfacedActor
+    {
+        void Call();
+        void CallWithParameter(System.Int32 value);
+        System.Int32 CallWithParameterAndReturn(System.Int32 value);
+        System.Int32 CallWithReturn();
+        System.Int32 ThrowException(System.Boolean throwException);
+    }
 }
 
 #endregion
@@ -378,6 +388,12 @@ namespace Akka.Interfaced.Tests
             };
             SendRequest(requestMessage);
         }
+    }
+
+    [AlternativeInterface(typeof(IDummy))]
+    public interface IDummySync : IInterfacedActor
+    {
+        System.Object Call(System.Object param);
     }
 }
 
@@ -496,6 +512,12 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IDummyEx))]
+    public interface IDummyExSync : IDummySync
+    {
+        System.Object CallEx(System.Object param);
+    }
 }
 
 #endregion
@@ -612,6 +634,12 @@ namespace Akka.Interfaced.Tests
             };
             SendRequest(requestMessage);
         }
+    }
+
+    [AlternativeInterface(typeof(IDummyEx2))]
+    public interface IDummyEx2Sync : IDummySync
+    {
+        System.Object CallEx2(System.Object param);
     }
 }
 
@@ -762,6 +790,12 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IDummyExFinal))]
+    public interface IDummyExFinalSync : IDummyExSync, IDummySync, IDummyEx2Sync
+    {
+        System.Object CallExFinal(System.Object param);
+    }
 }
 
 #endregion
@@ -868,6 +902,12 @@ namespace Akka.Interfaced.Tests
             };
             SendRequest(requestMessage);
         }
+    }
+
+    [AlternativeInterface(typeof(IDummyWithTag))]
+    public interface IDummyWithTagSync : IInterfacedActor
+    {
+        System.Object CallWithTag(System.Object param, System.String id = null);
     }
 }
 
@@ -1075,6 +1115,14 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IOverloaded))]
+    public interface IOverloadedSync : IInterfacedActor
+    {
+        System.Int32 Min(System.Int32 a, System.Int32 b);
+        System.Int32 Min(System.Int32 a, System.Int32 b, System.Int32 c);
+        System.Int32 Min(params System.Int32[] nums);
+    }
 }
 
 #endregion
@@ -1245,6 +1293,14 @@ namespace Akka.Interfaced.Tests
             };
             SendRequest(requestMessage);
         }
+    }
+
+    [AlternativeInterface(typeof(ISubject))]
+    public interface ISubjectSync : IInterfacedActor
+    {
+        void MakeEvent(System.String eventName);
+        void Subscribe(Akka.Interfaced.Tests.ISubjectObserver observer);
+        void Unsubscribe(Akka.Interfaced.Tests.ISubjectObserver observer);
     }
 }
 
@@ -1452,6 +1508,15 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(ISubject2))]
+    public interface ISubject2Sync : IInterfacedActor
+    {
+        void MakeEvent(System.String eventName);
+        void MakeEvent2(System.String eventName);
+        void Subscribe(Akka.Interfaced.Tests.ISubject2Observer observer);
+        void Unsubscribe(Akka.Interfaced.Tests.ISubject2Observer observer);
+    }
 }
 
 #endregion
@@ -1572,6 +1637,13 @@ namespace Akka.Interfaced.Tests
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IWorker))]
+    public interface IWorkerSync : IInterfacedActor
+    {
+        void Atomic(System.Int32 id);
+        void Reentrant(System.Int32 id);
+    }
 }
 
 #endregion
@@ -1650,6 +1722,13 @@ namespace Akka.Interfaced.Tests
             Notify(payload);
         }
     }
+
+    [AlternativeInterface(typeof(ISubject2Observer))]
+    public interface ISubject2ObserverAsync : IInterfacedObserver
+    {
+        Task Event(System.String eventName);
+        Task Event2(System.String eventName);
+    }
 }
 
 #endregion
@@ -1712,6 +1791,12 @@ namespace Akka.Interfaced.Tests
             Notify(payload);
         }
     }
+
+    [AlternativeInterface(typeof(ISubjectExObserver))]
+    public interface ISubjectExObserverAsync : ISubjectObserverAsync
+    {
+        Task EventEx(System.String eventName);
+    }
 }
 
 #endregion
@@ -1767,6 +1852,12 @@ namespace Akka.Interfaced.Tests
             var payload = new ISubjectObserver_PayloadTable.Event_Invoke { eventName = eventName };
             Notify(payload);
         }
+    }
+
+    [AlternativeInterface(typeof(ISubjectObserver))]
+    public interface ISubjectObserverAsync : IInterfacedObserver
+    {
+        Task Event(System.String eventName);
     }
 }
 

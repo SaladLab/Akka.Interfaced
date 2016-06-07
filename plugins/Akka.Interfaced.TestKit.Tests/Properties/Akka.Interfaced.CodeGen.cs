@@ -143,6 +143,13 @@ namespace Akka.Interfaced.TestKit.Tests
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IUser))]
+    public interface IUserSync : IInterfacedActor
+    {
+        System.String GetId();
+        void Say(System.String message);
+    }
 }
 
 #endregion
@@ -262,6 +269,12 @@ namespace Akka.Interfaced.TestKit.Tests
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IUserLogin))]
+    public interface IUserLoginSync : IInterfacedActor
+    {
+        Akka.Interfaced.TestKit.Tests.IUser Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer);
+    }
 }
 
 #endregion
@@ -317,6 +330,12 @@ namespace Akka.Interfaced.TestKit.Tests
             var payload = new IUserObserver_PayloadTable.Say_Invoke { message = message };
             Notify(payload);
         }
+    }
+
+    [AlternativeInterface(typeof(IUserObserver))]
+    public interface IUserObserverAsync : IInterfacedObserver
+    {
+        Task Say(System.String message);
     }
 }
 

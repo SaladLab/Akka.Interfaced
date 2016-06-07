@@ -209,6 +209,15 @@ namespace Akka.Interfaced.Persistence.Tests
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(INotepad))]
+    public interface INotepadSync : IInterfacedActor
+    {
+        void Clear();
+        void FlushSnapshot();
+        System.Collections.Generic.IList<System.String> GetDocument();
+        void Write(System.String message);
+    }
 }
 
 #endregion

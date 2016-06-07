@@ -229,6 +229,15 @@ namespace Akka.Interfaced.LogFilter.Tests
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(ITest))]
+    public interface ITestSync : IInterfacedActor
+    {
+        void Call(System.String value);
+        void CallWithActor(Akka.Interfaced.LogFilter.Tests.ITest test);
+        System.Int32 GetHelloCount();
+        System.String SayHello(System.String name);
+    }
 }
 
 #endregion

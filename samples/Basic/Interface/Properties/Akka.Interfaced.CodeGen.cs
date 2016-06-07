@@ -163,6 +163,13 @@ namespace Basic.Interface
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(ICalculator))]
+    public interface ICalculatorSync : IInterfacedActor
+    {
+        System.String Concat(System.String a, System.String b);
+        System.Int32 Sum(System.Int32 a, System.Int32 b);
+    }
 }
 
 #endregion
@@ -296,6 +303,13 @@ namespace Basic.Interface
             };
             SendRequest(requestMessage);
         }
+    }
+
+    [AlternativeInterface(typeof(ICounter))]
+    public interface ICounterSync : IInterfacedActor
+    {
+        System.Int32 GetCounter();
+        void IncCounter(System.Int32 delta);
     }
 }
 
@@ -505,6 +519,15 @@ namespace Basic.Interface
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IEventGenerator))]
+    public interface IEventGeneratorSync : IInterfacedActor
+    {
+        void Buy(System.String name, System.Int32 price);
+        void Sell(System.String name, System.Int32 price);
+        void Subscribe(Basic.Interface.IEventObserver observer);
+        void Unsubscribe(Basic.Interface.IEventObserver observer);
+    }
 }
 
 #endregion
@@ -711,6 +734,14 @@ namespace Basic.Interface
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IOverloaded))]
+    public interface IOverloadedSync : IInterfacedActor
+    {
+        System.Int32 Min(System.Int32 a, System.Int32 b);
+        System.Int32 Min(System.Int32 a, System.Int32 b, System.Int32 c);
+        System.Int32 Min(params System.Int32[] nums);
+    }
 }
 
 #endregion
@@ -831,6 +862,13 @@ namespace Basic.Interface
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(IWorker))]
+    public interface IWorkerSync : IInterfacedActor
+    {
+        void Atomic(System.String name);
+        void Reentrant(System.String name);
+    }
 }
 
 #endregion
@@ -910,6 +948,13 @@ namespace Basic.Interface
             var payload = new IEventObserver_PayloadTable.OnSell_Invoke { name = name, price = price };
             Notify(payload);
         }
+    }
+
+    [AlternativeInterface(typeof(IEventObserver))]
+    public interface IEventObserverAsync : IInterfacedObserver
+    {
+        Task OnBuy(System.String name, System.Int32 price);
+        Task OnSell(System.String name, System.Int32 price);
     }
 }
 

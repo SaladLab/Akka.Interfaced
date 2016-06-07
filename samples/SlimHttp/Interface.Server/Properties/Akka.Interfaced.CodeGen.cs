@@ -163,6 +163,13 @@ namespace SlimHttp.Interface
             SendRequest(requestMessage);
         }
     }
+
+    [AlternativeInterface(typeof(ICalculator))]
+    public interface ICalculatorSync : IInterfacedActor
+    {
+        System.String Concat(System.String a, System.String b);
+        System.Int32 Sum(System.Int32 a, System.Int32 b);
+    }
 }
 
 #endregion
@@ -296,6 +303,13 @@ namespace SlimHttp.Interface
             };
             SendRequest(requestMessage);
         }
+    }
+
+    [AlternativeInterface(typeof(ICounter))]
+    public interface ICounterSync : IInterfacedActor
+    {
+        System.Int32 GetCounter();
+        void IncCounter(System.Int32 delta);
     }
 }
 
@@ -635,6 +649,17 @@ namespace SlimHttp.Interface
             };
             SendRequest(requestMessage);
         }
+    }
+
+    [AlternativeInterface(typeof(IPedantic))]
+    public interface IPedanticSync : IInterfacedActor
+    {
+        void TestCall();
+        System.Nullable<System.Int32> TestOptional(System.Nullable<System.Int32> value);
+        System.Int32[] TestParams(params System.Int32[] values);
+        System.String TestPassClass(SlimHttp.Interface.TestParam param);
+        SlimHttp.Interface.TestResult TestReturnClass(System.Int32 value, System.Int32 offset);
+        System.Tuple<System.Int32, System.String> TestTuple(System.Tuple<System.Int32, System.String> value);
     }
 }
 
