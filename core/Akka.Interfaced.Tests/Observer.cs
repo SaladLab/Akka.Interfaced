@@ -198,6 +198,42 @@ namespace Akka.Interfaced.Tests
         }
     }
 
+    public class ObserverAsyncReentrantActor : InterfacedActor, IDummy, ISubjectObserverAsync
+    {
+        private SubjectRef _subject;
+        private List<string> _eventLog;
+
+        public ObserverAsyncReentrantActor(SubjectRef subject, List<string> eventLog)
+        {
+            _subject = subject.WithRequestWaiter(this);
+            _eventLog = eventLog;
+        }
+
+        [Reentrant]
+        async Task<object> IDummy.Call(object param)
+        {
+            var observer = CreateObserver<ISubjectObserver>(param);
+            await _subject.Subscribe(observer);
+            await _subject.MakeEvent("A");
+            await _subject.MakeEvent("B");
+            await _subject.Unsubscribe(observer);
+            RemoveObserver(observer);
+            return null;
+        }
+
+        [Reentrant]
+        async Task ISubjectObserverAsync.Event(string eventName)
+        {
+            var c = ObserverContext != null ? ObserverContext + ":" : "";
+            _eventLog.Add(c + eventName + ":1");
+
+            await Task.Delay(100);
+
+            var contextMessage2 = ObserverContext != null ? ObserverContext + ":" : "";
+            _eventLog.Add(contextMessage2 + eventName + ":2");
+        }
+    }
+
     public class Observer : Akka.TestKit.Xunit2.TestKit
     {
         public Observer(ITestOutputHelper output)
@@ -272,6 +308,24 @@ namespace Akka.Interfaced.Tests
             var observerActor = ActorOfAsTestActorRef<ObserverExtendedAsyncReentrantActor>(
                 Props.Create<ObserverExtendedAsyncReentrantActor>(subject, eventLog), "TestObserverExtendedAsyncReentrantActor");
             var observer = new DummyRef(observerActor);
+
+            // Act
+            await observer.Call(context);
+            await Task.Delay(200);
+
+            // Assert
+            var c = context != null ? context + ":" : "";
+            Assert.Equal(new[] { $"{c}A:1", $"{c}A:2" }, eventLog.Where(x => x.StartsWith($"{c}A")));
+            Assert.Equal(new[] { $"{c}B:1", $"{c}B:2" }, eventLog.Where(x => x.StartsWith($"{c}B")));
+        }
+
+        [Theory, InlineData(null), InlineData("CTX")]
+        public async Task AsyncReentrantActor_ObserveSubject(object context)
+        {
+            // Arrange
+            var eventLog = new List<string>();
+            var subject = new SubjectRef(ActorOfAsTestActorRef(() => new SubjectActor()));
+            var observer = new DummyRef(ActorOfAsTestActorRef(() => new ObserverAsyncReentrantActor(subject, eventLog)));
 
             // Act
             await observer.Call(context);
