@@ -55,6 +55,10 @@
       <HintPath>..\..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NLog.4.3.4\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.1.36.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
@@ -95,6 +99,10 @@
     <ProjectReference Include="..\..\..\core\Akka.Interfaced\Akka.Interfaced.csproj">
       <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>
       <Name>Akka.Interfaced</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\plugins\Akka.Interfaced.LogFilter\Akka.Interfaced.LogFilter.csproj">
+      <Project>{0f26dfce-11ba-4118-be9a-e4c541d70f14}</Project>
+      <Name>Akka.Interfaced.LogFilter</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\plugins\Akka.Interfaced.Persistence\Akka.Interfaced.Persistence.csproj">
       <Project>{6364051d-a683-4239-bbbe-88412a8f4e8b}</Project>
