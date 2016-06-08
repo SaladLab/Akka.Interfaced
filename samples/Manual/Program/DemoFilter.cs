@@ -43,6 +43,11 @@ namespace Manual
             }
         }
 
+        public interface IAuthorizable
+        {
+            bool Authorized { get; }
+        }
+
         [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
         public sealed class AuthorizedAttribute : Attribute, IFilterPerClassFactory, IPreRequestFilter
         {
@@ -57,8 +62,8 @@ namespace Manual
                 if (context.Handled)
                     return;
 
-                var actor = (MyActor)context.Actor;
-                if (actor.Permission < 1)
+                var actor = (IAuthorizable)context.Actor;
+                if (actor == null || actor.Authorized == false)
                 {
                     context.Response = new ResponseMessage
                     {
@@ -71,11 +76,13 @@ namespace Manual
         }
 
         [Log, ResponsiveException(typeof(ArgumentException))]
-        public class MyActor : InterfacedActor, IGreeterSync
+        public class MyActor : InterfacedActor, IGreeterSync, IAuthorizable
         {
             private int _count;
 
             public int Permission { get; }
+
+            bool IAuthorizable.Authorized => Permission > 0;
 
             public MyActor(int permission)
             {
