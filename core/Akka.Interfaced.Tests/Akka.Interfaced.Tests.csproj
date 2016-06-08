@@ -114,6 +114,7 @@
     <Compile Include="GracefulShutdownTest.cs" />
     <Compile Include="ExceptionAtStartStopTest.cs" />
     <Compile Include="ActorCancellationTokenTest.cs" />
+    <Compile Include="StartEventTest.cs" />
     <Compile Include="SubjectActor.cs" />
     <Compile Include="TaskRunTest.cs" />
   </ItemGroup>
