@@ -7,9 +7,9 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced
 {
-    public class ObserverFilterTest : TestKit.Xunit2.TestKit
+    public class NotificationFilterTest : TestKit.Xunit2.TestKit
     {
-        public ObserverFilterTest(ITestOutputHelper output)
+        public NotificationFilterTest(ITestOutputHelper output)
             : base(output: output)
         {
         }

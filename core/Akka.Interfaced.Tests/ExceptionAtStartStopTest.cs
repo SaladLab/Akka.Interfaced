@@ -8,9 +8,9 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced.Tests
 {
-    public class StartStopExceptionTest : TestKit.Xunit2.TestKit
+    public class ExceptionAtStartStopTest : TestKit.Xunit2.TestKit
     {
-        public StartStopExceptionTest(ITestOutputHelper output)
+        public ExceptionAtStartStopTest(ITestOutputHelper output)
             : base("akka.actor.guardian-supervisor-strategy = \"Akka.Actor.StoppingSupervisorStrategy\"", output: output)
         {
         }
@@ -24,12 +24,12 @@ namespace Akka.Interfaced.Tests
             {
                 _log = log;
                 _tag = tag;
-                _log.Log("ctor");
+                _log.Add("ctor");
             }
 
             protected override void PreStart()
             {
-                _log.Log("PreStart");
+                _log.Add("PreStart");
 
                 if (_tag == "PreStart")
                     throw new Exception();
@@ -39,14 +39,14 @@ namespace Akka.Interfaced.Tests
 
             protected override async Task OnStart(bool restarted)
             {
-                _log.Log("OnStart");
+                _log.Add("OnStart");
 
                 if (_tag == "OnStart")
                     throw new Exception();
 
                 await Task.Yield();
 
-                _log.Log("OnStart Done");
+                _log.Add("OnStart Done");
 
                 if (_tag == "OnStart Done")
                     throw new Exception();
@@ -54,14 +54,14 @@ namespace Akka.Interfaced.Tests
 
             protected override async Task OnGracefulStop()
             {
-                _log.Log("OnGracefulStop");
+                _log.Add("OnGracefulStop");
 
                 if (_tag == "OnGracefulStop")
                     throw new Exception();
 
                 await Task.Yield();
 
-                _log.Log("OnGracefulStop Done");
+                _log.Add("OnGracefulStop Done");
 
                 if (_tag == "OnGracefulStop Done")
                     throw new Exception();
@@ -69,7 +69,7 @@ namespace Akka.Interfaced.Tests
 
             protected override void PostStop()
             {
-                _log.Log("PostStop");
+                _log.Add("PostStop");
 
                 if (_tag == "PostStop")
                     throw new Exception();
@@ -80,7 +80,7 @@ namespace Akka.Interfaced.Tests
             [MessageHandler]
             private void Handle(string message)
             {
-                _log.Log($"Handle({message})");
+                _log.Add($"Handle({message})");
                 if (message == "E")
                     throw new Exception();
             }
@@ -102,7 +102,7 @@ namespace Akka.Interfaced.Tests
                     "ctor",
                     "PreStart",
                 },
-                log.GetLogs());
+                log);
         }
 
         [Fact]
@@ -123,7 +123,7 @@ namespace Akka.Interfaced.Tests
                     "OnStart",
                     "PostStop"
                 },
-                log.GetLogs());
+                log);
         }
 
         [Fact]
@@ -145,7 +145,7 @@ namespace Akka.Interfaced.Tests
                     "OnStart Done",
                     "PostStop"
                 },
-                log.GetLogs());
+                log);
         }
 
         [Fact]
@@ -168,7 +168,7 @@ namespace Akka.Interfaced.Tests
                     "OnGracefulStop",
                     "PostStop"
                 },
-                log.GetLogs());
+                log);
         }
 
         [Fact]
@@ -192,7 +192,7 @@ namespace Akka.Interfaced.Tests
                     "OnGracefulStop Done",
                     "PostStop"
                 },
-                log.GetLogs());
+                log);
         }
 
         [Fact]
@@ -216,7 +216,7 @@ namespace Akka.Interfaced.Tests
                     "OnGracefulStop Done",
                     "PostStop"
                 },
-                log.GetLogs());
+                log);
         }
 
         [Fact]
@@ -239,7 +239,7 @@ namespace Akka.Interfaced.Tests
                     "Handle(E)",
                     "PostStop"
                 },
-                log.GetLogs());
+                log);
         }
     }
 }

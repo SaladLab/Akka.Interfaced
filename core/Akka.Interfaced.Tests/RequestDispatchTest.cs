@@ -17,30 +17,30 @@ namespace Akka.Interfaced
 
         public class TestScheduleActor : InterfacedActor, IWorker
         {
-            private LogBoard<Tuple<int, int>> _logBoard;
+            private LogBoard<Tuple<int, int>> _log;
 
-            public TestScheduleActor(LogBoard<Tuple<int, int>> logBoard)
+            public TestScheduleActor(LogBoard<Tuple<int, int>> log)
             {
-                _logBoard = logBoard;
+                _log = log;
             }
 
             async Task IWorker.Atomic(int id)
             {
-                _logBoard.Log(Tuple.Create(id, 1));
+                _log.Add(Tuple.Create(id, 1));
                 await Task.Delay(10);
-                _logBoard.Log(Tuple.Create(id, 2));
+                _log.Add(Tuple.Create(id, 2));
                 await Task.Delay(10);
-                _logBoard.Log(Tuple.Create(id, 3));
+                _log.Add(Tuple.Create(id, 3));
             }
 
             [Reentrant]
             async Task IWorker.Reentrant(int id)
             {
-                _logBoard.Log(Tuple.Create(id, 1));
+                _log.Add(Tuple.Create(id, 1));
                 await Task.Delay(10);
-                _logBoard.Log(Tuple.Create(id, 2));
+                _log.Add(Tuple.Create(id, 2));
                 await Task.Delay(10);
-                _logBoard.Log(Tuple.Create(id, 3));
+                _log.Add(Tuple.Create(id, 3));
             }
         }
 
@@ -48,8 +48,8 @@ namespace Akka.Interfaced
         public async Task Schedule_AtomicHandler_Sequential()
         {
             // Arrange
-            var logBoard = new LogBoard<Tuple<int, int>>();
-            var a = new WorkerRef(ActorOf(() => new TestScheduleActor(logBoard)));
+            var log = new LogBoard<Tuple<int, int>>();
+            var a = new WorkerRef(ActorOf(() => new TestScheduleActor(log)));
 
             // Act
             var t1 = a.Atomic(1);
@@ -65,15 +65,15 @@ namespace Akka.Interfaced
                 Tuple.Create(2, 1),
                 Tuple.Create(2, 2),
                 Tuple.Create(2, 3),
-            }, logBoard.GetLogs());
+            }, log);
         }
 
         [Fact]
         public async Task Schedule_ReentrantHandler_Interleaved()
         {
             // Arrange
-            var logBoard = new LogBoard<Tuple<int, int>>();
-            var a = new WorkerRef(ActorOf(() => new TestScheduleActor(logBoard)));
+            var log = new LogBoard<Tuple<int, int>>();
+            var a = new WorkerRef(ActorOf(() => new TestScheduleActor(log)));
 
             // Act
             var t1 = a.Reentrant(1);
@@ -82,17 +82,17 @@ namespace Akka.Interfaced
 
             // Assert
             Assert.Equal(new[] { 1, 2, 3 },
-                         logBoard.GetLogs().Where(t => t.Item1 == 1).Select(t => t.Item2));
+                         log.Where(t => t.Item1 == 1).Select(t => t.Item2));
             Assert.Equal(new[] { 1, 2, 3 },
-                         logBoard.GetLogs().Where(t => t.Item1 == 1).Select(t => t.Item2));
+                         log.Where(t => t.Item1 == 1).Select(t => t.Item2));
         }
 
         [Fact]
         public async Task Schedule_AtomicAndReentrantHandler_Interleaved()
         {
             // Arrange
-            var logBoard = new LogBoard<Tuple<int, int>>();
-            var a = new WorkerRef(ActorOf(() => new TestScheduleActor(logBoard)));
+            var log = new LogBoard<Tuple<int, int>>();
+            var a = new WorkerRef(ActorOf(() => new TestScheduleActor(log)));
 
             // Act
             var t1 = a.Reentrant(1);
@@ -108,16 +108,16 @@ namespace Akka.Interfaced
                 Tuple.Create(2, 3),
                 Tuple.Create(1, 2),
                 Tuple.Create(1, 3),
-            }, logBoard.GetLogs());
+            }, log);
         }
 
         public class TestContextActor : InterfacedActor, IWorker
         {
-            private LogBoard<Tuple<int, object>> _logBoard;
+            private LogBoard<Tuple<int, object>> _log;
 
-            public TestContextActor(LogBoard<Tuple<int, object>> logBoard)
+            public TestContextActor(LogBoard<Tuple<int, object>> log)
             {
-                _logBoard = logBoard;
+                _log = log;
             }
 
             // InterfacedActor tries to keep sender correctly!
@@ -125,21 +125,21 @@ namespace Akka.Interfaced
 
             async Task IWorker.Atomic(int id)
             {
-                _logBoard.Log(Tuple.Create(id, CurrentContext));
+                _log.Add(Tuple.Create(id, CurrentContext));
                 await Task.Delay(10);
-                _logBoard.Log(Tuple.Create(id, CurrentContext));
+                _log.Add(Tuple.Create(id, CurrentContext));
                 await Task.Delay(10);
-                _logBoard.Log(Tuple.Create(id, CurrentContext));
+                _log.Add(Tuple.Create(id, CurrentContext));
             }
 
             [Reentrant]
             async Task IWorker.Reentrant(int id)
             {
-                _logBoard.Log(Tuple.Create(id, CurrentContext));
+                _log.Add(Tuple.Create(id, CurrentContext));
                 await Task.Delay(10);
-                _logBoard.Log(Tuple.Create(id, CurrentContext));
+                _log.Add(Tuple.Create(id, CurrentContext));
                 await Task.Delay(10);
-                _logBoard.Log(Tuple.Create(id, CurrentContext));
+                _log.Add(Tuple.Create(id, CurrentContext));
             }
         }
 
@@ -147,8 +147,8 @@ namespace Akka.Interfaced
         public async Task Dispatch_AtomicHandlers_KeepContext()
         {
             // Arrange
-            var logBoard = new LogBoard<Tuple<int, object>>();
-            var a = new WorkerRef(ActorOf(() => new TestContextActor(logBoard)));
+            var log = new LogBoard<Tuple<int, object>>();
+            var a = new WorkerRef(ActorOf(() => new TestContextActor(log)));
 
             // Act
             var t1 = a.Atomic(1);
@@ -156,7 +156,7 @@ namespace Akka.Interfaced
             await Task.WhenAll(t1, t2);
 
             // Assetr
-            var logs = logBoard.GetLogs();
+            var logs = log;
             Assert.Equal(1, logs.Where(t => t.Item1 == 1).Select(t => t.Item2).Distinct().Count());
             Assert.Equal(1, logs.Where(t => t.Item1 == 1).Select(t => t.Item2).Distinct().Count());
             Assert.Equal(2, logs.Select(t => t.Item2).Distinct().Count());
@@ -166,8 +166,8 @@ namespace Akka.Interfaced
         public async Task Dispatch_ReentrantHandlers_KeepContext()
         {
             // Arrange
-            var logBoard = new LogBoard<Tuple<int, object>>();
-            var a = new WorkerRef(ActorOf(() => new TestContextActor(logBoard)));
+            var log = new LogBoard<Tuple<int, object>>();
+            var a = new WorkerRef(ActorOf(() => new TestContextActor(log)));
 
             // Act
             var t1 = a.Reentrant(1);
@@ -175,7 +175,7 @@ namespace Akka.Interfaced
             await Task.WhenAll(t1, t2);
 
             // Assetr
-            var logs = logBoard.GetLogs();
+            var logs = log;
             Assert.Equal(1, logs.Where(t => t.Item1 == 1).Select(t => t.Item2).Distinct().Count());
             Assert.Equal(1, logs.Where(t => t.Item1 == 1).Select(t => t.Item2).Distinct().Count());
             Assert.Equal(2, logs.Select(t => t.Item2).Distinct().Count());

@@ -1,21 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace Akka.Interfaced
 {
-    public class LogBoard<T>
+    public class LogBoard<T> : IEnumerable<T>
     {
         private ConcurrentQueue<T> _logs = new ConcurrentQueue<T>();
 
-        public void Log(T log)
+        public void Add(T log)
         {
             _logs.Enqueue(log);
         }
 
-        public List<T> GetLogs()
+        public IEnumerator<T> GetEnumerator()
         {
-            return _logs.ToList();
+            return _logs.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _logs.GetEnumerator();
         }
     }
 }

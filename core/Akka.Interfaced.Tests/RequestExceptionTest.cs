@@ -30,7 +30,7 @@ namespace Akka.Interfaced
             [ExtendedHandler]
             private object Call(object param)
             {
-                _log.Log($"Call({param})");
+                _log.Add($"Call({param})");
 
                 if ((string)param == "E")
                     throw new Exception();
@@ -42,7 +42,7 @@ namespace Akka.Interfaced
 
             async Task IWorker.Atomic(int id)
             {
-                _log.Log($"Atomic({id})");
+                _log.Add($"Atomic({id})");
 
                 if (id == 1)
                     throw new Exception();
@@ -54,7 +54,7 @@ namespace Akka.Interfaced
                 else
                     await Task.Delay(_delay);
 
-                _log.Log($"Atomic({id}) Done");
+                _log.Add($"Atomic({id}) Done");
 
                 if (id == 2)
                     throw new Exception();
@@ -65,7 +65,7 @@ namespace Akka.Interfaced
             [Reentrant]
             async Task IWorker.Reentrant(int id)
             {
-                _log.Log($"Reentrant({id})");
+                _log.Add($"Reentrant({id})");
 
                 if (id == 1)
                     throw new Exception();
@@ -77,7 +77,7 @@ namespace Akka.Interfaced
                 else
                     await Task.Delay(_delay);
 
-                _log.Log($"Reentrant({id}) Done");
+                _log.Add($"Reentrant({id}) Done");
 
                 if (id == 2)
                     throw new Exception();
@@ -101,7 +101,7 @@ namespace Akka.Interfaced
             Watch(a.Actor);
             ExpectTerminated(a.Actor);
             Assert.Equal(new[] { "Call(E)" },
-                         log.GetLogs());
+                         log);
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace Akka.Interfaced
             // Assert
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(new[] { "Call(e)" },
-                         log.GetLogs());
+                         log);
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace Akka.Interfaced
             Watch(a.Actor);
             ExpectTerminated(a.Actor);
             Assert.Equal(new[] { "Atomic(1)" },
-                         log.GetLogs());
+                         log);
         }
 
         [Fact]
@@ -153,7 +153,7 @@ namespace Akka.Interfaced
             Watch(a.Actor);
             ExpectTerminated(a.Actor);
             Assert.Equal(new[] { "Atomic(2)", "Atomic(2) Done" },
-                         log.GetLogs());
+                         log);
         }
 
         [Fact]
@@ -171,7 +171,7 @@ namespace Akka.Interfaced
             Watch(a.Actor);
             ExpectTerminated(a.Actor);
             Assert.Equal(new[] { "Reentrant(1)" },
-                         log.GetLogs());
+                         log);
         }
 
         [Fact]
@@ -189,7 +189,7 @@ namespace Akka.Interfaced
             Watch(a.Actor);
             ExpectTerminated(a.Actor);
             Assert.Equal(new[] { "Reentrant(2)", "Reentrant(2) Done" },
-                         log.GetLogs());
+                         log);
         }
 
         [Fact]
@@ -208,7 +208,7 @@ namespace Akka.Interfaced
             Watch(a.Actor);
             ExpectTerminated(a.Actor);
             Assert.Equal(new[] { "Atomic(10)" },
-                         log.GetLogs());
+                         log);
         }
 
         [Fact]
@@ -230,7 +230,7 @@ namespace Akka.Interfaced
             Watch(a.Actor);
             ExpectTerminated(a.Actor);
             Assert.Equal(new[] { "Reentrant(10)", "Reentrant(11)", "Atomic(1)" },
-                         log.GetLogs());
+                         log);
         }
     }
 }

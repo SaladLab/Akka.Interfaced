@@ -17,33 +17,33 @@ namespace Akka.Interfaced
 
         public class TestGracefulShutdownActor : InterfacedActor, IWorker
         {
-            private readonly LogBoard<string> _logBoard;
+            private readonly LogBoard<string> _log;
 
-            public TestGracefulShutdownActor(LogBoard<string> logBoard)
+            public TestGracefulShutdownActor(LogBoard<string> log)
             {
-                _logBoard = logBoard;
+                _log = log;
             }
 
             protected override async Task OnGracefulStop()
             {
-                _logBoard.Log("OnGracefulStop");
+                _log.Add("OnGracefulStop");
                 await Task.Delay(10);
-                _logBoard.Log("OnGracefulStop done");
+                _log.Add("OnGracefulStop done");
             }
 
             async Task IWorker.Atomic(int id)
             {
-                _logBoard.Log($"Atomic({id})");
+                _log.Add($"Atomic({id})");
                 await Task.Delay(10);
-                _logBoard.Log($"Atomic({id}) done");
+                _log.Add($"Atomic({id}) done");
             }
 
             [Reentrant]
             async Task IWorker.Reentrant(int id)
             {
-                _logBoard.Log($"Reentrant({id})");
+                _log.Add($"Reentrant({id})");
                 await Task.Delay(10);
-                _logBoard.Log($"Reentrant({id}) done");
+                _log.Add($"Reentrant({id}) done");
             }
         }
 
@@ -51,8 +51,8 @@ namespace Akka.Interfaced
         public async Task GetInterfacedPoisonPill_WaitForAllAtomicHandlersDone()
         {
             // Arrange
-            var logBoard = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(() => new TestGracefulShutdownActor(logBoard)));
+            var log = new LogBoard<string>();
+            var a = new WorkerRef(ActorOf(() => new TestGracefulShutdownActor(log)));
 
             // Act
             a.WithNoReply().Atomic(1);
@@ -68,15 +68,15 @@ namespace Akka.Interfaced
                 "Atomic(2) done",
                 "OnGracefulStop",
                 "OnGracefulStop done"
-            }, logBoard.GetLogs());
+            }, log);
         }
 
         [Fact]
         public async Task GetInterfacedPoisonPill_WaitForAllReentrantHandlersDone()
         {
             // Arrange
-            var logBoard = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(() => new TestGracefulShutdownActor(logBoard)));
+            var log = new LogBoard<string>();
+            var a = new WorkerRef(ActorOf(() => new TestGracefulShutdownActor(log)));
 
             // Act
             a.WithNoReply().Reentrant(1);
@@ -90,12 +90,12 @@ namespace Akka.Interfaced
                 "Reentrant(1) done",
                 "Reentrant(2)",
                 "Reentrant(2) done",
-            }.SetEquals(logBoard.GetLogs().Take(4)));
+            }.SetEquals(log.Take(4)));
             Assert.Equal(new List<string>
             {
                 "OnGracefulStop",
                 "OnGracefulStop done"
-            }, logBoard.GetLogs().Skip(4));
+            }, log.Skip(4));
         }
     }
 }

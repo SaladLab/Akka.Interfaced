@@ -17,41 +17,41 @@ namespace Akka.Interfaced
 
         public class TestBasicActor : InterfacedActor, IBasic
         {
-            private LogBoard<string> _logBoard;
+            private LogBoard<string> _log;
 
-            public TestBasicActor(LogBoard<string> logBoard)
+            public TestBasicActor(LogBoard<string> log)
             {
-                _logBoard = logBoard;
+                _log = log;
             }
 
             Task IBasic.Call()
             {
-                _logBoard.Log($"Call()");
+                _log.Add($"Call()");
                 return Task.FromResult(0);
             }
 
             Task IBasic.CallWithParameter(int value)
             {
-                _logBoard.Log($"CallWithParameter({value})");
+                _log.Add($"CallWithParameter({value})");
                 return Task.FromResult(0);
             }
 
             Task<int> IBasic.CallWithParameterAndReturn(int value)
             {
-                _logBoard.Log($"CallWithParameterAndReturn({value})");
+                _log.Add($"CallWithParameterAndReturn({value})");
                 return Task.FromResult(value);
             }
 
             Task<int> IBasic.CallWithReturn()
             {
-                _logBoard.Log($"CallWithReturn()");
+                _log.Add($"CallWithReturn()");
                 return Task.FromResult(1);
             }
 
             [ResponsiveException(typeof(ArgumentException))]
             Task<int> IBasic.ThrowException(bool throwException)
             {
-                _logBoard.Log($"ThrowException({throwException})");
+                _log.Add($"ThrowException({throwException})");
 
                 if (throwException)
                     throw new ArgumentException("throwException");
@@ -62,39 +62,39 @@ namespace Akka.Interfaced
 
         public class TestBasicSyncActor : InterfacedActor, IBasicSync
         {
-            private LogBoard<string> _logBoard;
+            private LogBoard<string> _log;
 
-            public TestBasicSyncActor(LogBoard<string> logBoard)
+            public TestBasicSyncActor(LogBoard<string> log)
             {
-                _logBoard = logBoard;
+                _log = log;
             }
 
             void IBasicSync.Call()
             {
-                _logBoard.Log($"Call()");
+                _log.Add($"Call()");
             }
 
             void IBasicSync.CallWithParameter(int value)
             {
-                _logBoard.Log($"CallWithParameter({value})");
+                _log.Add($"CallWithParameter({value})");
             }
 
             int IBasicSync.CallWithParameterAndReturn(int value)
             {
-                _logBoard.Log($"CallWithParameterAndReturn({value})");
+                _log.Add($"CallWithParameterAndReturn({value})");
                 return value;
             }
 
             int IBasicSync.CallWithReturn()
             {
-                _logBoard.Log($"CallWithReturn()");
+                _log.Add($"CallWithReturn()");
                 return 1;
             }
 
             [ResponsiveException(typeof(ArgumentException))]
             int IBasicSync.ThrowException(bool throwException)
             {
-                _logBoard.Log($"ThrowException({throwException})");
+                _log.Add($"ThrowException({throwException})");
 
                 if (throwException)
                     throw new ArgumentException("throwException");
@@ -105,36 +105,36 @@ namespace Akka.Interfaced
 
         public class TestBasicExtendedActor : InterfacedActor, IExtendedInterface<IBasic>
         {
-            private LogBoard<string> _logBoard;
+            private LogBoard<string> _log;
 
-            public TestBasicExtendedActor(LogBoard<string> logBoard)
+            public TestBasicExtendedActor(LogBoard<string> log)
             {
-                _logBoard = logBoard;
+                _log = log;
             }
 
             [ExtendedHandler]
             private void Call()
             {
-                _logBoard.Log($"Call()");
+                _log.Add($"Call()");
             }
 
             [ExtendedHandler]
             private void CallWithParameter(int value)
             {
-                _logBoard.Log($"CallWithParameter({value})");
+                _log.Add($"CallWithParameter({value})");
             }
 
             [ExtendedHandler]
             private int CallWithParameterAndReturn(int value)
             {
-                _logBoard.Log($"CallWithParameterAndReturn({value})");
+                _log.Add($"CallWithParameterAndReturn({value})");
                 return value;
             }
 
             [ExtendedHandler]
             private Task<int> CallWithReturn()
             {
-                _logBoard.Log($"CallWithReturn()");
+                _log.Add($"CallWithReturn()");
                 return Task.FromResult(1);
             }
 
@@ -142,7 +142,7 @@ namespace Akka.Interfaced
             [ResponsiveException(typeof(ArgumentException))]
             private Task<int> ThrowException(bool throwException)
             {
-                _logBoard.Log($"ThrowException({throwException})");
+                _log.Add($"ThrowException({throwException})");
 
                 if (throwException)
                     throw new ArgumentException("throwException");
@@ -158,14 +158,14 @@ namespace Akka.Interfaced
         public async Task BasicCall_Done(Type actorType)
         {
             // Arrange
-            var board = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, board)));
+            var log = new LogBoard<string>();
+            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
 
             // Act
             await a.Call();
 
             // Assert
-            Assert.Equal(new[] { "Call()" }, board.GetLogs());
+            Assert.Equal(new[] { "Call()" }, log);
         }
 
         [Theory]
@@ -175,14 +175,14 @@ namespace Akka.Interfaced
         public async Task BasicCallWithParameter_Done(Type actorType)
         {
             // Arrange
-            var board = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, board)));
+            var log = new LogBoard<string>();
+            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
 
             // Act
             await a.CallWithParameter(1);
 
             // Assert
-            Assert.Equal(new[] { "CallWithParameter(1)" }, board.GetLogs());
+            Assert.Equal(new[] { "CallWithParameter(1)" }, log);
         }
 
         [Theory]
@@ -192,14 +192,14 @@ namespace Akka.Interfaced
         public async Task BasicCallWithParameterAndReturn_Done(Type actorType)
         {
             // Arrange
-            var board = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, board)));
+            var log = new LogBoard<string>();
+            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
 
             // Act
             var r = await a.CallWithParameterAndReturn(1);
 
             // Assert
-            Assert.Equal(new[] { "CallWithParameterAndReturn(1)" }, board.GetLogs());
+            Assert.Equal(new[] { "CallWithParameterAndReturn(1)" }, log);
             Assert.Equal(1, r);
         }
 
@@ -210,14 +210,14 @@ namespace Akka.Interfaced
         public async Task BasicCallWithReturn_Done(Type actorType)
         {
             // Arrange
-            var board = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, board)));
+            var log = new LogBoard<string>();
+            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
 
             // Act
             var r = await a.CallWithReturn();
 
             // Assert
-            Assert.Equal(new[] { "CallWithReturn()" }, board.GetLogs());
+            Assert.Equal(new[] { "CallWithReturn()" }, log);
             Assert.Equal(1, r);
         }
 
@@ -228,14 +228,14 @@ namespace Akka.Interfaced
         public async Task BasicThrowException_Done(Type actorType)
         {
             // Arrange
-            var board = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, board)));
+            var log = new LogBoard<string>();
+            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
 
             // Act
             var e = await Record.ExceptionAsync(() => a.ThrowException(true));
 
             // Assert
-            Assert.Equal(new[] { "ThrowException(True)" }, board.GetLogs());
+            Assert.Equal(new[] { "ThrowException(True)" }, log);
             Assert.IsType<ArgumentException>(e);
         }
     }
