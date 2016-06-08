@@ -206,7 +206,7 @@ namespace Akka.Interfaced
 
             // Act
             await a.Call(context);
-            await Task.Delay(200);
+            await a.Actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             // Assert
             var c = context != null ? context + ":" : "";
@@ -256,11 +256,11 @@ namespace Akka.Interfaced
             // Arrange
             var log = new LogBoard<string>();
             var subject = new SubjectRef(ActorOfAsTestActorRef(() => new SubjectActor()));
-            var observer = new DummyRef(ActorOfAsTestActorRef(() => new TestObserverAsyncReentrantActor(subject, log)));
+            var a = new DummyRef(ActorOfAsTestActorRef(() => new TestObserverAsyncReentrantActor(subject, log)));
 
             // Act
-            await observer.Call(context);
-            await Task.Delay(200);
+            await a.Call(context);
+            await a.Actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             // Assert
             var c = context != null ? context + ":" : "";
