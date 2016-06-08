@@ -1705,11 +1705,6 @@ namespace Akka.Interfaced
         {
         }
 
-        public Subject2Observer(IActorRef target, int observerId = 0)
-            : base(new ActorNotificationChannel(target), observerId)
-        {
-        }
-
         public void Event(System.String eventName)
         {
             var payload = new ISubject2Observer_PayloadTable.Event_Invoke { eventName = eventName };
@@ -1774,11 +1769,6 @@ namespace Akka.Interfaced
         {
         }
 
-        public SubjectExObserver(IActorRef target, int observerId = 0)
-            : base(new ActorNotificationChannel(target), observerId)
-        {
-        }
-
         public void EventEx(System.String eventName)
         {
             var payload = new ISubjectExObserver_PayloadTable.EventEx_Invoke { eventName = eventName };
@@ -1839,11 +1829,6 @@ namespace Akka.Interfaced
 
         public SubjectObserver(INotificationChannel channel, int observerId = 0)
             : base(channel, observerId)
-        {
-        }
-
-        public SubjectObserver(IActorRef target, int observerId = 0)
-            : base(new ActorNotificationChannel(target), observerId)
         {
         }
 

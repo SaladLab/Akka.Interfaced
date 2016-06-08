@@ -109,7 +109,7 @@ namespace Akka.Interfaced
             var log = new LogBoard<string>();
             var subject = new SubjectRef(ActorOf(() => new SubjectActor()));
             var observingActor = ActorOf(() => new TestFilterActor(log));
-            await subject.Subscribe(new SubjectObserver(observingActor));
+            await subject.Subscribe(new SubjectObserver(new ActorNotificationChannel(observingActor)));
 
             // Act
             await subject.MakeEvent("A");

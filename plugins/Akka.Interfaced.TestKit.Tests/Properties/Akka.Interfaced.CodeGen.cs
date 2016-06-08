@@ -320,11 +320,6 @@ namespace Akka.Interfaced.TestKit.Tests
         {
         }
 
-        public UserObserver(IActorRef target, int observerId = 0)
-            : base(new ActorNotificationChannel(target), observerId)
-        {
-        }
-
         public void Say(System.String message)
         {
             var payload = new IUserObserver_PayloadTable.Say_Invoke { message = message };

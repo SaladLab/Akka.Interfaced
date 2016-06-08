@@ -456,11 +456,6 @@ namespace Manual
         {
         }
 
-        public GreetObserver(IActorRef target, int observerId = 0)
-            : base(new ActorNotificationChannel(target), observerId)
-        {
-        }
-
         public void Event(System.String message)
         {
             var payload = new IGreetObserver_PayloadTable.Event_Invoke { message = message };

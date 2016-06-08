@@ -177,16 +177,6 @@ namespace CodeGen
                 {
                 }
 
-                // Constructor (IActorRef)
-
-                if (Options.UseSlimClient == false)
-                {
-                    using (w.B($"public {className}(IActorRef target, int observerId = 0)",
-                                $": base(new ActorNotificationChannel(target), observerId)"))
-                    {
-                    }
-                }
-
                 // Observer method messages
 
                 foreach (var t in typeInfos)
