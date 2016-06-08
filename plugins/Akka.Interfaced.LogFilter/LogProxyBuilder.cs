@@ -17,7 +17,7 @@ namespace Akka.Interfaced.LogFilter
 
         private static Tuple<Type, Func<object, object>> GetLoggerAccessor(Type targetType, string loggerName)
         {
-            const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+            const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
             if (string.IsNullOrEmpty(loggerName))
             {
