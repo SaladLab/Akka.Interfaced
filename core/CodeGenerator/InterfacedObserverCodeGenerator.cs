@@ -55,14 +55,14 @@ namespace CodeGen
             if (_surrogateForINotificationChannelGenerated)
                 return;
 
-            var namespaceHandle = (string.IsNullOrEmpty(callerType.Namespace) == false)
-                ? w.B($"namespace {callerType.Namespace}")
-                : null;
-
             var surrogateClassName = Utility.GetSurrogateClassName("INotificationChannel");
 
             w._($"#region {surrogateClassName}");
             w._();
+
+            var namespaceHandle = (string.IsNullOrEmpty(callerType.Namespace) == false)
+                ? w.B($"namespace {callerType.Namespace}")
+                : null;
 
             w._("[ProtoContract]");
             using (w.B($"public class {surrogateClassName}"))
