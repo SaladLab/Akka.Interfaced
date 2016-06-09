@@ -90,7 +90,6 @@ namespace Akka.Interfaced.TestKit
             var local = InterfacedObserver.Create(typeof(TObserver));
             local.ObserverId = observerId;
             local.Channel = new TestNotificationChannel { Observer = observer, Messages = messages };
-            local.Disposed = () => { RemoveObserver(observerId); };
             AddObserver(observerId, local);
 
             // duplicate an observer for passing to the actor because

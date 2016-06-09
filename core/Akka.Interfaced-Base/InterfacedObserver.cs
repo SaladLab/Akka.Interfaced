@@ -6,7 +6,6 @@ namespace Akka.Interfaced
     {
         public INotificationChannel Channel { get; set; }
         public int ObserverId { get; set; }
-        public Action Disposed { get; set; }
 
         protected InterfacedObserver(INotificationChannel channel, int observerId)
         {
