@@ -1,5 +1,3 @@
-** WRITING IN PROCESS **
-
 ## PersistentActor
 
 `UntypedPersistentActor` is the special base class the provides the persistency
