@@ -53,6 +53,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Interface\IGreeter.cs">
+      <Link>IGreeter.cs</Link>
+    </Compile>
     <Compile Include="Properties\Akka.Interfaced.CodeGen.Slim.Net35.cs" />
     <Compile Include="..\Interface\ICalculator.cs">
       <Link>ICalculator.cs</Link>

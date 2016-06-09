@@ -85,6 +85,7 @@
     <Compile Include="ActorController.cs" />
     <Compile Include="CalculatorActor.cs" />
     <Compile Include="CounterActor.cs" />
+    <Compile Include="GreetingActor.cs" />
     <Compile Include="PedanticActor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

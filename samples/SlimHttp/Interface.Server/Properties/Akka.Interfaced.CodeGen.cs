@@ -314,6 +314,163 @@ namespace SlimHttp.Interface
 }
 
 #endregion
+#region SlimHttp.Interface.IGreeter
+
+namespace SlimHttp.Interface
+{
+    [PayloadTable(typeof(IGreeter), PayloadTableKind.Request)]
+    public static class IGreeter_PayloadTable
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(GetCount_Invoke), typeof(GetCount_Return) },
+                { typeof(Greet_Invoke), typeof(Greet_Return) },
+            };
+        }
+
+        public class GetCount_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType()
+            {
+                return typeof(IGreeter);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IGreeter)__target).GetCount();
+                return (IValueGetable)(new GetCount_Return { v = __v });
+            }
+        }
+
+        public class GetCount_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public System.Int32 v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IGreeter);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+
+        public class Greet_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.String name;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IGreeter);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IGreeter)__target).Greet(name);
+                return (IValueGetable)(new Greet_Return { v = __v });
+            }
+        }
+
+        public class Greet_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public System.String v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IGreeter);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+    }
+
+    public interface IGreeter_NoReply
+    {
+        void GetCount();
+        void Greet(System.String name);
+    }
+
+    public class GreeterRef : InterfacedActorRef, IGreeter, IGreeter_NoReply
+    {
+        public GreeterRef() : base(null)
+        {
+        }
+
+        public GreeterRef(IActorRef actor) : base(actor)
+        {
+        }
+
+        public GreeterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        {
+        }
+
+        public IGreeter_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public GreeterRef WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new GreeterRef(Actor, requestWaiter, Timeout);
+        }
+
+        public GreeterRef WithTimeout(TimeSpan? timeout)
+        {
+            return new GreeterRef(Actor, RequestWaiter, timeout);
+        }
+
+        public Task<System.Int32> GetCount()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable.GetCount_Invoke {  }
+            };
+            return SendRequestAndReceive<System.Int32>(requestMessage);
+        }
+
+        public Task<System.String> Greet(System.String name)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
+            };
+            return SendRequestAndReceive<System.String>(requestMessage);
+        }
+
+        void IGreeter_NoReply.GetCount()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable.GetCount_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IGreeter_NoReply.Greet(System.String name)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+
+    [AlternativeInterface(typeof(IGreeter))]
+    public interface IGreeterSync : IInterfacedActor
+    {
+        System.Int32 GetCount();
+        System.String Greet(System.String name);
+    }
+}
+
+#endregion
 #region SlimHttp.Interface.IPedantic
 
 namespace SlimHttp.Interface

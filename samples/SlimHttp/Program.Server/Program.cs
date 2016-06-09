@@ -21,6 +21,7 @@ namespace SlimHttp.Program.Server
 
             DeadRequestProcessingActor.Install(System);
 
+            var greeter = System.ActorOf<GreetingActor>("greeter");
             var counter = System.ActorOf<CounterActor>("counter");
             var calculator = System.ActorOf<CalculatorActor>("calculator");
             var pedantic = System.ActorOf<PedanticActor>("pedantic");

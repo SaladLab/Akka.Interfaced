@@ -63,6 +63,9 @@
     <Compile Include="..\Interface\ICounter.cs">
       <Link>ICounter.cs</Link>
     </Compile>
+    <Compile Include="..\Interface\IGreeter.cs">
+      <Link>IGreeter.cs</Link>
+    </Compile>
     <Compile Include="..\Interface\IPedantic.cs">
       <Link>IPedantic.cs</Link>
     </Compile>

@@ -14,13 +14,20 @@ namespace SlimHttp.Program.Client
         {
             var requestWaiter = new SlimRequestWaiter { Root = new Uri("http://localhost:9000") };
 
+            // Greeter
+
+            Console.WriteLine("\n*** Greeter ***");
+
+            var greeter = new GreeterRef(new SlimActorRef("greeter"), requestWaiter, null);
+            PrintResult(greeter.Greet("World"));
+            PrintResult(greeter.Greet("Actor"));
+            PrintResult(greeter.GetCount());
+
             // Calculator
 
             Console.WriteLine("\n*** Calculator ***");
 
-            var calculatorActor = new SlimActorRef() { Id = "calculator" };
-            var calculator = new CalculatorRef(calculatorActor, requestWaiter, null);
-
+            var calculator = new CalculatorRef(new SlimActorRef("calculator"), requestWaiter, null);
             PrintResult(calculator.Concat("Hello", "World"));
             PrintResult(calculator.Concat(null, "Error"));
             PrintResult(calculator.Sum(1, 2));
@@ -29,9 +36,7 @@ namespace SlimHttp.Program.Client
 
             Console.WriteLine("\n*** Counter ***");
 
-            var counterActor = new SlimActorRef() { Id = "counter" };
-            var counter = new CounterRef(counterActor, requestWaiter, null);
-
+            var counter = new CounterRef(new SlimActorRef("counter"), requestWaiter, null);
             counter.IncCounter(1);
             counter.IncCounter(2);
             counter.IncCounter(3);
@@ -41,9 +46,7 @@ namespace SlimHttp.Program.Client
 
             Console.WriteLine("\n*** Pedantic ***");
 
-            var pedanticActor = new SlimActorRef() { Id = "pedantic" };
-            var pedantic = new PedanticRef(pedanticActor, requestWaiter, null);
-
+            var pedantic = new PedanticRef(new SlimActorRef("pedantic"), requestWaiter, null);
             pedantic.TestCall().Wait();
             PrintResult(pedantic.TestOptional(null));
             PrintResult(pedantic.TestOptional(1));
