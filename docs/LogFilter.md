@@ -1,38 +1,87 @@
-** WRITING IN PROCESS **
-
 ## LogFilter
 
-- Monitor all requests, notifications and messages.
-- Log library agnostic.
-  - it supports any kinds of log library which meets requirements
-    - class should have a logger member variable looks like '\*logger\*' or '\*log\*'.
-    - logger should have following methods.
-      - bool Is{logLevel}Enabled
-      - void {logLevel}(string/object message)
-    - Nlog and log4j meets requirements.
+LogFilter is a filter writing logs of request, notification and message.
+It's quite useful for understanding how actor works and debugging.
+
+For example, following actor class annotated with `[Log]` will show you
+what is going on the actor.
 
 ```csharp
-[Log]
-public class GreetingActor : InterfacedActor, IGreeter
+[Log, ResponsiveException(typeof(ArgumentException))]
+class GreetingActor : InterfacedActor, IGreeterSync
 {
-    private NLog.ILogger _logger; // will be used for writing logs
+    static Logger s_logger = LogManager.GetCurrentClassLogger();
+    int _count;
 
-    public TestActor()
-    {
-        _logger = NLog.LogManager.GetLogger("TestActor");
-    }
+    string IGreeterSync.Greet(string name) { ... }
+    int IGreeterSync.GetCount() { ... }
 
-    Task<string> IGreeter.Greet(string name) { ... }
-    Task<int> IGreeter.GetCount() { ... }  
+    [MessageHandler] void OnMessage(string message) { ... }
 }
 ```
 
-```csharp
-var hello = await greeter.Greet("Hello");
-// Log: <- (#-1) Greet {"name": "Hello"}
-// Log: -> (#-1) Greet "Hello World!"
+You can see `[Log]` attribute on the top of class and `s_logger` which LogFilter
+will write log messages to.
 
-var count = await greeter.GetCount();
-// Log: |LOG| <- (#-1) GetCount {}
-// Log: |LOG| -> (#-1) GetCount 1
+It captures input and output of request.
+
+```csharp
+await greeter.Greet("World");
+// Log: <- (#-1) Greet {"name":"World"}
+// Log: -> (#-1) Greet "Hello World!"
 ```
+
+When a responsive exception is thrown, it will be shown as a result.
+
+```csharp
+await greeter.Greet(null);
+// Log: <- (#-1) Greet {}
+// Log: -> (#-1) Greet Exception: System.ArgumentException: name
+```
+
+Also you can see incoming messages but outgoing ones are not possible to see.
+
+```csharp
+greeter.Actor.Tell("Bye!");
+// Log: <- OnMessage String("Bye!")
+```
+
+#### Setup
+
+To use log filter to specific actor class, you need to setup two things:
+
+- Add `[Log]` to a class or methods which should be traced.
+- Make a class contain a `Logger` field or property that can write logs.
+
+For example, previous `GreetingActor` has `[Log]` attribute of class and
+logger instance, `s_logger`.
+
+```csharp
+[Log]
+class GreetingActor : InterfacedActor
+{
+    static Logger s_logger = LogManager.GetCurrentClassLogger();
+}
+```
+
+LogFilter finds a logger instance whose name looks like `*logger` or `*log*`
+automatically but you can specify exact logger name like following.
+
+```csharp
+[Log(loggerName="_tracer")]
+class GreetingActor : InterfacedActor
+{
+    Logger _tracer;
+}
+```
+
+#### Log driver
+
+It's not easy to maintain supports for many log drivers.
+So LogFilter uses a reflection to support various log drivers such as log4net, NLog, etc.
+If logger instance provides following methods, it can be used for log target.
+
+- bool Is{LogLevel}Enabled
+- void {LogLevel}(string/object message)
+
+`LogLevel` is `Trace` by default and configurable.
