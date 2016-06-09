@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<packages>
+    <package id="Akka.Interfaced">
+        <files dir="lib/net45" source="core/Akka.Interfaced/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced-Base">
+        <files dir="lib/net45" source="core/Akka.Interfaced-Base/bin/Debug"/>
+        <files dir="lib/net35" source="core/Akka.Interfaced-Base.Net35/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced-SlimClient">
+        <files dir="lib/net45" source="core/Akka.Interfaced-SlimClient/bin/Debug"/>
+        <files dir="lib/net35" source="core/Akka.Interfaced-SlimClient.Net35/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced.Templates">
+        <files dir="tools" source="core/CodeGenerator/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced.Templates-Protobuf">
+        <files dir="tools" source="core/CodeGenerator/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced-SlimClient.Templates">
+        <files dir="tools" source="core/CodeGenerator/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced-SlimClient.Templates-Protobuf">
+        <files dir="tools" source="core/CodeGenerator/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced.CodeVerifier">
+        <files dir="tools" source="core/CodeVerifier/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced.LogFilter">
+        <files dir="lib/net45" source="plugins/Akka.Interfaced.LogFilter/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced.Persistence">
+        <files dir="lib/net45" source="plugins/Akka.Interfaced.Persistence/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced.ProtobufSerializer">
+        <files dir="lib/net45" source="plugins/Akka.Interfaced.ProtobufSerializer/bin/Debug"/>
+    </package>
+    <package id="Akka.Interfaced.TestKit">
+        <files dir="lib/net45" source="plugins/Akka.Interfaced.TestKit/bin/Debug"/>
+    </package>
+</packages>
