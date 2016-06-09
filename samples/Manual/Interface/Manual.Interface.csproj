@@ -56,7 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IGreeter.cs" />
-    <Compile Include="IGreeterWithObserver.cs" />
     <Compile Include="IGreetObserver.cs" />
     <Compile Include="Properties\Akka.Interfaced.CodeGen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

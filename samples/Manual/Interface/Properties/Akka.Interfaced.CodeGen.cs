@@ -179,75 +179,9 @@ namespace Manual
         public static Type[,] GetPayloadTypes()
         {
             return new Type[,] {
-                { typeof(GetCount_Invoke), typeof(GetCount_Return) },
-                { typeof(Greet_Invoke), typeof(Greet_Return) },
                 { typeof(Subscribe_Invoke), null },
                 { typeof(Unsubscribe_Invoke), null },
             };
-        }
-
-        public class GetCount_Invoke
-            : IInterfacedPayload, IAsyncInvokable
-        {
-            public Type GetInterfaceType()
-            {
-                return typeof(IGreeterWithObserver);
-            }
-
-            public async Task<IValueGetable> InvokeAsync(object __target)
-            {
-                var __v = await ((IGreeterWithObserver)__target).GetCount();
-                return (IValueGetable)(new GetCount_Return { v = __v });
-            }
-        }
-
-        public class GetCount_Return
-            : IInterfacedPayload, IValueGetable
-        {
-            public System.Int32 v;
-
-            public Type GetInterfaceType()
-            {
-                return typeof(IGreeterWithObserver);
-            }
-
-            public object Value
-            {
-                get { return v; }
-            }
-        }
-
-        public class Greet_Invoke
-            : IInterfacedPayload, IAsyncInvokable
-        {
-            public System.String name;
-
-            public Type GetInterfaceType()
-            {
-                return typeof(IGreeterWithObserver);
-            }
-
-            public async Task<IValueGetable> InvokeAsync(object __target)
-            {
-                var __v = await ((IGreeterWithObserver)__target).Greet(name);
-                return (IValueGetable)(new Greet_Return { v = __v });
-            }
-        }
-
-        public class Greet_Return
-            : IInterfacedPayload, IValueGetable
-        {
-            public System.String v;
-
-            public Type GetInterfaceType()
-            {
-                return typeof(IGreeterWithObserver);
-            }
-
-            public object Value
-            {
-                get { return v; }
-            }
         }
 
         public class Subscribe_Invoke
@@ -301,10 +235,8 @@ namespace Manual
         }
     }
 
-    public interface IGreeterWithObserver_NoReply
+    public interface IGreeterWithObserver_NoReply : IGreeter_NoReply
     {
-        void GetCount();
-        void Greet(System.String name);
         void Subscribe(Manual.IGreetObserver observer);
         void Unsubscribe(Manual.IGreetObserver observer);
     }
@@ -338,22 +270,6 @@ namespace Manual
             return new GreeterWithObserverRef(Actor, RequestWaiter, timeout);
         }
 
-        public Task<System.Int32> GetCount()
-        {
-            var requestMessage = new RequestMessage {
-                InvokePayload = new IGreeterWithObserver_PayloadTable.GetCount_Invoke {  }
-            };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
-        }
-
-        public Task<System.String> Greet(System.String name)
-        {
-            var requestMessage = new RequestMessage {
-                InvokePayload = new IGreeterWithObserver_PayloadTable.Greet_Invoke { name = name }
-            };
-            return SendRequestAndReceive<System.String>(requestMessage);
-        }
-
         public Task Subscribe(Manual.IGreetObserver observer)
         {
             var requestMessage = new RequestMessage {
@@ -370,20 +286,20 @@ namespace Manual
             return SendRequestAndWait(requestMessage);
         }
 
-        void IGreeterWithObserver_NoReply.GetCount()
+        public Task<System.Int32> GetCount()
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IGreeterWithObserver_PayloadTable.GetCount_Invoke {  }
+                InvokePayload = new IGreeter_PayloadTable.GetCount_Invoke {  }
             };
-            SendRequest(requestMessage);
+            return SendRequestAndReceive<System.Int32>(requestMessage);
         }
 
-        void IGreeterWithObserver_NoReply.Greet(System.String name)
+        public Task<System.String> Greet(System.String name)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IGreeterWithObserver_PayloadTable.Greet_Invoke { name = name }
+                InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
             };
-            SendRequest(requestMessage);
+            return SendRequestAndReceive<System.String>(requestMessage);
         }
 
         void IGreeterWithObserver_NoReply.Subscribe(Manual.IGreetObserver observer)
@@ -401,13 +317,27 @@ namespace Manual
             };
             SendRequest(requestMessage);
         }
+
+        void IGreeter_NoReply.GetCount()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable.GetCount_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IGreeter_NoReply.Greet(System.String name)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
+            };
+            SendRequest(requestMessage);
+        }
     }
 
     [AlternativeInterface(typeof(IGreeterWithObserver))]
-    public interface IGreeterWithObserverSync : IInterfacedActor
+    public interface IGreeterWithObserverSync : IGreeterSync
     {
-        System.Int32 GetCount();
-        System.String Greet(System.String name);
         void Subscribe(Manual.IGreetObserver observer);
         void Unsubscribe(Manual.IGreetObserver observer);
     }

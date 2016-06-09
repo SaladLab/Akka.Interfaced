@@ -20,7 +20,7 @@ namespace Manual
             private int _count;
             private List<IGreetObserver> _observers = new List<IGreetObserver>();
 
-            Task<string> IGreeterWithObserver.Greet(string name)
+            Task<string> IGreeter.Greet(string name)
             {
                 // send a notification 'Event' to all observers
                 _observers.ForEach(o => o.Event($"Greet({name})"));
@@ -28,7 +28,7 @@ namespace Manual
                 return Task.FromResult($"Hello {name}!");
             }
 
-            Task<int> IGreeterWithObserver.GetCount()
+            Task<int> IGreeter.GetCount()
             {
                 return Task.FromResult(_count);
             }
