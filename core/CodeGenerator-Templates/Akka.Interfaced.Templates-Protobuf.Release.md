@@ -1,3 +1,10 @@
+## 0.4.0 (Released 2016/06/15)
+
+* Sync with Akka.Interfaced 0.4.0
+* Check a type of observer instance passed via rpc.
+* Remove ctor(IActorRef) of generated observer class.
+* Add --include, --exclude option.
+
 ## 0.3.2 (Released 2016/05/30)
 
 * Sync with Akka.Interfaced 0.3.2

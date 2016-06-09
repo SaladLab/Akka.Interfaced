@@ -1,3 +1,17 @@
+## 0.4.0 (Released 2016/06/15)
+
+* Sync actor handler & async observer handler. #26
+* Support actor, observe interface inheritance. #27
+* Refactoring ActorBoundSession. #24 #27
+* Add observer context. #25
+* Remove IDisposable from InterfacedObserver.
+* Remove ctor(IActorRef) of generated observer class.
+* Add ObjectNotificationChannel.
+* Add warning log for receiving bad messages.
+* Check a type of observer instance passed via rpc.
+* Add missing fault handling of AkkaAskRequestWaiter.
+* Add RequestHandlerNotFoundException.
+
 ## 0.3.2 (Released 2016/05/30)
 
 * Add filter-order option to ResponsiveExceptionFilter.

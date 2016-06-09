@@ -1,3 +1,8 @@
+## 0.4.0 (Released 2016/06/15)
+
+* Sync with Akka.Interfaced 0.4.0
+* Support static member logger.
+
 ## 0.3.2 (Released 2016/05/30)
 
 * Sync with Akka.Interfaced 0.3.2
