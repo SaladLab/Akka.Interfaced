@@ -160,7 +160,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
     }
 
     [AlternativeInterface(typeof(IDefault))]
-    public interface IDefaultSync : IInterfacedActor
+    public interface IDefaultSync : IInterfacedActorSync
     {
         void Call(System.Int32 a, System.Int32 b, System.String c);
         void CallWithDefault(System.Int32 a = 1, System.Int32 b = 2, System.String c = "Test");

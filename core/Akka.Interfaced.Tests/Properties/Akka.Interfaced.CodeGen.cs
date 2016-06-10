@@ -280,7 +280,7 @@ namespace Akka.Interfaced
     }
 
     [AlternativeInterface(typeof(IBasic))]
-    public interface IBasicSync : IInterfacedActor
+    public interface IBasicSync : IInterfacedActorSync
     {
         void Call();
         void CallWithParameter(System.Int32 value);
@@ -391,7 +391,7 @@ namespace Akka.Interfaced
     }
 
     [AlternativeInterface(typeof(IDummy))]
-    public interface IDummySync : IInterfacedActor
+    public interface IDummySync : IInterfacedActorSync
     {
         System.Object Call(System.Object param);
     }
@@ -905,7 +905,7 @@ namespace Akka.Interfaced
     }
 
     [AlternativeInterface(typeof(IDummyWithTag))]
-    public interface IDummyWithTagSync : IInterfacedActor
+    public interface IDummyWithTagSync : IInterfacedActorSync
     {
         System.Object CallWithTag(System.Object param, System.String id = null);
     }
@@ -1117,7 +1117,7 @@ namespace Akka.Interfaced
     }
 
     [AlternativeInterface(typeof(IOverloaded))]
-    public interface IOverloadedSync : IInterfacedActor
+    public interface IOverloadedSync : IInterfacedActorSync
     {
         System.Int32 Min(System.Int32 a, System.Int32 b);
         System.Int32 Min(System.Int32 a, System.Int32 b, System.Int32 c);
@@ -1296,7 +1296,7 @@ namespace Akka.Interfaced
     }
 
     [AlternativeInterface(typeof(ISubject))]
-    public interface ISubjectSync : IInterfacedActor
+    public interface ISubjectSync : IInterfacedActorSync
     {
         void MakeEvent(System.String eventName);
         void Subscribe(Akka.Interfaced.ISubjectObserver observer);
@@ -1510,7 +1510,7 @@ namespace Akka.Interfaced
     }
 
     [AlternativeInterface(typeof(ISubject2))]
-    public interface ISubject2Sync : IInterfacedActor
+    public interface ISubject2Sync : IInterfacedActorSync
     {
         void MakeEvent(System.String eventName);
         void MakeEvent2(System.String eventName);
@@ -1639,7 +1639,7 @@ namespace Akka.Interfaced
     }
 
     [AlternativeInterface(typeof(IWorker))]
-    public interface IWorkerSync : IInterfacedActor
+    public interface IWorkerSync : IInterfacedActorSync
     {
         void Atomic(System.Int32 id);
         void Reentrant(System.Int32 id);
@@ -1719,7 +1719,7 @@ namespace Akka.Interfaced
     }
 
     [AlternativeInterface(typeof(ISubject2Observer))]
-    public interface ISubject2ObserverAsync : IInterfacedObserver
+    public interface ISubject2ObserverAsync : IInterfacedObserverSync
     {
         Task Event(System.String eventName);
         Task Event2(System.String eventName);
@@ -1840,7 +1840,7 @@ namespace Akka.Interfaced
     }
 
     [AlternativeInterface(typeof(ISubjectObserver))]
-    public interface ISubjectObserverAsync : IInterfacedObserver
+    public interface ISubjectObserverAsync : IInterfacedObserverSync
     {
         Task Event(System.String eventName);
     }

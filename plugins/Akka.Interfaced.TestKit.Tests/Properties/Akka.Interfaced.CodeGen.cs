@@ -145,7 +145,7 @@ namespace Akka.Interfaced.TestKit.Tests
     }
 
     [AlternativeInterface(typeof(IUser))]
-    public interface IUserSync : IInterfacedActor
+    public interface IUserSync : IInterfacedActorSync
     {
         System.String GetId();
         void Say(System.String message);
@@ -271,7 +271,7 @@ namespace Akka.Interfaced.TestKit.Tests
     }
 
     [AlternativeInterface(typeof(IUserLogin))]
-    public interface IUserLoginSync : IInterfacedActor
+    public interface IUserLoginSync : IInterfacedActorSync
     {
         Akka.Interfaced.TestKit.Tests.IUser Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer);
     }
@@ -328,7 +328,7 @@ namespace Akka.Interfaced.TestKit.Tests
     }
 
     [AlternativeInterface(typeof(IUserObserver))]
-    public interface IUserObserverAsync : IInterfacedObserver
+    public interface IUserObserverAsync : IInterfacedObserverSync
     {
         Task Say(System.String message);
     }

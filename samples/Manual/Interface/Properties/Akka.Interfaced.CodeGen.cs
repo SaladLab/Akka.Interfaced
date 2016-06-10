@@ -161,7 +161,7 @@ namespace Manual
     }
 
     [AlternativeInterface(typeof(IGreeter))]
-    public interface IGreeterSync : IInterfacedActor
+    public interface IGreeterSync : IInterfacedActorSync
     {
         System.Int32 GetCount();
         System.String Greet(System.String name);
@@ -394,7 +394,7 @@ namespace Manual
     }
 
     [AlternativeInterface(typeof(IGreetObserver))]
-    public interface IGreetObserverAsync : IInterfacedObserver
+    public interface IGreetObserverAsync : IInterfacedObserverSync
     {
         Task Event(System.String message);
     }

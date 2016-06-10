@@ -211,7 +211,7 @@ namespace Akka.Interfaced.Persistence.Tests
     }
 
     [AlternativeInterface(typeof(INotepad))]
-    public interface INotepadSync : IInterfacedActor
+    public interface INotepadSync : IInterfacedActorSync
     {
         void Clear();
         void FlushSnapshot();

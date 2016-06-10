@@ -188,7 +188,7 @@ namespace Protobuf.Interface
     }
 
     [AlternativeInterface(typeof(IHelloWorld))]
-    public interface IHelloWorldSync : IInterfacedActor
+    public interface IHelloWorldSync : IInterfacedActorSync
     {
         System.Int32 GetHelloCount();
         System.String SayHello(System.String name);
@@ -565,7 +565,7 @@ namespace Protobuf.Interface
     }
 
     [AlternativeInterface(typeof(IPedantic))]
-    public interface IPedanticSync : IInterfacedActor
+    public interface IPedanticSync : IInterfacedActorSync
     {
         void TestCall();
         System.Nullable<System.Int32> TestOptional(System.Nullable<System.Int32> value);
@@ -811,7 +811,7 @@ namespace Protobuf.Interface
     }
 
     [AlternativeInterface(typeof(ISurrogate))]
-    public interface ISurrogateSync : IInterfacedActor
+    public interface ISurrogateSync : IInterfacedActorSync
     {
         Akka.Actor.Address GetAddress(Akka.Actor.Address address);
         Akka.Actor.ActorPath GetPath(Akka.Actor.ActorPath path);

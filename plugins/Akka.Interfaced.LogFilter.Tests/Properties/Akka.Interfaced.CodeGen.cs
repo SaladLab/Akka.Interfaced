@@ -231,7 +231,7 @@ namespace Akka.Interfaced.LogFilter.Tests
     }
 
     [AlternativeInterface(typeof(ITest))]
-    public interface ITestSync : IInterfacedActor
+    public interface ITestSync : IInterfacedActorSync
     {
         void Call(System.String value);
         void CallWithActor(Akka.Interfaced.LogFilter.Tests.ITest test);

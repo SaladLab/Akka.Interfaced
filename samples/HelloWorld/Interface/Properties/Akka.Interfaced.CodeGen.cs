@@ -161,7 +161,7 @@ namespace HelloWorld.Interface
     }
 
     [AlternativeInterface(typeof(IGreeter))]
-    public interface IGreeterSync : IInterfacedActor
+    public interface IGreeterSync : IInterfacedActorSync
     {
         System.Int32 GetCount();
         System.String Greet(System.String name);
