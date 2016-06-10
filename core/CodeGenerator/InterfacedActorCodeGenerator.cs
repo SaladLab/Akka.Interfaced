@@ -458,7 +458,7 @@ namespace CodeGen
             // NoReply Interface
 
             var baseSynces = baseTypes.Select(t => Utility.GetActorSyncInterfaceName(t));
-            var baseSyncesInherit = baseSynces.Any() ? string.Join(", ", baseSynces) : "IInterfacedActor";
+            var baseSyncesInherit = baseSynces.Any() ? string.Join(", ", baseSynces) : "IInterfacedActorSync";
             w._($"[AlternativeInterface(typeof({type.Name}))]");
             using (w.B($"public interface {Utility.GetActorSyncInterfaceName(type)} : {baseSyncesInherit}"))
             {

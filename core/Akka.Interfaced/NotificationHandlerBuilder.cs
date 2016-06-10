@@ -30,7 +30,7 @@ namespace Akka.Interfaced
         {
             foreach (var ifs in _type.GetInterfaces())
             {
-                if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedObserver)))
+                if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedObserver) && t != typeof(IInterfacedObserverSync)))
                     continue;
 
                 var alternativeInterfaceAttribute = ifs.GetCustomAttribute<AlternativeInterfaceAttribute>();

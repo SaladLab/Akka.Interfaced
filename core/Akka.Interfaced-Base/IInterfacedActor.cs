@@ -9,4 +9,12 @@
     public interface IInterfacedActor
     {
     }
+
+    /// <summary>
+    ///   For alternative synchronous IInterfacedActor.
+    ///   This is only for generated code.
+    /// </summary>
+    public interface IInterfacedActorSync
+    {
+    }
 }

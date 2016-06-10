@@ -242,7 +242,7 @@ namespace CodeGen
             // NoReply Interface
 
             var baseSynces = baseTypes.Select(t => Utility.GetObserverAsyncInterfaceName(t));
-            var baseSyncesInherit = baseSynces.Any() ? string.Join(", ", baseSynces) : "IInterfacedObserver";
+            var baseSyncesInherit = baseSynces.Any() ? string.Join(", ", baseSynces) : "IInterfacedObserverSync";
             w._($"[AlternativeInterface(typeof({type.Name}))]");
             using (w.B($"public interface {Utility.GetObserverAsyncInterfaceName(type)} : {baseSyncesInherit}"))
             {
