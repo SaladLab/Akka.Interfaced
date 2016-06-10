@@ -16,4 +16,12 @@ namespace Akka.Interfaced
         Task Subscribe(ISubject2Observer observer);
         Task Unsubscribe(ISubject2Observer observer);
     }
+
+    public interface ISubjectEx : IInterfacedActor
+    {
+        Task MakeEvent(string eventName);
+        Task MakeEventEx(string eventName);
+        Task Subscribe(ISubjectExObserver observer);
+        Task Unsubscribe(ISubjectExObserver observer);
+    }
 }

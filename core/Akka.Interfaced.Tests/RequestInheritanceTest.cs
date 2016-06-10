@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 using Akka.Actor;
 using Xunit;
 using Xunit.Abstractions;
@@ -69,9 +67,41 @@ namespace Akka.Interfaced
             }
         }
 
+        public class DummyFinalExtendedActor : InterfacedActor, IExtendedInterface<IDummyExFinal>
+        {
+            public DummyFinalExtendedActor()
+            {
+            }
+
+            [ExtendedHandler]
+            private object Call(object param)
+            {
+                return "Call:" + param;
+            }
+
+            [ExtendedHandler]
+            private object CallEx(object param)
+            {
+                return "CallEx:" + param;
+            }
+
+            [ExtendedHandler]
+            private object CallEx2(object param)
+            {
+                return "CallEx2:" + param;
+            }
+
+            [ExtendedHandler]
+            private Task<object> CallExFinal(object param)
+            {
+                return Task.FromResult<object>("CallExFinal:" + param);
+            }
+        }
+
         [Theory]
         [InlineData(typeof(DummyFinalActor))]
         [InlineData(typeof(DummyFinalSyncActor))]
+        [InlineData(typeof(DummyFinalExtendedActor))]
         public async Task RequestInheritedInterfaced_Called(Type actorType)
         {
             // Arrange

@@ -1520,6 +1520,221 @@ namespace Akka.Interfaced
 }
 
 #endregion
+#region Akka.Interfaced.ISubjectEx
+
+namespace Akka.Interfaced
+{
+    [PayloadTable(typeof(ISubjectEx), PayloadTableKind.Request)]
+    public static class ISubjectEx_PayloadTable
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(MakeEvent_Invoke), null },
+                { typeof(MakeEventEx_Invoke), null },
+                { typeof(Subscribe_Invoke), null },
+                { typeof(Unsubscribe_Invoke), null },
+            };
+        }
+
+        public class MakeEvent_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.String eventName;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubjectEx);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubjectEx)__target).MakeEvent(eventName);
+                return null;
+            }
+        }
+
+        public class MakeEventEx_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.String eventName;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubjectEx);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubjectEx)__target).MakeEventEx(eventName);
+                return null;
+            }
+        }
+
+        public class Subscribe_Invoke
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
+        {
+            public Akka.Interfaced.ISubjectExObserver observer;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubjectEx);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubjectEx)__target).Subscribe(observer);
+                return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
+            }
+        }
+
+        public class Unsubscribe_Invoke
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
+        {
+            public Akka.Interfaced.ISubjectExObserver observer;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubjectEx);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubjectEx)__target).Unsubscribe(observer);
+                return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
+            }
+        }
+    }
+
+    public interface ISubjectEx_NoReply
+    {
+        void MakeEvent(System.String eventName);
+        void MakeEventEx(System.String eventName);
+        void Subscribe(Akka.Interfaced.ISubjectExObserver observer);
+        void Unsubscribe(Akka.Interfaced.ISubjectExObserver observer);
+    }
+
+    public class SubjectExRef : InterfacedActorRef, ISubjectEx, ISubjectEx_NoReply
+    {
+        public SubjectExRef() : base(null)
+        {
+        }
+
+        public SubjectExRef(IActorRef actor) : base(actor)
+        {
+        }
+
+        public SubjectExRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        {
+        }
+
+        public ISubjectEx_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public SubjectExRef WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new SubjectExRef(Actor, requestWaiter, Timeout);
+        }
+
+        public SubjectExRef WithTimeout(TimeSpan? timeout)
+        {
+            return new SubjectExRef(Actor, RequestWaiter, timeout);
+        }
+
+        public Task MakeEvent(System.String eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubjectEx_PayloadTable.MakeEvent_Invoke { eventName = eventName }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task MakeEventEx(System.String eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubjectEx_PayloadTable.MakeEventEx_Invoke { eventName = eventName }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task Subscribe(Akka.Interfaced.ISubjectExObserver observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubjectEx_PayloadTable.Subscribe_Invoke { observer = (SubjectExObserver)observer }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task Unsubscribe(Akka.Interfaced.ISubjectExObserver observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubjectEx_PayloadTable.Unsubscribe_Invoke { observer = (SubjectExObserver)observer }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        void ISubjectEx_NoReply.MakeEvent(System.String eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubjectEx_PayloadTable.MakeEvent_Invoke { eventName = eventName }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubjectEx_NoReply.MakeEventEx(System.String eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubjectEx_PayloadTable.MakeEventEx_Invoke { eventName = eventName }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubjectEx_NoReply.Subscribe(Akka.Interfaced.ISubjectExObserver observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubjectEx_PayloadTable.Subscribe_Invoke { observer = (SubjectExObserver)observer }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubjectEx_NoReply.Unsubscribe(Akka.Interfaced.ISubjectExObserver observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubjectEx_PayloadTable.Unsubscribe_Invoke { observer = (SubjectExObserver)observer }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+
+    [AlternativeInterface(typeof(ISubjectEx))]
+    public interface ISubjectExSync : IInterfacedActorSync
+    {
+        void MakeEvent(System.String eventName);
+        void MakeEventEx(System.String eventName);
+        void Subscribe(Akka.Interfaced.ISubjectExObserver observer);
+        void Unsubscribe(Akka.Interfaced.ISubjectExObserver observer);
+    }
+}
+
+#endregion
 #region Akka.Interfaced.IWorker
 
 namespace Akka.Interfaced

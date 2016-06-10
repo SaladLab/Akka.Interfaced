@@ -90,7 +90,12 @@ namespace Akka.Interfaced
                      .SelectMany(t => t.GenericTypeArguments)
                      .Where(t => t.GetInterfaces().Any(i => i == typeof(IInterfacedObserver)));
 
-            foreach (var ifs in extendedInterfaces)
+            // includes base interfaces
+            var extendedAllInterfaces = extendedInterfaces
+                .Concat(extendedInterfaces.SelectMany(t => t.GetInterfaces().Where(u => u != typeof(IInterfacedObserver))))
+                .Distinct().ToArray();
+
+            foreach (var ifs in extendedAllInterfaces)
             {
                 var payloadTypeTable = GetInterfacePayloadTypeTable(ifs);
                 var interfaceMethods = ifs.GetMethods().OrderBy(m => m, new MethodInfoComparer()).ToArray();

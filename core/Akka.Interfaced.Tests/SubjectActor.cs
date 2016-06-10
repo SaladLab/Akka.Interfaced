@@ -50,4 +50,31 @@ namespace Akka.Interfaced
             _observers.Remove(observer);
         }
     }
+
+    public class SubjectExActor : InterfacedActor, ISubjectExSync
+    {
+        private List<ISubjectExObserver> _observers = new List<ISubjectExObserver>();
+
+        void ISubjectExSync.MakeEvent(string eventName)
+        {
+            foreach (var observer in _observers)
+                observer.Event(eventName);
+        }
+
+        void ISubjectExSync.MakeEventEx(string eventName)
+        {
+            foreach (var observer in _observers)
+                observer.Event(eventName);
+        }
+
+        void ISubjectExSync.Subscribe(ISubjectExObserver observer)
+        {
+            _observers.Add(observer);
+        }
+
+        void ISubjectExSync.Unsubscribe(ISubjectExObserver observer)
+        {
+            _observers.Remove(observer);
+        }
+    }
 }

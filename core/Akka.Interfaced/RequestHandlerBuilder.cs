@@ -83,9 +83,15 @@ namespace Akka.Interfaced
                 _type.GetInterfaces()
                      .Where(t => t.FullName.StartsWith("Akka.Interfaced.IExtendedInterface"))
                      .SelectMany(t => t.GenericTypeArguments)
-                     .Where(t => t.GetInterfaces().Any(i => i == typeof(IInterfacedActor)));
+                     .Where(t => t.GetInterfaces().Any(i => i == typeof(IInterfacedActor)))
+                     .ToArray();
 
-            foreach (var ifs in extendedInterfaces)
+            // includes base interfaces
+            var extendedAllInterfaces = extendedInterfaces
+                .Concat(extendedInterfaces.SelectMany(t => t.GetInterfaces().Where(u => u != typeof(IInterfacedActor))))
+                .Distinct().ToArray();
+
+            foreach (var ifs in extendedAllInterfaces)
             {
                 var payloadTypeTable = GetInterfacePayloadTypeTable(ifs);
                 var interfaceMethods = ifs.GetMethods().OrderBy(m => m, new MethodInfoComparer()).ToArray();
