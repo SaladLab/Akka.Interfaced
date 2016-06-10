@@ -5,7 +5,7 @@ notification. It allows you to log or manipulate specific messages.
 
 <p align="center">
   <img src="./Figure_Filter.png"/><br/>
-  *Figure: Filter run code before or after main handler.*
+  <i>Figure: Filter run code before or after main handler.</i>
 </p>
 
 For example, folloing `MyActor` uses two filter.

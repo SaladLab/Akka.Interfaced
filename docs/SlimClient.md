@@ -5,7 +5,7 @@ This was originally developed to let a client on .NET 3.5 work with a server on 
 
 <p align="center">
   <img src="./Figure_SlimClient.png"/><br/>
-  *Figure: `GreeterRef` outside of Akka.NET sends `Greet` request to `Greeter` on Akka.NET via SlimSocket.*
+  <i>Figure: `GreeterRef` outside of Akka.NET sends `Greet` request to `Greeter` on Akka.NET via SlimSocket.</i>
 </p>
 
 SlimClient

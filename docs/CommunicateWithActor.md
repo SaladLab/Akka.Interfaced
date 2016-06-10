@@ -6,7 +6,7 @@ class.
 
 <p align="center">
   <img src="./Figure_Request.png"/><br/>
-  *Figure: `Greet` request is sent to `Greeter` using `Greet` method of `GreeterRef`.*
+  <i>Figure: `Greet` request is sent to `Greeter` using `Greet` method of `GreeterRef`.</i>
 </p>
 
 For example, `GreeterRef` is generated for interface `IGreeter`.

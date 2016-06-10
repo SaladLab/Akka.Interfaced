@@ -6,7 +6,7 @@ the other has a server-role which receives a request and reply a response.
 
 <p align="center">
   <img src="./Figure_Notification.png"/><br/>
-  *Figure: Actor gets a notification message for `Greet` event from `Greeter`.*
+  <i>Figure: Actor gets a notification message for `Greet` event from `Greeter`.</i>
 </p>
 
 But sometimes a server actor wants to send a notification message to a client.
