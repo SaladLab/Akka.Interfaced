@@ -2,7 +2,14 @@
 
 For every interface, `*Ref` class is generated and you can
 send and receive a message from an interfaced actor with this reference
-class. For example, `GreeterRef` is generated for interface `IGreeter`.
+class.
+
+<p align="center">
+  <img src="./Figure_Request.png"/><br/>
+  *Figure: `Greet` request is sent to `Greeter` using `Greet` method of `GreeterRef`.*
+</p>
+
+For example, `GreeterRef` is generated for interface `IGreeter`.
 
 ```csharp
 public class GreeterRef : InterfacedActorRef, IGreeter

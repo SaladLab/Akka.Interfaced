@@ -4,6 +4,11 @@ When two actors are communicating with each other,
 one has a client role which sends a request and waits for a response and
 the other has a server-role which receives a request and reply a response.
 
+<p align="center">
+  <img src="./Figure_Notification.png"/><br/>
+  *Figure: Actor gets a notification message for `Greet` event from `Greeter`.*
+</p>
+
 But sometimes a server actor wants to send a notification message to a client.
 In this case, `Observer` can be used.
 

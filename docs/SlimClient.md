@@ -1,11 +1,12 @@
-** WRITING IN PROCESS **
-
 ## SlimClient
 
 SlimClient is a client that can communicate with interfaced actors without Akka.NET dependency.
 This was originally developed to let a client on .NET 3.5 work with a server on Akka.NET.
 
-TODO: FIGURE (SlimClient, SlimServer, and Server on Akka.NET)
+<p align="center">
+  <img src="./Figure_SlimClient.png"/><br/>
+  *Figure: `GreeterRef` outside of Akka.NET sends `Greet` request to `Greeter` on Akka.NET via SlimSocket.*
+</p>
 
 SlimClient
 - Support .NET 3.5 and over (includig Unity3D)
