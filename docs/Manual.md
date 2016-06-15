@@ -24,3 +24,4 @@
 - [PersistentActor](./PersistentActor.md)
 - [TestKit](./TestKit.md)
 - [SlimClient](./SlimClient.md)
+- [Serialization](./Serialization.md)
