@@ -34,7 +34,7 @@ namespace Akka.Interfaced.TestKit.Tests
             var reply = await _actorBoundSession.Ask<ActorBoundSessionMessage.BindReply>(
                 new ActorBoundSessionMessage.Bind(user, typeof(IUser)));
 
-            return BoundActorRef.Create<UserRef>(reply.ActorId);
+            return new UserRef(new BoundActorTarget(reply.ActorId));
         }
 
         private bool CheckAccount(string id, string password)

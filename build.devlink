@@ -7,10 +7,6 @@
         <files dir="lib/net45" source="core/Akka.Interfaced-Base/bin/Debug"/>
         <files dir="lib/net35" source="core/Akka.Interfaced-Base.Net35/bin/Debug"/>
     </package>
-    <package id="Akka.Interfaced-SlimClient">
-        <files dir="lib/net45" source="core/Akka.Interfaced-SlimClient/bin/Debug"/>
-        <files dir="lib/net35" source="core/Akka.Interfaced-SlimClient.Net35/bin/Debug"/>
-    </package>
     <package id="Akka.Interfaced.Templates">
         <files dir="tools" source="core/CodeGenerator/bin/Debug"/>
     </package>

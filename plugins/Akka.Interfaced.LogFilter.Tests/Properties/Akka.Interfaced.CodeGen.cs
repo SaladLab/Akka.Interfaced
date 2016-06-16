@@ -142,13 +142,23 @@ namespace Akka.Interfaced.LogFilter.Tests
         {
         }
 
-        public TestRef(IActorRef actor) : base(actor)
+        public TestRef(IRequestTarget target) : base(target)
         {
         }
 
-        public TestRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public TestRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public TestRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public TestRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public ITest_NoReply WithNoReply()
         {
@@ -157,12 +167,12 @@ namespace Akka.Interfaced.LogFilter.Tests
 
         public TestRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new TestRef(Actor, requestWaiter, Timeout);
+            return new TestRef(Target, requestWaiter, Timeout);
         }
 
         public TestRef WithTimeout(TimeSpan? timeout)
         {
-            return new TestRef(Actor, RequestWaiter, timeout);
+            return new TestRef(Target, RequestWaiter, timeout);
         }
 
         public Task Call(System.String value)

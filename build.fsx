@@ -17,8 +17,6 @@ let solution =
                                     ("Akka", "") ] }
           { emptyProject with Name = "Akka.Interfaced-Base"
                               Folder = "./core/Akka.Interfaced-Base" }
-          { emptyProject with Name = "Akka.Interfaced-SlimClient"
-                              Folder = "./core/Akka.Interfaced-SlimClient"
                               Dependencies = [ ("Akka.Interfaced-Base", "") ] }
           { // CodeGenerator-Templates
             emptyProject with Name = "Akka.Interfaced.Templates"
@@ -36,13 +34,13 @@ let solution =
           { emptyProject with Name = "Akka.Interfaced-SlimClient.Templates"
                               Folder = "./core/CodeGenerator-Templates"
                               Template = true
-                              Dependencies = [ ("Akka.Interfaced-SlimClient", "") ] }
+                              Dependencies = [ ("Akka.Interfaced-Base", "") ] }
           { emptyProject with Name = "Akka.Interfaced-SlimClient.Templates-Protobuf"
                               Folder = "./core/CodeGenerator-Templates"
                               Template = true
                               PackagePrerelease = "beta"
                               Dependencies = 
-                                  [ ("Akka.Interfaced-SlimClient", "")
+                                  [ ("Akka.Interfaced-Base", "")
                                     ("protobuf-net", "2.1.0-alpha-1")
                                     ("TypeAlias", "1.1.2") ] }
           { // CodeVerifier

@@ -67,7 +67,7 @@ namespace Akka.Interfaced.TestKit
 
         public IActorRef GetBoundActorRef(InterfacedActorRef actor)
         {
-            var boundRef = actor.Actor as BoundActorRef;
+            var boundRef = actor.Target as BoundActorTarget;
             return boundRef != null
                 ? GetBoundActorRef(boundRef.Id)
                 : null;
@@ -77,7 +77,7 @@ namespace Akka.Interfaced.TestKit
             where TRef : InterfacedActorRef, new()
         {
             var actorRef = new TRef();
-            InterfacedActorRefModifier.SetActor(actorRef, new BoundActorRef(actorId));
+            InterfacedActorRefModifier.SetTarget(actorRef, new BoundActorTarget(actorId));
             InterfacedActorRefModifier.SetRequestWaiter(actorRef, this);
             return actorRef;
         }
@@ -147,9 +147,9 @@ namespace Akka.Interfaced.TestKit
             handler(message);
         }
 
-        private Tuple<IActorRef, BoundType> BeginSendRequest(IActorRef actor, RequestMessage requestMessage)
+        private Tuple<IActorRef, BoundType> BeginSendRequest(IRequestTarget target, RequestMessage requestMessage)
         {
-            var actorId = ((BoundActorRef)actor).Id;
+            var actorId = ((BoundActorTarget)target).Id;
             var a = GetBoundActor(actorId);
             if (a == null)
                 throw new InvalidOperationException($"No actor. (Id={actorId})");
@@ -184,13 +184,13 @@ namespace Akka.Interfaced.TestKit
             }, _self);
         }
 
-        void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
+        void IRequestWaiter.SendRequest(IRequestTarget target, RequestMessage requestMessage)
         {
             var a = BeginSendRequest(target, requestMessage);
             EndSendRequest(a, requestMessage);
         }
 
-        Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+        Task IRequestWaiter.SendRequestAndWait(IRequestTarget target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             var a = BeginSendRequest(target, requestMessage);
 
@@ -215,7 +215,7 @@ namespace Akka.Interfaced.TestKit
             return tcs.Task;
         }
 
-        Task<TReturn> IRequestWaiter.SendRequestAndReceive<TReturn>(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+        Task<TReturn> IRequestWaiter.SendRequestAndReceive<TReturn>(IRequestTarget target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             var a = BeginSendRequest(target, requestMessage);
 

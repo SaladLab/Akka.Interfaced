@@ -88,13 +88,23 @@ namespace Akka.Interfaced.TestKit.Tests
         {
         }
 
-        public UserRef(IActorRef actor) : base(actor)
+        public UserRef(IRequestTarget target) : base(target)
         {
         }
 
-        public UserRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public UserRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public UserRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public UserRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IUser_NoReply WithNoReply()
         {
@@ -103,12 +113,12 @@ namespace Akka.Interfaced.TestKit.Tests
 
         public UserRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new UserRef(Actor, requestWaiter, Timeout);
+            return new UserRef(Target, requestWaiter, Timeout);
         }
 
         public UserRef WithTimeout(TimeSpan? timeout)
         {
-            return new UserRef(Actor, RequestWaiter, timeout);
+            return new UserRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.String> GetId()
@@ -230,13 +240,23 @@ namespace Akka.Interfaced.TestKit.Tests
         {
         }
 
-        public UserLoginRef(IActorRef actor) : base(actor)
+        public UserLoginRef(IRequestTarget target) : base(target)
         {
         }
 
-        public UserLoginRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public UserLoginRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public UserLoginRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public UserLoginRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IUserLogin_NoReply WithNoReply()
         {
@@ -245,12 +265,12 @@ namespace Akka.Interfaced.TestKit.Tests
 
         public UserLoginRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new UserLoginRef(Actor, requestWaiter, Timeout);
+            return new UserLoginRef(Target, requestWaiter, Timeout);
         }
 
         public UserLoginRef WithTimeout(TimeSpan? timeout)
         {
-            return new UserLoginRef(Actor, RequestWaiter, timeout);
+            return new UserLoginRef(Target, RequestWaiter, timeout);
         }
 
         public Task<Akka.Interfaced.TestKit.Tests.IUser> Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer)

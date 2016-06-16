@@ -104,13 +104,23 @@ namespace HelloWorld.Interface
         {
         }
 
-        public GreeterRef(IActorRef actor) : base(actor)
+        public GreeterRef(IRequestTarget target) : base(target)
         {
         }
 
-        public GreeterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public GreeterRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public GreeterRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public GreeterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IGreeter_NoReply WithNoReply()
         {
@@ -119,12 +129,12 @@ namespace HelloWorld.Interface
 
         public GreeterRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new GreeterRef(Actor, requestWaiter, Timeout);
+            return new GreeterRef(Target, requestWaiter, Timeout);
         }
 
         public GreeterRef WithTimeout(TimeSpan? timeout)
         {
-            return new GreeterRef(Actor, RequestWaiter, timeout);
+            return new GreeterRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.Int32> GetCount()

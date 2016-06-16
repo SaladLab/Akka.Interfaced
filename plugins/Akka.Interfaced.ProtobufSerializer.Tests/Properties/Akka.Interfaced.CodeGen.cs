@@ -83,13 +83,23 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
         }
 
-        public DefaultRef(IActorRef actor) : base(actor)
+        public DefaultRef(IRequestTarget target) : base(target)
         {
         }
 
-        public DefaultRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public DefaultRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public DefaultRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public DefaultRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IDefault_NoReply WithNoReply()
         {
@@ -98,12 +108,12 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
 
         public DefaultRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new DefaultRef(Actor, requestWaiter, Timeout);
+            return new DefaultRef(Target, requestWaiter, Timeout);
         }
 
         public DefaultRef WithTimeout(TimeSpan? timeout)
         {
-            return new DefaultRef(Actor, RequestWaiter, timeout);
+            return new DefaultRef(Target, RequestWaiter, timeout);
         }
 
         public Task Call(System.Int32 a, System.Int32 b, System.String c)
@@ -142,20 +152,20 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
     [ProtoContract]
     public class SurrogateForIDefault
     {
-        [ProtoMember(1)] public IActorRef Actor;
+        [ProtoMember(1)] public IRequestTarget Target;
 
         [ProtoConverter]
         public static SurrogateForIDefault Convert(IDefault value)
         {
             if (value == null) return null;
-            return new SurrogateForIDefault { Actor = ((DefaultRef)value).Actor };
+            return new SurrogateForIDefault { Target = ((DefaultRef)value).Target };
         }
 
         [ProtoConverter]
         public static IDefault Convert(SurrogateForIDefault value)
         {
             if (value == null) return null;
-            return new DefaultRef(value.Actor);
+            return new DefaultRef(value.Target);
         }
     }
 

@@ -66,10 +66,6 @@
       <Project>{9bae7ab1-4508-45d0-91d4-9b12eee53cd3}</Project>
       <Name>Akka.Interfaced-Base.Net35</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\core\Akka.Interfaced-SlimClient.Net35\Akka.Interfaced-SlimClient.Net35.csproj">
-      <Project>{43de773d-3e00-48ed-93fe-a0eda5c105fb}</Project>
-      <Name>Akka.Interfaced-SlimClient.Net35</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Interface.Client.Net35\SlimHttp.Interface.Client.Net35.csproj">
       <Project>{63d15731-5e68-4799-93d6-64092e6988b1}</Project>
       <Name>SlimHttp.Interface.Client.Net35</Name>

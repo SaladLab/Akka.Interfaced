@@ -530,13 +530,12 @@ namespace Akka.Interfaced.Persistence
 
         // from IRequestWaiter
 
-        void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
+        void IRequestWaiter.SendRequest(IRequestTarget target, RequestMessage requestMessage)
         {
-            target.Tell(requestMessage);
+            ((AkkaActorTarget)target).Actor.Tell(requestMessage);
         }
 
-        Task IRequestWaiter.SendRequestAndWait(
-            IActorRef target, RequestMessage request, TimeSpan? timeout)
+        Task IRequestWaiter.SendRequestAndWait(IRequestTarget target, RequestMessage request, TimeSpan? timeout)
         {
             if (_requestWaiter == null)
                 _requestWaiter = new InterfacedActorRequestWaiter();
@@ -544,8 +543,7 @@ namespace Akka.Interfaced.Persistence
             return _requestWaiter.SendRequestAndWait(target, request, Self, timeout);
         }
 
-        Task<TReturn> IRequestWaiter.SendRequestAndReceive<TReturn>(
-            IActorRef target, RequestMessage request, TimeSpan? timeout)
+        Task<TReturn> IRequestWaiter.SendRequestAndReceive<TReturn>(IRequestTarget target, RequestMessage request, TimeSpan? timeout)
         {
             if (_requestWaiter == null)
                 _requestWaiter = new InterfacedActorRequestWaiter();

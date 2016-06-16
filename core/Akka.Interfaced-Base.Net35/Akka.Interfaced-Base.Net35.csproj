@@ -40,8 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Akka.Interfaced-Base\BoundActorTarget.cs">
+      <Link>BoundActorTarget.cs</Link>
+    </Compile>
     <Compile Include="..\Akka.Interfaced-Base\Exceptions.cs">
       <Link>Exceptions.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\IAsyncInvokable.cs">
+      <Link>IAsyncInvokable.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\IInterfacedActor.cs">
       <Link>IInterfacedActor.cs</Link>
@@ -58,6 +64,9 @@
     <Compile Include="..\Akka.Interfaced-Base\INotificationChannel.cs">
       <Link>INotificationChannel.cs</Link>
     </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\InterfacedActorRef.cs">
+      <Link>InterfacedActorRef.cs</Link>
+    </Compile>
     <Compile Include="..\Akka.Interfaced-Base\InterfacedObserver.cs">
       <Link>InterfacedObserver.cs</Link>
     </Compile>
@@ -69,6 +78,12 @@
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\IPayloadTagOverridable.cs">
       <Link>IPayloadTagOverridable.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\IRequestTarget.cs">
+      <Link>IRequestTarget.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\IRequestWaiter.cs">
+      <Link>IRequestWaiter.cs</Link>
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\IValueGetable.cs">
       <Link>IValueGetable.cs</Link>
@@ -93,6 +108,9 @@
     </Compile>
     <Compile Include="..\Akka.Interfaced-Base\TagOverridableAttribute.cs">
       <Link>TagOverridableAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\Task.cs">
+      <Link>Task.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -175,13 +175,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public BasicRef(IActorRef actor) : base(actor)
+        public BasicRef(IRequestTarget target) : base(target)
         {
         }
 
-        public BasicRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public BasicRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public BasicRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public BasicRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IBasic_NoReply WithNoReply()
         {
@@ -190,12 +200,12 @@ namespace Akka.Interfaced
 
         public BasicRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new BasicRef(Actor, requestWaiter, Timeout);
+            return new BasicRef(Target, requestWaiter, Timeout);
         }
 
         public BasicRef WithTimeout(TimeSpan? timeout)
         {
-            return new BasicRef(Actor, RequestWaiter, timeout);
+            return new BasicRef(Target, RequestWaiter, timeout);
         }
 
         public Task Call()
@@ -350,13 +360,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public DummyRef(IActorRef actor) : base(actor)
+        public DummyRef(IRequestTarget target) : base(target)
         {
         }
 
-        public DummyRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public DummyRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public DummyRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public DummyRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IDummy_NoReply WithNoReply()
         {
@@ -365,12 +385,12 @@ namespace Akka.Interfaced
 
         public DummyRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new DummyRef(Actor, requestWaiter, Timeout);
+            return new DummyRef(Target, requestWaiter, Timeout);
         }
 
         public DummyRef WithTimeout(TimeSpan? timeout)
         {
-            return new DummyRef(Actor, RequestWaiter, timeout);
+            return new DummyRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.Object> Call(System.Object param)
@@ -457,13 +477,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public DummyExRef(IActorRef actor) : base(actor)
+        public DummyExRef(IRequestTarget target) : base(target)
         {
         }
 
-        public DummyExRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public DummyExRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public DummyExRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public DummyExRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IDummyEx_NoReply WithNoReply()
         {
@@ -472,12 +502,12 @@ namespace Akka.Interfaced
 
         public DummyExRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new DummyExRef(Actor, requestWaiter, Timeout);
+            return new DummyExRef(Target, requestWaiter, Timeout);
         }
 
         public DummyExRef WithTimeout(TimeSpan? timeout)
         {
-            return new DummyExRef(Actor, RequestWaiter, timeout);
+            return new DummyExRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.Object> CallEx(System.Object param)
@@ -580,13 +610,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public DummyEx2Ref(IActorRef actor) : base(actor)
+        public DummyEx2Ref(IRequestTarget target) : base(target)
         {
         }
 
-        public DummyEx2Ref(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public DummyEx2Ref(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public DummyEx2Ref(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public DummyEx2Ref(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IDummyEx2_NoReply WithNoReply()
         {
@@ -595,12 +635,12 @@ namespace Akka.Interfaced
 
         public DummyEx2Ref WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new DummyEx2Ref(Actor, requestWaiter, Timeout);
+            return new DummyEx2Ref(Target, requestWaiter, Timeout);
         }
 
         public DummyEx2Ref WithTimeout(TimeSpan? timeout)
         {
-            return new DummyEx2Ref(Actor, RequestWaiter, timeout);
+            return new DummyEx2Ref(Target, RequestWaiter, timeout);
         }
 
         public Task<System.Object> CallEx2(System.Object param)
@@ -703,13 +743,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public DummyExFinalRef(IActorRef actor) : base(actor)
+        public DummyExFinalRef(IRequestTarget target) : base(target)
         {
         }
 
-        public DummyExFinalRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public DummyExFinalRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public DummyExFinalRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public DummyExFinalRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IDummyExFinal_NoReply WithNoReply()
         {
@@ -718,12 +768,12 @@ namespace Akka.Interfaced
 
         public DummyExFinalRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new DummyExFinalRef(Actor, requestWaiter, Timeout);
+            return new DummyExFinalRef(Target, requestWaiter, Timeout);
         }
 
         public DummyExFinalRef WithTimeout(TimeSpan? timeout)
         {
-            return new DummyExFinalRef(Actor, RequestWaiter, timeout);
+            return new DummyExFinalRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.Object> CallExFinal(System.Object param)
@@ -864,13 +914,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public DummyWithTagRef(IActorRef actor) : base(actor)
+        public DummyWithTagRef(IRequestTarget target) : base(target)
         {
         }
 
-        public DummyWithTagRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public DummyWithTagRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public DummyWithTagRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public DummyWithTagRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IDummyWithTag_NoReply WithNoReply()
         {
@@ -879,12 +939,12 @@ namespace Akka.Interfaced
 
         public DummyWithTagRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new DummyWithTagRef(Actor, requestWaiter, Timeout);
+            return new DummyWithTagRef(Target, requestWaiter, Timeout);
         }
 
         public DummyWithTagRef WithTimeout(TimeSpan? timeout)
         {
-            return new DummyWithTagRef(Actor, RequestWaiter, timeout);
+            return new DummyWithTagRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.Object> CallWithTag(System.Object param, System.String id = null)
@@ -1044,13 +1104,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public OverloadedRef(IActorRef actor) : base(actor)
+        public OverloadedRef(IRequestTarget target) : base(target)
         {
         }
 
-        public OverloadedRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public OverloadedRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public OverloadedRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public OverloadedRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IOverloaded_NoReply WithNoReply()
         {
@@ -1059,12 +1129,12 @@ namespace Akka.Interfaced
 
         public OverloadedRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new OverloadedRef(Actor, requestWaiter, Timeout);
+            return new OverloadedRef(Target, requestWaiter, Timeout);
         }
 
         public OverloadedRef WithTimeout(TimeSpan? timeout)
         {
-            return new OverloadedRef(Actor, RequestWaiter, timeout);
+            return new OverloadedRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.Int32> Min(System.Int32 a, System.Int32 b)
@@ -1223,13 +1293,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public SubjectRef(IActorRef actor) : base(actor)
+        public SubjectRef(IRequestTarget target) : base(target)
         {
         }
 
-        public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public SubjectRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public SubjectRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public ISubject_NoReply WithNoReply()
         {
@@ -1238,12 +1318,12 @@ namespace Akka.Interfaced
 
         public SubjectRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new SubjectRef(Actor, requestWaiter, Timeout);
+            return new SubjectRef(Target, requestWaiter, Timeout);
         }
 
         public SubjectRef WithTimeout(TimeSpan? timeout)
         {
-            return new SubjectRef(Actor, RequestWaiter, timeout);
+            return new SubjectRef(Target, RequestWaiter, timeout);
         }
 
         public Task MakeEvent(System.String eventName)
@@ -1421,13 +1501,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public Subject2Ref(IActorRef actor) : base(actor)
+        public Subject2Ref(IRequestTarget target) : base(target)
         {
         }
 
-        public Subject2Ref(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public Subject2Ref(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public Subject2Ref(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public Subject2Ref(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public ISubject2_NoReply WithNoReply()
         {
@@ -1436,12 +1526,12 @@ namespace Akka.Interfaced
 
         public Subject2Ref WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new Subject2Ref(Actor, requestWaiter, Timeout);
+            return new Subject2Ref(Target, requestWaiter, Timeout);
         }
 
         public Subject2Ref WithTimeout(TimeSpan? timeout)
         {
-            return new Subject2Ref(Actor, RequestWaiter, timeout);
+            return new Subject2Ref(Target, RequestWaiter, timeout);
         }
 
         public Task MakeEvent(System.String eventName)
@@ -1636,13 +1726,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public SubjectExRef(IActorRef actor) : base(actor)
+        public SubjectExRef(IRequestTarget target) : base(target)
         {
         }
 
-        public SubjectExRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public SubjectExRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public SubjectExRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public SubjectExRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public ISubjectEx_NoReply WithNoReply()
         {
@@ -1651,12 +1751,12 @@ namespace Akka.Interfaced
 
         public SubjectExRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new SubjectExRef(Actor, requestWaiter, Timeout);
+            return new SubjectExRef(Target, requestWaiter, Timeout);
         }
 
         public SubjectExRef WithTimeout(TimeSpan? timeout)
         {
-            return new SubjectExRef(Actor, RequestWaiter, timeout);
+            return new SubjectExRef(Target, RequestWaiter, timeout);
         }
 
         public Task MakeEvent(System.String eventName)
@@ -1797,13 +1897,23 @@ namespace Akka.Interfaced
         {
         }
 
-        public WorkerRef(IActorRef actor) : base(actor)
+        public WorkerRef(IRequestTarget target) : base(target)
         {
         }
 
-        public WorkerRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public WorkerRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public WorkerRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public WorkerRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IWorker_NoReply WithNoReply()
         {
@@ -1812,12 +1922,12 @@ namespace Akka.Interfaced
 
         public WorkerRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new WorkerRef(Actor, requestWaiter, Timeout);
+            return new WorkerRef(Target, requestWaiter, Timeout);
         }
 
         public WorkerRef WithTimeout(TimeSpan? timeout)
         {
-            return new WorkerRef(Actor, RequestWaiter, timeout);
+            return new WorkerRef(Target, RequestWaiter, timeout);
         }
 
         public Task Atomic(System.Int32 id)

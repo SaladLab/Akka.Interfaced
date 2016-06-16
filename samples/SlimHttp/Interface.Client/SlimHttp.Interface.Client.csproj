@@ -74,10 +74,6 @@
       <Project>{c0d22336-c49e-4245-b39d-0b3083c28205}</Project>
       <Name>Akka.Interfaced-Base</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\core\Akka.Interfaced-SlimClient\Akka.Interfaced-SlimClient.csproj">
-      <Project>{c6ac0dd2-3f9a-4a8b-b937-98f25ceb5d57}</Project>
-      <Name>Akka.Interfaced-SlimClient</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

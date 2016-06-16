@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CodeWriter;
-using Akka.Interfaced;
 
-namespace CodeGen
+namespace CodeGenerator
 {
     public class InterfacedObserverCodeGenerator
     {

@@ -111,13 +111,23 @@ namespace Protobuf.Interface
         {
         }
 
-        public HelloWorldRef(IActorRef actor) : base(actor)
+        public HelloWorldRef(IRequestTarget target) : base(target)
         {
         }
 
-        public HelloWorldRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public HelloWorldRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public HelloWorldRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public HelloWorldRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IHelloWorld_NoReply WithNoReply()
         {
@@ -126,12 +136,12 @@ namespace Protobuf.Interface
 
         public HelloWorldRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new HelloWorldRef(Actor, requestWaiter, Timeout);
+            return new HelloWorldRef(Target, requestWaiter, Timeout);
         }
 
         public HelloWorldRef WithTimeout(TimeSpan? timeout)
         {
-            return new HelloWorldRef(Actor, RequestWaiter, timeout);
+            return new HelloWorldRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.Int32> GetHelloCount()
@@ -170,20 +180,20 @@ namespace Protobuf.Interface
     [ProtoContract]
     public class SurrogateForIHelloWorld
     {
-        [ProtoMember(1)] public IActorRef Actor;
+        [ProtoMember(1)] public IRequestTarget Target;
 
         [ProtoConverter]
         public static SurrogateForIHelloWorld Convert(IHelloWorld value)
         {
             if (value == null) return null;
-            return new SurrogateForIHelloWorld { Actor = ((HelloWorldRef)value).Actor };
+            return new SurrogateForIHelloWorld { Target = ((HelloWorldRef)value).Target };
         }
 
         [ProtoConverter]
         public static IHelloWorld Convert(SurrogateForIHelloWorld value)
         {
             if (value == null) return null;
-            return new HelloWorldRef(value.Actor);
+            return new HelloWorldRef(value.Target);
         }
     }
 
@@ -424,13 +434,23 @@ namespace Protobuf.Interface
         {
         }
 
-        public PedanticRef(IActorRef actor) : base(actor)
+        public PedanticRef(IRequestTarget target) : base(target)
         {
         }
 
-        public PedanticRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public PedanticRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public PedanticRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public PedanticRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IPedantic_NoReply WithNoReply()
         {
@@ -439,12 +459,12 @@ namespace Protobuf.Interface
 
         public PedanticRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new PedanticRef(Actor, requestWaiter, Timeout);
+            return new PedanticRef(Target, requestWaiter, Timeout);
         }
 
         public PedanticRef WithTimeout(TimeSpan? timeout)
         {
-            return new PedanticRef(Actor, RequestWaiter, timeout);
+            return new PedanticRef(Target, RequestWaiter, timeout);
         }
 
         public Task TestCall()
@@ -547,20 +567,20 @@ namespace Protobuf.Interface
     [ProtoContract]
     public class SurrogateForIPedantic
     {
-        [ProtoMember(1)] public IActorRef Actor;
+        [ProtoMember(1)] public IRequestTarget Target;
 
         [ProtoConverter]
         public static SurrogateForIPedantic Convert(IPedantic value)
         {
             if (value == null) return null;
-            return new SurrogateForIPedantic { Actor = ((PedanticRef)value).Actor };
+            return new SurrogateForIPedantic { Target = ((PedanticRef)value).Target };
         }
 
         [ProtoConverter]
         public static IPedantic Convert(SurrogateForIPedantic value)
         {
             if (value == null) return null;
-            return new PedanticRef(value.Actor);
+            return new PedanticRef(value.Target);
         }
     }
 
@@ -718,13 +738,23 @@ namespace Protobuf.Interface
         {
         }
 
-        public SurrogateRef(IActorRef actor) : base(actor)
+        public SurrogateRef(IRequestTarget target) : base(target)
         {
         }
 
-        public SurrogateRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public SurrogateRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public SurrogateRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public SurrogateRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public ISurrogate_NoReply WithNoReply()
         {
@@ -733,12 +763,12 @@ namespace Protobuf.Interface
 
         public SurrogateRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new SurrogateRef(Actor, requestWaiter, Timeout);
+            return new SurrogateRef(Target, requestWaiter, Timeout);
         }
 
         public SurrogateRef WithTimeout(TimeSpan? timeout)
         {
-            return new SurrogateRef(Actor, RequestWaiter, timeout);
+            return new SurrogateRef(Target, RequestWaiter, timeout);
         }
 
         public Task<Akka.Actor.Address> GetAddress(Akka.Actor.Address address)
@@ -793,20 +823,20 @@ namespace Protobuf.Interface
     [ProtoContract]
     public class SurrogateForISurrogate
     {
-        [ProtoMember(1)] public IActorRef Actor;
+        [ProtoMember(1)] public IRequestTarget Target;
 
         [ProtoConverter]
         public static SurrogateForISurrogate Convert(ISurrogate value)
         {
             if (value == null) return null;
-            return new SurrogateForISurrogate { Actor = ((SurrogateRef)value).Actor };
+            return new SurrogateForISurrogate { Target = ((SurrogateRef)value).Target };
         }
 
         [ProtoConverter]
         public static ISurrogate Convert(SurrogateForISurrogate value)
         {
             if (value == null) return null;
-            return new SurrogateRef(value.Actor);
+            return new SurrogateRef(value.Target);
         }
     }
 

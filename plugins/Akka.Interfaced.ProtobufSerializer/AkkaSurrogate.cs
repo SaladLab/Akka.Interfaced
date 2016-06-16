@@ -96,6 +96,37 @@ namespace Akka.Interfaced.ProtobufSerializer
         }
 
         [ProtoContract]
+        public class SurrogateForIRequestTarget
+        {
+            // Alwasy assumes that IRequestTarget is AkkaActorTarget
+            // because this serializer cannot be used under SlimClient.
+
+            [ProtoMember(1)]
+            public string Path;
+
+            [ProtoConverter]
+            public static SurrogateForIRequestTarget Convert(IRequestTarget value)
+            {
+                if (value == null)
+                    return null;
+
+                var actor = ((AkkaActorTarget)value).Actor;
+                var path = ((ActorRefBase.Surrogate)actor.ToSurrogate(CurrentSystem)).Path;
+                return new SurrogateForIRequestTarget { Path = path };
+            }
+
+            [ProtoConverter]
+            public static IRequestTarget Convert(SurrogateForIRequestTarget value)
+            {
+                if (value == null)
+                    return null;
+
+                var actor = (IActorRef)((new ActorRefBase.Surrogate(value.Path)).FromSurrogate(CurrentSystem));
+                return new AkkaActorTarget(actor);
+            }
+        }
+
+        [ProtoContract]
         public class SurrogateForINotificationChannel
         {
             [ProtoMember(1)] public IActorRef Actor;

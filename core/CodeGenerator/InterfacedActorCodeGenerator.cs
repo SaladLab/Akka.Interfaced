@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using Akka.Interfaced;
 using CodeWriter;
 
-namespace CodeGen
+namespace CodeGenerator
 {
     public class InterfacedActorCodeGenerator
     {
@@ -19,7 +17,7 @@ namespace CodeGen
             Console.WriteLine("GenerateCode: " + type.FullName);
 
             if (Options.UseProtobuf && Options.UseSlimClient)
-                EnsureSurrogateForIActorRef(type, w);
+                EnsureSurrogateForIRequestTarget(type, w);
 
             w._($"#region {type.FullName}");
             w._();
@@ -52,12 +50,12 @@ namespace CodeGen
             w._($"#endregion");
         }
 
-        private void EnsureSurrogateForIActorRef(Type callerType, CodeWriter.CodeWriter w)
+        private void EnsureSurrogateForIRequestTarget(Type callerType, CodeWriter.CodeWriter w)
         {
             if (_surrogateForIActorRefGenerated)
                 return;
 
-            var surrogateClassName = Utility.GetSurrogateClassName("IActorRef");
+            var surrogateClassName = Utility.GetSurrogateClassName("IRequestTarget");
 
             w._($"#region {surrogateClassName}");
             w._();
@@ -73,18 +71,17 @@ namespace CodeGen
                 w._();
 
                 w._("[ProtoConverter]");
-                using (w.B($"public static {surrogateClassName} Convert(IActorRef value)"))
+                using (w.B($"public static {surrogateClassName} Convert(IRequestTarget value)"))
                 {
                     w._($"if (value == null) return null;");
-                    w._($"var actor = ((BoundActorRef)value);");
-                    w._($"return new {surrogateClassName} {{ Id = actor.Id }};");
+                    w._($"return new {surrogateClassName} {{ Id = ((BoundActorTarget)value).Id }};");
                 }
 
                 w._("[ProtoConverter]");
-                using (w.B($"public static IActorRef Convert({surrogateClassName} value)"))
+                using (w.B($"public static IRequestTarget Convert({surrogateClassName} value)"))
                 {
                     w._($"if (value == null) return null;");
-                    w._($"return new BoundActorRef(value.Id);");
+                    w._($"return new BoundActorTarget(value.Id);");
                 }
             }
 
@@ -330,12 +327,28 @@ namespace CodeGen
                 {
                 }
 
-                using (w.B($"public {refClassName}(IActorRef actor) : base(actor)"))
+                using (w.B($"public {refClassName}(IRequestTarget target) : base(target)"))
                 {
                 }
 
-                using (w.B($"public {refClassName}(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)"))
+                using (w.B($"public {refClassName}(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)"))
                 {
+                }
+
+                // For IActorRef
+
+                if (Options.UseSlimClient == false)
+                {
+                    using (w.B($"public {refClassName}(IActorRef actor) : base(new AkkaActorTarget(actor))"))
+                    {
+                    }
+
+                    using (w.B($"public {refClassName}(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)"))
+                    {
+                    }
+
+                    w._($"public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;");
+                    w._();
                 }
 
                 // With Helpers
@@ -347,12 +360,12 @@ namespace CodeGen
 
                 using (w.B($"public {refClassName} WithRequestWaiter(IRequestWaiter requestWaiter)"))
                 {
-                    w._($"return new {refClassName}(Actor, requestWaiter, Timeout);");
+                    w._($"return new {refClassName}(Target, requestWaiter, Timeout);");
                 }
 
                 using (w.B($"public {refClassName} WithTimeout(TimeSpan? timeout)"))
                 {
-                    w._($"return new {refClassName}(Actor, RequestWaiter, timeout);");
+                    w._($"return new {refClassName}(Target, RequestWaiter, timeout);");
                 }
 
                 // IInterface message methods
@@ -431,21 +444,21 @@ namespace CodeGen
                 w._("[ProtoContract]");
                 using (w.B($"public class {surrogateClassName}"))
                 {
-                    w._($"[ProtoMember(1)] public IActorRef Actor;");
+                    w._($"[ProtoMember(1)] public IRequestTarget Target;");
                     w._();
 
                     w._("[ProtoConverter]");
                     using (w.B($"public static {surrogateClassName} Convert({type.Name} value)"))
                     {
                         w._($"if (value == null) return null;");
-                        w._($"return new {surrogateClassName} {{ Actor = (({refClassName})value).Actor }};");
+                        w._($"return new {surrogateClassName} {{ Target = (({refClassName})value).Target }};");
                     }
 
                     w._("[ProtoConverter]");
                     using (w.B($"public static {type.Name} Convert({surrogateClassName} value)"))
                     {
                         w._($"if (value == null) return null;");
-                        w._($"return new {refClassName}(value.Actor);");
+                        w._($"return new {refClassName}(value.Target);");
                     }
                 }
             }

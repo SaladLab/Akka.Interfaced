@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace CodeGen
+namespace CodeGenerator
 {
     public static class Utility
     {

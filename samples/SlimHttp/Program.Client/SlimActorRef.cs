@@ -2,17 +2,19 @@
 
 namespace SlimHttp.Program.Client
 {
-    internal class SlimActorRef : IActorRef
+    internal class SlimActorTarget : IRequestTarget
     {
         public string Id { get; set; }
 
-        public SlimActorRef()
+        public SlimActorTarget()
         {
         }
 
-        public SlimActorRef(string id)
+        public SlimActorTarget(string id)
         {
             Id = id;
         }
+
+        public IRequestWaiter DefaultRequestWaiter => null;
     }
 }

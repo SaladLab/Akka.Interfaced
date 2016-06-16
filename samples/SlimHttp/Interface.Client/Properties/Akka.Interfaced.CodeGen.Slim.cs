@@ -105,11 +105,11 @@ namespace SlimHttp.Interface
         {
         }
 
-        public CalculatorRef(IActorRef actor) : base(actor)
+        public CalculatorRef(IRequestTarget target) : base(target)
         {
         }
 
-        public CalculatorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public CalculatorRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
 
@@ -120,12 +120,12 @@ namespace SlimHttp.Interface
 
         public CalculatorRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new CalculatorRef(Actor, requestWaiter, Timeout);
+            return new CalculatorRef(Target, requestWaiter, Timeout);
         }
 
         public CalculatorRef WithTimeout(TimeSpan? timeout)
         {
-            return new CalculatorRef(Actor, RequestWaiter, timeout);
+            return new CalculatorRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.String> Concat(System.String a, System.String b)
@@ -237,11 +237,11 @@ namespace SlimHttp.Interface
         {
         }
 
-        public CounterRef(IActorRef actor) : base(actor)
+        public CounterRef(IRequestTarget target) : base(target)
         {
         }
 
-        public CounterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public CounterRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
 
@@ -252,12 +252,12 @@ namespace SlimHttp.Interface
 
         public CounterRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new CounterRef(Actor, requestWaiter, Timeout);
+            return new CounterRef(Target, requestWaiter, Timeout);
         }
 
         public CounterRef WithTimeout(TimeSpan? timeout)
         {
-            return new CounterRef(Actor, RequestWaiter, timeout);
+            return new CounterRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.Int32> GetCounter()
@@ -385,11 +385,11 @@ namespace SlimHttp.Interface
         {
         }
 
-        public GreeterRef(IActorRef actor) : base(actor)
+        public GreeterRef(IRequestTarget target) : base(target)
         {
         }
 
-        public GreeterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public GreeterRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
 
@@ -400,12 +400,12 @@ namespace SlimHttp.Interface
 
         public GreeterRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new GreeterRef(Actor, requestWaiter, Timeout);
+            return new GreeterRef(Target, requestWaiter, Timeout);
         }
 
         public GreeterRef WithTimeout(TimeSpan? timeout)
         {
-            return new GreeterRef(Actor, RequestWaiter, timeout);
+            return new GreeterRef(Target, RequestWaiter, timeout);
         }
 
         public Task<System.Int32> GetCount()
@@ -654,11 +654,11 @@ namespace SlimHttp.Interface
         {
         }
 
-        public PedanticRef(IActorRef actor) : base(actor)
+        public PedanticRef(IRequestTarget target) : base(target)
         {
         }
 
-        public PedanticRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public PedanticRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
 
@@ -669,12 +669,12 @@ namespace SlimHttp.Interface
 
         public PedanticRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new PedanticRef(Actor, requestWaiter, Timeout);
+            return new PedanticRef(Target, requestWaiter, Timeout);
         }
 
         public PedanticRef WithTimeout(TimeSpan? timeout)
         {
-            return new PedanticRef(Actor, RequestWaiter, timeout);
+            return new PedanticRef(Target, RequestWaiter, timeout);
         }
 
         public Task TestCall()

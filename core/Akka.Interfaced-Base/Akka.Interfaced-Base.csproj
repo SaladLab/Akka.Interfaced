@@ -36,7 +36,11 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoundActorTarget.cs" />
     <Compile Include="Exceptions.cs" />
+    <Compile Include="IRequestTarget.cs" />
+    <Compile Include="IAsyncInvokable.cs" />
+    <Compile Include="InterfacedActorRef.cs" />
     <Compile Include="IPayloadActorRefUpdatable.cs" />
     <Compile Include="IInterfacedActor.cs" />
     <Compile Include="IInterfacedPayload.cs" />
@@ -46,6 +50,7 @@
     <Compile Include="InterfacedObserver.cs" />
     <Compile Include="IPayloadObserverUpdatable.cs" />
     <Compile Include="IPayloadTagOverridable.cs" />
+    <Compile Include="IRequestWaiter.cs" />
     <Compile Include="IValueGetable.cs" />
     <Compile Include="NotificationMessage.cs" />
     <Compile Include="PayloadTableAttribute.cs" />
@@ -54,6 +59,7 @@
     <Compile Include="RequestMessage.cs" />
     <Compile Include="ResponseMessage.cs" />
     <Compile Include="TagOverridableAttribute.cs" />
+    <Compile Include="Task.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

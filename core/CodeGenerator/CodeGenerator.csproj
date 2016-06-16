@@ -64,8 +64,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyLoader.cs" />
+    <Compile Include="EntryCodeGenerator.cs" />
     <Compile Include="InterfacedActorCodeGenerator.cs" />
     <Compile Include="InterfacedObserverCodeGenerator.cs" />
+    <Compile Include="MethodInfoComparer.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -74,12 +76,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Akka.Interfaced\Akka.Interfaced.csproj">
-      <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>
-      <Name>Akka.Interfaced</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />

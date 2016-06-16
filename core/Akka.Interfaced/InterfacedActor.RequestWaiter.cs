@@ -21,14 +21,12 @@ namespace Akka.Interfaced
         private readonly ConcurrentDictionary<int, ResponseWaitingItem> _responseWaitingItems =
             new ConcurrentDictionary<int, ResponseWaitingItem>();
 
-        public Task SendRequestAndWait(
-            IActorRef target, RequestMessage request, IActorRef sender, TimeSpan? timeout)
+        public Task SendRequestAndWait(IRequestTarget target, RequestMessage request, IActorRef sender, TimeSpan? timeout)
         {
             return SendRequestAndReceive<object>(target, request, sender, timeout);
         }
 
-        public Task<TReturn> SendRequestAndReceive<TReturn>(
-            IActorRef target, RequestMessage request, IActorRef sender, TimeSpan? timeout)
+        public Task<TReturn> SendRequestAndReceive<TReturn>(IRequestTarget target, RequestMessage request, IActorRef sender, TimeSpan? timeout)
         {
             // Issue requestId and register it in table
 
@@ -82,7 +80,7 @@ namespace Akka.Interfaced
             // Fire request
 
             request.RequestId = requestId;
-            target.Tell(request, sender);
+            ((AkkaActorTarget)target).Actor.Tell(request, sender);
             return tcs.Task;
         }
 

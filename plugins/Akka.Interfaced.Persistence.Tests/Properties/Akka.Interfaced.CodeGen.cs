@@ -122,13 +122,23 @@ namespace Akka.Interfaced.Persistence.Tests
         {
         }
 
-        public NotepadRef(IActorRef actor) : base(actor)
+        public NotepadRef(IRequestTarget target) : base(target)
         {
         }
 
-        public NotepadRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(actor, requestWaiter, timeout)
+        public NotepadRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public NotepadRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public NotepadRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public INotepad_NoReply WithNoReply()
         {
@@ -137,12 +147,12 @@ namespace Akka.Interfaced.Persistence.Tests
 
         public NotepadRef WithRequestWaiter(IRequestWaiter requestWaiter)
         {
-            return new NotepadRef(Actor, requestWaiter, Timeout);
+            return new NotepadRef(Target, requestWaiter, Timeout);
         }
 
         public NotepadRef WithTimeout(TimeSpan? timeout)
         {
-            return new NotepadRef(Actor, RequestWaiter, timeout);
+            return new NotepadRef(Target, RequestWaiter, timeout);
         }
 
         public Task Clear()

@@ -53,8 +53,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AkkaActorTarget.cs" />
     <Compile Include="AlternativeInterfaceAttribute.cs" />
-    <Compile Include="BoundActorRef.cs" />
     <Compile Include="ActorBoundSession.cs" />
     <Compile Include="ActorBoundSessionMessage.cs" />
     <Compile Include="ActorFaultExtentions.cs" />
@@ -64,7 +64,6 @@
     <Compile Include="ExtendedHandlerAttribute.cs" />
     <Compile Include="FilterHandlerBuilder.cs" />
     <Compile Include="HandlerBuilderHelpers.cs" />
-    <Compile Include="IAsyncInvokable.cs" />
     <Compile Include="IFilter.cs" />
     <Compile Include="IFilterFactory.cs" />
     <Compile Include="IExtendedInterface.cs" />
@@ -74,8 +73,6 @@
     <Compile Include="InterfacedActorHandler.cs" />
     <Compile Include="ActorNotificationChannel.cs" />
     <Compile Include="InterfacedActor.cs" />
-    <Compile Include="InterfacedActorRef.cs" />
-    <Compile Include="IRequestWaiter.cs" />
     <Compile Include="MessageHandler.cs" />
     <Compile Include="MessageHandlerAttribute.cs" />
     <Compile Include="MessageDispatcher.cs" />

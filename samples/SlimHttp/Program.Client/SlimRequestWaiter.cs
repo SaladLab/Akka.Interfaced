@@ -35,12 +35,12 @@ namespace SlimHttp.Program.Client
         private int _lastRequestId;
 
 #if NET20 || NET35
-        void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
+        void IRequestWaiter.SendRequest(IRequestTarget target, RequestMessage requestMessage)
         {
             SendRequest(target, requestMessage);
         }
 
-        Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+        Task IRequestWaiter.SendRequestAndWait(IRequestTarget target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             var httpWebRequest = SendRequest(target, requestMessage);
             var task = new SlimTask();
@@ -50,7 +50,7 @@ namespace SlimHttp.Program.Client
             return task;
         }
 
-        Task<T> IRequestWaiter.SendRequestAndReceive<T>(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+        Task<T> IRequestWaiter.SendRequestAndReceive<T>(IRequestTarget target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             var httpWebRequest = SendRequest(target, requestMessage);
             var task = new SlimTask<T>();
@@ -101,12 +101,12 @@ namespace SlimHttp.Program.Client
             }
         }
 #else
-        void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
+        void IRequestWaiter.SendRequest(IRequestTarget target, RequestMessage requestMessage)
         {
             SendRequest(target, requestMessage);
         }
 
-        async Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+        async Task IRequestWaiter.SendRequestAndWait(IRequestTarget target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             // Get result from stream
 
@@ -118,7 +118,7 @@ namespace SlimHttp.Program.Client
                 throw reply.Exception;
         }
 
-        async Task<T> IRequestWaiter.SendRequestAndReceive<T>(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+        async Task<T> IRequestWaiter.SendRequestAndReceive<T>(IRequestTarget target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             // Get result from stream
 
@@ -133,9 +133,9 @@ namespace SlimHttp.Program.Client
         }
 #endif
 
-        private HttpWebRequest SendRequest(IActorRef target, RequestMessage requestMessage)
+        private HttpWebRequest SendRequest(IRequestTarget target, RequestMessage requestMessage)
         {
-            var actorId = ((SlimActorRef)target).Id;
+            var actorId = ((SlimActorTarget)target).Id;
             var uri = new Uri(Root, "/actor/" + actorId);
 
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(uri);

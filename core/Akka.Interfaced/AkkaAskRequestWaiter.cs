@@ -6,15 +6,15 @@ namespace Akka.Interfaced
 {
     internal class AkkaAskRequestWaiter : IRequestWaiter
     {
-        void IRequestWaiter.SendRequest(IActorRef target, RequestMessage requestMessage)
+        void IRequestWaiter.SendRequest(IRequestTarget target, RequestMessage requestMessage)
         {
-            target.Tell(requestMessage);
+            ((AkkaActorTarget)target).Actor.Tell(requestMessage);
         }
 
-        Task IRequestWaiter.SendRequestAndWait(IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+        Task IRequestWaiter.SendRequestAndWait(IRequestTarget target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             requestMessage.RequestId = -1;
-            return target.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
+            return ((AkkaActorTarget)target).Actor.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
             {
                 if (t.IsCanceled)
                     throw new TaskCanceledException();
@@ -30,10 +30,10 @@ namespace Akka.Interfaced
         }
 
         Task<TReturn> IRequestWaiter.SendRequestAndReceive<TReturn>(
-            IActorRef target, RequestMessage requestMessage, TimeSpan? timeout)
+            IRequestTarget target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             requestMessage.RequestId = -1;
-            return target.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
+            return ((AkkaActorTarget)target).Actor.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
             {
                 if (t.IsCanceled)
                     throw new TaskCanceledException();
