@@ -10,7 +10,7 @@ namespace HelloWorld.Program
     {
         private static void Main(string[] args)
         {
-            var system = ActorSystem.Create("MySystem");
+            var system = ActorSystem.Create("MySystem", "akka.suppress-json-serializer-warning=on");
             DeadRequestProcessingActor.Install(system);
             TestAsync(system).Wait();
         }
