@@ -1,12 +1,11 @@
 {
   "id": "AkkaInterfaced",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "authors": [ "Esun Kim" ],
   "owners": [ "Esun Kim" ],
   "description": "Akka.Interfaced SlimClient for Unity3D",
   "files": [
     "../Akka.Interfaced-Base.Net35/bin/Release/Akka.Interfaced-Base.dll",
-    "../Akka.Interfaced-SlimClient.Net35/bin/Release/Akka.Interfaced-SlimClient.dll",
     "$dependencies$"
   ]
 }
