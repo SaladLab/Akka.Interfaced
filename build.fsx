@@ -17,7 +17,6 @@ let solution =
                                     ("Akka", "") ] }
           { emptyProject with Name = "Akka.Interfaced-Base"
                               Folder = "./core/Akka.Interfaced-Base" }
-                              Dependencies = [ ("Akka.Interfaced-Base", "") ] }
           { // CodeGenerator-Templates
             emptyProject with Name = "Akka.Interfaced.Templates"
                               Folder = "./core/CodeGenerator-Templates"
