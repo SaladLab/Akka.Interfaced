@@ -1,7 +1,8 @@
 ## 0.4.0 (Released 2016/06/15)
 
+* Allow normal and slim client work together #29
 * Sync actor handler & async observer handler. #26
-* Support actor, observe interface inheritance. #27
+* Support actor, observer interface inheritance. #27
 * Refactoring ActorBoundSession. #24 #27
 * Add observer context. #25
 * Remove IDisposable from InterfacedObserver.
