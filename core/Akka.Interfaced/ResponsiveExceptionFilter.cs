@@ -3,6 +3,33 @@ using System.Linq;
 
 namespace Akka.Interfaced
 {
+    public class ResponsiveExceptionFilter : IPostRequestFilter
+    {
+        private int _filterOrder;
+        private Func<Exception, bool> _filter;
+
+        int IFilter.Order => _filterOrder;
+
+        public ResponsiveExceptionFilter(int filterOrder, Func<Exception, bool> filter)
+        {
+            _filterOrder = filterOrder;
+            _filter = filter;
+        }
+
+        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
+        {
+            if (context.Exception != null && _filter(context.Exception))
+            {
+                context.Response = new ResponseMessage
+                {
+                    RequestId = context.Request.RequestId,
+                    Exception = context.Exception
+                };
+                context.Exception = null;
+            }
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class ResponsiveExceptionAttribute : Attribute, IFilterPerClassFactory
     {
@@ -41,30 +68,12 @@ namespace Akka.Interfaced
         }
     }
 
-    public class ResponsiveExceptionFilter : IPostRequestFilter
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
+    public class ResponsiveExceptionAllAttribute : ResponsiveExceptionAttribute
     {
-        private int _filterOrder;
-        private Func<Exception, bool> _filter;
-
-        int IFilter.Order => _filterOrder;
-
-        public ResponsiveExceptionFilter(int filterOrder, Func<Exception, bool> filter)
+        public ResponsiveExceptionAllAttribute(int filterOrder = FilterDefaultOrder)
+            : base(filterOrder, filter: _ => true)
         {
-            _filterOrder = filterOrder;
-            _filter = filter;
-        }
-
-        void IPostRequestFilter.OnPostRequest(PostRequestFilterContext context)
-        {
-            if (context.Exception != null && _filter(context.Exception))
-            {
-                context.Response = new ResponseMessage
-                {
-                    RequestId = context.Request.RequestId,
-                    Exception = context.Exception
-                };
-                context.Exception = null;
-            }
         }
     }
 }
