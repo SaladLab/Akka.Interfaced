@@ -3,7 +3,7 @@ using Akka.Actor;
 
 namespace Akka.Interfaced
 {
-    public static class ActorBoundSessionMessage
+    public static class ActorBoundChannelMessage
     {
         public class InterfaceType
         {
@@ -101,7 +101,7 @@ namespace Akka.Interfaced
             }
         }
 
-        public class SessionTerminated
+        public class ChannelTerminated
         {
         }
     }

@@ -8,10 +8,10 @@ using Akka.Actor;
 
 namespace Akka.Interfaced.TestKit
 {
-    public class TestActorBoundSession : ActorBoundSession, IRequestWaiter
+    public class TestActorBoundChannel : ActorBoundChannel, IRequestWaiter
     {
         private readonly IActorRef _self;
-        private readonly Func<IActorContext, Tuple<IActorRef, ActorBoundSessionMessage.InterfaceType[]>[]> _initialActorFactory;
+        private readonly Func<IActorContext, Tuple<IActorRef, ActorBoundChannelMessage.InterfaceType[]>[]> _initialActorFactory;
 
         private int _lastRequestId;
         private readonly ConcurrentDictionary<int, Action<ResponseMessage>> _requestMap =
@@ -42,7 +42,7 @@ namespace Akka.Interfaced.TestKit
             }
         }
 
-        public TestActorBoundSession(Func<IActorContext, Tuple<IActorRef, ActorBoundSessionMessage.InterfaceType[]>[]> initialActorFactory)
+        public TestActorBoundChannel(Func<IActorContext, Tuple<IActorRef, ActorBoundChannelMessage.InterfaceType[]>[]> initialActorFactory)
         {
             _self = Self;
             _initialActorFactory = initialActorFactory;

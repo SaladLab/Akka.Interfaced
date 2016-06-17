@@ -9,14 +9,14 @@ using Xunit;
 
 namespace Akka.Interfaced
 {
-    public class ActorBoundSessionTest : TestKit.Xunit2.TestKit
+    public class ActorBoundChannelTest : TestKit.Xunit2.TestKit
     {
-        public ActorBoundSessionTest(ITestOutputHelper output)
+        public ActorBoundChannelTest(ITestOutputHelper output)
             : base(output: output)
         {
         }
 
-        public class TestActorBoundSesson : ActorBoundSession
+        public class TestActorBoundChannel : ActorBoundChannel
         {
             public class Request
             {
@@ -111,13 +111,13 @@ namespace Akka.Interfaced
         private async Task RequestToBoundActor_Response()
         {
             // Arrange
-            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var channel = ActorOfAsTestActorRef<TestActorBoundChannel>();
             var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
-            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyExFinal)));
+            var r = await channel.Ask<ActorBoundChannelMessage.BindReply>(new ActorBoundChannelMessage.Bind(dummy, typeof(IDummyExFinal)));
             Assert.NotEqual(0, r.ActorId);
 
             // Act
-            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
                 ActorId = r.ActorId,
                 Message = new RequestMessage
@@ -136,13 +136,13 @@ namespace Akka.Interfaced
         private async Task RequestToBoundActorWithTag_Response()
         {
             // Arrange
-            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var channel = ActorOfAsTestActorRef<TestActorBoundChannel>();
             var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
-            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyWithTag), "ID"));
+            var r = await channel.Ask<ActorBoundChannelMessage.BindReply>(new ActorBoundChannelMessage.Bind(dummy, typeof(IDummyWithTag), "ID"));
             Assert.NotEqual(0, r.ActorId);
 
             // Act
-            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
                 ActorId = r.ActorId,
                 Message = new RequestMessage
@@ -161,11 +161,11 @@ namespace Akka.Interfaced
         private async Task RequestToUnboundActor_Exception()
         {
             // Arrange
-            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var channel = ActorOfAsTestActorRef<TestActorBoundChannel>();
             var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
 
             // Act
-            var r = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            var r = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
                 ActorId = 1,
                 Message = new RequestMessage
@@ -184,13 +184,13 @@ namespace Akka.Interfaced
         private async Task RequestOnUnboundType_Exception()
         {
             // Arrange
-            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var channel = ActorOfAsTestActorRef<TestActorBoundChannel>();
             var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
-            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyEx)));
+            var r = await channel.Ask<ActorBoundChannelMessage.BindReply>(new ActorBoundChannelMessage.Bind(dummy, typeof(IDummyEx)));
             Assert.NotEqual(0, r.ActorId);
 
             // Act
-            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
                 ActorId = r.ActorId,
                 Message = new RequestMessage
@@ -209,14 +209,14 @@ namespace Akka.Interfaced
         private async Task UnbindActor_And_RequestToUnboundActor_Exception()
         {
             // Arrange
-            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var channel = ActorOfAsTestActorRef<TestActorBoundChannel>();
             var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
-            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyEx)));
+            var r = await channel.Ask<ActorBoundChannelMessage.BindReply>(new ActorBoundChannelMessage.Bind(dummy, typeof(IDummyEx)));
             Assert.NotEqual(0, r.ActorId);
 
             // Act
-            session.Tell(new ActorBoundSessionMessage.Unbind(dummy));
-            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            channel.Tell(new ActorBoundChannelMessage.Unbind(dummy));
+            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
                 ActorId = r.ActorId,
                 Message = new RequestMessage
@@ -235,14 +235,14 @@ namespace Akka.Interfaced
         private async Task AddTypeToBoundActor_And_RequestToBoundActor_Response()
         {
             // Arrange
-            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var channel = ActorOfAsTestActorRef<TestActorBoundChannel>();
             var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
-            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyEx)));
+            var r = await channel.Ask<ActorBoundChannelMessage.BindReply>(new ActorBoundChannelMessage.Bind(dummy, typeof(IDummyEx)));
             Assert.NotEqual(0, r.ActorId);
 
             // Act
-            session.Tell(new ActorBoundSessionMessage.AddType(dummy, typeof(IDummyEx2)));
-            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            channel.Tell(new ActorBoundChannelMessage.AddType(dummy, typeof(IDummyEx2)));
+            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
                 ActorId = r.ActorId,
                 Message = new RequestMessage
@@ -261,15 +261,15 @@ namespace Akka.Interfaced
         private async Task RemoveTypeToBoundActor_And_RequestOnUnboundType_Exception()
         {
             // Arrange
-            var session = ActorOfAsTestActorRef<TestActorBoundSesson>();
+            var channel = ActorOfAsTestActorRef<TestActorBoundChannel>();
             var dummy = ActorOfAsTestActorRef<DummyWorkerActor>();
-            var r = await session.Ask<ActorBoundSessionMessage.BindReply>(new ActorBoundSessionMessage.Bind(dummy, typeof(IDummyEx)));
+            var r = await channel.Ask<ActorBoundChannelMessage.BindReply>(new ActorBoundChannelMessage.Bind(dummy, typeof(IDummyEx)));
             Assert.NotEqual(0, r.ActorId);
 
             // Act
-            session.Tell(new ActorBoundSessionMessage.AddType(dummy, typeof(IDummyEx2)));
-            session.Tell(new ActorBoundSessionMessage.RemoveType(dummy, typeof(IDummyEx2)));
-            var r2 = await session.Ask<ResponseMessage>(new TestActorBoundSesson.Request
+            channel.Tell(new ActorBoundChannelMessage.AddType(dummy, typeof(IDummyEx2)));
+            channel.Tell(new ActorBoundChannelMessage.RemoveType(dummy, typeof(IDummyEx2)));
+            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
                 ActorId = r.ActorId,
                 Message = new RequestMessage

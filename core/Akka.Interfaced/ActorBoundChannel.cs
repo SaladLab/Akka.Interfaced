@@ -6,7 +6,7 @@ using Akka.Actor;
 
 namespace Akka.Interfaced
 {
-    public abstract class ActorBoundSession : UntypedActor
+    public abstract class ActorBoundChannel : UntypedActor
     {
         protected class BoundActor
         {
@@ -31,7 +31,7 @@ namespace Akka.Interfaced
             {
             }
 
-            public BoundType(ActorBoundSessionMessage.InterfaceType type)
+            public BoundType(ActorBoundChannelMessage.InterfaceType type)
             {
                 Type = type.Type;
                 TagValue = type.TagValue;
@@ -56,7 +56,7 @@ namespace Akka.Interfaced
                 foreach (var a in _boundActorMap.Values)
                 {
                     if (a.IsChildActor == false)
-                        a.Actor.Tell(new ActorBoundSessionMessage.SessionTerminated());
+                        a.Actor.Tell(new ActorBoundChannelMessage.ChannelTerminated());
                 }
 
                 _boundActorMap.Clear();
@@ -83,17 +83,17 @@ namespace Akka.Interfaced
 
             // ActorBound messages
 
-            var bindMessage = message as ActorBoundSessionMessage.Bind;
+            var bindMessage = message as ActorBoundChannelMessage.Bind;
             if (bindMessage != null)
             {
                 var actorId = BindActor(
                     bindMessage.Actor,
                     bindMessage.Types.Select(t => new BoundType(t)));
-                Sender.Tell(new ActorBoundSessionMessage.BindReply(actorId));
+                Sender.Tell(new ActorBoundChannelMessage.BindReply(actorId));
                 return;
             }
 
-            var unbindMessage = message as ActorBoundSessionMessage.Unbind;
+            var unbindMessage = message as ActorBoundChannelMessage.Unbind;
             if (unbindMessage != null)
             {
                 if (unbindMessage.Actor != null)
@@ -101,7 +101,7 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var addTypeMessage = message as ActorBoundSessionMessage.AddType;
+            var addTypeMessage = message as ActorBoundChannelMessage.AddType;
             if (addTypeMessage != null)
             {
                 AddType(
@@ -110,7 +110,7 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var removeTypeMessage = message as ActorBoundSessionMessage.RemoveType;
+            var removeTypeMessage = message as ActorBoundChannelMessage.RemoveType;
             if (removeTypeMessage != null)
             {
                 RemoveType(

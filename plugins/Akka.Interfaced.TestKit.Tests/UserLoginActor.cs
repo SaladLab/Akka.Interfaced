@@ -7,11 +7,11 @@ namespace Akka.Interfaced.TestKit.Tests
 {
     public class UserLoginActor : InterfacedActor, IUserLogin
     {
-        private readonly IActorRef _actorBoundSession;
+        private readonly IActorRef _actorBoundChannel;
 
-        public UserLoginActor(IActorRef actorBoundSession)
+        public UserLoginActor(IActorRef actorBoundChannel)
         {
-            _actorBoundSession = actorBoundSession;
+            _actorBoundChannel = actorBoundChannel;
         }
 
         public async Task<IUser> Login(string id, string password, IUserObserver observer)
@@ -31,8 +31,8 @@ namespace Akka.Interfaced.TestKit.Tests
 
             var user = Context.System.ActorOf(Props.Create(() => new UserActor(id, observer)));
 
-            var reply = await _actorBoundSession.Ask<ActorBoundSessionMessage.BindReply>(
-                new ActorBoundSessionMessage.Bind(user, typeof(IUser)));
+            var reply = await _actorBoundChannel.Ask<ActorBoundChannelMessage.BindReply>(
+                new ActorBoundChannelMessage.Bind(user, typeof(IUser)));
 
             return new UserRef(new BoundActorTarget(reply.ActorId));
         }
