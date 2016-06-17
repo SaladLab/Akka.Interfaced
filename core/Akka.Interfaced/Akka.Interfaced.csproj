@@ -91,6 +91,7 @@
     <Compile Include="RequestHandlerBuilder.cs" />
     <Compile Include="RequestHandlerBuilderInternalHelpers.cs" />
     <Compile Include="InterfacedPoisonPill.cs" />
+    <Compile Include="ResponsiveException.cs" />
     <Compile Include="ResponsiveExceptionFilter.cs" />
     <Compile Include="SynchronizationContextSwitcher.cs" />
     <Compile Include="TaskContinuationMessage.cs" />

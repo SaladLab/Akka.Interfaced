@@ -15,6 +15,24 @@ namespace Akka.Interfaced
         {
         }
 
+        private static class ThrowExceptionHelper
+        {
+            public static void Throw(ThrowExceptionType type)
+            {
+                switch (type)
+                {
+                    case ThrowExceptionType.ResponsiveByWrap:
+                        throw new ResponsiveException(new ArgumentException(nameof(type)));
+
+                    case ThrowExceptionType.ResponsiveByFilter:
+                        throw new ArgumentException(nameof(type));
+
+                    case ThrowExceptionType.Fault:
+                        throw new InvalidOperationException(nameof(type));
+                }
+            }
+        }
+
         public class TestBasicActor : InterfacedActor, IBasic
         {
             private LogBoard<string> _log;
@@ -49,13 +67,10 @@ namespace Akka.Interfaced
             }
 
             [ResponsiveException(typeof(ArgumentException))]
-            Task<int> IBasic.ThrowException(bool throwException)
+            Task<int> IBasic.ThrowException(ThrowExceptionType type)
             {
-                _log.Add($"ThrowException({throwException})");
-
-                if (throwException)
-                    throw new ArgumentException("throwException");
-
+                _log.Add($"ThrowException({type})");
+                ThrowExceptionHelper.Throw(type);
                 return Task.FromResult(1);
             }
         }
@@ -92,13 +107,10 @@ namespace Akka.Interfaced
             }
 
             [ResponsiveException(typeof(ArgumentException))]
-            int IBasicSync.ThrowException(bool throwException)
+            int IBasicSync.ThrowException(ThrowExceptionType type)
             {
-                _log.Add($"ThrowException({throwException})");
-
-                if (throwException)
-                    throw new ArgumentException("throwException");
-
+                _log.Add($"ThrowException({type})");
+                ThrowExceptionHelper.Throw(type);
                 return 1;
             }
         }
@@ -140,13 +152,10 @@ namespace Akka.Interfaced
 
             [ExtendedHandler]
             [ResponsiveException(typeof(ArgumentException))]
-            private Task<int> ThrowException(bool throwException)
+            private Task<int> ThrowException(ThrowExceptionType type)
             {
-                _log.Add($"ThrowException({throwException})");
-
-                if (throwException)
-                    throw new ArgumentException("throwException");
-
+                _log.Add($"ThrowException({type})");
+                ThrowExceptionHelper.Throw(type);
                 return Task.FromResult(1);
             }
         }
@@ -225,17 +234,35 @@ namespace Akka.Interfaced
         [InlineData(typeof(TestBasicActor))]
         [InlineData(typeof(TestBasicSyncActor))]
         [InlineData(typeof(TestBasicExtendedActor))]
-        public async Task BasicThrowException_Done(Type actorType)
+        public async Task BasicThrowExceptionWithWrap_Done(Type actorType)
         {
             // Arrange
             var log = new LogBoard<string>();
             var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
 
             // Act
-            var e = await Record.ExceptionAsync(() => a.ThrowException(true));
+            var e = await Record.ExceptionAsync(() => a.ThrowException(ThrowExceptionType.ResponsiveByWrap));
 
             // Assert
-            Assert.Equal(new[] { "ThrowException(True)" }, log);
+            Assert.Equal(new[] { "ThrowException(ResponsiveByWrap)" }, log);
+            Assert.IsType<ArgumentException>(e);
+        }
+
+        [Theory]
+        [InlineData(typeof(TestBasicActor))]
+        [InlineData(typeof(TestBasicSyncActor))]
+        [InlineData(typeof(TestBasicExtendedActor))]
+        public async Task BasicThrowExceptionWithFilter_Done(Type actorType)
+        {
+            // Arrange
+            var log = new LogBoard<string>();
+            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
+
+            // Act
+            var e = await Record.ExceptionAsync(() => a.ThrowException(ThrowExceptionType.ResponsiveByFilter));
+
+            // Assert
+            Assert.Equal(new[] { "ThrowException(ResponsiveByFilter)" }, log);
             Assert.IsType<ArgumentException>(e);
         }
     }

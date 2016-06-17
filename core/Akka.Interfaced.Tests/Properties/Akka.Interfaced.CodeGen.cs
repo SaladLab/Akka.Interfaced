@@ -129,7 +129,7 @@ namespace Akka.Interfaced
         public class ThrowException_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Boolean throwException;
+            public Akka.Interfaced.ThrowExceptionType type;
 
             public Type GetInterfaceType()
             {
@@ -138,7 +138,7 @@ namespace Akka.Interfaced
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IBasic)__target).ThrowException(throwException);
+                var __v = await ((IBasic)__target).ThrowException(type);
                 return (IValueGetable)(new ThrowException_Return { v = __v });
             }
         }
@@ -166,7 +166,7 @@ namespace Akka.Interfaced
         void CallWithParameter(System.Int32 value);
         void CallWithParameterAndReturn(System.Int32 value);
         void CallWithReturn();
-        void ThrowException(System.Boolean throwException);
+        void ThrowException(Akka.Interfaced.ThrowExceptionType type);
     }
 
     public class BasicRef : InterfacedActorRef, IBasic, IBasic_NoReply
@@ -240,10 +240,10 @@ namespace Akka.Interfaced
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
 
-        public Task<System.Int32> ThrowException(System.Boolean throwException)
+        public Task<System.Int32> ThrowException(Akka.Interfaced.ThrowExceptionType type)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IBasic_PayloadTable.ThrowException_Invoke { throwException = throwException }
+                InvokePayload = new IBasic_PayloadTable.ThrowException_Invoke { type = type }
             };
             return SendRequestAndReceive<System.Int32>(requestMessage);
         }
@@ -280,10 +280,10 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void IBasic_NoReply.ThrowException(System.Boolean throwException)
+        void IBasic_NoReply.ThrowException(Akka.Interfaced.ThrowExceptionType type)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IBasic_PayloadTable.ThrowException_Invoke { throwException = throwException }
+                InvokePayload = new IBasic_PayloadTable.ThrowException_Invoke { type = type }
             };
             SendRequest(requestMessage);
         }
@@ -296,7 +296,7 @@ namespace Akka.Interfaced
         void CallWithParameter(System.Int32 value);
         System.Int32 CallWithParameterAndReturn(System.Int32 value);
         System.Int32 CallWithReturn();
-        System.Int32 ThrowException(System.Boolean throwException);
+        System.Int32 ThrowException(Akka.Interfaced.ThrowExceptionType type);
     }
 }
 

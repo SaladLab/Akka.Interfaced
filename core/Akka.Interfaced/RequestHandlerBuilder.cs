@@ -234,6 +234,14 @@ namespace Akka.Interfaced
                             ReturnPayload = returnPayload
                         };
                     }
+                    catch (ResponsiveException e)
+                    {
+                        response = new ResponseMessage
+                        {
+                            RequestId = request.RequestId,
+                            Exception = e.InnerException
+                        };
+                    }
                     catch (Exception e)
                     {
                         exception = e;
@@ -356,6 +364,14 @@ namespace Akka.Interfaced
                         {
                             RequestId = request.RequestId,
                             ReturnPayload = returnPayload
+                        };
+                    }
+                    catch (ResponsiveException e)
+                    {
+                        response = new ResponseMessage
+                        {
+                            RequestId = request.RequestId,
+                            Exception = e.InnerException
                         };
                     }
                     catch (Exception e)
