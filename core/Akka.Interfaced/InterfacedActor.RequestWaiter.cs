@@ -45,14 +45,14 @@ namespace Akka.Interfaced
                     {
                         var completionSource = ((TaskCompletionSource<TReturn>)taskCompletionSource);
                         if (response.Exception != null)
-                            completionSource.SetException(response.Exception);
+                            completionSource.TrySetException(response.Exception);
                         else
-                            completionSource.SetResult((TReturn)response.ReturnPayload?.Value);
+                            completionSource.TrySetResult((TReturn)response.ReturnPayload?.Value);
                     },
                     CancelHandler = (taskCompletionSource) =>
                     {
                         var completionSource = ((TaskCompletionSource<TReturn>)taskCompletionSource);
-                        completionSource.SetCanceled();
+                        completionSource.TrySetCanceled();
                     },
                     TaskCompletionSource = tcs
                 });
