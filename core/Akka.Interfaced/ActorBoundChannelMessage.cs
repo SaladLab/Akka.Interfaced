@@ -17,6 +17,7 @@ namespace Akka.Interfaced
             }
         }
 
+        // Bind an (typed) actor to a destinated channel
         public class Bind
         {
             public IActorRef Actor { get; }
@@ -50,6 +51,7 @@ namespace Akka.Interfaced
             }
         }
 
+        // Unbind an actor to a destinated channel
         public class Unbind
         {
             public IActorRef Actor;
@@ -60,6 +62,7 @@ namespace Akka.Interfaced
             }
         }
 
+        // Add more types to a bound actor.
         public class AddType
         {
             public IActorRef Actor { get; }
@@ -83,6 +86,7 @@ namespace Akka.Interfaced
             }
         }
 
+        // Remove (allowed) types to a bound actor.
         public class RemoveType
         {
             public IActorRef Actor { get; }

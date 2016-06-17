@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActorBoundGatewayMessage.cs" />
     <Compile Include="AkkaActorTarget.cs" />
     <Compile Include="AlternativeInterfaceAttribute.cs" />
     <Compile Include="ActorBoundChannel.cs" />
