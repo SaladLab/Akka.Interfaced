@@ -1,4 +1,4 @@
-## 0.4.0 (Released 2016/06/15)
+## 0.4.0 (Released 2016/06/20)
 
 * Sync with Akka.Interfaced 0.4.0
 * Check a type of observer instance passed via rpc.
