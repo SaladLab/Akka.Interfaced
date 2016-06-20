@@ -91,4 +91,19 @@ namespace Akka.Interfaced
         {
         }
     }
+
+    /// <summary>
+    /// This exception is thrown when the channel used for communicating with an actor has a problem.
+    /// </summary>
+    public class RequestChannelException : AkkaInterfacedException
+    {
+        public RequestChannelException()
+        {
+        }
+
+        public RequestChannelException(string message, Exception innerException = null)
+            : base(message, innerException)
+        {
+        }
+    }
 }

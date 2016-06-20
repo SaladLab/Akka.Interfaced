@@ -9,8 +9,6 @@ namespace Akka.Interfaced
 {
     internal class InterfacedActorRequestWaiter
     {
-        private int _lastRequestId;
-
         private struct ResponseWaitingItem
         {
             public Action<object, ResponseMessage> ResponseHandler;
@@ -18,6 +16,7 @@ namespace Akka.Interfaced
             public object TaskCompletionSource;
         }
 
+        private int _lastRequestId;
         private readonly ConcurrentDictionary<int, ResponseWaitingItem> _responseWaitingItems =
             new ConcurrentDictionary<int, ResponseWaitingItem>();
 
