@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using Akka.Actor;
 
-namespace Akka.Interfaced
+namespace Akka.Interfaced.SlimServer
 {
-    public abstract class ActorBoundChannel : UntypedActor
+    public abstract class ActorBoundChannelBase : InterfacedActor, IActorBoundChannelSync
     {
         protected class BoundActor
         {
             public IActorRef Actor;
             public bool IsChildActor;
+            public ChannelClosedNotificationType ChannelClosedNotification;
             public List<BoundType> Types;
             public List<BoundType> DerivedTypes;
 
@@ -31,7 +32,7 @@ namespace Akka.Interfaced
             {
             }
 
-            public BoundType(ActorBoundChannelMessage.InterfaceType type)
+            public BoundType(TaggedType type)
             {
                 Type = type.Type;
                 TagValue = type.TagValue;
@@ -51,6 +52,8 @@ namespace Akka.Interfaced
 
         protected override void PostStop()
         {
+            // TODO:!
+            /*
             lock (_boundActorLock)
             {
                 foreach (var a in _boundActorMap.Values)
@@ -61,6 +64,7 @@ namespace Akka.Interfaced
 
                 _boundActorMap.Clear();
             }
+            */
         }
 
         protected override void OnReceive(object message)
@@ -81,45 +85,7 @@ namespace Akka.Interfaced
                 return;
             }
 
-            // ActorBound messages
-
-            var bindMessage = message as ActorBoundChannelMessage.Bind;
-            if (bindMessage != null)
-            {
-                var actorId = BindActor(
-                    bindMessage.Actor,
-                    bindMessage.Types.Select(t => new BoundType(t)));
-                Sender.Tell(new ActorBoundChannelMessage.BindReply(actorId));
-                return;
-            }
-
-            var unbindMessage = message as ActorBoundChannelMessage.Unbind;
-            if (unbindMessage != null)
-            {
-                if (unbindMessage.Actor != null)
-                    UnbindActor(unbindMessage.Actor);
-                return;
-            }
-
-            var addTypeMessage = message as ActorBoundChannelMessage.AddType;
-            if (addTypeMessage != null)
-            {
-                AddType(
-                    addTypeMessage.Actor,
-                    addTypeMessage.Types.Select(t => new BoundType(t)));
-                return;
-            }
-
-            var removeTypeMessage = message as ActorBoundChannelMessage.RemoveType;
-            if (removeTypeMessage != null)
-            {
-                RemoveType(
-                    removeTypeMessage.Actor,
-                    removeTypeMessage.Types);
-                return;
-            }
-
-            Unhandled(message);
+            base.OnReceive(message);
         }
 
         protected BoundActor GetBoundActor(int id)
@@ -140,7 +106,7 @@ namespace Akka.Interfaced
             }
         }
 
-        protected int BindActor(IActorRef actor, IEnumerable<BoundType> boundTypes)
+        protected int BindActor(IActorRef actor, IEnumerable<BoundType> boundTypes, ChannelClosedNotificationType channelClosedNotification = ChannelClosedNotificationType.Default)
         {
             lock (_boundActorLock)
             {
@@ -152,6 +118,7 @@ namespace Akka.Interfaced
                 {
                     Actor = actor,
                     IsChildActor = (Self.Path == actor.Path.Parent),
+                    ChannelClosedNotification = channelClosedNotification,
                     Types = boundTypes.ToList(),
                     DerivedTypes = GetDerivedBoundTypes(boundTypes)
                 };
@@ -160,7 +127,7 @@ namespace Akka.Interfaced
             }
         }
 
-        protected void UnbindActor(IActorRef actor)
+        protected bool UnbindActor(IActorRef actor)
         {
             lock (_boundActorLock)
             {
@@ -169,17 +136,19 @@ namespace Akka.Interfaced
                 {
                     _boundActorMap.Remove(actorId);
                     _boundActorInverseMap.Remove(actor);
+                    return true;
                 }
             }
+            return false;
         }
 
-        protected void AddType(IActorRef actor, IEnumerable<BoundType> boundTypes)
+        protected bool BindType(IActorRef actor, IEnumerable<BoundType> boundTypes)
         {
             lock (_boundActorLock)
             {
                 var actorId = GetBoundActorId(actor);
                 if (actorId == 0)
-                    return;
+                    return false;
 
                 var boundActor = _boundActorMap[actorId];
                 foreach (var bt in boundTypes)
@@ -192,16 +161,17 @@ namespace Akka.Interfaced
                         boundActor.Types.Add(bt);
                 }
                 boundActor.DerivedTypes = GetDerivedBoundTypes(boundActor.Types);
+                return true;
             }
         }
 
-        protected void RemoveType(IActorRef actor, IEnumerable<Type> types)
+        protected bool UnbindType(IActorRef actor, IEnumerable<Type> types)
         {
             lock (_boundActorLock)
             {
                 var actorId = GetBoundActorId(actor);
                 if (actorId == 0)
-                    return;
+                    return false;
 
                 var boundActor = _boundActorMap[actorId];
                 foreach (var type in types)
@@ -209,6 +179,7 @@ namespace Akka.Interfaced
                     boundActor.Types.RemoveAll(t => t.Type == type);
                 }
                 boundActor.DerivedTypes = GetDerivedBoundTypes(boundActor.Types);
+                return true;
             }
         }
 
@@ -229,6 +200,43 @@ namespace Akka.Interfaced
                 }
             }
             return derivedBoundTypes;
+        }
+
+        [ResponsiveExceptionAll]
+        int IActorBoundChannelSync.BindActor(IActorRef actor, TaggedType[] types, ChannelClosedNotificationType channelClosedNotification)
+        {
+            if (actor == null)
+                throw new ArgumentNullException(nameof(actor));
+
+            var actorId = BindActor(actor, types.Select(t => new BoundType(t)), channelClosedNotification);
+            return actorId;
+        }
+
+        [ResponsiveExceptionAll]
+        bool IActorBoundChannelSync.UnbindActor(IActorRef actor)
+        {
+            if (actor == null)
+                throw new ArgumentNullException(nameof(actor));
+
+            return UnbindActor(actor);
+        }
+
+        [ResponsiveExceptionAll]
+        bool IActorBoundChannelSync.BindType(IActorRef actor, TaggedType[] types)
+        {
+            if (actor == null)
+                throw new ArgumentNullException(nameof(actor));
+
+            return BindType(actor, types.Select(t => new BoundType(t)));
+        }
+
+        [ResponsiveExceptionAll]
+        bool IActorBoundChannelSync.UnbindType(IActorRef actor, Type[] types)
+        {
+            if (actor == null)
+                throw new ArgumentNullException(nameof(actor));
+
+            return UnbindType(actor, types);
         }
     }
 }

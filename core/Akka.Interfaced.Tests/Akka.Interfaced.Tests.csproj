@@ -84,7 +84,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActorBoundChannelTest.cs" />
     <Compile Include="Interface\IBasic.cs" />
     <Compile Include="Interface\IDummy.cs" />
     <Compile Include="Interface\IOverloaded.cs" />

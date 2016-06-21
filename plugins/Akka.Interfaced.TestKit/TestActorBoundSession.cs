@@ -5,13 +5,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using Akka.Actor;
+using Akka.Interfaced.SlimServer;
 
 namespace Akka.Interfaced.TestKit
 {
-    public class TestActorBoundChannel : ActorBoundChannel, IRequestWaiter
+    public class TestActorBoundChannel : ActorBoundChannelBase, IRequestWaiter
     {
         private readonly IActorRef _self;
-        private readonly Func<IActorContext, Tuple<IActorRef, ActorBoundChannelMessage.InterfaceType[]>[]> _initialActorFactory;
+        private readonly Func<IActorContext, Tuple<IActorRef, TaggedType[]>[]> _initialActorFactory;
 
         private int _lastRequestId;
         private readonly ConcurrentDictionary<int, Action<ResponseMessage>> _requestMap =
@@ -42,7 +43,7 @@ namespace Akka.Interfaced.TestKit
             }
         }
 
-        public TestActorBoundChannel(Func<IActorContext, Tuple<IActorRef, ActorBoundChannelMessage.InterfaceType[]>[]> initialActorFactory)
+        public TestActorBoundChannel(Func<IActorContext, Tuple<IActorRef, TaggedType[]>[]> initialActorFactory)
         {
             _self = Self;
             _initialActorFactory = initialActorFactory;

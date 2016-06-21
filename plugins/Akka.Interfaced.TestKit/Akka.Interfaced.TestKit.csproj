@@ -68,6 +68,10 @@
       <Project>{5cbda46b-b22c-474a-8b99-e2e855a8bca8}</Project>
       <Name>Akka.Interfaced</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Akka.Interfaced.SlimServer\Akka.Interfaced.SlimServer.csproj">
+      <Project>{5bc078fe-32d5-4c6d-a6f6-de521be63e36}</Project>
+      <Name>Akka.Interfaced.SlimServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

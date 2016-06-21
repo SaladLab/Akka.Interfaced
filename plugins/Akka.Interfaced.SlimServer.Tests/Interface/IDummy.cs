@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Akka.Interfaced
+namespace Akka.Interfaced.SlimServer
 {
     public interface IDummy : IInterfacedActor
     {
@@ -20,5 +20,11 @@ namespace Akka.Interfaced
     public interface IDummyExFinal : IDummyEx, IDummyEx2
     {
         Task<object> CallExFinal(object param);
+    }
+
+    [TagOverridable("id")]
+    public interface IDummyWithTag : IInterfacedActor
+    {
+        Task<object> CallWithTag(object param, string id = null);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Akka.Interfaced.SlimServer;
 using Akka.TestKit;
 using Xunit;
 using Xunit.Abstractions;
@@ -28,13 +29,13 @@ namespace Akka.Interfaced.TestKit.Tests
             _actorBoundChannel = a.UnderlyingActor;
         }
 
-        private Tuple<IActorRef, ActorBoundChannelMessage.InterfaceType[]>[] CreateInitialActor(IActorContext context)
+        private Tuple<IActorRef, TaggedType[]>[] CreateInitialActor(IActorContext context)
         {
             return new[]
             {
                 Tuple.Create(
                     context.ActorOf(Props.Create(() => new UserLoginActor(context.Self))),
-                    new[] { new ActorBoundChannelMessage.InterfaceType(typeof(IUserLogin)) })
+                    new TaggedType[] { typeof(IUserLogin) })
             };
         }
 

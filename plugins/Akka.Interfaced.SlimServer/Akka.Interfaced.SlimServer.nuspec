@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>@project@</id>
+    <title>@project@@title@</title>
+    <version>@build.number@</version>
+    <authors>Esun Kim</authors>
+    <owners>Esun Kim</owners>
+    <description>Akka.Interfaced SlimServer Base Library</description>
+    <licenseUrl>https://raw.githubusercontent.com/SaladLab/Akka.Interfaced/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/SaladLab/Akka.Interfaced</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>@releaseNotes@</releaseNotes>
+    <copyright>Copyright © 2016 SaladLab</copyright>
+    <tags>akka interfaced log filter</tags>
+    @dependencies@
+    @references@
+  </metadata>
+</package>

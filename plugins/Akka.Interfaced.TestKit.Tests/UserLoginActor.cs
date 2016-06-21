@@ -2,16 +2,17 @@
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Akka.Interfaced.SlimServer;
 
 namespace Akka.Interfaced.TestKit.Tests
 {
     public class UserLoginActor : InterfacedActor, IUserLogin
     {
-        private readonly IActorRef _actorBoundChannel;
+        private readonly ActorBoundChannelRef _actorBoundChannel;
 
         public UserLoginActor(IActorRef actorBoundChannel)
         {
-            _actorBoundChannel = actorBoundChannel;
+            _actorBoundChannel = new ActorBoundChannelRef(actorBoundChannel).WithRequestWaiter(this);
         }
 
         public async Task<IUser> Login(string id, string password, IUserObserver observer)
@@ -30,11 +31,9 @@ namespace Akka.Interfaced.TestKit.Tests
             // Make UserActor and bind it
 
             var user = Context.System.ActorOf(Props.Create(() => new UserActor(id, observer)));
+            var actorId = await _actorBoundChannel.BindActor(user, new TaggedType[] { typeof(IUser) });
 
-            var reply = await _actorBoundChannel.Ask<ActorBoundChannelMessage.BindReply>(
-                new ActorBoundChannelMessage.Bind(user, typeof(IUser)));
-
-            return new UserRef(new BoundActorTarget(reply.ActorId));
+            return new UserRef(new BoundActorTarget(actorId));
         }
 
         private bool CheckAccount(string id, string password)

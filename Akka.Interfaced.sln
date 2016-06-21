@@ -109,6 +109,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{A1C9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGenerator.Tests", "core\CodeGenerator.Tests\CodeGenerator.Tests.csproj", "{84E0EC8E-E7F1-482C-83CF-86671A86EE04}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.SlimServer", "plugins\Akka.Interfaced.SlimServer\Akka.Interfaced.SlimServer.csproj", "{5BC078FE-32D5-4C6D-A6F6-DE521BE63E36}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Interfaced.SlimServer.Tests", "plugins\Akka.Interfaced.SlimServer.Tests\Akka.Interfaced.SlimServer.Tests.csproj", "{CAF11DD4-060F-418E-A195-DA1A2EB281E8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C44CF322-7993-4451-A2F6-028C4ABCFD17} = {C44CF322-7993-4451-A2F6-028C4ABCFD17}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -330,6 +337,22 @@ Global
 		{84E0EC8E-E7F1-482C-83CF-86671A86EE04}.Release|Any CPU.Build.0 = Release|Any CPU
 		{84E0EC8E-E7F1-482C-83CF-86671A86EE04}.Release|Win32.ActiveCfg = Release|Any CPU
 		{84E0EC8E-E7F1-482C-83CF-86671A86EE04}.Release|Win32.Build.0 = Release|Any CPU
+		{5BC078FE-32D5-4C6D-A6F6-DE521BE63E36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BC078FE-32D5-4C6D-A6F6-DE521BE63E36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BC078FE-32D5-4C6D-A6F6-DE521BE63E36}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{5BC078FE-32D5-4C6D-A6F6-DE521BE63E36}.Debug|Win32.Build.0 = Debug|Any CPU
+		{5BC078FE-32D5-4C6D-A6F6-DE521BE63E36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BC078FE-32D5-4C6D-A6F6-DE521BE63E36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BC078FE-32D5-4C6D-A6F6-DE521BE63E36}.Release|Win32.ActiveCfg = Release|Any CPU
+		{5BC078FE-32D5-4C6D-A6F6-DE521BE63E36}.Release|Win32.Build.0 = Release|Any CPU
+		{CAF11DD4-060F-418E-A195-DA1A2EB281E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAF11DD4-060F-418E-A195-DA1A2EB281E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAF11DD4-060F-418E-A195-DA1A2EB281E8}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{CAF11DD4-060F-418E-A195-DA1A2EB281E8}.Debug|Win32.Build.0 = Debug|Any CPU
+		{CAF11DD4-060F-418E-A195-DA1A2EB281E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAF11DD4-060F-418E-A195-DA1A2EB281E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAF11DD4-060F-418E-A195-DA1A2EB281E8}.Release|Win32.ActiveCfg = Release|Any CPU
+		{CAF11DD4-060F-418E-A195-DA1A2EB281E8}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -363,5 +386,7 @@ Global
 		{9EECBF54-7B2D-4A41-BBDE-CBFBB344A142} = {A1C92C0E-3504-4F85-BBF5-505F68630D91}
 		{3933BEAA-19AC-452E-A13A-B746E1EA6A8F} = {A1C92C0E-3504-4F85-BBF5-505F68630D91}
 		{84E0EC8E-E7F1-482C-83CF-86671A86EE04} = {1A90348B-9EF5-475B-83D8-9D4F385BA8B5}
+		{5BC078FE-32D5-4C6D-A6F6-DE521BE63E36} = {558DE237-AC05-41A5-AA45-2084614D95D3}
+		{CAF11DD4-060F-418E-A195-DA1A2EB281E8} = {558DE237-AC05-41A5-AA45-2084614D95D3}
 	EndGlobalSection
 EndGlobal

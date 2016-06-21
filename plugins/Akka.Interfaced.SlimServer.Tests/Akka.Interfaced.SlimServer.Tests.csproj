@@ -7,11 +7,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EC828D56-8C88-49EF-9716-68B2663A7F81}</ProjectGuid>
+    <ProjectGuid>{CAF11DD4-060F-418E-A195-DA1A2EB281E8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Akka.Interfaced.TestKit.Tests</RootNamespace>
-    <AssemblyName>Akka.Interfaced.TestKit.Tests</AssemblyName>
+    <RootNamespace>Akka.Interfaced.SlimServer.Tests</RootNamespace>
+    <AssemblyName>Akka.Interfaced.SlimServer.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -84,18 +84,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interface\IUser.cs" />
-    <Compile Include="Interface\IUserLogin.cs" />
-    <Compile Include="Interface\IUserObserver.cs" />
+    <Compile Include="ActorBoundChannelTest.cs" />
+    <Compile Include="Interface\IDummy.cs" />
     <Compile Include="Properties\Akka.Interfaced.CodeGen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestActorBoundChannelTest.cs" />
-    <Compile Include="UserActor.cs" />
-    <Compile Include="UserLoginActor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\Akka.Interfaced-Base\Akka.Interfaced-Base.csproj">
@@ -110,13 +108,6 @@
       <Project>{5bc078fe-32d5-4c6d-a6f6-de521be63e36}</Project>
       <Name>Akka.Interfaced.SlimServer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Akka.Interfaced.TestKit\Akka.Interfaced.TestKit.csproj">
-      <Project>{96ebc938-b31c-464f-aec5-dd5cc219ace8}</Project>
-      <Name>Akka.Interfaced.TestKit</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />

@@ -67,9 +67,15 @@ let solution =
                                   [ ("Akka.Interfaced", "")
                                     ("protobuf-net", "")
                                     ("TypeAlias", "") ] }
+          { emptyProject with Name = "Akka.Interfaced.SlimServer"
+                              Folder = "./plugins/Akka.Interfaced.SlimServer"
+                              Dependencies = 
+                                  [ ("Akka.Interfaced", "") ] }
           { emptyProject with Name = "Akka.Interfaced.TestKit"
                               Folder = "./plugins/Akka.Interfaced.TestKit"
-                              Dependencies = [ ("Akka.Interfaced", "") ] } ]
+                              Dependencies = 
+                                  [ ("Akka.Interfaced", "")
+                                    ("Akka.Interfaced.SlimServer", "") ] } ]
 
 Target "Clean" <| fun _ -> cleanBin
 
