@@ -139,6 +139,9 @@ namespace CodeGenerator
             if (type == typeof(char))
                 return string.Format("'{0}'", value);
 
+            if (type.IsEnum)
+                return string.Format("{0}.{1}", type.FullName, value);
+
             return string.Format("{0}", value);
         }
 
