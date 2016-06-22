@@ -113,6 +113,7 @@ namespace Akka.Interfaced
 
             // Act
             await subject.MakeEvent("A");
+            await Task.Delay(10);
 
             // Assert
             Assert.Equal(
