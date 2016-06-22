@@ -25,6 +25,9 @@
     <package id="Akka.Interfaced.LogFilter">
         <files dir="lib/net45" source="plugins/Akka.Interfaced.LogFilter/bin/Debug"/>
     </package>
+    <package id="Akka.Interfaced.SlimServer">
+        <files dir="lib/net45" source="plugins/Akka.Interfaced.SlimServer/bin/Debug"/>
+    </package>
     <package id="Akka.Interfaced.Persistence">
         <files dir="lib/net45" source="plugins/Akka.Interfaced.Persistence/bin/Debug"/>
     </package>
