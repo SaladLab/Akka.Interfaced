@@ -29,13 +29,14 @@ namespace Akka.Interfaced.TestKit.Tests
             _actorBoundChannel = a.UnderlyingActor;
         }
 
-        private Tuple<IActorRef, TaggedType[]>[] CreateInitialActor(IActorContext context)
+        private Tuple<IActorRef, TaggedType[], ChannelClosedNotificationType>[] CreateInitialActor(IActorContext context)
         {
             return new[]
             {
                 Tuple.Create(
                     context.ActorOf(Props.Create(() => new UserLoginActor(context.Self))),
-                    new TaggedType[] { typeof(IUserLogin) })
+                    new TaggedType[] { typeof(IUserLogin) },
+                    ChannelClosedNotificationType.InterfacedPoisonPill)
             };
         }
 

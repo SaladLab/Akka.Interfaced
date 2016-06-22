@@ -307,8 +307,8 @@ namespace Akka.Interfaced.SlimServer
             : IInterfacedPayload, IAsyncInvokable
         {
             public Akka.Actor.IActorRef actor;
-            public System.Object channelClosedNotification;
             public Akka.Interfaced.SlimServer.TaggedType[] types;
+            public Akka.Interfaced.SlimServer.ChannelClosedNotificationType channelClosedNotification;
 
             public Type GetInterfaceType()
             {
@@ -317,7 +317,7 @@ namespace Akka.Interfaced.SlimServer
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IActorBoundGateway)__target).OpenChannel(actor, channelClosedNotification, types);
+                var __v = await ((IActorBoundGateway)__target).OpenChannel(actor, types, channelClosedNotification);
                 return (IValueGetable)(new OpenChannel_Return { v = __v });
             }
         }
@@ -341,7 +341,7 @@ namespace Akka.Interfaced.SlimServer
 
     public interface IActorBoundGateway_NoReply
     {
-        void OpenChannel(Akka.Actor.IActorRef actor, System.Object channelClosedNotification, params Akka.Interfaced.SlimServer.TaggedType[] types);
+        void OpenChannel(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ChannelClosedNotificationType channelClosedNotification = Akka.Interfaced.SlimServer.ChannelClosedNotificationType.Default);
     }
 
     public class ActorBoundGatewayRef : InterfacedActorRef, IActorBoundGateway, IActorBoundGateway_NoReply
@@ -383,18 +383,18 @@ namespace Akka.Interfaced.SlimServer
             return new ActorBoundGatewayRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.String> OpenChannel(Akka.Actor.IActorRef actor, System.Object channelClosedNotification, params Akka.Interfaced.SlimServer.TaggedType[] types)
+        public Task<System.String> OpenChannel(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ChannelClosedNotificationType channelClosedNotification = Akka.Interfaced.SlimServer.ChannelClosedNotificationType.Default)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IActorBoundGateway_PayloadTable.OpenChannel_Invoke { actor = actor, channelClosedNotification = channelClosedNotification, types = types }
+                InvokePayload = new IActorBoundGateway_PayloadTable.OpenChannel_Invoke { actor = actor, types = types, channelClosedNotification = channelClosedNotification }
             };
             return SendRequestAndReceive<System.String>(requestMessage);
         }
 
-        void IActorBoundGateway_NoReply.OpenChannel(Akka.Actor.IActorRef actor, System.Object channelClosedNotification, params Akka.Interfaced.SlimServer.TaggedType[] types)
+        void IActorBoundGateway_NoReply.OpenChannel(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ChannelClosedNotificationType channelClosedNotification)
         {
             var requestMessage = new RequestMessage {
-                InvokePayload = new IActorBoundGateway_PayloadTable.OpenChannel_Invoke { actor = actor, channelClosedNotification = channelClosedNotification, types = types }
+                InvokePayload = new IActorBoundGateway_PayloadTable.OpenChannel_Invoke { actor = actor, types = types, channelClosedNotification = channelClosedNotification }
             };
             SendRequest(requestMessage);
         }
@@ -403,7 +403,7 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(IActorBoundGateway))]
     public interface IActorBoundGatewaySync : IInterfacedActorSync
     {
-        System.String OpenChannel(Akka.Actor.IActorRef actor, System.Object channelClosedNotification, params Akka.Interfaced.SlimServer.TaggedType[] types);
+        System.String OpenChannel(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ChannelClosedNotificationType channelClosedNotification = Akka.Interfaced.SlimServer.ChannelClosedNotificationType.Default);
     }
 }
 

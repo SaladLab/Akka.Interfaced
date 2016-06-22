@@ -5,6 +5,6 @@ namespace Akka.Interfaced.SlimServer
 {
     public interface IActorBoundGateway : IInterfacedActor
     {
-        Task<string> OpenChannel(IActorRef actor, object channelClosedNotification, params TaggedType[] types);
+        Task<string> OpenChannel(IActorRef actor, TaggedType[] types, ChannelClosedNotificationType channelClosedNotification = ChannelClosedNotificationType.Default);
     }
 }

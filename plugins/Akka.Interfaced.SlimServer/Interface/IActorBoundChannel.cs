@@ -4,7 +4,7 @@ using Akka.Actor;
 
 namespace Akka.Interfaced.SlimServer
 {
-    public class TaggedType
+    public sealed class TaggedType
     {
         public Type Type { get; }
         public object TagValue { get; }
@@ -15,6 +15,17 @@ namespace Akka.Interfaced.SlimServer
             TagValue = tagValue;
         }
 
+        public override bool Equals(object obj)
+        {
+            var t = obj as TaggedType;
+            return (t != null) && (Type == t.Type && TagValue == t.TagValue);
+        }
+
+        public override int GetHashCode()
+        {
+            return Type.GetHashCode();
+        }
+
         public static implicit operator TaggedType(Type type)
         {
             return new TaggedType(type);
@@ -23,9 +34,10 @@ namespace Akka.Interfaced.SlimServer
 
     public enum ChannelClosedNotificationType
     {
-        Default = 0,
-        InterfacedPoisonPill = 1,
-        ChannelClosed = 2,
+        Default = 0,                    // For a child, InterfacedPoisonPill. For others, Nothing.
+        Nothing = 1,                    // Do nothing
+        InterfacedPoisonPill = 2,       // Bound actor will be sent a InterfacedPoisonPill
+        ChannelClosed = 3,              // Bound actor will be invoked a `IActorBoundChannelObserver.ChannelClosed` which has to be implemented.
     }
 
     public interface IActorBoundChannel : IInterfacedActor

@@ -683,3 +683,249 @@ namespace Akka.Interfaced.SlimServer
 }
 
 #endregion
+#region Akka.Interfaced.SlimServer.ISubject
+
+namespace Akka.Interfaced.SlimServer
+{
+    [PayloadTable(typeof(ISubject), PayloadTableKind.Request)]
+    public static class ISubject_PayloadTable
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(MakeEvent_Invoke), null },
+                { typeof(Subscribe_Invoke), null },
+                { typeof(Unsubscribe_Invoke), null },
+            };
+        }
+
+        public class MakeEvent_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public System.String eventName;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject)__target).MakeEvent(eventName);
+                return null;
+            }
+        }
+
+        public class Subscribe_Invoke
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
+        {
+            public Akka.Interfaced.SlimServer.ISubjectObserver observer;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject)__target).Subscribe(observer);
+                return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
+            }
+        }
+
+        public class Unsubscribe_Invoke
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
+        {
+            public Akka.Interfaced.SlimServer.ISubjectObserver observer;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject)__target).Unsubscribe(observer);
+                return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
+            }
+        }
+    }
+
+    public interface ISubject_NoReply
+    {
+        void MakeEvent(System.String eventName);
+        void Subscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer);
+        void Unsubscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer);
+    }
+
+    public class SubjectRef : InterfacedActorRef, ISubject, ISubject_NoReply
+    {
+        public SubjectRef() : base(null)
+        {
+        }
+
+        public SubjectRef(IRequestTarget target) : base(target)
+        {
+        }
+
+        public SubjectRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
+        {
+        }
+
+        public SubjectRef(IActorRef actor) : base(new AkkaActorTarget(actor))
+        {
+        }
+
+        public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
+        {
+        }
+
+        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public ISubject_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public SubjectRef WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new SubjectRef(Target, requestWaiter, Timeout);
+        }
+
+        public SubjectRef WithTimeout(TimeSpan? timeout)
+        {
+            return new SubjectRef(Target, RequestWaiter, timeout);
+        }
+
+        public Task MakeEvent(System.String eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable.MakeEvent_Invoke { eventName = eventName }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task Subscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (SubjectObserver)observer }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task Unsubscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (SubjectObserver)observer }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        void ISubject_NoReply.MakeEvent(System.String eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable.MakeEvent_Invoke { eventName = eventName }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubject_NoReply.Subscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable.Subscribe_Invoke { observer = (SubjectObserver)observer }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubject_NoReply.Unsubscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable.Unsubscribe_Invoke { observer = (SubjectObserver)observer }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+
+    [AlternativeInterface(typeof(ISubject))]
+    public interface ISubjectSync : IInterfacedActorSync
+    {
+        void MakeEvent(System.String eventName);
+        void Subscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer);
+        void Unsubscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer);
+    }
+}
+
+#endregion
+#region Akka.Interfaced.SlimServer.ISubjectObserver
+
+namespace Akka.Interfaced.SlimServer
+{
+    [PayloadTable(typeof(ISubjectObserver), PayloadTableKind.Notification)]
+    public static class ISubjectObserver_PayloadTable
+    {
+        public static Type[] GetPayloadTypes()
+        {
+            return new Type[] {
+                typeof(Event_Invoke),
+            };
+        }
+
+        public class Event_Invoke : IInterfacedPayload, IInvokable
+        {
+            public System.String eventName;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubjectObserver);
+            }
+
+            public void Invoke(object __target)
+            {
+                ((ISubjectObserver)__target).Event(eventName);
+            }
+        }
+    }
+
+    public class SubjectObserver : InterfacedObserver, ISubjectObserver
+    {
+        public SubjectObserver()
+            : base(null, 0)
+        {
+        }
+
+        public SubjectObserver(INotificationChannel channel, int observerId = 0)
+            : base(channel, observerId)
+        {
+        }
+
+        public void Event(System.String eventName)
+        {
+            var payload = new ISubjectObserver_PayloadTable.Event_Invoke { eventName = eventName };
+            Notify(payload);
+        }
+    }
+
+    [AlternativeInterface(typeof(ISubjectObserver))]
+    public interface ISubjectObserverAsync : IInterfacedObserverSync
+    {
+        Task Event(System.String eventName);
+    }
+}
+
+#endregion

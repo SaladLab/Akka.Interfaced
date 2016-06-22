@@ -43,6 +43,7 @@ namespace Akka.Interfaced.SlimServer
         private readonly Dictionary<int, BoundActor> _boundActorMap = new Dictionary<int, BoundActor>();
         private readonly Dictionary<IActorRef, int> _boundActorInverseMap = new Dictionary<IActorRef, int>();
         private int _lastBoundActorId;
+        private bool _closed;
 
         // When OnResponseMessage received
         protected abstract void OnResponseMessage(ResponseMessage message);
@@ -50,21 +51,75 @@ namespace Akka.Interfaced.SlimServer
         // When NotificationMessage received
         protected abstract void OnNotificationMessage(NotificationMessage message);
 
-        protected override void PostStop()
+        // Close channel and send channel-closed notification to bound actors.
+        protected void Close()
         {
-            // TODO:!
-            /*
+            if (_closed)
+                return;
+
+            _closed = true;
+
+            // Send channel-closed notification message to bound actors
+
             lock (_boundActorLock)
             {
-                foreach (var a in _boundActorMap.Values)
+                foreach (var i in _boundActorMap)
                 {
-                    if (a.IsChildActor == false)
-                        a.Actor.Tell(new ActorBoundChannelMessage.ChannelTerminated());
+                    var notification = i.Value.ChannelClosedNotification;
+                    if (notification == ChannelClosedNotificationType.Default)
+                    {
+                        notification = i.Value.IsChildActor
+                            ? ChannelClosedNotificationType.InterfacedPoisonPill
+                            : ChannelClosedNotificationType.Nothing;
+                    }
+
+                    switch (notification)
+                    {
+                        case ChannelClosedNotificationType.InterfacedPoisonPill:
+                            i.Value.Actor.Tell(InterfacedPoisonPill.Instance);
+                            break;
+
+                        case ChannelClosedNotificationType.ChannelClosed:
+                            i.Value.Actor.Tell(new NotificationMessage
+                            {
+                                InvokePayload = new IActorBoundChannelObserver_PayloadTable.ChannelClose_Invoke
+                                {
+                                    types = i.Value.Types.Select(t => new TaggedType(t.Type, t.TagValue)).ToArray()
+                                },
+                            });
+                            break;
+                    }
                 }
 
-                _boundActorMap.Clear();
+                // after sending notification, waiting for all children to stop.
+                // but in this case, there is no child so stop now.
+
+                if (_boundActorMap.Any(i => i.Value.IsChildActor) == false)
+                    Self.Tell(InterfacedPoisonPill.Instance);
             }
-            */
+        }
+
+        private void OnChildTerminate(Terminated m)
+        {
+            lock (_boundActorLock)
+            {
+                UnbindActor(m.ActorRef);
+
+                // all children stopped and it's time to stop self now
+
+                if (_closed && _boundActorMap.Any(i => i.Value.IsChildActor) == false)
+                    Self.Tell(InterfacedPoisonPill.Instance);
+            }
+        }
+
+        protected override void PostStop()
+        {
+            if (_closed == false)
+            {
+                Context.System.EventStream.Publish(new Event.Warning(
+                    Self.Path.ToString(), GetType(),
+                    $"ActorBoundChannel should be called Close before Stop."));
+            }
         }
 
         protected override void OnReceive(object message)
@@ -82,6 +137,13 @@ namespace Akka.Interfaced.SlimServer
             if (notificationMessage != null)
             {
                 OnNotificationMessage(notificationMessage);
+                return;
+            }
+
+            var terminated = message as Terminated;
+            if (terminated != null)
+            {
+                OnChildTerminate(terminated);
                 return;
             }
 
@@ -106,15 +168,18 @@ namespace Akka.Interfaced.SlimServer
             }
         }
 
-        protected int BindActor(IActorRef actor, IEnumerable<BoundType> boundTypes, ChannelClosedNotificationType channelClosedNotification = ChannelClosedNotificationType.Default)
+        protected int BindActor(IActorRef actor, IEnumerable<BoundType> boundTypes, ChannelClosedNotificationType channelClosedNotification = ChannelClosedNotificationType.Nothing)
         {
+            if (_closed)
+                return 0;
+
             lock (_boundActorLock)
             {
                 if (GetBoundActorId(actor) != 0)
                     return 0;
 
                 var actorId = ++_lastBoundActorId;
-                _boundActorMap[actorId] = new BoundActor
+                var boundActor = new BoundActor
                 {
                     Actor = actor,
                     IsChildActor = (Self.Path == actor.Path.Parent),
@@ -122,7 +187,13 @@ namespace Akka.Interfaced.SlimServer
                     Types = boundTypes.ToList(),
                     DerivedTypes = GetDerivedBoundTypes(boundTypes)
                 };
+                _boundActorMap[actorId] = boundActor;
                 _boundActorInverseMap[actor] = actorId;
+
+                // watch this actor if child.
+                if (boundActor.IsChildActor)
+                    Context.Watch(actor);
+
                 return actorId;
             }
         }
@@ -134,8 +205,14 @@ namespace Akka.Interfaced.SlimServer
                 int actorId;
                 if (_boundActorInverseMap.TryGetValue(actor, out actorId))
                 {
+                    var boundActor = _boundActorMap[actorId];
                     _boundActorMap.Remove(actorId);
                     _boundActorInverseMap.Remove(actor);
+
+                    // unwatch this actor if child.
+                    if (_closed == false && boundActor.IsChildActor)
+                        Context.Unwatch(actor);
+
                     return true;
                 }
             }
@@ -144,6 +221,9 @@ namespace Akka.Interfaced.SlimServer
 
         protected bool BindType(IActorRef actor, IEnumerable<BoundType> boundTypes)
         {
+            if (_closed)
+                return false;
+
             lock (_boundActorLock)
             {
                 var actorId = GetBoundActorId(actor);
@@ -167,6 +247,9 @@ namespace Akka.Interfaced.SlimServer
 
         protected bool UnbindType(IActorRef actor, IEnumerable<Type> types)
         {
+            if (_closed)
+                return false;
+
             lock (_boundActorLock)
             {
                 var actorId = GetBoundActorId(actor);
