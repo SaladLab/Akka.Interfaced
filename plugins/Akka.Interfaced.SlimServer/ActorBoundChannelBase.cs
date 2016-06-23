@@ -300,15 +300,7 @@ namespace Akka.Interfaced.SlimServer
             if (targetActor == null)
                 throw new ArgumentException("InterfacedActorRef should have valid IActorRef target.");
 
-            // Get IDummyRef fro DummyRef
-            var refType = actor.GetType();
-            var interfaceName = "I" + refType.Name.Substring(0, refType.Name.Length - 3);
-            var interfaceFullName = (refType.Namespace.Length > 0 ? refType.Namespace + "." : "") + interfaceName;
-            var interfaceType = refType.Assembly.GetType(interfaceFullName);
-            if (interfaceType == null)
-                throw new ArgumentException("Cannot resolve the interface type from " + refType.FullName);
-
-            var actorId = BindActor(targetActor, new[] { new BoundType(interfaceType) }, bindingFlags);
+            var actorId = BindActor(targetActor, new[] { new BoundType(actor.InterfaceType) }, bindingFlags);
             return actorId;
         }
 
