@@ -113,6 +113,8 @@ namespace SlimHttp.Interface
         {
         }
 
+        public override Type InterfaceType => typeof(ICalculator);
+
         public ICalculator_NoReply WithNoReply()
         {
             return this;
@@ -244,6 +246,8 @@ namespace SlimHttp.Interface
         public CounterRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public override Type InterfaceType => typeof(ICounter);
 
         public ICounter_NoReply WithNoReply()
         {
@@ -392,6 +396,8 @@ namespace SlimHttp.Interface
         public GreeterRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public override Type InterfaceType => typeof(IGreeter);
 
         public IGreeter_NoReply WithNoReply()
         {
@@ -661,6 +667,8 @@ namespace SlimHttp.Interface
         public PedanticRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
+
+        public override Type InterfaceType => typeof(IPedantic);
 
         public IPedantic_NoReply WithNoReply()
         {

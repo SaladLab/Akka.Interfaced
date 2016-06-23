@@ -166,6 +166,8 @@ namespace Akka.Interfaced.LogFilter.Tests
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(ITest);
+
         public ITest_NoReply WithNoReply()
         {
             return this;

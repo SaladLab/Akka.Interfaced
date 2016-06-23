@@ -112,6 +112,8 @@ namespace Akka.Interfaced.TestKit.Tests
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IUser);
+
         public IUser_NoReply WithNoReply()
         {
             return this;
@@ -269,6 +271,8 @@ namespace Akka.Interfaced.TestKit.Tests
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(IUserLogin);
 
         public IUserLogin_NoReply WithNoReply()
         {

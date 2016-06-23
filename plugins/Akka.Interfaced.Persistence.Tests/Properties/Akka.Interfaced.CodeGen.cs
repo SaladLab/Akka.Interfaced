@@ -146,6 +146,8 @@ namespace Akka.Interfaced.Persistence.Tests
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(INotepad);
+
         public INotepad_NoReply WithNoReply()
         {
             return this;

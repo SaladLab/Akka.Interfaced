@@ -199,6 +199,8 @@ namespace Akka.Interfaced
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IBasic);
+
         public IBasic_NoReply WithNoReply()
         {
             return this;
@@ -390,6 +392,8 @@ namespace Akka.Interfaced
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IDummy);
+
         public IDummy_NoReply WithNoReply()
         {
             return this;
@@ -512,6 +516,8 @@ namespace Akka.Interfaced
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(IDummyEx);
 
         public IDummyEx_NoReply WithNoReply()
         {
@@ -652,6 +658,8 @@ namespace Akka.Interfaced
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IDummyEx2);
+
         public IDummyEx2_NoReply WithNoReply()
         {
             return this;
@@ -790,6 +798,8 @@ namespace Akka.Interfaced
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(IDummyExFinal);
 
         public IDummyExFinal_NoReply WithNoReply()
         {
@@ -1035,6 +1045,8 @@ namespace Akka.Interfaced
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IOverloaded);
+
         public IOverloaded_NoReply WithNoReply()
         {
             return this;
@@ -1229,6 +1241,8 @@ namespace Akka.Interfaced
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(ISubject);
 
         public ISubject_NoReply WithNoReply()
         {
@@ -1443,6 +1457,8 @@ namespace Akka.Interfaced
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(ISubject2);
 
         public ISubject2_NoReply WithNoReply()
         {
@@ -1675,6 +1691,8 @@ namespace Akka.Interfaced
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(ISubjectEx);
+
         public ISubjectEx_NoReply WithNoReply()
         {
             return this;
@@ -1851,6 +1869,8 @@ namespace Akka.Interfaced
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(IWorker);
 
         public IWorker_NoReply WithNoReply()
         {

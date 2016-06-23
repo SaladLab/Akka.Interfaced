@@ -128,6 +128,8 @@ namespace Manual
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IGreeter);
+
         public IGreeter_NoReply WithNoReply()
         {
             return this;
@@ -286,6 +288,8 @@ namespace Manual
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(IGreeterWithObserver);
 
         public IGreeterWithObserver_NoReply WithNoReply()
         {

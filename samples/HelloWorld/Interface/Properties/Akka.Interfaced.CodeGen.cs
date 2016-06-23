@@ -128,6 +128,8 @@ namespace HelloWorld.Interface
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IGreeter);
+
         public IGreeter_NoReply WithNoReply()
         {
             return this;

@@ -95,6 +95,8 @@ namespace Akka.Interfaced.SlimServer
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IDummy);
+
         public IDummy_NoReply WithNoReply()
         {
             return this;
@@ -217,6 +219,8 @@ namespace Akka.Interfaced.SlimServer
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(IDummyEx);
 
         public IDummyEx_NoReply WithNoReply()
         {
@@ -357,6 +361,8 @@ namespace Akka.Interfaced.SlimServer
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IDummyEx2);
+
         public IDummyEx2_NoReply WithNoReply()
         {
             return this;
@@ -495,6 +501,8 @@ namespace Akka.Interfaced.SlimServer
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(IDummyExFinal);
 
         public IDummyExFinal_NoReply WithNoReply()
         {
@@ -673,6 +681,8 @@ namespace Akka.Interfaced.SlimServer
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IDummyWithTag);
+
         public IDummyWithTag_NoReply WithNoReply()
         {
             return this;
@@ -833,6 +843,8 @@ namespace Akka.Interfaced.SlimServer
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(ISubject);
 
         public ISubject_NoReply WithNoReply()
         {

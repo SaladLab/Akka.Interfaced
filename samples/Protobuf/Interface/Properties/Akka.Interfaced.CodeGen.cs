@@ -135,6 +135,8 @@ namespace Protobuf.Interface
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IHelloWorld);
+
         public IHelloWorld_NoReply WithNoReply()
         {
             return this;
@@ -464,6 +466,8 @@ namespace Protobuf.Interface
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IPedantic);
+
         public IPedantic_NoReply WithNoReply()
         {
             return this;
@@ -773,6 +777,8 @@ namespace Protobuf.Interface
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
+
+        public override Type InterfaceType => typeof(ISurrogate);
 
         public ISurrogate_NoReply WithNoReply()
         {

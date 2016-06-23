@@ -107,6 +107,8 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
+        public override Type InterfaceType => typeof(IDefault);
+
         public IDefault_NoReply WithNoReply()
         {
             return this;
