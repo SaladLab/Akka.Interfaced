@@ -32,17 +32,20 @@ namespace Akka.Interfaced.SlimServer
         }
     }
 
-    public enum ChannelClosedNotificationType
+    [Flags]
+    public enum ActorBindingFlags
     {
-        Default = 0,                    // For a child, InterfacedPoisonPill. For others, Nothing.
-        Nothing = 1,                    // Do nothing
-        InterfacedPoisonPill = 2,       // Bound actor will be sent a InterfacedPoisonPill
-        ChannelClosed = 3,              // Bound actor will be invoked a `IActorBoundChannelObserver.ChannelClosed` which has to be implemented.
+        CloseThenDefault = 0,           // When channel closed: For a child, `CloseThenStop`. For others, `CloseThenNothing`.
+        CloseThenNothing = 1,           // When channel closed: Do nothing
+        CloseThenStop = 2,              // When channel closed: Bound actor will be sent a InterfacedPoisonPill.
+        CloseThenNotification = 3,      // When channel closed: Bound actor will be invoked a `IActorBoundChannelObserver.ChannelClosed` which has to be implemented.
+        StopThenCloseChannel = 4,       // If bound actor stops, then close holding channel.
     }
 
     public interface IActorBoundChannel : IInterfacedActor
     {
-        Task<int> BindActor(IActorRef actor, TaggedType[] types, ChannelClosedNotificationType channelClosedNotification = ChannelClosedNotificationType.Default);
+        Task<int> BindActor(InterfacedActorRef actor, ActorBindingFlags bindingFlags = 0);
+        Task<int> BindActor(IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags = 0);
         Task<bool> UnbindActor(IActorRef actor);
         Task<bool> BindType(IActorRef actor, TaggedType[] types);
         Task<bool> UnbindType(IActorRef actor, Type[] types);

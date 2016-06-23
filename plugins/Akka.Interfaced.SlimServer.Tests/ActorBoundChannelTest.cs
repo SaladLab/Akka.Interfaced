@@ -23,7 +23,7 @@ namespace Akka.Interfaced.SlimServer
                 public RequestMessage Message;
             }
 
-            private Func<IActorContext, Tuple<IActorRef, TaggedType[], ChannelClosedNotificationType>[]> _initialActorFactory;
+            private Func<IActorContext, Tuple<IActorRef, TaggedType[], ActorBindingFlags>[]> _initialActorFactory;
             private Dictionary<int, IActorRef> _requestMap = new Dictionary<int, IActorRef>();
             private Dictionary<int, INotificationChannel> _observerChannelMap = new Dictionary<int, INotificationChannel>();
 
@@ -31,7 +31,7 @@ namespace Akka.Interfaced.SlimServer
             {
             }
 
-            public TestActorBoundChannel(Func<IActorContext, Tuple<IActorRef, TaggedType[], ChannelClosedNotificationType>[]> initialActorFactory)
+            public TestActorBoundChannel(Func<IActorContext, Tuple<IActorRef, TaggedType[], ActorBindingFlags>[]> initialActorFactory)
             {
                 _initialActorFactory = initialActorFactory;
             }
@@ -382,7 +382,7 @@ namespace Akka.Interfaced.SlimServer
         {
             // Arrange
             var channel = ActorOf(Props.Create(() => new TestActorBoundChannel(context =>
-                new[] { Tuple.Create(context.ActorOf<SubjectActor>(null), new TaggedType[] { typeof(ISubject) }, ChannelClosedNotificationType.InterfacedPoisonPill) })));
+                new[] { Tuple.Create(context.ActorOf<SubjectActor>(null), new TaggedType[] { typeof(ISubject) }, ActorBindingFlags.CloseThenStop) })));
             var channelRef = new ActorBoundChannelRef(channel);
             var actorId = 1;
 
@@ -429,7 +429,7 @@ namespace Akka.Interfaced.SlimServer
             var channelRef = new ActorBoundChannelRef(channel);
             var dummy = ActorOfAsTestActorRef<DummyEventActor>();
             var dummyActor = dummy.UnderlyingActor;
-            var actorId = await channelRef.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ChannelClosedNotificationType.ChannelClosed);
+            var actorId = await channelRef.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.CloseThenNotification);
             Assert.NotEqual(0, actorId);
 
             // Act
@@ -449,7 +449,7 @@ namespace Akka.Interfaced.SlimServer
             var channelRef = new ActorBoundChannelRef(channel);
             var dummy = ActorOfAsTestActorRef<DummyEventActor>();
             var dummyActor = dummy.UnderlyingActor;
-            var actorId = await channelRef.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ChannelClosedNotificationType.InterfacedPoisonPill);
+            var actorId = await channelRef.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.CloseThenStop);
             Assert.NotEqual(0, actorId);
 
             // Act
@@ -465,14 +465,28 @@ namespace Akka.Interfaced.SlimServer
         private void CloseChannel_WithChildren_WaitsForAllChildrenStop()
         {
             // Arrange
-            var channel = ActorOf(Props.Create(() => new TestActorBoundChannel(context =>
-                new[] { Tuple.Create(context.ActorOf<DummyEventActor>(null), new TaggedType[] { typeof(IDummy) }, ChannelClosedNotificationType.ChannelClosed) })));
-            var channelRef = new ActorBoundChannelRef(channel);
+            ActorBoundChannelRef channel = Sys.InterfacedActorOf(() => new TestActorBoundChannel(context =>
+                new[] { Tuple.Create(context.ActorOf<DummyEventActor>(null), new TaggedType[] { typeof(IDummy) }, ActorBindingFlags.CloseThenNotification) }));
 
             // Act
-            channel.Tell("Close");
-            Watch(channel);
-            ExpectTerminated(channel);
+            channel.Actor.Tell("Close");
+            Watch(channel.Actor);
+            ExpectTerminated(channel.Actor);
+        }
+
+        [Fact]
+        private async Task ChildActorStops_Then_CloseChannel()
+        {
+            // Arrange
+            ActorBoundChannelRef channel = Sys.InterfacedActorOf<TestActorBoundChannel>();
+            DummyRef dummy = Sys.InterfacedActorOf<DummyActor>();
+            var actorId = await channel.BindActor(dummy, ActorBindingFlags.StopThenCloseChannel);
+            Assert.NotEqual(0, actorId);
+
+            // Act
+            dummy.Actor.Tell(InterfacedPoisonPill.Instance);
+            Watch(channel.Actor);
+            ExpectTerminated(channel.Actor);
         }
     }
 }

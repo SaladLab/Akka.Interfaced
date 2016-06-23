@@ -12,7 +12,7 @@ namespace Akka.Interfaced.SlimServer
         {
             public IActorRef Actor;
             public bool IsChildActor;
-            public ChannelClosedNotificationType ChannelClosedNotification;
+            public ActorBindingFlags BindingFlags;
             public List<BoundType> Types;
             public List<BoundType> DerivedTypes;
 
@@ -65,21 +65,21 @@ namespace Akka.Interfaced.SlimServer
             {
                 foreach (var i in _boundActorMap)
                 {
-                    var notification = i.Value.ChannelClosedNotification;
-                    if (notification == ChannelClosedNotificationType.Default)
+                    var notification = (ActorBindingFlags)((int)i.Value.BindingFlags & 0x3);
+                    if (notification == ActorBindingFlags.CloseThenDefault)
                     {
                         notification = i.Value.IsChildActor
-                            ? ChannelClosedNotificationType.InterfacedPoisonPill
-                            : ChannelClosedNotificationType.Nothing;
+                            ? ActorBindingFlags.CloseThenStop
+                            : ActorBindingFlags.CloseThenNothing;
                     }
 
                     switch (notification)
                     {
-                        case ChannelClosedNotificationType.InterfacedPoisonPill:
+                        case ActorBindingFlags.CloseThenStop:
                             i.Value.Actor.Tell(InterfacedPoisonPill.Instance);
                             break;
 
-                        case ChannelClosedNotificationType.ChannelClosed:
+                        case ActorBindingFlags.CloseThenNotification:
                             i.Value.Actor.Tell(new NotificationMessage
                             {
                                 InvokePayload = new IActorBoundChannelObserver_PayloadTable.ChannelClose_Invoke
@@ -103,12 +103,19 @@ namespace Akka.Interfaced.SlimServer
         {
             lock (_boundActorLock)
             {
-                UnbindActor(m.ActorRef);
+                var boundActor = UnbindActor(m.ActorRef);
 
-                // all children stopped and it's time to stop self now
-
-                if (_closed && _boundActorMap.Any(i => i.Value.IsChildActor) == false)
-                    Self.Tell(InterfacedPoisonPill.Instance);
+                if (_closed)
+                {
+                    // all children stopped and it's time to stop self now
+                    if (_closed && _boundActorMap.Any(i => i.Value.IsChildActor) == false)
+                        Self.Tell(InterfacedPoisonPill.Instance);
+                }
+                else
+                {
+                    if (boundActor != null && boundActor.BindingFlags.HasFlag(ActorBindingFlags.StopThenCloseChannel))
+                        Close();
+                }
             }
         }
 
@@ -168,7 +175,7 @@ namespace Akka.Interfaced.SlimServer
             }
         }
 
-        protected int BindActor(IActorRef actor, IEnumerable<BoundType> boundTypes, ChannelClosedNotificationType channelClosedNotification = ChannelClosedNotificationType.Nothing)
+        protected int BindActor(IActorRef actor, IEnumerable<BoundType> boundTypes, ActorBindingFlags bindingFlags = 0)
         {
             if (_closed)
                 return 0;
@@ -183,22 +190,20 @@ namespace Akka.Interfaced.SlimServer
                 {
                     Actor = actor,
                     IsChildActor = (Self.Path == actor.Path.Parent),
-                    ChannelClosedNotification = channelClosedNotification,
+                    BindingFlags = bindingFlags,
                     Types = boundTypes.ToList(),
                     DerivedTypes = GetDerivedBoundTypes(boundTypes)
                 };
                 _boundActorMap[actorId] = boundActor;
                 _boundActorInverseMap[actor] = actorId;
 
-                // watch this actor if child.
-                if (boundActor.IsChildActor)
-                    Context.Watch(actor);
+                Context.Watch(actor);
 
                 return actorId;
             }
         }
 
-        protected bool UnbindActor(IActorRef actor)
+        protected BoundActor UnbindActor(IActorRef actor)
         {
             lock (_boundActorLock)
             {
@@ -209,14 +214,13 @@ namespace Akka.Interfaced.SlimServer
                     _boundActorMap.Remove(actorId);
                     _boundActorInverseMap.Remove(actor);
 
-                    // unwatch this actor if child.
-                    if (_closed == false && boundActor.IsChildActor)
+                    if (_closed == false)
                         Context.Unwatch(actor);
 
-                    return true;
+                    return boundActor;
                 }
             }
-            return false;
+            return null;
         }
 
         protected bool BindType(IActorRef actor, IEnumerable<BoundType> boundTypes)
@@ -286,12 +290,35 @@ namespace Akka.Interfaced.SlimServer
         }
 
         [ResponsiveExceptionAll]
-        int IActorBoundChannelSync.BindActor(IActorRef actor, TaggedType[] types, ChannelClosedNotificationType channelClosedNotification)
+        int IActorBoundChannelSync.BindActor(InterfacedActorRef actor, ActorBindingFlags bindingFlags)
         {
             if (actor == null)
                 throw new ArgumentNullException(nameof(actor));
 
-            var actorId = BindActor(actor, types.Select(t => new BoundType(t)), channelClosedNotification);
+            // Resolve IActorRef
+            var targetActor = ((AkkaActorTarget)actor.Target).Actor;
+            if (targetActor == null)
+                throw new ArgumentException("InterfacedActorRef should have valid IActorRef target.");
+
+            // Get IDummyRef fro DummyRef
+            var refType = actor.GetType();
+            var interfaceName = "I" + refType.Name.Substring(0, refType.Name.Length - 3);
+            var interfaceFullName = (refType.Namespace.Length > 0 ? refType.Namespace + "." : "") + interfaceName;
+            var interfaceType = refType.Assembly.GetType(interfaceFullName);
+            if (interfaceType == null)
+                throw new ArgumentException("Cannot resolve the interface type from " + refType.FullName);
+
+            var actorId = BindActor(targetActor, new[] { new BoundType(interfaceType) }, bindingFlags);
+            return actorId;
+        }
+
+        [ResponsiveExceptionAll]
+        int IActorBoundChannelSync.BindActor(IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags)
+        {
+            if (actor == null)
+                throw new ArgumentNullException(nameof(actor));
+
+            var actorId = BindActor(actor, types.Select(t => new BoundType(t)), bindingFlags);
             return actorId;
         }
 
@@ -301,7 +328,7 @@ namespace Akka.Interfaced.SlimServer
             if (actor == null)
                 throw new ArgumentNullException(nameof(actor));
 
-            return UnbindActor(actor);
+            return UnbindActor(actor) != null;
         }
 
         [ResponsiveExceptionAll]
