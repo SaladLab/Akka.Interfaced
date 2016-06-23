@@ -99,6 +99,12 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         {
         }
 
+        public static implicit operator DefaultRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDefault));
+            return new DefaultRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IDefault_NoReply WithNoReply()

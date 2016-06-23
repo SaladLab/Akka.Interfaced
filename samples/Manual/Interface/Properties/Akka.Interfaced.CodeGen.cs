@@ -120,6 +120,12 @@ namespace Manual
         {
         }
 
+        public static implicit operator GreeterRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IGreeter));
+            return new GreeterRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IGreeter_NoReply WithNoReply()
@@ -271,6 +277,12 @@ namespace Manual
 
         public GreeterWithObserverRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
         {
+        }
+
+        public static implicit operator GreeterWithObserverRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IGreeterWithObserver));
+            return new GreeterWithObserverRef(typedActor.Actor);
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;

@@ -196,6 +196,12 @@ namespace Akka.Interfaced.SlimServer
         {
         }
 
+        public static implicit operator ActorBoundChannelRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IActorBoundChannel));
+            return new ActorBoundChannelRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IActorBoundChannel_NoReply WithNoReply()
@@ -364,6 +370,12 @@ namespace Akka.Interfaced.SlimServer
 
         public ActorBoundGatewayRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
         {
+        }
+
+        public static implicit operator ActorBoundGatewayRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IActorBoundGateway));
+            return new ActorBoundGatewayRef(typedActor.Actor);
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;

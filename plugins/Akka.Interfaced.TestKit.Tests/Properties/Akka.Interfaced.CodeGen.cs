@@ -104,6 +104,12 @@ namespace Akka.Interfaced.TestKit.Tests
         {
         }
 
+        public static implicit operator UserRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IUser));
+            return new UserRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IUser_NoReply WithNoReply()
@@ -254,6 +260,12 @@ namespace Akka.Interfaced.TestKit.Tests
 
         public UserLoginRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
         {
+        }
+
+        public static implicit operator UserLoginRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IUserLogin));
+            return new UserLoginRef(typedActor.Actor);
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;

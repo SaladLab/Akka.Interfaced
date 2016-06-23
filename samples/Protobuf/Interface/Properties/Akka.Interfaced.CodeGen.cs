@@ -127,6 +127,12 @@ namespace Protobuf.Interface
         {
         }
 
+        public static implicit operator HelloWorldRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IHelloWorld));
+            return new HelloWorldRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IHelloWorld_NoReply WithNoReply()
@@ -450,6 +456,12 @@ namespace Protobuf.Interface
         {
         }
 
+        public static implicit operator PedanticRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IPedantic));
+            return new PedanticRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IPedantic_NoReply WithNoReply()
@@ -752,6 +764,12 @@ namespace Protobuf.Interface
 
         public SurrogateRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
         {
+        }
+
+        public static implicit operator SurrogateRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(ISurrogate));
+            return new SurrogateRef(typedActor.Actor);
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;

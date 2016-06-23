@@ -158,6 +158,12 @@ namespace Akka.Interfaced.LogFilter.Tests
         {
         }
 
+        public static implicit operator TestRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(ITest));
+            return new TestRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public ITest_NoReply WithNoReply()

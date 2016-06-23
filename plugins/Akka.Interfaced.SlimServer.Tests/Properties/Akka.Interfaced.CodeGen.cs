@@ -87,6 +87,12 @@ namespace Akka.Interfaced.SlimServer
         {
         }
 
+        public static implicit operator DummyRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDummy));
+            return new DummyRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IDummy_NoReply WithNoReply()
@@ -202,6 +208,12 @@ namespace Akka.Interfaced.SlimServer
 
         public DummyExRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
         {
+        }
+
+        public static implicit operator DummyExRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDummyEx));
+            return new DummyExRef(typedActor.Actor);
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
@@ -337,6 +349,12 @@ namespace Akka.Interfaced.SlimServer
         {
         }
 
+        public static implicit operator DummyEx2Ref(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDummyEx2));
+            return new DummyEx2Ref(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IDummyEx2_NoReply WithNoReply()
@@ -468,6 +486,12 @@ namespace Akka.Interfaced.SlimServer
 
         public DummyExFinalRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
         {
+        }
+
+        public static implicit operator DummyExFinalRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDummyExFinal));
+            return new DummyExFinalRef(typedActor.Actor);
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
@@ -641,6 +665,12 @@ namespace Akka.Interfaced.SlimServer
         {
         }
 
+        public static implicit operator DummyWithTagRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDummyWithTag));
+            return new DummyWithTagRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IDummyWithTag_NoReply WithNoReply()
@@ -794,6 +824,12 @@ namespace Akka.Interfaced.SlimServer
 
         public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
         {
+        }
+
+        public static implicit operator SubjectRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(ISubject));
+            return new SubjectRef(typedActor.Actor);
         }
 
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;

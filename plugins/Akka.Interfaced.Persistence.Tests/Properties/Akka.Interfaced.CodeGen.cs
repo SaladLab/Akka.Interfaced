@@ -138,6 +138,12 @@ namespace Akka.Interfaced.Persistence.Tests
         {
         }
 
+        public static implicit operator NotepadRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(INotepad));
+            return new NotepadRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public INotepad_NoReply WithNoReply()

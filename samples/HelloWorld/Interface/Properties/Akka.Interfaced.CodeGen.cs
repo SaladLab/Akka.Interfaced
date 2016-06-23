@@ -120,6 +120,12 @@ namespace HelloWorld.Interface
         {
         }
 
+        public static implicit operator GreeterRef(TypedActorRef typedActor)
+        {
+            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IGreeter));
+            return new GreeterRef(typedActor.Actor);
+        }
+
         public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
 
         public IGreeter_NoReply WithNoReply()
