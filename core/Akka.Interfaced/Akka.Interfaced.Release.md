@@ -1,3 +1,9 @@
+## 0.4.1 (Released 2016/06/23)
+
+* Add Akka.Interfaced.SlimServer module.
+* Add InterfacedActorOf extension method.
+* Add Cast extension method.
+
 ## 0.4.0 (Released 2016/06/20)
 
 * Allow normal and slim client work together #29
