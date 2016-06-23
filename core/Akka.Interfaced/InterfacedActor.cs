@@ -535,23 +535,23 @@ namespace Akka.Interfaced
 
         // async support
 
-        protected new void RunTask(Action action)
+        protected void RunTask(Action action, IActorRef self = null)
         {
             RunTask(() =>
             {
                 action();
                 return Task.FromResult(0);
-            });
+            }, self);
         }
 
-        protected new void RunTask(Func<Task> function)
+        protected void RunTask(Func<Task> function, IActorRef self = null)
         {
-            RunTask(function, false);
+            RunTask(function, false, self);
         }
 
-        protected void RunTask(Func<Task> function, bool isReentrant)
+        protected void RunTask(Func<Task> function, bool isReentrant, IActorRef self = null)
         {
-            Self.Tell(new TaskRunMessage { Function = function, IsReentrant = isReentrant });
+            (self ?? Self).Tell(new TaskRunMessage { Function = function, IsReentrant = isReentrant });
         }
 
         // other messages
