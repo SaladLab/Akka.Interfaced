@@ -41,6 +41,15 @@ namespace Manual
             actor.Tell(InterfacedPoisonPill.Instance);
         }
 
+        private async Task DemoCommunicateWithActor2()
+        {
+            GreeterRef greeter = _system.InterfacedActorOf<GreetingActor>();
+            Console.WriteLine(await greeter.Greet("World"));
+            Console.WriteLine(await greeter.Greet("Actor"));
+            Console.WriteLine(await greeter.GetCount());
+            greeter.Actor.Tell(InterfacedPoisonPill.Instance);
+        }
+
         private class TestActor : InterfacedActor
         {
             [MessageHandler]
@@ -100,12 +109,11 @@ namespace Manual
 
         private async Task DemoFireAndForget()
         {
-            var actor = _system.ActorOf<GreetingActor>();
-            var greeter = new GreeterRef(actor);
+            GreeterRef greeter = _system.InterfacedActorOf<GreetingActor>();
             greeter.WithNoReply().Greet("World");
             greeter.WithNoReply().Greet("Actor");
             Console.WriteLine(await greeter.GetCount());
-            actor.Tell(InterfacedPoisonPill.Instance);
+            greeter.Actor.Tell(InterfacedPoisonPill.Instance);
         }
     }
 }
