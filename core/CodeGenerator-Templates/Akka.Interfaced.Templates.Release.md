@@ -1,6 +1,9 @@
 ## 0.4.1 (Released 2016/06/23)
 
 * Sync with Akka.Interfaced 0.4.1
+* Fix enum namespace literal bug.
+* Remove special traits for non slim-client TRef.
+* Add InterfaceType property to InterfacedActorRef.
 
 ## 0.4.0 (Released 2016/06/20)
 

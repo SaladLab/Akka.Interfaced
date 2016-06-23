@@ -1,8 +1,9 @@
 ## 0.4.1 (Released 2016/06/23)
 
 * Add Akka.Interfaced.SlimServer module.
-* Add InterfacedActorOf extension method.
-* Add Cast extension method.
+* Add InterfaceType property to InterfacedActorRef.
+* Add InterfacedActorOf extension method to InterfacedActorRef.
+* Add Cast extension method to InterfacedActorRef.
 
 ## 0.4.0 (Released 2016/06/20)
 
