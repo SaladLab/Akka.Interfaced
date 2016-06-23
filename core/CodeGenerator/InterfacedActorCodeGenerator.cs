@@ -347,6 +347,12 @@ namespace CodeGenerator
                     {
                     }
 
+                    using (w.B($"public static implicit operator {refClassName}(TypedActorRef typedActor)"))
+                    {
+                        w._($"InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof({type.Name}));");
+                        w._($"return new {refClassName}(typedActor.Actor);");
+                    }
+
                     w._($"public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;");
                     w._();
                 }

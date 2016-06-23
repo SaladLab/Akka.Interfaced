@@ -38,6 +38,19 @@ namespace Akka.Interfaced
         {
             return RequestWaiter.SendRequestAndReceive<TReturn>(Target, requestMessage, Timeout);
         }
+
+        // Cast (not type-safe cast)
+
+        public TRef Cast<TRef>()
+            where TRef : InterfacedActorRef, new()
+        {
+            return new TRef()
+            {
+                Target = Target,
+                RequestWaiter = RequestWaiter,
+                Timeout = Timeout
+            };
+        }
     }
 
     // Internal use only

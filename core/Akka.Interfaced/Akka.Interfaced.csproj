@@ -71,6 +71,7 @@
     <Compile Include="InterfacedActorHandler.cs" />
     <Compile Include="ActorNotificationChannel.cs" />
     <Compile Include="InterfacedActor.cs" />
+    <Compile Include="InterfacedActorOfExtensions.cs" />
     <Compile Include="MessageHandler.cs" />
     <Compile Include="MessageHandlerAttribute.cs" />
     <Compile Include="MessageDispatcher.cs" />
