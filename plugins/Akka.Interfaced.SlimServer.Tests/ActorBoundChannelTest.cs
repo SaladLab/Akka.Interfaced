@@ -194,16 +194,15 @@ namespace Akka.Interfaced.SlimServer
         private async Task RequestToBoundActor_Response()
         {
             // Arrange
-            var channel = ActorOf<TestActorBoundChannel>();
-            var channelRef = new ActorBoundChannelRef(channel);
+            var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var actorId = await channelRef.BindActor(dummy, new TaggedType[] { typeof(IDummyExFinal) });
-            Assert.NotEqual(0, actorId);
+            var boundActor = await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyExFinal) });
+            Assert.NotNull(boundActor);
 
             // Act
-            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
+            var r2 = await channel.CastToIActorRef().Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
-                ActorId = actorId,
+                ActorId = boundActor.Id,
                 Message = new RequestMessage
                 {
                     RequestId = 1,
@@ -220,16 +219,15 @@ namespace Akka.Interfaced.SlimServer
         private async Task RequestToBoundActorWithTag_Response()
         {
             // Arrange
-            var channel = ActorOf<TestActorBoundChannel>();
-            var channelRef = new ActorBoundChannelRef(channel);
+            var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var actorId = await channelRef.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") });
-            Assert.NotEqual(0, actorId);
+            var boundActor = await channel.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") });
+            Assert.NotNull(boundActor);
 
             // Act
-            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
+            var r2 = await channel.CastToIActorRef().Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
-                ActorId = actorId,
+                ActorId = boundActor.Id,
                 Message = new RequestMessage
                 {
                     RequestId = 1,
@@ -269,16 +267,15 @@ namespace Akka.Interfaced.SlimServer
         private async Task RequestOnUnboundType_Exception()
         {
             // Arrange
-            var channel = ActorOf<TestActorBoundChannel>();
-            var channelRef = new ActorBoundChannelRef(channel);
+            var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var actorId = await channelRef.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
-            Assert.NotEqual(0, actorId);
+            var boundActor = await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
+            Assert.NotNull(boundActor);
 
             // Act
-            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
+            var r2 = await channel.CastToIActorRef().Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
-                ActorId = actorId,
+                ActorId = boundActor.Id,
                 Message = new RequestMessage
                 {
                     RequestId = 1,
@@ -295,18 +292,17 @@ namespace Akka.Interfaced.SlimServer
         private async Task UnbindActor_And_RequestToUnboundActor_Exception()
         {
             // Arrange
-            var channel = ActorOf<TestActorBoundChannel>();
-            var channelRef = new ActorBoundChannelRef(channel);
+            var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var actorId = await channelRef.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
-            Assert.NotEqual(0, actorId);
+            var boundActor = await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
+            Assert.NotNull(boundActor);
 
             // Act
-            var done = await channelRef.UnbindActor(dummy);
+            var done = await channel.UnbindActor(dummy);
             Assert.True(done);
-            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
+            var r2 = await channel.CastToIActorRef().Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
-                ActorId = actorId,
+                ActorId = boundActor.Id,
                 Message = new RequestMessage
                 {
                     RequestId = 1,
@@ -323,18 +319,17 @@ namespace Akka.Interfaced.SlimServer
         private async Task BindTypeToBoundActor_And_RequestToBoundActor_Response()
         {
             // Arrange
-            var channel = ActorOf<TestActorBoundChannel>();
-            var channelRef = new ActorBoundChannelRef(channel);
+            var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var actorId = await channelRef.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
-            Assert.NotEqual(0, actorId);
+            var boundActor = await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
+            Assert.NotNull(boundActor);
 
             // Act
-            var done = await channelRef.BindType(dummy, new TaggedType[] { typeof(IDummyEx2) });
+            var done = await channel.BindType(dummy, new TaggedType[] { typeof(IDummyEx2) });
             Assert.True(done);
-            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
+            var r2 = await channel.CastToIActorRef().Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
-                ActorId = actorId,
+                ActorId = boundActor.Id,
                 Message = new RequestMessage
                 {
                     RequestId = 1,
@@ -351,20 +346,19 @@ namespace Akka.Interfaced.SlimServer
         private async Task UnbindTypeToBoundActor_And_RequestOnUnboundType_Exception()
         {
             // Arrange
-            var channel = ActorOf<TestActorBoundChannel>();
-            var channelRef = new ActorBoundChannelRef(channel);
+            var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var actorId = await channelRef.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
-            Assert.NotEqual(0, actorId);
+            var boundActor = await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
+            Assert.NotNull(boundActor);
 
             // Act
-            var done = await channelRef.BindType(dummy, new TaggedType[] { typeof(IDummyEx2) });
+            var done = await channel.BindType(dummy, new TaggedType[] { typeof(IDummyEx2) });
             Assert.True(done);
-            var done2 = await channelRef.UnbindType(dummy, new[] { typeof(IDummyEx2) });
+            var done2 = await channel.UnbindType(dummy, new[] { typeof(IDummyEx2) });
             Assert.True(done2);
-            var r2 = await channel.Ask<ResponseMessage>(new TestActorBoundChannel.Request
+            var r2 = await channel.CastToIActorRef().Ask<ResponseMessage>(new TestActorBoundChannel.Request
             {
-                ActorId = actorId,
+                ActorId = boundActor.Id,
                 Message = new RequestMessage
                 {
                     RequestId = 1,
@@ -383,7 +377,7 @@ namespace Akka.Interfaced.SlimServer
             // Arrange
             var channel = ActorOf(Props.Create(() => new TestActorBoundChannel(context =>
                 new[] { Tuple.Create(context.ActorOf<SubjectActor>(null), new TaggedType[] { typeof(ISubject) }, ActorBindingFlags.CloseThenStop) })));
-            var channelRef = new ActorBoundChannelRef(channel);
+            var channelRef = channel.Cast<ActorBoundChannelRef>();
             var actorId = 1;
 
             // Act
@@ -425,17 +419,16 @@ namespace Akka.Interfaced.SlimServer
         private async Task CloseChannel_SendClosedChannelNotification()
         {
             // Arrange
-            var channel = ActorOf<TestActorBoundChannel>();
-            var channelRef = new ActorBoundChannelRef(channel);
+            var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOfAsTestActorRef<DummyEventActor>();
             var dummyActor = dummy.UnderlyingActor;
-            var actorId = await channelRef.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.CloseThenNotification);
-            Assert.NotEqual(0, actorId);
+            var boundActor = await channel.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.CloseThenNotification);
+            Assert.NotNull(boundActor);
 
             // Act
-            channel.Tell("Close");
-            Watch(channel);
-            ExpectTerminated(channel);
+            channel.CastToIActorRef().Tell("Close");
+            Watch(channel.CastToIActorRef());
+            ExpectTerminated(channel.CastToIActorRef());
 
             // Assert
             Assert.Equal(new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, dummyActor._typesInClosed);
@@ -446,11 +439,11 @@ namespace Akka.Interfaced.SlimServer
         {
             // Arrange
             var channel = ActorOf<TestActorBoundChannel>();
-            var channelRef = new ActorBoundChannelRef(channel);
+            var channelRef = channel.Cast<ActorBoundChannelRef>();
             var dummy = ActorOfAsTestActorRef<DummyEventActor>();
             var dummyActor = dummy.UnderlyingActor;
-            var actorId = await channelRef.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.CloseThenStop);
-            Assert.NotEqual(0, actorId);
+            var boundActor = await channelRef.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.CloseThenStop);
+            Assert.NotNull(boundActor);
 
             // Act
             channel.Tell("Close");
@@ -465,28 +458,28 @@ namespace Akka.Interfaced.SlimServer
         private void CloseChannel_WithChildren_WaitsForAllChildrenStop()
         {
             // Arrange
-            ActorBoundChannelRef channel = Sys.InterfacedActorOf(() => new TestActorBoundChannel(context =>
-                new[] { Tuple.Create(context.ActorOf<DummyEventActor>(null), new TaggedType[] { typeof(IDummy) }, ActorBindingFlags.CloseThenNotification) }));
+            var channel = Sys.InterfacedActorOf(() => new TestActorBoundChannel(context =>
+                new[] { Tuple.Create(context.ActorOf<DummyEventActor>(null), new TaggedType[] { typeof(IDummy) }, ActorBindingFlags.CloseThenNotification) })).Cast<ActorBoundChannelRef>();
 
             // Act
-            channel.Actor.Tell("Close");
-            Watch(channel.Actor);
-            ExpectTerminated(channel.Actor);
+            channel.CastToIActorRef().Tell("Close");
+            Watch(channel.CastToIActorRef());
+            ExpectTerminated(channel.CastToIActorRef());
         }
 
         [Fact]
         private async Task ChildActorStops_Then_CloseChannel()
         {
             // Arrange
-            ActorBoundChannelRef channel = Sys.InterfacedActorOf<TestActorBoundChannel>();
-            DummyRef dummy = Sys.InterfacedActorOf<DummyActor>();
-            var actorId = await channel.BindActor(dummy, ActorBindingFlags.StopThenCloseChannel);
-            Assert.NotEqual(0, actorId);
+            var channel = Sys.InterfacedActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
+            var dummy = Sys.InterfacedActorOf<DummyActor>().Cast<DummyRef>();
+            var boundActor = (DummyRef)(await channel.BindActor(dummy, ActorBindingFlags.StopThenCloseChannel));
+            Assert.NotNull(boundActor);
 
             // Act
-            dummy.Actor.Tell(InterfacedPoisonPill.Instance);
-            Watch(channel.Actor);
-            ExpectTerminated(channel.Actor);
+            dummy.CastToIActorRef().Tell(InterfacedPoisonPill.Instance);
+            Watch(channel.CastToIActorRef());
+            ExpectTerminated(channel.CastToIActorRef());
         }
     }
 }

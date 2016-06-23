@@ -50,8 +50,8 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var subject = new SubjectRef(ActorOf(() => new SubjectActor()));
-            var a = new DummyRef(ActorOf(() => new TestObserverActor(subject, log)));
+            var subject = ActorOf(() => new SubjectActor()).Cast<SubjectRef>();
+            var a = ActorOf(() => new TestObserverActor(subject, log)).Cast<DummyRef>();
 
             // Act
             await a.Call(context);
@@ -97,8 +97,8 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var subject = new SubjectRef(ActorOf(() => new SubjectActor()));
-            var a = new DummyRef(ActorOf(() => new TestObserverExtendedActor(subject, log)));
+            var subject = ActorOf(() => new SubjectActor()).Cast<SubjectRef>();
+            var a = ActorOf(() => new TestObserverExtendedActor(subject, log)).Cast<DummyRef>();
 
             // Act
             await a.Call(context);
@@ -149,8 +149,8 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var subject = new SubjectRef(ActorOf(() => new SubjectActor()));
-            var a = new DummyRef(ActorOf(() => new TestObserverExtendedAsyncActor(subject, log)));
+            var subject = ActorOf(() => new SubjectActor()).Cast<SubjectRef>();
+            var a = ActorOf(() => new TestObserverExtendedAsyncActor(subject, log)).Cast<DummyRef>();
 
             // Act
             await a.Call(context);
@@ -201,12 +201,12 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var subject = new SubjectRef(ActorOf(() => new SubjectActor()));
-            var a = new DummyRef(ActorOf(() => new TestObserverExtendedAsyncReentrantActor(subject, log)));
+            var subject = ActorOf(() => new SubjectActor()).Cast<SubjectRef>();
+            var a = ActorOf(() => new TestObserverExtendedAsyncReentrantActor(subject, log)).Cast<DummyRef>();
 
             // Act
             await a.Call(context);
-            await a.Actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
+            await a.CastToIActorRef().GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             // Assert
             var c = context != null ? context + ":" : "";
@@ -255,12 +255,12 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var subject = new SubjectRef(ActorOfAsTestActorRef(() => new SubjectActor()));
-            var a = new DummyRef(ActorOfAsTestActorRef(() => new TestObserverAsyncReentrantActor(subject, log)));
+            var subject = ActorOfAsTestActorRef(() => new SubjectActor()).Cast<SubjectRef>();
+            var a = ActorOfAsTestActorRef(() => new TestObserverAsyncReentrantActor(subject, log)).Cast<DummyRef>();
 
             // Act
             await a.Call(context);
-            await a.Actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
+            await a.CastToIActorRef().GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             // Assert
             var c = context != null ? context + ":" : "";

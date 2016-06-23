@@ -81,14 +81,14 @@ namespace Akka.Interfaced
         public async Task StopActor_RunningAsyncRequestHandler_Canceled()
         {
             var log = new LogBoard<string>();
-            var worker = new WorkerRef(ActorOf(() => new TaskCancellationActor(log, 100)));
+            var worker = ActorOf(() => new TaskCancellationActor(log, 100)).Cast<WorkerRef>();
 
             var exceptionTask = Record.ExceptionAsync(() => worker.Reentrant(1));
-            worker.Actor.Tell("E");
+            worker.CastToIActorRef().Tell("E");
             Assert.IsType<RequestHaltException>(await exceptionTask);
 
-            Watch(worker.Actor);
-            ExpectTerminated(worker.Actor);
+            Watch(worker.CastToIActorRef());
+            ExpectTerminated(worker.CastToIActorRef());
             await Task.Delay(100);
 
             Assert.Equal(new[] { "Reentrant(1)" }, log);
@@ -100,7 +100,7 @@ namespace Akka.Interfaced
             var log = new LogBoard<string>();
 
             var subjectActor = ActorOfAsTestActorRef<SubjectActor>("Subject");
-            var subject = new SubjectRef(subjectActor);
+            var subject = subjectActor.Cast<SubjectRef>();
             var observingActor = ActorOf(() => new TaskCancellationActor(log, 100));
             await subject.Subscribe(new SubjectObserver(new ActorNotificationChannel(observingActor)));
 
@@ -117,13 +117,13 @@ namespace Akka.Interfaced
         public async Task StopActor_RunningAsyncMessageHandler_Canceled()
         {
             var log = new LogBoard<string>();
-            var worker = new WorkerRef(ActorOf(() => new TaskCancellationActor(log, 100)));
+            var worker = ActorOf(() => new TaskCancellationActor(log, 100)).Cast<WorkerRef>();
 
-            worker.Actor.Tell(1);
-            worker.Actor.Tell("E");
+            worker.CastToIActorRef().Tell(1);
+            worker.CastToIActorRef().Tell("E");
 
-            Watch(worker.Actor);
-            ExpectTerminated(worker.Actor);
+            Watch(worker.CastToIActorRef());
+            ExpectTerminated(worker.CastToIActorRef());
             await Task.Delay(100);
             Assert.Equal(new[] { "Handle(1)" }, log);
         }

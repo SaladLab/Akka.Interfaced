@@ -42,7 +42,7 @@ namespace Manual
         private async Task DemoFaultException()
         {
             var actor = _system.ActorOf<GreetingActor>();
-            var greeter = new GreeterRef(actor);
+            var greeter = actor.Cast<GreeterRef>();
 
             try
             {
@@ -84,7 +84,7 @@ namespace Manual
         private async Task DemoResponsiveException()
         {
             var actor = _system.ActorOf<GreetingActorWithResponsiveException>();
-            var greeter = new GreeterRef(actor);
+            var greeter = actor.Cast<GreeterRef>();
 
             try
             {

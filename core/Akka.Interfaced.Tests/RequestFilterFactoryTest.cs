@@ -74,7 +74,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new DummyRef(ActorOf(() => new RequestFilterPerClassActor(log)));
+            var a = ActorOf(() => new RequestFilterPerClassActor(log)).Cast<DummyRef>();
 
             // Act
             await a.Call("A");
@@ -155,7 +155,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new DummyRef(ActorOf(() => new RequestFilterPerClassMethodActor(log)));
+            var a = ActorOf(() => new RequestFilterPerClassMethodActor(log)).Cast<DummyRef>();
 
             // Act
             await a.Call("A");
@@ -243,7 +243,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new DummyExRef(ActorOf(() => new RequestFilterPerInstanceActor(log)));
+            var a = ActorOf(() => new RequestFilterPerInstanceActor(log)).Cast<DummyExRef>();
 
             // Act
             await a.Call("A");
@@ -339,7 +339,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new DummyExRef(ActorOf(() => new RequestFilterPerInstanceMethodActor(log)));
+            var a = ActorOf(() => new RequestFilterPerInstanceMethodActor(log)).Cast<DummyExRef>();
 
             // Act
             await a.Call("A");
@@ -445,7 +445,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new DummyExRef(ActorOf(() => new RequestFilterPerRequestActor(log)));
+            var a = ActorOf(() => new RequestFilterPerRequestActor(log)).Cast<DummyExRef>();
 
             // Act
             await a.Call("A");

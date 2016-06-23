@@ -24,7 +24,7 @@ namespace Protobuf.Program
         Task<ISurrogate> ISurrogate.GetSelf()
         {
             Console.WriteLine("GetSelf return {0}", Self.Path);
-            return Task.FromResult((ISurrogate)new SurrogateRef(Self)); // BE CAREFUL: DON'T DO just "this"
+            return Task.FromResult<ISurrogate>(Self.Cast<SurrogateRef>()); // BE CAREFUL: DON'T DO just "this"
         }
     }
 }

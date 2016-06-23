@@ -107,6 +107,8 @@ namespace Protobuf.Interface
 
     public class HelloWorldRef : InterfacedActorRef, IHelloWorld, IHelloWorld_NoReply
     {
+        public override Type InterfaceType => typeof(IHelloWorld);
+
         public HelloWorldRef() : base(null)
         {
         }
@@ -118,24 +120,6 @@ namespace Protobuf.Interface
         public HelloWorldRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public HelloWorldRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public HelloWorldRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator HelloWorldRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IHelloWorld));
-            return new HelloWorldRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IHelloWorld);
 
         public IHelloWorld_NoReply WithNoReply()
         {
@@ -438,6 +422,8 @@ namespace Protobuf.Interface
 
     public class PedanticRef : InterfacedActorRef, IPedantic, IPedantic_NoReply
     {
+        public override Type InterfaceType => typeof(IPedantic);
+
         public PedanticRef() : base(null)
         {
         }
@@ -449,24 +435,6 @@ namespace Protobuf.Interface
         public PedanticRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public PedanticRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public PedanticRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator PedanticRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IPedantic));
-            return new PedanticRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IPedantic);
 
         public IPedantic_NoReply WithNoReply()
         {
@@ -750,6 +718,8 @@ namespace Protobuf.Interface
 
     public class SurrogateRef : InterfacedActorRef, ISurrogate, ISurrogate_NoReply
     {
+        public override Type InterfaceType => typeof(ISurrogate);
+
         public SurrogateRef() : base(null)
         {
         }
@@ -761,24 +731,6 @@ namespace Protobuf.Interface
         public SurrogateRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public SurrogateRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public SurrogateRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator SurrogateRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(ISurrogate));
-            return new SurrogateRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(ISurrogate);
 
         public ISurrogate_NoReply WithNoReply()
         {

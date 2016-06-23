@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="BoundActorTarget.cs" />
     <Compile Include="Exceptions.cs" />
+    <Compile Include="InterfacedActorRefExtensions.cs" />
     <Compile Include="IRequestTarget.cs" />
     <Compile Include="IAsyncInvokable.cs" />
     <Compile Include="InterfacedActorRef.cs" />

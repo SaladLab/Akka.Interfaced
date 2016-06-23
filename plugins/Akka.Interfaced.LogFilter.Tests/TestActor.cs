@@ -25,7 +25,7 @@ namespace Akka.Interfaced.LogFilter.Tests
 
         public Task CallWithActor(ITest test)
         {
-            _logger.Trace($"CallWithActor({((TestRef)test).Actor.Path})");
+            _logger.Trace($"CallWithActor({((TestRef)test).CastToIActorRef().Path})");
             return Task.FromResult(0);
         }
 

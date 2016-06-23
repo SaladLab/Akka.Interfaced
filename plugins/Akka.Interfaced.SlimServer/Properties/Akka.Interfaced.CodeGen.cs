@@ -52,7 +52,7 @@ namespace Akka.Interfaced.SlimServer
         public class BindActor_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public Akka.Interfaced.BoundActorTarget v;
 
             public Type GetInterfaceType()
             {
@@ -86,7 +86,7 @@ namespace Akka.Interfaced.SlimServer
         public class BindActor_2_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public Akka.Interfaced.InterfacedActorRef v;
 
             public Type GetInterfaceType()
             {
@@ -212,6 +212,8 @@ namespace Akka.Interfaced.SlimServer
 
     public class ActorBoundChannelRef : InterfacedActorRef, IActorBoundChannel, IActorBoundChannel_NoReply
     {
+        public override Type InterfaceType => typeof(IActorBoundChannel);
+
         public ActorBoundChannelRef() : base(null)
         {
         }
@@ -223,24 +225,6 @@ namespace Akka.Interfaced.SlimServer
         public ActorBoundChannelRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public ActorBoundChannelRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public ActorBoundChannelRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator ActorBoundChannelRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IActorBoundChannel));
-            return new ActorBoundChannelRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IActorBoundChannel);
 
         public IActorBoundChannel_NoReply WithNoReply()
         {
@@ -257,20 +241,20 @@ namespace Akka.Interfaced.SlimServer
             return new ActorBoundChannelRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Int32> BindActor(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = Akka.Interfaced.SlimServer.ActorBindingFlags.CloseThenDefault)
+        public Task<Akka.Interfaced.BoundActorTarget> BindActor(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = Akka.Interfaced.SlimServer.ActorBindingFlags.CloseThenDefault)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IActorBoundChannel_PayloadTable.BindActor_Invoke { actor = actor, types = types, bindingFlags = bindingFlags }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<Akka.Interfaced.BoundActorTarget>(requestMessage);
         }
 
-        public Task<System.Int32> BindActor(Akka.Interfaced.InterfacedActorRef actor, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = Akka.Interfaced.SlimServer.ActorBindingFlags.CloseThenDefault)
+        public Task<Akka.Interfaced.InterfacedActorRef> BindActor(Akka.Interfaced.InterfacedActorRef actor, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = Akka.Interfaced.SlimServer.ActorBindingFlags.CloseThenDefault)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IActorBoundChannel_PayloadTable.BindActor_2_Invoke { actor = actor, bindingFlags = bindingFlags }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<Akka.Interfaced.InterfacedActorRef>(requestMessage);
         }
 
         public Task<System.Boolean> BindType(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types)
@@ -341,8 +325,8 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(IActorBoundChannel))]
     public interface IActorBoundChannelSync : IInterfacedActorSync
     {
-        System.Int32 BindActor(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = Akka.Interfaced.SlimServer.ActorBindingFlags.CloseThenDefault);
-        System.Int32 BindActor(Akka.Interfaced.InterfacedActorRef actor, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = Akka.Interfaced.SlimServer.ActorBindingFlags.CloseThenDefault);
+        Akka.Interfaced.BoundActorTarget BindActor(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = Akka.Interfaced.SlimServer.ActorBindingFlags.CloseThenDefault);
+        Akka.Interfaced.InterfacedActorRef BindActor(Akka.Interfaced.InterfacedActorRef actor, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = Akka.Interfaced.SlimServer.ActorBindingFlags.CloseThenDefault);
         System.Boolean BindType(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types);
         System.Boolean UnbindActor(Akka.Actor.IActorRef actor);
         System.Boolean UnbindType(Akka.Actor.IActorRef actor, System.Type[] types);
@@ -443,6 +427,8 @@ namespace Akka.Interfaced.SlimServer
 
     public class ActorBoundGatewayRef : InterfacedActorRef, IActorBoundGateway, IActorBoundGateway_NoReply
     {
+        public override Type InterfaceType => typeof(IActorBoundGateway);
+
         public ActorBoundGatewayRef() : base(null)
         {
         }
@@ -454,24 +440,6 @@ namespace Akka.Interfaced.SlimServer
         public ActorBoundGatewayRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public ActorBoundGatewayRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public ActorBoundGatewayRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator ActorBoundGatewayRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IActorBoundGateway));
-            return new ActorBoundGatewayRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IActorBoundGateway);
 
         public IActorBoundGateway_NoReply WithNoReply()
         {

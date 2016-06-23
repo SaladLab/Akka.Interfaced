@@ -84,6 +84,8 @@ namespace Akka.Interfaced.TestKit.Tests
 
     public class UserRef : InterfacedActorRef, IUser, IUser_NoReply
     {
+        public override Type InterfaceType => typeof(IUser);
+
         public UserRef() : base(null)
         {
         }
@@ -95,24 +97,6 @@ namespace Akka.Interfaced.TestKit.Tests
         public UserRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public UserRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public UserRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator UserRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IUser));
-            return new UserRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IUser);
 
         public IUser_NoReply WithNoReply()
         {
@@ -244,6 +228,8 @@ namespace Akka.Interfaced.TestKit.Tests
 
     public class UserLoginRef : InterfacedActorRef, IUserLogin, IUserLogin_NoReply
     {
+        public override Type InterfaceType => typeof(IUserLogin);
+
         public UserLoginRef() : base(null)
         {
         }
@@ -255,24 +241,6 @@ namespace Akka.Interfaced.TestKit.Tests
         public UserLoginRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public UserLoginRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public UserLoginRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator UserLoginRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IUserLogin));
-            return new UserLoginRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IUserLogin);
 
         public IUserLogin_NoReply WithNoReply()
         {

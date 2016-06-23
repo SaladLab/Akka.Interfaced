@@ -168,7 +168,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
+            var a = ActorOf(Props.Create(actorType, log)).Cast<BasicRef>();
 
             // Act
             await a.Call();
@@ -185,7 +185,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
+            var a = ActorOf(Props.Create(actorType, log)).Cast<BasicRef>();
 
             // Act
             await a.CallWithParameter(1);
@@ -202,7 +202,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
+            var a = ActorOf(Props.Create(actorType, log)).Cast<BasicRef>();
 
             // Act
             var r = await a.CallWithParameterAndReturn(1);
@@ -220,7 +220,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
+            var a = ActorOf(Props.Create(actorType, log)).Cast<BasicRef>();
 
             // Act
             var r = await a.CallWithReturn();
@@ -238,7 +238,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
+            var a = ActorOf(Props.Create(actorType, log)).Cast<BasicRef>();
 
             // Act
             var e = await Record.ExceptionAsync(() => a.ThrowException(ThrowExceptionType.ResponsiveByWrap));
@@ -256,7 +256,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new BasicRef(ActorOf(Props.Create(actorType, log)));
+            var a = ActorOf(Props.Create(actorType, log)).Cast<BasicRef>();
 
             // Act
             var e = await Record.ExceptionAsync(() => a.ThrowException(ThrowExceptionType.ResponsiveByFilter));

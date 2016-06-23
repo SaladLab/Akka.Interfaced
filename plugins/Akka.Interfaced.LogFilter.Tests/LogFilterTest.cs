@@ -36,7 +36,7 @@ namespace Akka.Interfaced.LogFilter.Tests
             ClearLogger();
 
             var actor = ActorOfAsTestActorRef<TestActor>(Props.Create<TestActor>());
-            var a = new TestRef(actor);
+            var a = actor.Cast<TestRef>();
             await a.Call("Test");
 
             var logs = GetLogs();
@@ -52,7 +52,7 @@ namespace Akka.Interfaced.LogFilter.Tests
             ClearLogger();
 
             var actor = ActorOfAsTestActorRef<TestActor>(Props.Create<TestActor>(), "TA");
-            var a = new TestRef(actor);
+            var a = actor.Cast<TestRef>();
             await a.CallWithActor(a);
 
             var logs = GetLogs();
@@ -68,7 +68,7 @@ namespace Akka.Interfaced.LogFilter.Tests
             ClearLogger();
 
             var actor = ActorOfAsTestActorRef<TestActor>(Props.Create<TestActor>());
-            var a = new TestRef(actor);
+            var a = actor.Cast<TestRef>();
             var ret = await a.GetHelloCount();
             Assert.Equal(0, ret);
 
@@ -87,7 +87,7 @@ namespace Akka.Interfaced.LogFilter.Tests
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
                 var actor = ActorOfAsTestActorRef<TestActor>(Props.Create<TestActor>());
-                var a = new TestRef(actor);
+                var a = actor.Cast<TestRef>();
                 await a.Call(null);
             });
 
@@ -103,7 +103,7 @@ namespace Akka.Interfaced.LogFilter.Tests
             ClearLogger();
 
             var actor = ActorOfAsTestActorRef<TestActor>(Props.Create<TestActor>());
-            var a = new TestRef(actor);
+            var a = actor.Cast<TestRef>();
             var ret = await a.SayHello("World");
             Assert.Equal("Hello World", ret);
 

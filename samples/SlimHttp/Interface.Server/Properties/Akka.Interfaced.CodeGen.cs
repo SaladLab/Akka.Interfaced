@@ -104,6 +104,8 @@ namespace SlimHttp.Interface
 
     public class CalculatorRef : InterfacedActorRef, ICalculator, ICalculator_NoReply
     {
+        public override Type InterfaceType => typeof(ICalculator);
+
         public CalculatorRef() : base(null)
         {
         }
@@ -115,24 +117,6 @@ namespace SlimHttp.Interface
         public CalculatorRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public CalculatorRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public CalculatorRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator CalculatorRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(ICalculator));
-            return new CalculatorRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(ICalculator);
 
         public ICalculator_NoReply WithNoReply()
         {
@@ -263,6 +247,8 @@ namespace SlimHttp.Interface
 
     public class CounterRef : InterfacedActorRef, ICounter, ICounter_NoReply
     {
+        public override Type InterfaceType => typeof(ICounter);
+
         public CounterRef() : base(null)
         {
         }
@@ -274,24 +260,6 @@ namespace SlimHttp.Interface
         public CounterRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public CounterRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public CounterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator CounterRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(ICounter));
-            return new CounterRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(ICounter);
 
         public ICounter_NoReply WithNoReply()
         {
@@ -438,6 +406,8 @@ namespace SlimHttp.Interface
 
     public class GreeterRef : InterfacedActorRef, IGreeter, IGreeter_NoReply
     {
+        public override Type InterfaceType => typeof(IGreeter);
+
         public GreeterRef() : base(null)
         {
         }
@@ -449,24 +419,6 @@ namespace SlimHttp.Interface
         public GreeterRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public GreeterRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public GreeterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator GreeterRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IGreeter));
-            return new GreeterRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IGreeter);
 
         public IGreeter_NoReply WithNoReply()
         {
@@ -738,6 +690,8 @@ namespace SlimHttp.Interface
 
     public class PedanticRef : InterfacedActorRef, IPedantic, IPedantic_NoReply
     {
+        public override Type InterfaceType => typeof(IPedantic);
+
         public PedanticRef() : base(null)
         {
         }
@@ -749,24 +703,6 @@ namespace SlimHttp.Interface
         public PedanticRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public PedanticRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public PedanticRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator PedanticRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IPedantic));
-            return new PedanticRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IPedantic);
 
         public IPedantic_NoReply WithNoReply()
         {

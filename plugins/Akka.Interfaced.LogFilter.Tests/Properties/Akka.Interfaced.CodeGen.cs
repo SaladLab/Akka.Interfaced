@@ -138,6 +138,8 @@ namespace Akka.Interfaced.LogFilter.Tests
 
     public class TestRef : InterfacedActorRef, ITest, ITest_NoReply
     {
+        public override Type InterfaceType => typeof(ITest);
+
         public TestRef() : base(null)
         {
         }
@@ -149,24 +151,6 @@ namespace Akka.Interfaced.LogFilter.Tests
         public TestRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public TestRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public TestRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator TestRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(ITest));
-            return new TestRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(ITest);
 
         public ITest_NoReply WithNoReply()
         {

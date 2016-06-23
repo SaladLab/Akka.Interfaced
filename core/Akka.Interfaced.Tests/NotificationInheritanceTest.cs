@@ -106,8 +106,8 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var subject = new SubjectExRef(ActorOf(() => new SubjectExActor()));
-            var a = new DummyRef(ActorOf(() => new TestObserverActor(subject, log)));
+            var subject = ActorOf(() => new SubjectExActor()).Cast<SubjectExRef>();
+            var a = ActorOf(() => new TestObserverActor(subject, log)).Cast<DummyRef>();
 
             // Act
             await a.Call(context);

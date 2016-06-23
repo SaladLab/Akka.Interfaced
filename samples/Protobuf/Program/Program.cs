@@ -81,7 +81,7 @@ namespace Protobuf.Program
 
             var serverActor = serverSystem.ActorOf<HelloWorldActor>("actor");
             var clientActor = clientSystem.ActorSelection("akka.tcp://Server@localhost:9001/user/actor").ResolveOne(TimeSpan.Zero).Result;
-            var helloWorld = new HelloWorldRef(clientActor);
+            var helloWorld = clientActor.Cast<HelloWorldRef>();
 
             Console.WriteLine(await helloWorld.SayHello("World"));
             Console.WriteLine(await helloWorld.SayHello("Dlrow"));
@@ -104,11 +104,11 @@ namespace Protobuf.Program
 
             var serverActor = serverSystem.ActorOf<SurrogateActor>("surrogate");
             var clientActor = clientSystem.ActorSelection("akka.tcp://Server@localhost:9001/user/surrogate").ResolveOne(TimeSpan.Zero).Result;
-            var surrogate = new SurrogateRef(clientActor);
+            var surrogate = clientActor.Cast<SurrogateRef>();
 
             Console.WriteLine(await surrogate.GetPath(clientActor.Path));
             Console.WriteLine(await surrogate.GetAddress(clientActor.Path.Address));
-            Console.WriteLine(((SurrogateRef)await surrogate.GetSelf()).Actor.Path);
+            Console.WriteLine(((SurrogateRef)await surrogate.GetSelf()).CastToIActorRef().Path);
         }
 
         private async static Task TestPedantic(ActorSystem serverSystem, ActorSystem clientSystem)
@@ -117,7 +117,7 @@ namespace Protobuf.Program
 
             var serverActor = serverSystem.ActorOf<PedanticActor>("pedantic");
             var clientActor = clientSystem.ActorSelection("akka.tcp://Server@localhost:9001/user/pedantic").ResolveOne(TimeSpan.Zero).Result;
-            var pedantic = new PedanticRef(clientActor);
+            var pedantic = clientActor.Cast<PedanticRef>();
 
             await pedantic.TestCall();
             Console.WriteLine(await pedantic.TestOptional(null));

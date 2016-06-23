@@ -6,9 +6,9 @@ using Xunit.Abstractions;
 
 namespace Akka.Interfaced
 {
-    public class InterfacedActorOfTest : TestKit.Xunit2.TestKit
+    public class InterfacedActorRefCastTest : TestKit.Xunit2.TestKit
     {
-        public InterfacedActorOfTest(ITestOutputHelper output)
+        public InterfacedActorRefCastTest(ITestOutputHelper output)
             : base(output: output)
         {
         }
@@ -37,10 +37,10 @@ namespace Akka.Interfaced
         [InlineData(typeof(TestDummyExExtended))]
         public void CheckIfActorImplements(Type actorType)
         {
-            Assert.True(InterfacedActorOfExtensions.CheckIfActorImplements(actorType, typeof(IDummy)));
-            Assert.True(InterfacedActorOfExtensions.CheckIfActorImplements(actorType, typeof(IDummyEx)));
-            Assert.False(InterfacedActorOfExtensions.CheckIfActorImplements(actorType, typeof(IDummyEx2)));
-            Assert.False(InterfacedActorOfExtensions.CheckIfActorImplements(actorType, typeof(IDummyExFinal)));
+            Assert.True(InterfacedActorRefAkkaExtensions.CheckIfActorImplements(actorType, typeof(IDummy)));
+            Assert.True(InterfacedActorRefAkkaExtensions.CheckIfActorImplements(actorType, typeof(IDummyEx)));
+            Assert.False(InterfacedActorRefAkkaExtensions.CheckIfActorImplements(actorType, typeof(IDummyEx2)));
+            Assert.False(InterfacedActorRefAkkaExtensions.CheckIfActorImplements(actorType, typeof(IDummyExFinal)));
         }
 
         [Theory]
@@ -49,7 +49,7 @@ namespace Akka.Interfaced
         [InlineData(typeof(TestDummyExExtended))]
         public async Task CastTypedActorRefToInterfacedRef(Type actorType)
         {
-            DummyExRef actor = Sys.InterfacedActorOf(Props.Create(actorType));
+            var actor = Sys.InterfacedActorOf(Props.Create(actorType)).Cast<DummyExRef>();
             Assert.Equal("Test", await actor.Call("Test"));
         }
 
@@ -61,7 +61,7 @@ namespace Akka.Interfaced
         {
             var exception = Record.Exception(() =>
             {
-                DummyEx2Ref actor = Sys.InterfacedActorOf(Props.Create(actorType));
+                var actor = Sys.InterfacedActorOf(Props.Create(actorType)).Cast<DummyEx2Ref>();
             });
             Assert.IsType<InvalidCastException>(exception);
         }

@@ -21,3 +21,6 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("c0d22336-c49e-4245-b39d-0b3083c28205")]
+
+// Friend aseembly
+[assembly: InternalsVisibleTo("Akka.Interfaced")]

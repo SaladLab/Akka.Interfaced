@@ -37,14 +37,14 @@ namespace Akka.Interfaced.Persistence.Tests
             {
                 var eventLog = new List<string>();
                 var actor = ActorOfAsTestActorRef<TestNotepadActor>(Props.Create<TestNotepadActor>("notepad1", eventLog));
-                var a = new NotepadRef(actor);
+                var a = actor.Cast<NotepadRef>();
                 await a.Clear();
                 await a.Write("Apple");
                 await a.Write("Banana");
                 await a.FlushSnapshot();
                 await a.Write("Cinamon");
                 var doc = await a.GetDocument();
-                await a.Actor.GracefulStop(TimeSpan.FromSeconds(5), InterfacedPoisonPill.Instance);
+                await a.CastToIActorRef().GracefulStop(TimeSpan.FromSeconds(5), InterfacedPoisonPill.Instance);
 
                 Assert.Equal(new List<string> { "Apple", "Banana", "Cinamon" }, doc);
                 Assert.Equal(new List<string>(), eventLog);
@@ -54,7 +54,7 @@ namespace Akka.Interfaced.Persistence.Tests
             {
                 var eventLog = new List<string>();
                 var actor = ActorOfAsTestActorRef<TestNotepadActor>(Props.Create<TestNotepadActor>("notepad1", eventLog));
-                var a = new NotepadRef(actor);
+                var a = actor.Cast<NotepadRef>();
                 var doc = await a.GetDocument();
 
                 Assert.Equal(new List<string> { "Apple", "Banana", "Cinamon" }, doc);

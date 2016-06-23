@@ -118,6 +118,8 @@ namespace Akka.Interfaced.Persistence.Tests
 
     public class NotepadRef : InterfacedActorRef, INotepad, INotepad_NoReply
     {
+        public override Type InterfaceType => typeof(INotepad);
+
         public NotepadRef() : base(null)
         {
         }
@@ -129,24 +131,6 @@ namespace Akka.Interfaced.Persistence.Tests
         public NotepadRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public NotepadRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public NotepadRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator NotepadRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(INotepad));
-            return new NotepadRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(INotepad);
 
         public INotepad_NoReply WithNoReply()
         {

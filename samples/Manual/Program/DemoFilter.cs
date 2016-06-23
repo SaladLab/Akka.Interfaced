@@ -109,7 +109,7 @@ namespace Manual
         {
             Console.WriteLine($"- Work with permission={permission}");
 
-            var greeter = new GreeterRef(_system.ActorOf(Props.Create(() => new MyActor(permission))));
+            var greeter = _system.ActorOf(Props.Create(() => new MyActor(permission))).Cast<GreeterRef>();
 
             try
             {

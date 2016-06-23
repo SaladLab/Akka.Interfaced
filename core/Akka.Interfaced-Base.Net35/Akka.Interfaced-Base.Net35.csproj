@@ -67,6 +67,9 @@
     <Compile Include="..\Akka.Interfaced-Base\InterfacedActorRef.cs">
       <Link>InterfacedActorRef.cs</Link>
     </Compile>
+    <Compile Include="..\Akka.Interfaced-Base\InterfacedActorRefExtensions.cs">
+      <Link>InterfacedActorRefExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Akka.Interfaced-Base\InterfacedObserver.cs">
       <Link>InterfacedObserver.cs</Link>
     </Compile>

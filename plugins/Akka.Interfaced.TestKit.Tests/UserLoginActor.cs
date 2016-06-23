@@ -12,7 +12,7 @@ namespace Akka.Interfaced.TestKit.Tests
 
         public UserLoginActor(IActorRef actorBoundChannel)
         {
-            _actorBoundChannel = new ActorBoundChannelRef(actorBoundChannel).WithRequestWaiter(this);
+            _actorBoundChannel = actorBoundChannel.Cast<ActorBoundChannelRef>().WithRequestWaiter(this);
         }
 
         public async Task<IUser> Login(string id, string password, IUserObserver observer)
@@ -30,10 +30,8 @@ namespace Akka.Interfaced.TestKit.Tests
 
             // Make UserActor and bind it
 
-            var user = Context.System.ActorOf(Props.Create(() => new UserActor(id, observer)));
-            var actorId = await _actorBoundChannel.BindActor(user, new TaggedType[] { typeof(IUser) });
-
-            return new UserRef(new BoundActorTarget(actorId));
+            var user = Context.System.InterfacedActorOf(Props.Create(() => new UserActor(id, observer))).Cast<UserRef>();
+            return (await _actorBoundChannel.BindActor(user)).Cast<UserRef>();
         }
 
         private bool CheckAccount(string id, string password)

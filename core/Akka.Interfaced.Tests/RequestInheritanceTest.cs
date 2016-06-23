@@ -105,7 +105,7 @@ namespace Akka.Interfaced
         public async Task RequestInheritedInterfaced_Called(Type actorType)
         {
             // Arrange
-            var a = new DummyExFinalRef(ActorOf(Props.Create(actorType)));
+            var a = ActorOf(Props.Create(actorType)).Cast<DummyExFinalRef>();
 
             // Act & Assert
             Assert.Equal("Call:1", await a.Call("1"));

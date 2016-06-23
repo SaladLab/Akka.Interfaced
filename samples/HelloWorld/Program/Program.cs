@@ -19,7 +19,7 @@ namespace HelloWorld.Program
         {
             // Create GreetingActor and make a reference pointing to an actor.
             var actor = system.ActorOf<GreetingActor>();
-            var greeter = new GreeterRef(actor);
+            var greeter = actor.Cast<GreeterRef>();
 
             // Make some noise
             Console.WriteLine(await greeter.Greet("World"));

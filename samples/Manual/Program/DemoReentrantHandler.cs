@@ -38,7 +38,7 @@ namespace Manual
         private async Task DemoAtomicMethod()
         {
             var actor = _system.ActorOf<GreetingActor>();
-            var greeter = new GreeterRef(actor);
+            var greeter = actor.Cast<GreeterRef>();
             await Task.WhenAll(
                 greeter.Greet("A"),
                 greeter.Greet("B"),
@@ -69,7 +69,7 @@ namespace Manual
         private async Task DemoReentrantMethod()
         {
             var actor = _system.ActorOf<GreetingReentrantActor>();
-            var greeter = new GreeterRef(actor);
+            var greeter = actor.Cast<GreeterRef>();
             await Task.WhenAll(
                 greeter.Greet("A"),
                 greeter.Greet("B"),
@@ -117,14 +117,14 @@ namespace Manual
         private async Task DemoBackgroundServing()
         {
             var actor = _system.ActorOf<ServingActor>();
-            var greeter = new GreeterRef(actor);
+            var greeter = actor.Cast<GreeterRef>();
             for (int i = 0; i < 5; i++)
             {
                 await Task.Delay(200);
                 Console.WriteLine(await greeter.GetCount());
                 if (i == 3)
                 {
-                    greeter.Actor.Tell("stop");
+                    actor.Tell("stop");
                     Console.WriteLine("stop");
                 }
             }

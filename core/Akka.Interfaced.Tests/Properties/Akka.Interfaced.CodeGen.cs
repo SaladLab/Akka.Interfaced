@@ -171,6 +171,8 @@ namespace Akka.Interfaced
 
     public class BasicRef : InterfacedActorRef, IBasic, IBasic_NoReply
     {
+        public override Type InterfaceType => typeof(IBasic);
+
         public BasicRef() : base(null)
         {
         }
@@ -182,24 +184,6 @@ namespace Akka.Interfaced
         public BasicRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public BasicRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public BasicRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator BasicRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IBasic));
-            return new BasicRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IBasic);
 
         public IBasic_NoReply WithNoReply()
         {
@@ -364,6 +348,8 @@ namespace Akka.Interfaced
 
     public class DummyRef : InterfacedActorRef, IDummy, IDummy_NoReply
     {
+        public override Type InterfaceType => typeof(IDummy);
+
         public DummyRef() : base(null)
         {
         }
@@ -375,24 +361,6 @@ namespace Akka.Interfaced
         public DummyRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public DummyRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public DummyRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator DummyRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDummy));
-            return new DummyRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IDummy);
 
         public IDummy_NoReply WithNoReply()
         {
@@ -489,6 +457,8 @@ namespace Akka.Interfaced
 
     public class DummyExRef : InterfacedActorRef, IDummyEx, IDummyEx_NoReply
     {
+        public override Type InterfaceType => typeof(IDummyEx);
+
         public DummyExRef() : base(null)
         {
         }
@@ -500,24 +470,6 @@ namespace Akka.Interfaced
         public DummyExRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public DummyExRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public DummyExRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator DummyExRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDummyEx));
-            return new DummyExRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IDummyEx);
 
         public IDummyEx_NoReply WithNoReply()
         {
@@ -630,6 +582,8 @@ namespace Akka.Interfaced
 
     public class DummyEx2Ref : InterfacedActorRef, IDummyEx2, IDummyEx2_NoReply
     {
+        public override Type InterfaceType => typeof(IDummyEx2);
+
         public DummyEx2Ref() : base(null)
         {
         }
@@ -641,24 +595,6 @@ namespace Akka.Interfaced
         public DummyEx2Ref(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public DummyEx2Ref(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public DummyEx2Ref(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator DummyEx2Ref(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDummyEx2));
-            return new DummyEx2Ref(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IDummyEx2);
 
         public IDummyEx2_NoReply WithNoReply()
         {
@@ -771,6 +707,8 @@ namespace Akka.Interfaced
 
     public class DummyExFinalRef : InterfacedActorRef, IDummyExFinal, IDummyExFinal_NoReply
     {
+        public override Type InterfaceType => typeof(IDummyExFinal);
+
         public DummyExFinalRef() : base(null)
         {
         }
@@ -782,24 +720,6 @@ namespace Akka.Interfaced
         public DummyExFinalRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public DummyExFinalRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public DummyExFinalRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator DummyExFinalRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDummyExFinal));
-            return new DummyExFinalRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IDummyExFinal);
 
         public IDummyExFinal_NoReply WithNoReply()
         {
@@ -1017,6 +937,8 @@ namespace Akka.Interfaced
 
     public class OverloadedRef : InterfacedActorRef, IOverloaded, IOverloaded_NoReply
     {
+        public override Type InterfaceType => typeof(IOverloaded);
+
         public OverloadedRef() : base(null)
         {
         }
@@ -1028,24 +950,6 @@ namespace Akka.Interfaced
         public OverloadedRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public OverloadedRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public OverloadedRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator OverloadedRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IOverloaded));
-            return new OverloadedRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IOverloaded);
 
         public IOverloaded_NoReply WithNoReply()
         {
@@ -1214,6 +1118,8 @@ namespace Akka.Interfaced
 
     public class SubjectRef : InterfacedActorRef, ISubject, ISubject_NoReply
     {
+        public override Type InterfaceType => typeof(ISubject);
+
         public SubjectRef() : base(null)
         {
         }
@@ -1225,24 +1131,6 @@ namespace Akka.Interfaced
         public SubjectRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public SubjectRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public SubjectRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator SubjectRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(ISubject));
-            return new SubjectRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(ISubject);
 
         public ISubject_NoReply WithNoReply()
         {
@@ -1430,6 +1318,8 @@ namespace Akka.Interfaced
 
     public class Subject2Ref : InterfacedActorRef, ISubject2, ISubject2_NoReply
     {
+        public override Type InterfaceType => typeof(ISubject2);
+
         public Subject2Ref() : base(null)
         {
         }
@@ -1441,24 +1331,6 @@ namespace Akka.Interfaced
         public Subject2Ref(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public Subject2Ref(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public Subject2Ref(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator Subject2Ref(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(ISubject2));
-            return new Subject2Ref(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(ISubject2);
 
         public ISubject2_NoReply WithNoReply()
         {
@@ -1663,6 +1535,8 @@ namespace Akka.Interfaced
 
     public class SubjectExRef : InterfacedActorRef, ISubjectEx, ISubjectEx_NoReply
     {
+        public override Type InterfaceType => typeof(ISubjectEx);
+
         public SubjectExRef() : base(null)
         {
         }
@@ -1674,24 +1548,6 @@ namespace Akka.Interfaced
         public SubjectExRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public SubjectExRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public SubjectExRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator SubjectExRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(ISubjectEx));
-            return new SubjectExRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(ISubjectEx);
 
         public ISubjectEx_NoReply WithNoReply()
         {
@@ -1842,6 +1698,8 @@ namespace Akka.Interfaced
 
     public class WorkerRef : InterfacedActorRef, IWorker, IWorker_NoReply
     {
+        public override Type InterfaceType => typeof(IWorker);
+
         public WorkerRef() : base(null)
         {
         }
@@ -1853,24 +1711,6 @@ namespace Akka.Interfaced
         public WorkerRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public WorkerRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public WorkerRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator WorkerRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IWorker));
-            return new WorkerRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IWorker);
 
         public IWorker_NoReply WithNoReply()
         {

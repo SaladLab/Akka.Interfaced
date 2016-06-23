@@ -49,7 +49,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<Tuple<int, int>>();
-            var a = new WorkerRef(ActorOf(() => new TestScheduleActor(log)));
+            var a = ActorOf(() => new TestScheduleActor(log)).Cast<WorkerRef>();
 
             // Act
             var t1 = a.Atomic(1);
@@ -73,7 +73,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<Tuple<int, int>>();
-            var a = new WorkerRef(ActorOf(() => new TestScheduleActor(log)));
+            var a = ActorOf(() => new TestScheduleActor(log)).Cast<WorkerRef>();
 
             // Act
             var t1 = a.Reentrant(1);
@@ -92,7 +92,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<Tuple<int, int>>();
-            var a = new WorkerRef(ActorOf(() => new TestScheduleActor(log)));
+            var a = ActorOf(() => new TestScheduleActor(log)).Cast<WorkerRef>();
 
             // Act
             var t1 = a.Reentrant(1);
@@ -148,7 +148,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<Tuple<int, object>>();
-            var a = new WorkerRef(ActorOf(() => new TestContextActor(log)));
+            var a = ActorOf(() => new TestContextActor(log)).Cast<WorkerRef>();
 
             // Act
             var t1 = a.Atomic(1);
@@ -167,7 +167,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<Tuple<int, object>>();
-            var a = new WorkerRef(ActorOf(() => new TestContextActor(log)));
+            var a = ActorOf(() => new TestContextActor(log)).Cast<WorkerRef>();
 
             // Act
             var t1 = a.Reentrant(1);

@@ -44,8 +44,8 @@ namespace Akka.Interfaced.SlimServer
 
     public interface IActorBoundChannel : IInterfacedActor
     {
-        Task<int> BindActor(InterfacedActorRef actor, ActorBindingFlags bindingFlags = 0);
-        Task<int> BindActor(IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags = 0);
+        Task<InterfacedActorRef> BindActor(InterfacedActorRef actor, ActorBindingFlags bindingFlags = 0);
+        Task<BoundActorTarget> BindActor(IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags = 0);
         Task<bool> UnbindActor(IActorRef actor);
         Task<bool> BindType(IActorRef actor, TaggedType[] types);
         Task<bool> UnbindType(IActorRef actor, Type[] types);

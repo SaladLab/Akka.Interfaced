@@ -57,7 +57,7 @@ namespace Manual
         private async Task DemoObjectNotificationChannel()
         {
             var actor = _system.ActorOf<GreetingActor>();
-            var greeter = new GreeterWithObserverRef(actor);
+            var greeter = actor.Cast<GreeterWithObserverRef>();
             await greeter.Subscribe(ObjectNotificationChannel.Create<IGreetObserver>(new GreetObserverDisplay()));
             await greeter.Greet("World");
             await greeter.Greet("Actor");
@@ -70,7 +70,7 @@ namespace Manual
             private async Task Handle(string message)
             {
                 var actor = Context.ActorOf<GreetingActor>();
-                var greeter = new GreeterWithObserverRef(actor);
+                var greeter = actor.Cast<GreeterWithObserverRef>();
                 await greeter.Subscribe(CreateObserver<IGreetObserver>());
                 await greeter.Greet("World");
                 await greeter.Greet("Actor");

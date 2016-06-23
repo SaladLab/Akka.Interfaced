@@ -34,7 +34,7 @@ namespace Manual
         private async Task DemoCommunicateWithActor()
         {
             var actor = _system.ActorOf<GreetingActor>();
-            var greeter = new GreeterRef(actor);
+            var greeter = actor.Cast<GreeterRef>();
             Console.WriteLine(await greeter.Greet("World"));
             Console.WriteLine(await greeter.Greet("Actor"));
             Console.WriteLine(await greeter.GetCount());
@@ -43,11 +43,11 @@ namespace Manual
 
         private async Task DemoCommunicateWithActor2()
         {
-            GreeterRef greeter = _system.InterfacedActorOf<GreetingActor>();
+            var greeter = _system.InterfacedActorOf<GreetingActor>().Cast<GreeterRef>();
             Console.WriteLine(await greeter.Greet("World"));
             Console.WriteLine(await greeter.Greet("Actor"));
             Console.WriteLine(await greeter.GetCount());
-            greeter.Actor.Tell(InterfacedPoisonPill.Instance);
+            greeter.CastToIActorRef().Tell(InterfacedPoisonPill.Instance);
         }
 
         private class TestActor : InterfacedActor
@@ -55,8 +55,7 @@ namespace Manual
             [MessageHandler]
             private async Task Handle(string message)
             {
-                var actor = Context.ActorOf<GreetingActor>();
-                var greeter = new GreeterRef(actor, this);
+                var greeter = Context.ActorOf<GreetingActor>().Cast<GreeterRef>().WithRequestWaiter(this);
                 Console.WriteLine(await greeter.Greet("World"));
                 Console.WriteLine(await greeter.Greet("Actor"));
                 Console.WriteLine(await greeter.GetCount());
@@ -90,7 +89,7 @@ namespace Manual
         private async Task DemoTimeout()
         {
             var actor = _system.ActorOf<GreetingActorWithDelay>();
-            var greeter = new GreeterRef(actor);
+            var greeter = actor.Cast<GreeterRef>();
 
             await greeter.Greet("World");
 
@@ -109,11 +108,11 @@ namespace Manual
 
         private async Task DemoFireAndForget()
         {
-            GreeterRef greeter = _system.InterfacedActorOf<GreetingActor>();
+            var greeter = _system.InterfacedActorOf<GreetingActor>().Cast<GreeterRef>();
             greeter.WithNoReply().Greet("World");
             greeter.WithNoReply().Greet("Actor");
             Console.WriteLine(await greeter.GetCount());
-            greeter.Actor.Tell(InterfacedPoisonPill.Instance);
+            greeter.CastToIActorRef().Tell(InterfacedPoisonPill.Instance);
         }
     }
 }

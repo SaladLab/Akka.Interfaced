@@ -52,12 +52,12 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(() => new TestGracefulShutdownActor(log)));
+            var a = ActorOf(() => new TestGracefulShutdownActor(log)).Cast<WorkerRef>();
 
             // Act
             a.WithNoReply().Atomic(1);
             a.WithNoReply().Atomic(2);
-            await a.Actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
+            await a.CastToIActorRef().GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             // Assert
             Assert.Equal(new List<string>
@@ -76,12 +76,12 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(() => new TestGracefulShutdownActor(log)));
+            var a = ActorOf(() => new TestGracefulShutdownActor(log)).Cast<WorkerRef>();
 
             // Act
             a.WithNoReply().Reentrant(1);
             a.WithNoReply().Reentrant(2);
-            await a.Actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
+            await a.CastToIActorRef().GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             // Assert
             Assert.True(new HashSet<string>

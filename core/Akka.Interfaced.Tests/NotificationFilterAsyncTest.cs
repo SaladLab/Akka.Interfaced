@@ -75,7 +75,7 @@ namespace Akka.Interfaced
         private async Task<Tuple<Subject2Ref, TestActorRef<TObservingActor>>> SetupActors2<TObservingActor>(LogBoard<string> log)
             where TObservingActor : ActorBase
         {
-            var subject = new Subject2Ref(ActorOfAsTestActorRef<Subject2Actor>("Subject"));
+            var subject = ActorOfAsTestActorRef<Subject2Actor>("Subject").Cast<Subject2Ref>();
             var observingActor = ActorOfAsTestActorRef<TObservingActor>(Props.Create<TObservingActor>(log));
             await subject.Subscribe(new Subject2Observer(new ActorNotificationChannel(observingActor)));
             return Tuple.Create(subject, observingActor);

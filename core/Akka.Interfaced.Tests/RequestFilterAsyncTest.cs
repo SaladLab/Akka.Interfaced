@@ -72,7 +72,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(() => new RequestFilterAsyncActor(log)));
+            var a = ActorOf(() => new RequestFilterAsyncActor(log)).Cast<WorkerRef>();
 
             // Act
             await a.Atomic(1);
@@ -95,7 +95,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(() => new RequestFilterAsyncActor(log)));
+            var a = ActorOf(() => new RequestFilterAsyncActor(log)).Cast<WorkerRef>();
 
             // Act
             await a.Reentrant(1);

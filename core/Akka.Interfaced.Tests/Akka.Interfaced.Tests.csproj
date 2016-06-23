@@ -84,7 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InterfacedActorOfTest.cs" />
+    <Compile Include="InterfacedActorRefCastTest.cs" />
     <Compile Include="Interface\IBasic.cs" />
     <Compile Include="Interface\IDummy.cs" />
     <Compile Include="Interface\IOverloaded.cs" />

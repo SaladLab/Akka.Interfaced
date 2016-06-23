@@ -108,7 +108,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new DummyRef(ActorOf(() => new TestFilterActor(log)));
+            var a = ActorOf(() => new TestFilterActor(log)).Cast<DummyRef>();
 
             // Act
             await a.Call("A");

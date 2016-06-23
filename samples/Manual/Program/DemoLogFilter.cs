@@ -46,7 +46,7 @@ namespace Manual
         private async Task DemoLogRequest()
         {
             var actor = _system.ActorOf<GreetingActor>();
-            var greeter = new GreeterRef(actor);
+            var greeter = actor.Cast<GreeterRef>();
             Console.WriteLine(await greeter.Greet("World"));
             try
             {
@@ -57,7 +57,7 @@ namespace Manual
                 Console.WriteLine(e.GetType().Name);
             }
             Console.WriteLine(await greeter.GetCount());
-            greeter.Actor.Tell("Bye!");
+            actor.Tell("Bye!");
             await actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
         }
     }

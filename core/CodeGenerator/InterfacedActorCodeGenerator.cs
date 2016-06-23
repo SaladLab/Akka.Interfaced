@@ -321,6 +321,11 @@ namespace CodeGenerator
 
             using (w.B($"public class {refClassName} : InterfacedActorRef, {type.Name}, {noReplyInterfaceName}"))
             {
+                // InterfaceType property
+
+                w._($"public override Type InterfaceType => typeof({type.Name});");
+                w._();
+
                 // Constructors
 
                 using (w.B($"public {refClassName}() : base(null)"))
@@ -334,33 +339,6 @@ namespace CodeGenerator
                 using (w.B($"public {refClassName}(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)"))
                 {
                 }
-
-                // For IActorRef
-
-                if (Options.UseSlimClient == false)
-                {
-                    using (w.B($"public {refClassName}(IActorRef actor) : base(new AkkaActorTarget(actor))"))
-                    {
-                    }
-
-                    using (w.B($"public {refClassName}(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)"))
-                    {
-                    }
-
-                    using (w.B($"public static implicit operator {refClassName}(TypedActorRef typedActor)"))
-                    {
-                        w._($"InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof({type.Name}));");
-                        w._($"return new {refClassName}(typedActor.Actor);");
-                    }
-
-                    w._($"public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;");
-                    w._();
-                }
-
-                // InterfaceType property
-
-                w._($"public override Type InterfaceType => typeof({type.Name});");
-                w._();
 
                 // With Helpers
 

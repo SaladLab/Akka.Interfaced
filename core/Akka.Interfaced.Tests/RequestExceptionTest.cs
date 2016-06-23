@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 using Akka.Actor;
 using Xunit;
 using Xunit.Abstractions;
@@ -91,15 +89,15 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new DummyRef(ActorOf(Props.Create(() => new TestExceptionActor(log, 0))));
+            var a = ActorOf(Props.Create(() => new TestExceptionActor(log, 0))).Cast<DummyRef>();
 
             // Act
             var exception = await Record.ExceptionAsync(() => a.Call("E"));
 
             // Assert
             Assert.IsType<RequestFaultException>(exception);
-            Watch(a.Actor);
-            ExpectTerminated(a.Actor);
+            Watch(a.CastToIActorRef());
+            ExpectTerminated(a.CastToIActorRef());
             Assert.Equal(new[] { "Call(E)" },
                          log);
         }
@@ -109,7 +107,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new DummyRef(ActorOf(Props.Create(() => new TestExceptionActor(log, 0))));
+            var a = ActorOf(Props.Create(() => new TestExceptionActor(log, 0))).Cast<DummyRef>();
 
             // Act
             var exception = await Record.ExceptionAsync(() => a.Call("e"));
@@ -125,15 +123,15 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(Props.Create(() => new TestExceptionActor(log, 0))));
+            var a = ActorOf(Props.Create(() => new TestExceptionActor(log, 0))).Cast<WorkerRef>();
 
             // Act
             var exception = await Record.ExceptionAsync(() => a.Atomic(1));
 
             // Assert
             Assert.IsType<RequestFaultException>(exception);
-            Watch(a.Actor);
-            ExpectTerminated(a.Actor);
+            Watch(a.CastToIActorRef());
+            ExpectTerminated(a.CastToIActorRef());
             Assert.Equal(new[] { "Atomic(1)" },
                          log);
         }
@@ -143,15 +141,15 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(Props.Create(() => new TestExceptionActor(log, 0))));
+            var a = ActorOf(Props.Create(() => new TestExceptionActor(log, 0))).Cast<WorkerRef>();
 
             // Act
             var exception = await Record.ExceptionAsync(() => a.Atomic(2));
 
             // Assert
             Assert.IsType<RequestFaultException>(exception);
-            Watch(a.Actor);
-            ExpectTerminated(a.Actor);
+            Watch(a.CastToIActorRef());
+            ExpectTerminated(a.CastToIActorRef());
             Assert.Equal(new[] { "Atomic(2)", "Atomic(2) Done" },
                          log);
         }
@@ -161,15 +159,15 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(Props.Create(() => new TestExceptionActor(log, 0))));
+            var a = ActorOf(Props.Create(() => new TestExceptionActor(log, 0))).Cast<WorkerRef>();
 
             // Act
             var exception = await Record.ExceptionAsync(() => a.Reentrant(1));
 
             // Assert
             Assert.IsType<RequestFaultException>(exception);
-            Watch(a.Actor);
-            ExpectTerminated(a.Actor);
+            Watch(a.CastToIActorRef());
+            ExpectTerminated(a.CastToIActorRef());
             Assert.Equal(new[] { "Reentrant(1)" },
                          log);
         }
@@ -179,15 +177,15 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(Props.Create(() => new TestExceptionActor(log, 0))));
+            var a = ActorOf(Props.Create(() => new TestExceptionActor(log, 0))).Cast<WorkerRef>();
 
             // Act
             var exception = await Record.ExceptionAsync(() => a.Reentrant(2));
 
             // Assert
             Assert.IsType<RequestFaultException>(exception);
-            Watch(a.Actor);
-            ExpectTerminated(a.Actor);
+            Watch(a.CastToIActorRef());
+            ExpectTerminated(a.CastToIActorRef());
             Assert.Equal(new[] { "Reentrant(2)", "Reentrant(2) Done" },
                          log);
         }
@@ -197,16 +195,16 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(Props.Create(() => new TestExceptionActor(log, 1000))));
+            var a = ActorOf(Props.Create(() => new TestExceptionActor(log, 1000))).Cast<WorkerRef>();
 
             // Act
             var exceptionTask = Record.ExceptionAsync(() => a.Atomic(10));
-            a.Actor.Tell(PoisonPill.Instance); // dangerous but for test
+            a.CastToIActorRef().Tell(PoisonPill.Instance); // dangerous but for test
 
             // Assert
             Assert.IsType<RequestHaltException>(await exceptionTask);
-            Watch(a.Actor);
-            ExpectTerminated(a.Actor);
+            Watch(a.CastToIActorRef());
+            ExpectTerminated(a.CastToIActorRef());
             Assert.Equal(new[] { "Atomic(10)" },
                          log);
         }
@@ -216,7 +214,7 @@ namespace Akka.Interfaced
         {
             // Arrange
             var log = new LogBoard<string>();
-            var a = new WorkerRef(ActorOf(Props.Create(() => new TestExceptionActor(log, 1000))));
+            var a = ActorOf(Props.Create(() => new TestExceptionActor(log, 1000))).Cast<WorkerRef>();
 
             // Act
             var exceptionTask1 = Record.ExceptionAsync(() => a.Reentrant(10));
@@ -227,8 +225,8 @@ namespace Akka.Interfaced
             Assert.IsType<RequestFaultException>(exception);
             Assert.IsType<RequestHaltException>(await exceptionTask1);
             Assert.IsType<RequestHaltException>(await exceptionTask2);
-            Watch(a.Actor);
-            ExpectTerminated(a.Actor);
+            Watch(a.CastToIActorRef());
+            ExpectTerminated(a.CastToIActorRef());
             Assert.Equal(new[] { "Reentrant(10)", "Reentrant(11)", "Atomic(1)" },
                          log);
         }

@@ -75,7 +75,7 @@ namespace Manual
         {
             // create actor, change state of it, and destroy it.
             var a = _system.ActorOf(Props.Create(() => new PersistentGreetingActor("greeter1")));
-            var g = new GreeterRef(a);
+            var g = a.Cast<GreeterRef>();
             await g.Greet("World");
             await g.Greet("Actor");
             Console.WriteLine("1st: " + await g.GetCount());
@@ -83,7 +83,7 @@ namespace Manual
 
             // create actor, and check saved state.
             var a2 = _system.ActorOf(Props.Create(() => new PersistentGreetingActor("greeter1")));
-            var g2 = new GreeterRef(a2);
+            var g2 = a2.Cast<GreeterRef>();
             Console.WriteLine("2nd: " + await g2.GetCount());
             await g2.Greet("More");
             Console.WriteLine("3rd: " + await g2.GetCount());

@@ -79,6 +79,8 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
 
     public class DefaultRef : InterfacedActorRef, IDefault, IDefault_NoReply
     {
+        public override Type InterfaceType => typeof(IDefault);
+
         public DefaultRef() : base(null)
         {
         }
@@ -90,24 +92,6 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         public DefaultRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public DefaultRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public DefaultRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator DefaultRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IDefault));
-            return new DefaultRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IDefault);
 
         public IDefault_NoReply WithNoReply()
         {

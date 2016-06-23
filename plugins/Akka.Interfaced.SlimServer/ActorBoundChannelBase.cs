@@ -290,28 +290,33 @@ namespace Akka.Interfaced.SlimServer
         }
 
         [ResponsiveExceptionAll]
-        int IActorBoundChannelSync.BindActor(InterfacedActorRef actor, ActorBindingFlags bindingFlags)
+        InterfacedActorRef IActorBoundChannelSync.BindActor(InterfacedActorRef actor, ActorBindingFlags bindingFlags)
         {
             if (actor == null)
                 throw new ArgumentNullException(nameof(actor));
 
-            // Resolve IActorRef
             var targetActor = ((AkkaActorTarget)actor.Target).Actor;
             if (targetActor == null)
                 throw new ArgumentException("InterfacedActorRef should have valid IActorRef target.");
 
             var actorId = BindActor(targetActor, new[] { new BoundType(actor.InterfaceType) }, bindingFlags);
-            return actorId;
+            if (actorId == 0)
+                return null;
+
+            var actorRef = (InterfacedActorRef)Activator.CreateInstance(actor.GetType());
+            InterfacedActorRefModifier.SetTarget(actorRef, new BoundActorTarget(actorId));
+
+            return actorRef;
         }
 
         [ResponsiveExceptionAll]
-        int IActorBoundChannelSync.BindActor(IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags)
+        BoundActorTarget IActorBoundChannelSync.BindActor(IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags)
         {
             if (actor == null)
                 throw new ArgumentNullException(nameof(actor));
 
             var actorId = BindActor(actor, types.Select(t => new BoundType(t)), bindingFlags);
-            return actorId;
+            return actorId != 0 ? new BoundActorTarget(actorId) : null;
         }
 
         [ResponsiveExceptionAll]

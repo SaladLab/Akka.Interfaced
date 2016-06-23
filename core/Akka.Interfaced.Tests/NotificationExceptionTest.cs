@@ -66,7 +66,7 @@ namespace Akka.Interfaced
         private async Task<Tuple<SubjectRef, IActorRef>> SetupActors(LogBoard<string> log)
         {
             var subjectActor = ActorOfAsTestActorRef<SubjectActor>("Subject");
-            var subject = new SubjectRef(subjectActor);
+            var subject = subjectActor.Cast<SubjectRef>();
             var observingActor = ActorOf(() => new TestExceptionActor(log));
             await subject.Subscribe(new SubjectObserver(new ActorNotificationChannel(observingActor)));
             return Tuple.Create(subject, (IActorRef)observingActor);
@@ -75,7 +75,7 @@ namespace Akka.Interfaced
         private async Task<Tuple<Subject2Ref, IActorRef>> SetupActors2(LogBoard<string> log)
         {
             var subjectActor = ActorOfAsTestActorRef<Subject2Actor>("Subject");
-            var subject = new Subject2Ref(subjectActor);
+            var subject = subjectActor.Cast<Subject2Ref>();
             var observingActor = ActorOf(() => new TestExceptionActor(log));
             await subject.Subscribe(new Subject2Observer(new ActorNotificationChannel(observingActor)));
             return Tuple.Create(subject, (IActorRef)observingActor);

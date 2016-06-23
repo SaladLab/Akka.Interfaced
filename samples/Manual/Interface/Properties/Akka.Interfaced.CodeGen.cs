@@ -100,6 +100,8 @@ namespace Manual
 
     public class GreeterRef : InterfacedActorRef, IGreeter, IGreeter_NoReply
     {
+        public override Type InterfaceType => typeof(IGreeter);
+
         public GreeterRef() : base(null)
         {
         }
@@ -111,24 +113,6 @@ namespace Manual
         public GreeterRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public GreeterRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public GreeterRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator GreeterRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IGreeter));
-            return new GreeterRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IGreeter);
 
         public IGreeter_NoReply WithNoReply()
         {
@@ -261,6 +245,8 @@ namespace Manual
 
     public class GreeterWithObserverRef : InterfacedActorRef, IGreeterWithObserver, IGreeterWithObserver_NoReply
     {
+        public override Type InterfaceType => typeof(IGreeterWithObserver);
+
         public GreeterWithObserverRef() : base(null)
         {
         }
@@ -272,24 +258,6 @@ namespace Manual
         public GreeterWithObserverRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
         {
         }
-
-        public GreeterWithObserverRef(IActorRef actor) : base(new AkkaActorTarget(actor))
-        {
-        }
-
-        public GreeterWithObserverRef(IActorRef actor, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(new AkkaActorTarget(actor), requestWaiter, timeout)
-        {
-        }
-
-        public static implicit operator GreeterWithObserverRef(TypedActorRef typedActor)
-        {
-            InterfacedActorOfExtensions.CheckIfActorImplementsOrThrow(typedActor.Type, typeof(IGreeterWithObserver));
-            return new GreeterWithObserverRef(typedActor.Actor);
-        }
-
-        public IActorRef Actor => ((AkkaActorTarget)Target)?.Actor;
-
-        public override Type InterfaceType => typeof(IGreeterWithObserver);
 
         public IGreeterWithObserver_NoReply WithNoReply()
         {
