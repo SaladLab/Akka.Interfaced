@@ -9,6 +9,8 @@ namespace Akka.Interfaced
         public IRequestWaiter RequestWaiter { get; protected internal set; }
         public TimeSpan? Timeout { get; protected internal set; }
 
+        abstract public Type InterfaceType { get; }
+
         protected InterfacedActorRef(IRequestTarget target)
         {
             Target = target;

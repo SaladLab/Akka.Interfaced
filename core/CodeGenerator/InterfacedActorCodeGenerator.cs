@@ -357,6 +357,11 @@ namespace CodeGenerator
                     w._();
                 }
 
+                // InterfaceType property
+
+                w._($"public override Type InterfaceType => typeof({type.Name});");
+                w._();
+
                 // With Helpers
 
                 using (w.B($"public {noReplyInterfaceName} WithNoReply()"))
