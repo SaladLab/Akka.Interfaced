@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CodeGenerator
 {
@@ -126,23 +126,18 @@ namespace CodeGenerator
 
         public static string GetValueLiteral(object value)
         {
-            // NOTE: For simple implementation, escaping string is not considered.
+            var literal = SymbolDisplay.FormatPrimitive(value, true, false);
 
-            if (value == null)
-                return "null";
+            if (value != null)
+            {
+                var type = value.GetType();
+                if (type.IsEnum)
+                    return $"({type.FullName}){literal}";
+                if (type == typeof(float))
+                    return literal + "f";
+            }
 
-            var type = value.GetType();
-
-            if (type == typeof(string))
-                return string.Format("\"{0}\"", value);
-
-            if (type == typeof(char))
-                return string.Format("'{0}'", value);
-
-            if (type.IsEnum)
-                return string.Format("{0}.{1}", type.FullName, value);
-
-            return string.Format("{0}", value);
+            return literal;
         }
 
         public static IEnumerable<string> GetReachableMemebers(Type type, Func<Type, bool> filter)

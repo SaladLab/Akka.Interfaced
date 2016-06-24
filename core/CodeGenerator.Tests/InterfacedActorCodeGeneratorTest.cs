@@ -15,6 +15,22 @@ namespace CodeGenerator
         Task<int> GetCount();
     }
 
+    public enum TestEnum
+    {
+        Yes = 1,
+        No = 2,
+    }
+
+    public interface IDefaultValues : IInterfacedActor
+    {
+        Task Bool(bool a = false, bool b = true);
+        Task Integer(byte a = 1, short b = 2, int c = 3, long d = 4);
+        Task Float(float a = 3.14f, double b = 3.141592);
+        Task String(char a = '\0', string b = "abc\t");
+        Task Enum(TestEnum a = TestEnum.Yes);
+        Task Null(object a = null);
+    }
+
     public class InterfacedActorCodeGeneratorTest
     {
         private readonly ITestOutputHelper _output;
@@ -59,6 +75,13 @@ namespace CodeGenerator
                     "GreeterRef",
                 },
                 compilation.GetTypeSymbolNames());
+        }
+
+        [Fact]
+        public void GenerateActorCode_WithDefaultValues()
+        {
+            var compilation = TestUtility.Generate(new Options { UseSlimClient = true }, new[] { typeof(IDefaultValues) }, _output);
+            Assert.NotEmpty(compilation.GetTypeSymbolNames());
         }
     }
 }
