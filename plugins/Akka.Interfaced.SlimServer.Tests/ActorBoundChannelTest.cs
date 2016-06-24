@@ -97,13 +97,6 @@ namespace Akka.Interfaced.SlimServer
                 boundActor.Actor.Tell(message, Self);
             }
 
-            [MessageHandler]
-            private void Handle(string m)
-            {
-                if (m == "Close")
-                    Close();
-            }
-
             protected override void OnResponseMessage(ResponseMessage m)
             {
                 _requestMap[m.RequestId].Tell(m);
@@ -113,6 +106,11 @@ namespace Akka.Interfaced.SlimServer
             protected override void OnNotificationMessage(NotificationMessage m)
             {
                 _observerChannelMap[m.ObserverId].Notify(m);
+            }
+
+            protected override void OnCloseRequest()
+            {
+                Close();
             }
         }
 
@@ -426,7 +424,7 @@ namespace Akka.Interfaced.SlimServer
             Assert.NotNull(boundActor);
 
             // Act
-            channel.CastToIActorRef().Tell("Close");
+            channel.WithNoReply().Close();
             Watch(channel.CastToIActorRef());
             ExpectTerminated(channel.CastToIActorRef());
 
@@ -438,17 +436,16 @@ namespace Akka.Interfaced.SlimServer
         private async Task CloseChannel_SendInterfacedPoisonPill()
         {
             // Arrange
-            var channel = ActorOf<TestActorBoundChannel>();
-            var channelRef = channel.Cast<ActorBoundChannelRef>();
+            var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOfAsTestActorRef<DummyEventActor>();
             var dummyActor = dummy.UnderlyingActor;
-            var boundActor = await channelRef.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.CloseThenStop);
+            var boundActor = await channel.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.CloseThenStop);
             Assert.NotNull(boundActor);
 
             // Act
-            channel.Tell("Close");
-            Watch(channel);
-            ExpectTerminated(channel);
+            channel.WithNoReply().Close();
+            Watch(channel.CastToIActorRef());
+            ExpectTerminated(channel.CastToIActorRef());
 
             // Assert
             Assert.Null(dummyActor._typesInClosed);
@@ -462,7 +459,7 @@ namespace Akka.Interfaced.SlimServer
                 new[] { Tuple.Create(context.ActorOf<DummyEventActor>(null), new TaggedType[] { typeof(IDummy) }, ActorBindingFlags.CloseThenNotification) })).Cast<ActorBoundChannelRef>();
 
             // Act
-            channel.CastToIActorRef().Tell("Close");
+            channel.WithNoReply().Close();
             Watch(channel.CastToIActorRef());
             ExpectTerminated(channel.CastToIActorRef());
         }

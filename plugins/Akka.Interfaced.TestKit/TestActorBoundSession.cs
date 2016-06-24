@@ -148,6 +148,11 @@ namespace Akka.Interfaced.TestKit
             handler(message);
         }
 
+        protected override void OnCloseRequest()
+        {
+            Close();
+        }
+
         private Tuple<IActorRef, BoundType> BeginSendRequest(IRequestTarget target, RequestMessage requestMessage)
         {
             var actorId = ((BoundActorTarget)target).Id;

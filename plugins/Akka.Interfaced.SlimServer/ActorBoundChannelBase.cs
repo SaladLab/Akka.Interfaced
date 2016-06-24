@@ -51,6 +51,9 @@ namespace Akka.Interfaced.SlimServer
         // When NotificationMessage received
         protected abstract void OnNotificationMessage(NotificationMessage message);
 
+        // When requested to be closed by "IActorBoundChannel.Close"
+        protected abstract void OnCloseRequest();
+
         // Close channel and send channel-closed notification to bound actors.
         protected void Close()
         {
@@ -344,6 +347,12 @@ namespace Akka.Interfaced.SlimServer
                 throw new ArgumentNullException(nameof(actor));
 
             return UnbindType(actor, types);
+        }
+
+        [ResponsiveExceptionAll]
+        void IActorBoundChannelSync.Close()
+        {
+            OnCloseRequest();
         }
     }
 }

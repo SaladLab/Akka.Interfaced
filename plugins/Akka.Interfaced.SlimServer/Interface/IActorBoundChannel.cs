@@ -49,6 +49,7 @@ namespace Akka.Interfaced.SlimServer
         Task<bool> UnbindActor(IActorRef actor);
         Task<bool> BindType(IActorRef actor, TaggedType[] types);
         Task<bool> UnbindType(IActorRef actor, Type[] types);
+        Task Close();
     }
 
     public interface IActorBoundChannelObserver : IInterfacedObserver
