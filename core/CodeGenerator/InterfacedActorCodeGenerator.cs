@@ -68,20 +68,22 @@ namespace CodeGenerator
             using (w.B($"public class {surrogateClassName}"))
             {
                 w._($"[ProtoMember(1)] public int Id;");
+                w._($"[ProtoMember(2)] public string Address;");
                 w._();
 
                 w._("[ProtoConverter]");
                 using (w.B($"public static {surrogateClassName} Convert(IRequestTarget value)"))
                 {
                     w._($"if (value == null) return null;");
-                    w._($"return new {surrogateClassName} {{ Id = ((BoundActorTarget)value).Id }};");
+                    w._($"var target = ((BoundActorTarget)value);");
+                    w._($"return new {surrogateClassName} {{ Id = target.Id, Address = target.Address }};");
                 }
 
                 w._("[ProtoConverter]");
                 using (w.B($"public static IRequestTarget Convert({surrogateClassName} value)"))
                 {
                     w._($"if (value == null) return null;");
-                    w._($"return new BoundActorTarget(value.Id);");
+                    w._($"return new BoundActorTarget(value.Id, value.Address);");
                 }
             }
 
