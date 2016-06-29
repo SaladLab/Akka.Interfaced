@@ -27,6 +27,12 @@ namespace Akka.Interfaced.SlimServer
             private Dictionary<int, IActorRef> _requestMap = new Dictionary<int, IActorRef>();
             private Dictionary<int, INotificationChannel> _observerChannelMap = new Dictionary<int, INotificationChannel>();
 
+            public object Tag
+            {
+                get { return _tag; }
+                set { _tag = value; }
+            }
+
             public TestActorBoundChannel()
             {
             }
@@ -148,7 +154,8 @@ namespace Akka.Interfaced.SlimServer
 
         public class DummyEventActor : InterfacedActor, IDummySync, IDummyWithTagSync, IActorBoundChannelObserver
         {
-            internal TaggedType[] _typesInClosed;
+            internal object _tagByChannelOpen;
+            internal object _tagByChannelClose;
 
             object IDummySync.Call(object param)
             {
@@ -160,9 +167,14 @@ namespace Akka.Interfaced.SlimServer
                 return "CallWithTag:" + param + ":" + id;
             }
 
-            void IActorBoundChannelObserver.ChannelClose(TaggedType[] types)
+            void IActorBoundChannelObserver.ChannelOpen(IActorBoundChannel channel, object tag)
             {
-                _typesInClosed = types;
+                _tagByChannelOpen = tag;
+            }
+
+            void IActorBoundChannelObserver.ChannelClose(IActorBoundChannel channel, object tag)
+            {
+                _tagByChannelClose = tag;
                 Self.Tell(InterfacedPoisonPill.Instance);
             }
         }
@@ -414,10 +426,33 @@ namespace Akka.Interfaced.SlimServer
         }
 
         [Fact]
+        private async Task OpenChannel_SendOpenChannelNotification()
+        {
+            // Arrange
+            var channelActor = ActorOfAsTestActorRef<TestActorBoundChannel>();
+            channelActor.UnderlyingActor.Tag = "Tag";
+            var channel = channelActor.Cast<ActorBoundChannelRef>();
+            var dummy = ActorOfAsTestActorRef<DummyEventActor>();
+            var dummyActor = dummy.UnderlyingActor;
+            var boundActor = await channel.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.OpenThenNotification);
+            Assert.NotNull(boundActor);
+
+            // Act
+            channel.WithNoReply().Close();
+            Watch(channel.CastToIActorRef());
+            ExpectTerminated(channel.CastToIActorRef());
+
+            // Assert
+            Assert.Equal("Tag", dummyActor._tagByChannelOpen);
+        }
+
+        [Fact]
         private async Task CloseChannel_SendClosedChannelNotification()
         {
             // Arrange
-            var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
+            var channelActor = ActorOfAsTestActorRef<TestActorBoundChannel>();
+            channelActor.UnderlyingActor.Tag = "Tag";
+            var channel = channelActor.Cast<ActorBoundChannelRef>();
             var dummy = ActorOfAsTestActorRef<DummyEventActor>();
             var dummyActor = dummy.UnderlyingActor;
             var boundActor = await channel.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.CloseThenNotification);
@@ -429,14 +464,16 @@ namespace Akka.Interfaced.SlimServer
             ExpectTerminated(channel.CastToIActorRef());
 
             // Assert
-            Assert.Equal(new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, dummyActor._typesInClosed);
+            Assert.Equal("Tag", dummyActor._tagByChannelClose);
         }
 
         [Fact]
         private async Task CloseChannel_SendInterfacedPoisonPill()
         {
             // Arrange
-            var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
+            var channelActor = ActorOfAsTestActorRef<TestActorBoundChannel>();
+            channelActor.UnderlyingActor.Tag = "Tag";
+            var channel = channelActor.Cast<ActorBoundChannelRef>();
             var dummy = ActorOfAsTestActorRef<DummyEventActor>();
             var dummyActor = dummy.UnderlyingActor;
             var boundActor = await channel.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") }, ActorBindingFlags.CloseThenStop);
@@ -448,7 +485,7 @@ namespace Akka.Interfaced.SlimServer
             ExpectTerminated(channel.CastToIActorRef());
 
             // Assert
-            Assert.Null(dummyActor._typesInClosed);
+            Assert.Null(dummyActor._tagByChannelClose);
         }
 
         [Fact]

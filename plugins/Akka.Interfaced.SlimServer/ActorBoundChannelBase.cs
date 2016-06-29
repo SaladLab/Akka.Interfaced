@@ -39,6 +39,7 @@ namespace Akka.Interfaced.SlimServer
             }
         }
 
+        protected object _tag;
         private readonly object _boundActorLock = new object();
         private readonly Dictionary<int, BoundActor> _boundActorMap = new Dictionary<int, BoundActor>();
         private readonly Dictionary<IActorRef, int> _boundActorInverseMap = new Dictionary<IActorRef, int>();
@@ -68,7 +69,7 @@ namespace Akka.Interfaced.SlimServer
             {
                 foreach (var i in _boundActorMap)
                 {
-                    var notification = (ActorBindingFlags)((int)i.Value.BindingFlags & 0x3);
+                    var notification = (ActorBindingFlags)(((int)i.Value.BindingFlags) & (0x3 << 1));
                     if (notification == ActorBindingFlags.CloseThenDefault)
                     {
                         notification = i.Value.IsChildActor
@@ -87,7 +88,8 @@ namespace Akka.Interfaced.SlimServer
                             {
                                 InvokePayload = new IActorBoundChannelObserver_PayloadTable.ChannelClose_Invoke
                                 {
-                                    types = i.Value.Types.Select(t => new TaggedType(t.Type, t.TagValue)).ToArray()
+                                    channel = Self.Cast<ActorBoundChannelRef>(),
+                                    tag = _tag
                                 },
                             });
                             break;
@@ -202,6 +204,18 @@ namespace Akka.Interfaced.SlimServer
 
                 Context.Watch(actor);
 
+                if (bindingFlags.HasFlag(ActorBindingFlags.OpenThenNotification))
+                {
+                    actor.Tell(new NotificationMessage
+                    {
+                        InvokePayload = new IActorBoundChannelObserver_PayloadTable.ChannelOpen_Invoke
+                        {
+                            channel = Self.Cast<ActorBoundChannelRef>(),
+                            tag = _tag
+                        },
+                    });
+                }
+
                 return actorId;
             }
         }
@@ -290,6 +304,12 @@ namespace Akka.Interfaced.SlimServer
                 }
             }
             return derivedBoundTypes;
+        }
+
+        [ResponsiveExceptionAll]
+        void IActorBoundChannelSync.SetTag(object tag)
+        {
+            _tag = tag;
         }
 
         [ResponsiveExceptionAll]
