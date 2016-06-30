@@ -45,7 +45,7 @@ namespace HelloWorld.Interface
         public class GetCount_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -61,7 +61,7 @@ namespace HelloWorld.Interface
         public class Greet_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String name;
+            public string name;
 
             public Type GetInterfaceType()
             {
@@ -78,7 +78,7 @@ namespace HelloWorld.Interface
         public class Greet_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.String v;
+            public string v;
 
             public Type GetInterfaceType()
             {
@@ -95,7 +95,7 @@ namespace HelloWorld.Interface
     public interface IGreeter_NoReply
     {
         void GetCount();
-        void Greet(System.String name);
+        void Greet(string name);
     }
 
     public class GreeterRef : InterfacedActorRef, IGreeter, IGreeter_NoReply
@@ -129,20 +129,20 @@ namespace HelloWorld.Interface
             return new GreeterRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Int32> GetCount()
+        public Task<int> GetCount()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.GetCount_Invoke {  }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task<System.String> Greet(System.String name)
+        public Task<string> Greet(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
             };
-            return SendRequestAndReceive<System.String>(requestMessage);
+            return SendRequestAndReceive<string>(requestMessage);
         }
 
         void IGreeter_NoReply.GetCount()
@@ -153,7 +153,7 @@ namespace HelloWorld.Interface
             SendRequest(requestMessage);
         }
 
-        void IGreeter_NoReply.Greet(System.String name)
+        void IGreeter_NoReply.Greet(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
@@ -165,8 +165,8 @@ namespace HelloWorld.Interface
     [AlternativeInterface(typeof(IGreeter))]
     public interface IGreeterSync : IInterfacedActorSync
     {
-        System.Int32 GetCount();
-        System.String Greet(System.String name);
+        int GetCount();
+        string Greet(string name);
     }
 }
 

@@ -45,7 +45,7 @@ namespace Akka.Interfaced.TestKit.Tests
         public class GetId_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.String v;
+            public string v;
 
             public Type GetInterfaceType()
             {
@@ -61,7 +61,7 @@ namespace Akka.Interfaced.TestKit.Tests
         public class Say_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String message;
+            public string message;
 
             public Type GetInterfaceType()
             {
@@ -79,7 +79,7 @@ namespace Akka.Interfaced.TestKit.Tests
     public interface IUser_NoReply
     {
         void GetId();
-        void Say(System.String message);
+        void Say(string message);
     }
 
     public class UserRef : InterfacedActorRef, IUser, IUser_NoReply
@@ -113,15 +113,15 @@ namespace Akka.Interfaced.TestKit.Tests
             return new UserRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.String> GetId()
+        public Task<string> GetId()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IUser_PayloadTable.GetId_Invoke {  }
             };
-            return SendRequestAndReceive<System.String>(requestMessage);
+            return SendRequestAndReceive<string>(requestMessage);
         }
 
-        public Task Say(System.String message)
+        public Task Say(string message)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IUser_PayloadTable.Say_Invoke { message = message }
@@ -137,7 +137,7 @@ namespace Akka.Interfaced.TestKit.Tests
             SendRequest(requestMessage);
         }
 
-        void IUser_NoReply.Say(System.String message)
+        void IUser_NoReply.Say(string message)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IUser_PayloadTable.Say_Invoke { message = message }
@@ -149,8 +149,8 @@ namespace Akka.Interfaced.TestKit.Tests
     [AlternativeInterface(typeof(IUser))]
     public interface IUserSync : IInterfacedActorSync
     {
-        System.String GetId();
-        void Say(System.String message);
+        string GetId();
+        void Say(string message);
     }
 }
 
@@ -172,8 +172,8 @@ namespace Akka.Interfaced.TestKit.Tests
         public class Login_Invoke
             : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
         {
-            public System.String id;
-            public System.String password;
+            public string id;
+            public string password;
             public Akka.Interfaced.TestKit.Tests.IUserObserver observer;
 
             public Type GetInterfaceType()
@@ -223,7 +223,7 @@ namespace Akka.Interfaced.TestKit.Tests
 
     public interface IUserLogin_NoReply
     {
-        void Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer);
+        void Login(string id, string password, Akka.Interfaced.TestKit.Tests.IUserObserver observer);
     }
 
     public class UserLoginRef : InterfacedActorRef, IUserLogin, IUserLogin_NoReply
@@ -257,7 +257,7 @@ namespace Akka.Interfaced.TestKit.Tests
             return new UserLoginRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<Akka.Interfaced.TestKit.Tests.IUser> Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer)
+        public Task<Akka.Interfaced.TestKit.Tests.IUser> Login(string id, string password, Akka.Interfaced.TestKit.Tests.IUserObserver observer)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observer = (UserObserver)observer }
@@ -265,7 +265,7 @@ namespace Akka.Interfaced.TestKit.Tests
             return SendRequestAndReceive<Akka.Interfaced.TestKit.Tests.IUser>(requestMessage);
         }
 
-        void IUserLogin_NoReply.Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer)
+        void IUserLogin_NoReply.Login(string id, string password, Akka.Interfaced.TestKit.Tests.IUserObserver observer)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IUserLogin_PayloadTable.Login_Invoke { id = id, password = password, observer = (UserObserver)observer }
@@ -277,7 +277,7 @@ namespace Akka.Interfaced.TestKit.Tests
     [AlternativeInterface(typeof(IUserLogin))]
     public interface IUserLoginSync : IInterfacedActorSync
     {
-        Akka.Interfaced.TestKit.Tests.IUser Login(System.String id, System.String password, Akka.Interfaced.TestKit.Tests.IUserObserver observer);
+        Akka.Interfaced.TestKit.Tests.IUser Login(string id, string password, Akka.Interfaced.TestKit.Tests.IUserObserver observer);
     }
 }
 
@@ -298,7 +298,7 @@ namespace Akka.Interfaced.TestKit.Tests
 
         public class Say_Invoke : IInterfacedPayload, IInvokable
         {
-            public System.String message;
+            public string message;
 
             public Type GetInterfaceType()
             {
@@ -324,7 +324,7 @@ namespace Akka.Interfaced.TestKit.Tests
         {
         }
 
-        public void Say(System.String message)
+        public void Say(string message)
         {
             var payload = new IUserObserver_PayloadTable.Say_Invoke { message = message };
             Notify(payload);
@@ -334,7 +334,7 @@ namespace Akka.Interfaced.TestKit.Tests
     [AlternativeInterface(typeof(IUserObserver))]
     public interface IUserObserverAsync : IInterfacedObserverSync
     {
-        Task Say(System.String message);
+        Task Say(string message);
     }
 }
 

@@ -32,7 +32,7 @@ namespace Akka.Interfaced.LogFilter.Tests
         public class Call_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String value;
+            public string value;
 
             public Type GetInterfaceType()
             {
@@ -81,7 +81,7 @@ namespace Akka.Interfaced.LogFilter.Tests
         public class GetHelloCount_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -97,7 +97,7 @@ namespace Akka.Interfaced.LogFilter.Tests
         public class SayHello_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String name;
+            public string name;
 
             public Type GetInterfaceType()
             {
@@ -114,7 +114,7 @@ namespace Akka.Interfaced.LogFilter.Tests
         public class SayHello_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.String v;
+            public string v;
 
             public Type GetInterfaceType()
             {
@@ -130,10 +130,10 @@ namespace Akka.Interfaced.LogFilter.Tests
 
     public interface ITest_NoReply
     {
-        void Call(System.String value);
+        void Call(string value);
         void CallWithActor(Akka.Interfaced.LogFilter.Tests.ITest test);
         void GetHelloCount();
-        void SayHello(System.String name);
+        void SayHello(string name);
     }
 
     public class TestRef : InterfacedActorRef, ITest, ITest_NoReply
@@ -167,7 +167,7 @@ namespace Akka.Interfaced.LogFilter.Tests
             return new TestRef(Target, RequestWaiter, timeout);
         }
 
-        public Task Call(System.String value)
+        public Task Call(string value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ITest_PayloadTable.Call_Invoke { value = value }
@@ -183,23 +183,23 @@ namespace Akka.Interfaced.LogFilter.Tests
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task<System.Int32> GetHelloCount()
+        public Task<int> GetHelloCount()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ITest_PayloadTable.GetHelloCount_Invoke {  }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task<System.String> SayHello(System.String name)
+        public Task<string> SayHello(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ITest_PayloadTable.SayHello_Invoke { name = name }
             };
-            return SendRequestAndReceive<System.String>(requestMessage);
+            return SendRequestAndReceive<string>(requestMessage);
         }
 
-        void ITest_NoReply.Call(System.String value)
+        void ITest_NoReply.Call(string value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ITest_PayloadTable.Call_Invoke { value = value }
@@ -223,7 +223,7 @@ namespace Akka.Interfaced.LogFilter.Tests
             SendRequest(requestMessage);
         }
 
-        void ITest_NoReply.SayHello(System.String name)
+        void ITest_NoReply.SayHello(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ITest_PayloadTable.SayHello_Invoke { name = name }
@@ -235,10 +235,10 @@ namespace Akka.Interfaced.LogFilter.Tests
     [AlternativeInterface(typeof(ITest))]
     public interface ITestSync : IInterfacedActorSync
     {
-        void Call(System.String value);
+        void Call(string value);
         void CallWithActor(Akka.Interfaced.LogFilter.Tests.ITest test);
-        System.Int32 GetHelloCount();
-        System.String SayHello(System.String name);
+        int GetHelloCount();
+        string SayHello(string name);
     }
 }
 

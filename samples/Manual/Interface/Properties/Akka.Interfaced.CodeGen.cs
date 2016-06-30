@@ -45,7 +45,7 @@ namespace Manual
         public class GetCount_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -61,7 +61,7 @@ namespace Manual
         public class Greet_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String name;
+            public string name;
 
             public Type GetInterfaceType()
             {
@@ -78,7 +78,7 @@ namespace Manual
         public class Greet_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.String v;
+            public string v;
 
             public Type GetInterfaceType()
             {
@@ -95,7 +95,7 @@ namespace Manual
     public interface IGreeter_NoReply
     {
         void GetCount();
-        void Greet(System.String name);
+        void Greet(string name);
     }
 
     public class GreeterRef : InterfacedActorRef, IGreeter, IGreeter_NoReply
@@ -129,20 +129,20 @@ namespace Manual
             return new GreeterRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Int32> GetCount()
+        public Task<int> GetCount()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.GetCount_Invoke {  }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task<System.String> Greet(System.String name)
+        public Task<string> Greet(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
             };
-            return SendRequestAndReceive<System.String>(requestMessage);
+            return SendRequestAndReceive<string>(requestMessage);
         }
 
         void IGreeter_NoReply.GetCount()
@@ -153,7 +153,7 @@ namespace Manual
             SendRequest(requestMessage);
         }
 
-        void IGreeter_NoReply.Greet(System.String name)
+        void IGreeter_NoReply.Greet(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
@@ -165,8 +165,8 @@ namespace Manual
     [AlternativeInterface(typeof(IGreeter))]
     public interface IGreeterSync : IInterfacedActorSync
     {
-        System.Int32 GetCount();
-        System.String Greet(System.String name);
+        int GetCount();
+        string Greet(string name);
     }
 }
 
@@ -290,20 +290,20 @@ namespace Manual
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task<System.Int32> GetCount()
+        public Task<int> GetCount()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.GetCount_Invoke {  }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task<System.String> Greet(System.String name)
+        public Task<string> Greet(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
             };
-            return SendRequestAndReceive<System.String>(requestMessage);
+            return SendRequestAndReceive<string>(requestMessage);
         }
 
         void IGreeterWithObserver_NoReply.Subscribe(Manual.IGreetObserver observer)
@@ -330,7 +330,7 @@ namespace Manual
             SendRequest(requestMessage);
         }
 
-        void IGreeter_NoReply.Greet(System.String name)
+        void IGreeter_NoReply.Greet(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
@@ -364,7 +364,7 @@ namespace Manual
 
         public class Event_Invoke : IInterfacedPayload, IInvokable
         {
-            public System.String message;
+            public string message;
 
             public Type GetInterfaceType()
             {
@@ -390,7 +390,7 @@ namespace Manual
         {
         }
 
-        public void Event(System.String message)
+        public void Event(string message)
         {
             var payload = new IGreetObserver_PayloadTable.Event_Invoke { message = message };
             Notify(payload);
@@ -400,7 +400,7 @@ namespace Manual
     [AlternativeInterface(typeof(IGreetObserver))]
     public interface IGreetObserverAsync : IInterfacedObserverSync
     {
-        Task Event(System.String message);
+        Task Event(string message);
     }
 }
 

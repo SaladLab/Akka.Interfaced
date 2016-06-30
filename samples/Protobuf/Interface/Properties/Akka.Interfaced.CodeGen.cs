@@ -50,7 +50,7 @@ namespace Protobuf.Interface
         public class GetHelloCount_Return
             : IInterfacedPayload, IValueGetable
         {
-            [ProtoMember(1)] public System.Int32 v;
+            [ProtoMember(1)] public int v;
 
             public Type GetInterfaceType()
             {
@@ -67,7 +67,7 @@ namespace Protobuf.Interface
         public class SayHello_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            [ProtoMember(1)] public System.String name;
+            [ProtoMember(1)] public string name;
 
             public Type GetInterfaceType()
             {
@@ -85,7 +85,7 @@ namespace Protobuf.Interface
         public class SayHello_Return
             : IInterfacedPayload, IValueGetable
         {
-            [ProtoMember(1)] public System.String v;
+            [ProtoMember(1)] public string v;
 
             public Type GetInterfaceType()
             {
@@ -102,7 +102,7 @@ namespace Protobuf.Interface
     public interface IHelloWorld_NoReply
     {
         void GetHelloCount();
-        void SayHello(System.String name);
+        void SayHello(string name);
     }
 
     public class HelloWorldRef : InterfacedActorRef, IHelloWorld, IHelloWorld_NoReply
@@ -136,20 +136,20 @@ namespace Protobuf.Interface
             return new HelloWorldRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Int32> GetHelloCount()
+        public Task<int> GetHelloCount()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IHelloWorld_PayloadTable.GetHelloCount_Invoke {  }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task<System.String> SayHello(System.String name)
+        public Task<string> SayHello(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
             };
-            return SendRequestAndReceive<System.String>(requestMessage);
+            return SendRequestAndReceive<string>(requestMessage);
         }
 
         void IHelloWorld_NoReply.GetHelloCount()
@@ -160,7 +160,7 @@ namespace Protobuf.Interface
             SendRequest(requestMessage);
         }
 
-        void IHelloWorld_NoReply.SayHello(System.String name)
+        void IHelloWorld_NoReply.SayHello(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IHelloWorld_PayloadTable.SayHello_Invoke { name = name }
@@ -192,8 +192,8 @@ namespace Protobuf.Interface
     [AlternativeInterface(typeof(IHelloWorld))]
     public interface IHelloWorldSync : IInterfacedActorSync
     {
-        System.Int32 GetHelloCount();
-        System.String SayHello(System.String name);
+        int GetHelloCount();
+        string SayHello(string name);
     }
 }
 
@@ -237,7 +237,7 @@ namespace Protobuf.Interface
         public class TestOptional_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            [ProtoMember(1)] public System.Nullable<System.Int32> value;
+            [ProtoMember(1)] public System.Nullable<int> value;
 
             public Type GetInterfaceType()
             {
@@ -255,7 +255,7 @@ namespace Protobuf.Interface
         public class TestOptional_Return
             : IInterfacedPayload, IValueGetable
         {
-            [ProtoMember(1)] public System.Nullable<System.Int32> v;
+            [ProtoMember(1)] public System.Nullable<int> v;
 
             public Type GetInterfaceType()
             {
@@ -325,7 +325,7 @@ namespace Protobuf.Interface
         public class TestPassClass_Return
             : IInterfacedPayload, IValueGetable
         {
-            [ProtoMember(1)] public System.String v;
+            [ProtoMember(1)] public string v;
 
             public Type GetInterfaceType()
             {
@@ -342,8 +342,8 @@ namespace Protobuf.Interface
         public class TestReturnClass_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            [ProtoMember(1)] public System.Int32 value;
-            [ProtoMember(2)] public System.Int32 offset;
+            [ProtoMember(1)] public int value;
+            [ProtoMember(2)] public int offset;
 
             public Type GetInterfaceType()
             {
@@ -378,7 +378,7 @@ namespace Protobuf.Interface
         public class TestTuple_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            [ProtoMember(1)] public System.Tuple<System.Int32, System.String> value;
+            [ProtoMember(1)] public System.Tuple<int, string> value;
 
             public Type GetInterfaceType()
             {
@@ -396,7 +396,7 @@ namespace Protobuf.Interface
         public class TestTuple_Return
             : IInterfacedPayload, IValueGetable
         {
-            [ProtoMember(1)] public System.Tuple<System.Int32, System.String> v;
+            [ProtoMember(1)] public System.Tuple<int, string> v;
 
             public Type GetInterfaceType()
             {
@@ -413,11 +413,11 @@ namespace Protobuf.Interface
     public interface IPedantic_NoReply
     {
         void TestCall();
-        void TestOptional(System.Nullable<System.Int32> value);
+        void TestOptional(System.Nullable<int> value);
         void TestParams(params System.Int32[] values);
         void TestPassClass(Protobuf.Interface.TestParam param);
-        void TestReturnClass(System.Int32 value, System.Int32 offset);
-        void TestTuple(System.Tuple<System.Int32, System.String> value);
+        void TestReturnClass(int value, int offset);
+        void TestTuple(System.Tuple<int, string> value);
     }
 
     public class PedanticRef : InterfacedActorRef, IPedantic, IPedantic_NoReply
@@ -459,12 +459,12 @@ namespace Protobuf.Interface
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task<System.Nullable<System.Int32>> TestOptional(System.Nullable<System.Int32> value)
+        public Task<System.Nullable<int>> TestOptional(System.Nullable<int> value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = value }
             };
-            return SendRequestAndReceive<System.Nullable<System.Int32>>(requestMessage);
+            return SendRequestAndReceive<System.Nullable<int>>(requestMessage);
         }
 
         public Task<System.Int32[]> TestParams(params System.Int32[] values)
@@ -475,15 +475,15 @@ namespace Protobuf.Interface
             return SendRequestAndReceive<System.Int32[]>(requestMessage);
         }
 
-        public Task<System.String> TestPassClass(Protobuf.Interface.TestParam param)
+        public Task<string> TestPassClass(Protobuf.Interface.TestParam param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestPassClass_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.String>(requestMessage);
+            return SendRequestAndReceive<string>(requestMessage);
         }
 
-        public Task<Protobuf.Interface.TestResult> TestReturnClass(System.Int32 value, System.Int32 offset)
+        public Task<Protobuf.Interface.TestResult> TestReturnClass(int value, int offset)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestReturnClass_Invoke { value = value, offset = offset }
@@ -491,12 +491,12 @@ namespace Protobuf.Interface
             return SendRequestAndReceive<Protobuf.Interface.TestResult>(requestMessage);
         }
 
-        public Task<System.Tuple<System.Int32, System.String>> TestTuple(System.Tuple<System.Int32, System.String> value)
+        public Task<System.Tuple<int, string>> TestTuple(System.Tuple<int, string> value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = value }
             };
-            return SendRequestAndReceive<System.Tuple<System.Int32, System.String>>(requestMessage);
+            return SendRequestAndReceive<System.Tuple<int, string>>(requestMessage);
         }
 
         void IPedantic_NoReply.TestCall()
@@ -507,7 +507,7 @@ namespace Protobuf.Interface
             SendRequest(requestMessage);
         }
 
-        void IPedantic_NoReply.TestOptional(System.Nullable<System.Int32> value)
+        void IPedantic_NoReply.TestOptional(System.Nullable<int> value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = value }
@@ -531,7 +531,7 @@ namespace Protobuf.Interface
             SendRequest(requestMessage);
         }
 
-        void IPedantic_NoReply.TestReturnClass(System.Int32 value, System.Int32 offset)
+        void IPedantic_NoReply.TestReturnClass(int value, int offset)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestReturnClass_Invoke { value = value, offset = offset }
@@ -539,7 +539,7 @@ namespace Protobuf.Interface
             SendRequest(requestMessage);
         }
 
-        void IPedantic_NoReply.TestTuple(System.Tuple<System.Int32, System.String> value)
+        void IPedantic_NoReply.TestTuple(System.Tuple<int, string> value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = value }
@@ -572,11 +572,11 @@ namespace Protobuf.Interface
     public interface IPedanticSync : IInterfacedActorSync
     {
         void TestCall();
-        System.Nullable<System.Int32> TestOptional(System.Nullable<System.Int32> value);
+        System.Nullable<int> TestOptional(System.Nullable<int> value);
         System.Int32[] TestParams(params System.Int32[] values);
-        System.String TestPassClass(Protobuf.Interface.TestParam param);
-        Protobuf.Interface.TestResult TestReturnClass(System.Int32 value, System.Int32 offset);
-        System.Tuple<System.Int32, System.String> TestTuple(System.Tuple<System.Int32, System.String> value);
+        string TestPassClass(Protobuf.Interface.TestParam param);
+        Protobuf.Interface.TestResult TestReturnClass(int value, int offset);
+        System.Tuple<int, string> TestTuple(System.Tuple<int, string> value);
     }
 }
 

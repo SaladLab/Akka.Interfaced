@@ -34,9 +34,9 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         public class Call_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            [ProtoMember(1)] public System.Int32 a;
-            [ProtoMember(2)] public System.Int32 b;
-            [ProtoMember(3)] public System.String c;
+            [ProtoMember(1)] public int a;
+            [ProtoMember(2)] public int b;
+            [ProtoMember(3)] public string c;
 
             public Type GetInterfaceType()
             {
@@ -54,9 +54,9 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
         public class CallWithDefault_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            [ProtoMember(1), DefaultValue(1)] public System.Int32 a = 1;
-            [ProtoMember(2), DefaultValue(2)] public System.Int32 b = 2;
-            [ProtoMember(3), DefaultValue("Test")] public System.String c = "Test";
+            [ProtoMember(1), DefaultValue(1)] public int a = 1;
+            [ProtoMember(2), DefaultValue(2)] public int b = 2;
+            [ProtoMember(3), DefaultValue("Test")] public string c = "Test";
 
             public Type GetInterfaceType()
             {
@@ -73,8 +73,8 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
 
     public interface IDefault_NoReply
     {
-        void Call(System.Int32 a, System.Int32 b, System.String c);
-        void CallWithDefault(System.Int32 a = 1, System.Int32 b = 2, System.String c = "Test");
+        void Call(int a, int b, string c);
+        void CallWithDefault(int a = 1, int b = 2, string c = "Test");
     }
 
     public class DefaultRef : InterfacedActorRef, IDefault, IDefault_NoReply
@@ -108,7 +108,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             return new DefaultRef(Target, RequestWaiter, timeout);
         }
 
-        public Task Call(System.Int32 a, System.Int32 b, System.String c)
+        public Task Call(int a, int b, string c)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDefault_PayloadTable.Call_Invoke { a = a, b = b, c = c }
@@ -116,7 +116,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task CallWithDefault(System.Int32 a = 1, System.Int32 b = 2, System.String c = "Test")
+        public Task CallWithDefault(int a = 1, int b = 2, string c = "Test")
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDefault_PayloadTable.CallWithDefault_Invoke { a = a, b = b, c = c }
@@ -124,7 +124,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             return SendRequestAndWait(requestMessage);
         }
 
-        void IDefault_NoReply.Call(System.Int32 a, System.Int32 b, System.String c)
+        void IDefault_NoReply.Call(int a, int b, string c)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDefault_PayloadTable.Call_Invoke { a = a, b = b, c = c }
@@ -132,7 +132,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
             SendRequest(requestMessage);
         }
 
-        void IDefault_NoReply.CallWithDefault(System.Int32 a, System.Int32 b, System.String c)
+        void IDefault_NoReply.CallWithDefault(int a, int b, string c)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDefault_PayloadTable.CallWithDefault_Invoke { a = a, b = b, c = c }
@@ -164,8 +164,8 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
     [AlternativeInterface(typeof(IDefault))]
     public interface IDefaultSync : IInterfacedActorSync
     {
-        void Call(System.Int32 a, System.Int32 b, System.String c);
-        void CallWithDefault(System.Int32 a = 1, System.Int32 b = 2, System.String c = "Test");
+        void Call(int a, int b, string c);
+        void CallWithDefault(int a = 1, int b = 2, string c = "Test");
     }
 }
 

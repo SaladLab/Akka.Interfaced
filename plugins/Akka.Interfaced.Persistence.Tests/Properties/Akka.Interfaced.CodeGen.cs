@@ -77,7 +77,7 @@ namespace Akka.Interfaced.Persistence.Tests
         public class GetDocument_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Collections.Generic.IList<System.String> v;
+            public System.Collections.Generic.IList<string> v;
 
             public Type GetInterfaceType()
             {
@@ -93,7 +93,7 @@ namespace Akka.Interfaced.Persistence.Tests
         public class Write_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String message;
+            public string message;
 
             public Type GetInterfaceType()
             {
@@ -113,7 +113,7 @@ namespace Akka.Interfaced.Persistence.Tests
         void Clear();
         void FlushSnapshot();
         void GetDocument();
-        void Write(System.String message);
+        void Write(string message);
     }
 
     public class NotepadRef : InterfacedActorRef, INotepad, INotepad_NoReply
@@ -163,15 +163,15 @@ namespace Akka.Interfaced.Persistence.Tests
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task<System.Collections.Generic.IList<System.String>> GetDocument()
+        public Task<System.Collections.Generic.IList<string>> GetDocument()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new INotepad_PayloadTable.GetDocument_Invoke {  }
             };
-            return SendRequestAndReceive<System.Collections.Generic.IList<System.String>>(requestMessage);
+            return SendRequestAndReceive<System.Collections.Generic.IList<string>>(requestMessage);
         }
 
-        public Task Write(System.String message)
+        public Task Write(string message)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new INotepad_PayloadTable.Write_Invoke { message = message }
@@ -203,7 +203,7 @@ namespace Akka.Interfaced.Persistence.Tests
             SendRequest(requestMessage);
         }
 
-        void INotepad_NoReply.Write(System.String message)
+        void INotepad_NoReply.Write(string message)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new INotepad_PayloadTable.Write_Invoke { message = message }
@@ -217,8 +217,8 @@ namespace Akka.Interfaced.Persistence.Tests
     {
         void Clear();
         void FlushSnapshot();
-        System.Collections.Generic.IList<System.String> GetDocument();
-        void Write(System.String message);
+        System.Collections.Generic.IList<string> GetDocument();
+        void Write(string message);
     }
 }
 

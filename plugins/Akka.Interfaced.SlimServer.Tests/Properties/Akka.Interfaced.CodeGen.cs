@@ -29,7 +29,7 @@ namespace Akka.Interfaced.SlimServer
         public class Call_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Object param;
+            public object param;
 
             public Type GetInterfaceType()
             {
@@ -46,7 +46,7 @@ namespace Akka.Interfaced.SlimServer
         public class Call_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Object v;
+            public object v;
 
             public Type GetInterfaceType()
             {
@@ -62,7 +62,7 @@ namespace Akka.Interfaced.SlimServer
 
     public interface IDummy_NoReply
     {
-        void Call(System.Object param);
+        void Call(object param);
     }
 
     public class DummyRef : InterfacedActorRef, IDummy, IDummy_NoReply
@@ -96,15 +96,15 @@ namespace Akka.Interfaced.SlimServer
             return new DummyRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Object> Call(System.Object param)
+        public Task<object> Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        void IDummy_NoReply.Call(System.Object param)
+        void IDummy_NoReply.Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
@@ -116,7 +116,7 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(IDummy))]
     public interface IDummySync : IInterfacedActorSync
     {
-        System.Object Call(System.Object param);
+        object Call(object param);
     }
 }
 
@@ -138,7 +138,7 @@ namespace Akka.Interfaced.SlimServer
         public class CallEx_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Object param;
+            public object param;
 
             public Type GetInterfaceType()
             {
@@ -155,7 +155,7 @@ namespace Akka.Interfaced.SlimServer
         public class CallEx_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Object v;
+            public object v;
 
             public Type GetInterfaceType()
             {
@@ -171,7 +171,7 @@ namespace Akka.Interfaced.SlimServer
 
     public interface IDummyEx_NoReply : IDummy_NoReply
     {
-        void CallEx(System.Object param);
+        void CallEx(object param);
     }
 
     public class DummyExRef : InterfacedActorRef, IDummyEx, IDummyEx_NoReply
@@ -205,23 +205,23 @@ namespace Akka.Interfaced.SlimServer
             return new DummyExRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Object> CallEx(System.Object param)
+        public Task<object> CallEx(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        public Task<System.Object> Call(System.Object param)
+        public Task<object> Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        void IDummyEx_NoReply.CallEx(System.Object param)
+        void IDummyEx_NoReply.CallEx(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
@@ -229,7 +229,7 @@ namespace Akka.Interfaced.SlimServer
             SendRequest(requestMessage);
         }
 
-        void IDummy_NoReply.Call(System.Object param)
+        void IDummy_NoReply.Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
@@ -241,7 +241,7 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(IDummyEx))]
     public interface IDummyExSync : IDummySync
     {
-        System.Object CallEx(System.Object param);
+        object CallEx(object param);
     }
 }
 
@@ -263,7 +263,7 @@ namespace Akka.Interfaced.SlimServer
         public class CallEx2_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Object param;
+            public object param;
 
             public Type GetInterfaceType()
             {
@@ -280,7 +280,7 @@ namespace Akka.Interfaced.SlimServer
         public class CallEx2_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Object v;
+            public object v;
 
             public Type GetInterfaceType()
             {
@@ -296,7 +296,7 @@ namespace Akka.Interfaced.SlimServer
 
     public interface IDummyEx2_NoReply : IDummy_NoReply
     {
-        void CallEx2(System.Object param);
+        void CallEx2(object param);
     }
 
     public class DummyEx2Ref : InterfacedActorRef, IDummyEx2, IDummyEx2_NoReply
@@ -330,23 +330,23 @@ namespace Akka.Interfaced.SlimServer
             return new DummyEx2Ref(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Object> CallEx2(System.Object param)
+        public Task<object> CallEx2(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        public Task<System.Object> Call(System.Object param)
+        public Task<object> Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        void IDummyEx2_NoReply.CallEx2(System.Object param)
+        void IDummyEx2_NoReply.CallEx2(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
@@ -354,7 +354,7 @@ namespace Akka.Interfaced.SlimServer
             SendRequest(requestMessage);
         }
 
-        void IDummy_NoReply.Call(System.Object param)
+        void IDummy_NoReply.Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
@@ -366,7 +366,7 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(IDummyEx2))]
     public interface IDummyEx2Sync : IDummySync
     {
-        System.Object CallEx2(System.Object param);
+        object CallEx2(object param);
     }
 }
 
@@ -388,7 +388,7 @@ namespace Akka.Interfaced.SlimServer
         public class CallExFinal_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Object param;
+            public object param;
 
             public Type GetInterfaceType()
             {
@@ -405,7 +405,7 @@ namespace Akka.Interfaced.SlimServer
         public class CallExFinal_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Object v;
+            public object v;
 
             public Type GetInterfaceType()
             {
@@ -421,7 +421,7 @@ namespace Akka.Interfaced.SlimServer
 
     public interface IDummyExFinal_NoReply : IDummyEx_NoReply, IDummy_NoReply, IDummyEx2_NoReply
     {
-        void CallExFinal(System.Object param);
+        void CallExFinal(object param);
     }
 
     public class DummyExFinalRef : InterfacedActorRef, IDummyExFinal, IDummyExFinal_NoReply
@@ -455,39 +455,39 @@ namespace Akka.Interfaced.SlimServer
             return new DummyExFinalRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Object> CallExFinal(System.Object param)
+        public Task<object> CallExFinal(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyExFinal_PayloadTable.CallExFinal_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        public Task<System.Object> CallEx(System.Object param)
+        public Task<object> CallEx(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        public Task<System.Object> Call(System.Object param)
+        public Task<object> Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        public Task<System.Object> CallEx2(System.Object param)
+        public Task<object> CallEx2(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        void IDummyExFinal_NoReply.CallExFinal(System.Object param)
+        void IDummyExFinal_NoReply.CallExFinal(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyExFinal_PayloadTable.CallExFinal_Invoke { param = param }
@@ -495,7 +495,7 @@ namespace Akka.Interfaced.SlimServer
             SendRequest(requestMessage);
         }
 
-        void IDummyEx_NoReply.CallEx(System.Object param)
+        void IDummyEx_NoReply.CallEx(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
@@ -503,7 +503,7 @@ namespace Akka.Interfaced.SlimServer
             SendRequest(requestMessage);
         }
 
-        void IDummy_NoReply.Call(System.Object param)
+        void IDummy_NoReply.Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
@@ -511,7 +511,7 @@ namespace Akka.Interfaced.SlimServer
             SendRequest(requestMessage);
         }
 
-        void IDummyEx2_NoReply.CallEx2(System.Object param)
+        void IDummyEx2_NoReply.CallEx2(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
@@ -523,7 +523,7 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(IDummyExFinal))]
     public interface IDummyExFinalSync : IDummyExSync, IDummySync, IDummyEx2Sync
     {
-        System.Object CallExFinal(System.Object param);
+        object CallExFinal(object param);
     }
 }
 
@@ -545,8 +545,8 @@ namespace Akka.Interfaced.SlimServer
         public class CallWithTag_Invoke
             : IInterfacedPayload, IAsyncInvokable, IPayloadTagOverridable
         {
-            public System.Object param;
-            public System.String id;
+            public object param;
+            public string id;
 
             public Type GetInterfaceType()
             {
@@ -561,14 +561,14 @@ namespace Akka.Interfaced.SlimServer
 
             void IPayloadTagOverridable.SetTag(object value)
             {
-                id = (System.String)value;
+                id = (string)value;
             }
         }
 
         public class CallWithTag_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Object v;
+            public object v;
 
             public Type GetInterfaceType()
             {
@@ -584,7 +584,7 @@ namespace Akka.Interfaced.SlimServer
 
     public interface IDummyWithTag_NoReply
     {
-        void CallWithTag(System.Object param, System.String id = null);
+        void CallWithTag(object param, string id = null);
     }
 
     public class DummyWithTagRef : InterfacedActorRef, IDummyWithTag, IDummyWithTag_NoReply
@@ -618,15 +618,15 @@ namespace Akka.Interfaced.SlimServer
             return new DummyWithTagRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Object> CallWithTag(System.Object param, System.String id = null)
+        public Task<object> CallWithTag(object param, string id = null)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyWithTag_PayloadTable.CallWithTag_Invoke { param = param, id = id }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        void IDummyWithTag_NoReply.CallWithTag(System.Object param, System.String id)
+        void IDummyWithTag_NoReply.CallWithTag(object param, string id)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyWithTag_PayloadTable.CallWithTag_Invoke { param = param, id = id }
@@ -638,7 +638,7 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(IDummyWithTag))]
     public interface IDummyWithTagSync : IInterfacedActorSync
     {
-        System.Object CallWithTag(System.Object param, System.String id = null);
+        object CallWithTag(object param, string id = null);
     }
 }
 
@@ -662,7 +662,7 @@ namespace Akka.Interfaced.SlimServer
         public class MakeEvent_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -729,7 +729,7 @@ namespace Akka.Interfaced.SlimServer
 
     public interface ISubject_NoReply
     {
-        void MakeEvent(System.String eventName);
+        void MakeEvent(string eventName);
         void Subscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer);
         void Unsubscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer);
     }
@@ -765,7 +765,7 @@ namespace Akka.Interfaced.SlimServer
             return new SubjectRef(Target, RequestWaiter, timeout);
         }
 
-        public Task MakeEvent(System.String eventName)
+        public Task MakeEvent(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject_PayloadTable.MakeEvent_Invoke { eventName = eventName }
@@ -789,7 +789,7 @@ namespace Akka.Interfaced.SlimServer
             return SendRequestAndWait(requestMessage);
         }
 
-        void ISubject_NoReply.MakeEvent(System.String eventName)
+        void ISubject_NoReply.MakeEvent(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject_PayloadTable.MakeEvent_Invoke { eventName = eventName }
@@ -817,7 +817,7 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(ISubject))]
     public interface ISubjectSync : IInterfacedActorSync
     {
-        void MakeEvent(System.String eventName);
+        void MakeEvent(string eventName);
         void Subscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer);
         void Unsubscribe(Akka.Interfaced.SlimServer.ISubjectObserver observer);
     }
@@ -840,7 +840,7 @@ namespace Akka.Interfaced.SlimServer
 
         public class Event_Invoke : IInterfacedPayload, IInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -866,7 +866,7 @@ namespace Akka.Interfaced.SlimServer
         {
         }
 
-        public void Event(System.String eventName)
+        public void Event(string eventName)
         {
             var payload = new ISubjectObserver_PayloadTable.Event_Invoke { eventName = eventName };
             Notify(payload);
@@ -876,7 +876,7 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(ISubjectObserver))]
     public interface ISubjectObserverAsync : IInterfacedObserverSync
     {
-        Task Event(System.String eventName);
+        Task Event(string eventName);
     }
 }
 

@@ -30,8 +30,8 @@ namespace SlimHttp.Interface
         public class Concat_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String a;
-            public System.String b;
+            public string a;
+            public string b;
 
             public Type GetInterfaceType()
             {
@@ -48,7 +48,7 @@ namespace SlimHttp.Interface
         public class Concat_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.String v;
+            public string v;
 
             public Type GetInterfaceType()
             {
@@ -64,8 +64,8 @@ namespace SlimHttp.Interface
         public class Sum_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Int32 a;
-            public System.Int32 b;
+            public int a;
+            public int b;
 
             public Type GetInterfaceType()
             {
@@ -82,7 +82,7 @@ namespace SlimHttp.Interface
         public class Sum_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -98,8 +98,8 @@ namespace SlimHttp.Interface
 
     public interface ICalculator_NoReply
     {
-        void Concat(System.String a, System.String b);
-        void Sum(System.Int32 a, System.Int32 b);
+        void Concat(string a, string b);
+        void Sum(int a, int b);
     }
 
     public class CalculatorRef : InterfacedActorRef, ICalculator, ICalculator_NoReply
@@ -133,23 +133,23 @@ namespace SlimHttp.Interface
             return new CalculatorRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.String> Concat(System.String a, System.String b)
+        public Task<string> Concat(string a, string b)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ICalculator_PayloadTable.Concat_Invoke { a = a, b = b }
             };
-            return SendRequestAndReceive<System.String>(requestMessage);
+            return SendRequestAndReceive<string>(requestMessage);
         }
 
-        public Task<System.Int32> Sum(System.Int32 a, System.Int32 b)
+        public Task<int> Sum(int a, int b)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ICalculator_PayloadTable.Sum_Invoke { a = a, b = b }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        void ICalculator_NoReply.Concat(System.String a, System.String b)
+        void ICalculator_NoReply.Concat(string a, string b)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ICalculator_PayloadTable.Concat_Invoke { a = a, b = b }
@@ -157,7 +157,7 @@ namespace SlimHttp.Interface
             SendRequest(requestMessage);
         }
 
-        void ICalculator_NoReply.Sum(System.Int32 a, System.Int32 b)
+        void ICalculator_NoReply.Sum(int a, int b)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ICalculator_PayloadTable.Sum_Invoke { a = a, b = b }
@@ -169,8 +169,8 @@ namespace SlimHttp.Interface
     [AlternativeInterface(typeof(ICalculator))]
     public interface ICalculatorSync : IInterfacedActorSync
     {
-        System.String Concat(System.String a, System.String b);
-        System.Int32 Sum(System.Int32 a, System.Int32 b);
+        string Concat(string a, string b);
+        int Sum(int a, int b);
     }
 }
 
@@ -208,7 +208,7 @@ namespace SlimHttp.Interface
         public class GetCounter_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -224,7 +224,7 @@ namespace SlimHttp.Interface
         public class IncCounter_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Int32 delta;
+            public int delta;
 
             public Type GetInterfaceType()
             {
@@ -242,7 +242,7 @@ namespace SlimHttp.Interface
     public interface ICounter_NoReply
     {
         void GetCounter();
-        void IncCounter(System.Int32 delta);
+        void IncCounter(int delta);
     }
 
     public class CounterRef : InterfacedActorRef, ICounter, ICounter_NoReply
@@ -276,15 +276,15 @@ namespace SlimHttp.Interface
             return new CounterRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Int32> GetCounter()
+        public Task<int> GetCounter()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ICounter_PayloadTable.GetCounter_Invoke {  }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task IncCounter(System.Int32 delta)
+        public Task IncCounter(int delta)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ICounter_PayloadTable.IncCounter_Invoke { delta = delta }
@@ -300,7 +300,7 @@ namespace SlimHttp.Interface
             SendRequest(requestMessage);
         }
 
-        void ICounter_NoReply.IncCounter(System.Int32 delta)
+        void ICounter_NoReply.IncCounter(int delta)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ICounter_PayloadTable.IncCounter_Invoke { delta = delta }
@@ -312,8 +312,8 @@ namespace SlimHttp.Interface
     [AlternativeInterface(typeof(ICounter))]
     public interface ICounterSync : IInterfacedActorSync
     {
-        System.Int32 GetCounter();
-        void IncCounter(System.Int32 delta);
+        int GetCounter();
+        void IncCounter(int delta);
     }
 }
 
@@ -351,7 +351,7 @@ namespace SlimHttp.Interface
         public class GetCount_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -367,7 +367,7 @@ namespace SlimHttp.Interface
         public class Greet_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String name;
+            public string name;
 
             public Type GetInterfaceType()
             {
@@ -384,7 +384,7 @@ namespace SlimHttp.Interface
         public class Greet_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.String v;
+            public string v;
 
             public Type GetInterfaceType()
             {
@@ -401,7 +401,7 @@ namespace SlimHttp.Interface
     public interface IGreeter_NoReply
     {
         void GetCount();
-        void Greet(System.String name);
+        void Greet(string name);
     }
 
     public class GreeterRef : InterfacedActorRef, IGreeter, IGreeter_NoReply
@@ -435,20 +435,20 @@ namespace SlimHttp.Interface
             return new GreeterRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Int32> GetCount()
+        public Task<int> GetCount()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.GetCount_Invoke {  }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task<System.String> Greet(System.String name)
+        public Task<string> Greet(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
             };
-            return SendRequestAndReceive<System.String>(requestMessage);
+            return SendRequestAndReceive<string>(requestMessage);
         }
 
         void IGreeter_NoReply.GetCount()
@@ -459,7 +459,7 @@ namespace SlimHttp.Interface
             SendRequest(requestMessage);
         }
 
-        void IGreeter_NoReply.Greet(System.String name)
+        void IGreeter_NoReply.Greet(string name)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IGreeter_PayloadTable.Greet_Invoke { name = name }
@@ -471,8 +471,8 @@ namespace SlimHttp.Interface
     [AlternativeInterface(typeof(IGreeter))]
     public interface IGreeterSync : IInterfacedActorSync
     {
-        System.Int32 GetCount();
-        System.String Greet(System.String name);
+        int GetCount();
+        string Greet(string name);
     }
 }
 
@@ -514,7 +514,7 @@ namespace SlimHttp.Interface
         public class TestOptional_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Nullable<System.Int32> value;
+            public System.Nullable<int> value;
 
             public Type GetInterfaceType()
             {
@@ -531,7 +531,7 @@ namespace SlimHttp.Interface
         public class TestOptional_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Nullable<System.Int32> v;
+            public System.Nullable<int> v;
 
             public Type GetInterfaceType()
             {
@@ -597,7 +597,7 @@ namespace SlimHttp.Interface
         public class TestPassClass_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.String v;
+            public string v;
 
             public Type GetInterfaceType()
             {
@@ -613,8 +613,8 @@ namespace SlimHttp.Interface
         public class TestReturnClass_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Int32 value;
-            public System.Int32 offset;
+            public int value;
+            public int offset;
 
             public Type GetInterfaceType()
             {
@@ -647,7 +647,7 @@ namespace SlimHttp.Interface
         public class TestTuple_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Tuple<System.Int32, System.String> value;
+            public System.Tuple<int, string> value;
 
             public Type GetInterfaceType()
             {
@@ -664,7 +664,7 @@ namespace SlimHttp.Interface
         public class TestTuple_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Tuple<System.Int32, System.String> v;
+            public System.Tuple<int, string> v;
 
             public Type GetInterfaceType()
             {
@@ -681,11 +681,11 @@ namespace SlimHttp.Interface
     public interface IPedantic_NoReply
     {
         void TestCall();
-        void TestOptional(System.Nullable<System.Int32> value);
+        void TestOptional(System.Nullable<int> value);
         void TestParams(params System.Int32[] values);
         void TestPassClass(SlimHttp.Interface.TestParam param);
-        void TestReturnClass(System.Int32 value, System.Int32 offset);
-        void TestTuple(System.Tuple<System.Int32, System.String> value);
+        void TestReturnClass(int value, int offset);
+        void TestTuple(System.Tuple<int, string> value);
     }
 
     public class PedanticRef : InterfacedActorRef, IPedantic, IPedantic_NoReply
@@ -727,12 +727,12 @@ namespace SlimHttp.Interface
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task<System.Nullable<System.Int32>> TestOptional(System.Nullable<System.Int32> value)
+        public Task<System.Nullable<int>> TestOptional(System.Nullable<int> value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = value }
             };
-            return SendRequestAndReceive<System.Nullable<System.Int32>>(requestMessage);
+            return SendRequestAndReceive<System.Nullable<int>>(requestMessage);
         }
 
         public Task<System.Int32[]> TestParams(params System.Int32[] values)
@@ -743,15 +743,15 @@ namespace SlimHttp.Interface
             return SendRequestAndReceive<System.Int32[]>(requestMessage);
         }
 
-        public Task<System.String> TestPassClass(SlimHttp.Interface.TestParam param)
+        public Task<string> TestPassClass(SlimHttp.Interface.TestParam param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestPassClass_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.String>(requestMessage);
+            return SendRequestAndReceive<string>(requestMessage);
         }
 
-        public Task<SlimHttp.Interface.TestResult> TestReturnClass(System.Int32 value, System.Int32 offset)
+        public Task<SlimHttp.Interface.TestResult> TestReturnClass(int value, int offset)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestReturnClass_Invoke { value = value, offset = offset }
@@ -759,12 +759,12 @@ namespace SlimHttp.Interface
             return SendRequestAndReceive<SlimHttp.Interface.TestResult>(requestMessage);
         }
 
-        public Task<System.Tuple<System.Int32, System.String>> TestTuple(System.Tuple<System.Int32, System.String> value)
+        public Task<System.Tuple<int, string>> TestTuple(System.Tuple<int, string> value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = value }
             };
-            return SendRequestAndReceive<System.Tuple<System.Int32, System.String>>(requestMessage);
+            return SendRequestAndReceive<System.Tuple<int, string>>(requestMessage);
         }
 
         void IPedantic_NoReply.TestCall()
@@ -775,7 +775,7 @@ namespace SlimHttp.Interface
             SendRequest(requestMessage);
         }
 
-        void IPedantic_NoReply.TestOptional(System.Nullable<System.Int32> value)
+        void IPedantic_NoReply.TestOptional(System.Nullable<int> value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestOptional_Invoke { value = value }
@@ -799,7 +799,7 @@ namespace SlimHttp.Interface
             SendRequest(requestMessage);
         }
 
-        void IPedantic_NoReply.TestReturnClass(System.Int32 value, System.Int32 offset)
+        void IPedantic_NoReply.TestReturnClass(int value, int offset)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestReturnClass_Invoke { value = value, offset = offset }
@@ -807,7 +807,7 @@ namespace SlimHttp.Interface
             SendRequest(requestMessage);
         }
 
-        void IPedantic_NoReply.TestTuple(System.Tuple<System.Int32, System.String> value)
+        void IPedantic_NoReply.TestTuple(System.Tuple<int, string> value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IPedantic_PayloadTable.TestTuple_Invoke { value = value }
@@ -820,11 +820,11 @@ namespace SlimHttp.Interface
     public interface IPedanticSync : IInterfacedActorSync
     {
         void TestCall();
-        System.Nullable<System.Int32> TestOptional(System.Nullable<System.Int32> value);
+        System.Nullable<int> TestOptional(System.Nullable<int> value);
         System.Int32[] TestParams(params System.Int32[] values);
-        System.String TestPassClass(SlimHttp.Interface.TestParam param);
-        SlimHttp.Interface.TestResult TestReturnClass(System.Int32 value, System.Int32 offset);
-        System.Tuple<System.Int32, System.String> TestTuple(System.Tuple<System.Int32, System.String> value);
+        string TestPassClass(SlimHttp.Interface.TestParam param);
+        SlimHttp.Interface.TestResult TestReturnClass(int value, int offset);
+        System.Tuple<int, string> TestTuple(System.Tuple<int, string> value);
     }
 }
 
