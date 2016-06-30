@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Akka.Interfaced;
 using Xunit;
@@ -29,6 +26,16 @@ namespace CodeGenerator
         Task String(char a = '\0', string b = "abc\t");
         Task Enum(TestEnum a = TestEnum.Yes);
         Task Null(object a = null);
+    }
+
+    public interface IGeneric<T> : IInterfacedActor
+        where T : new()
+    {
+        Task<T> Create();
+        Task<T> Echo(T value);
+        Task<U> Echo<U>(U value);
+        Task<bool> Equal<U>(U value1, U value2)
+            where U : IEquatable<U>;
     }
 
     public class InterfacedActorCodeGeneratorTest
@@ -81,6 +88,13 @@ namespace CodeGenerator
         public void GenerateActorCode_WithDefaultValues()
         {
             var compilation = TestUtility.Generate(new Options { UseSlimClient = true }, new[] { typeof(IDefaultValues) }, _output);
+            Assert.NotEmpty(compilation.GetTypeSymbolNames());
+        }
+
+        [Fact]
+        public void GenerateActorCode_WithGeneric()
+        {
+            var compilation = TestUtility.Generate(new Options { UseSlimClient = true }, new[] { typeof(IGeneric<>) }, _output);
             Assert.NotEmpty(compilation.GetTypeSymbolNames());
         }
     }

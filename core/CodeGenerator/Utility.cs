@@ -8,6 +8,18 @@ namespace CodeGenerator
 {
     public static class Utility
     {
+        public static string GetReferenceDisplay(this Type type)
+        {
+            if (type.IsGenericType)
+            {
+                return type.GetPureName() + "<" + new string(',', type.GetTypeInfo().GenericTypeParameters.Count() - 1) + ">";
+            }
+            else
+            {
+                return type.Name;
+            }
+        }
+
         public static string GetTypeName(Type type)
         {
             if (type.IsGenericType)
@@ -16,10 +28,46 @@ namespace CodeGenerator
                 var delimiterPos = type.Name.IndexOf('`');
                 return type.Namespace + "." + type.Name.Substring(0, delimiterPos) + "<" + genericParams + ">";
             }
+            else if (type.IsGenericParameter)
+            {
+                return type.Name;
+            }
             else
             {
                 return type.FullName;
             }
+        }
+
+        public static string GetIdFromType(Type type)
+        {
+            if (type.IsGenericType)
+            {
+                return type.Name.Replace('`', '_');
+            }
+            else
+            {
+                return type.Name;
+            }
+        }
+
+        public static string GetPureName(this Type type)
+        {
+            if (type.IsGenericType)
+            {
+                var delimiterPos = type.Name.IndexOf('`');
+                return type.Name.Substring(0, delimiterPos);
+            }
+            else
+            {
+                return type.Name;
+            }
+        }
+
+        public static string GetGenericParameterDeclaration(this Type type)
+        {
+            return type.IsGenericType
+                ? "<" + string.Join(", ", type.GetTypeInfo().GenericTypeParameters.Select(t => t.Name)) + ">"
+                : "";
         }
 
         public static bool IsActorInterface(Type type)
@@ -42,35 +90,35 @@ namespace CodeGenerator
 
         public static string GetPayloadTableClassName(Type type)
         {
-            return type.Name + "_PayloadTable";
+            return type.GetPureName() + "_PayloadTable";
         }
 
         public static string GetNoReplyInterfaceName(Type type)
         {
-            return type.Name + "_NoReply";
+            return type.GetPureName() + "_NoReply";
         }
 
         public static string GetActorRefClassName(Type type)
         {
             // because user will type this type, no _ prefix.
-            return type.Name.Substring(1) + "Ref";
+            return type.GetPureName().Substring(1) + "Ref";
         }
 
         public static string GetActorSyncInterfaceName(Type type)
         {
             // because user will type this type, no _ prefix.
-            return type.Name + "Sync";
+            return type.GetPureName() + "Sync";
         }
 
         public static string GetObserverClassName(Type type)
         {
-            return type.Name.Substring(1);
+            return type.GetPureName().Substring(1);
         }
 
         public static string GetObserverAsyncInterfaceName(Type type)
         {
             // because user will type this type, no _ prefix.
-            return type.Name + "Async";
+            return type.GetPureName() + "Async";
         }
 
         public static string GetActorInterfaceTagName(Type type)
