@@ -42,8 +42,69 @@ namespace Akka.Interfaced
             }
         }
 
+        public class TestOverloadedSyncActor : InterfacedActor, IOverloadedSync
+        {
+            private LogBoard<string> _log;
+
+            public TestOverloadedSyncActor(LogBoard<string> log)
+            {
+                _log = log;
+            }
+
+            int IOverloadedSync.Min(int a, int b)
+            {
+                _log.Add($"Min({a}, {b})");
+                return Math.Min(a, b);
+            }
+
+            int IOverloadedSync.Min(int a, int b, int c)
+            {
+                _log.Add($"Min({a}, {b}, {c})");
+                return Math.Min(Math.Min(a, b), c);
+            }
+
+            int IOverloadedSync.Min(params int[] nums)
+            {
+                _log.Add($"Min({string.Join(", ", nums)})");
+                return nums.Min();
+            }
+        }
+
+        public class TestOverloadedExtendedActor : InterfacedActor, IExtendedInterface<IOverloaded>
+        {
+            private LogBoard<string> _log;
+
+            public TestOverloadedExtendedActor(LogBoard<string> log)
+            {
+                _log = log;
+            }
+
+            [ExtendedHandler]
+            private int Min(int a, int b)
+            {
+                _log.Add($"Min({a}, {b})");
+                return Math.Min(a, b);
+            }
+
+            [ExtendedHandler]
+            private int Min(int a, int b, int c)
+            {
+                _log.Add($"Min({a}, {b}, {c})");
+                return Math.Min(Math.Min(a, b), c);
+            }
+
+            [ExtendedHandler]
+            private Task<int> Min(params int[] nums)
+            {
+                _log.Add($"Min({string.Join(", ", nums)})");
+                return Task.FromResult(nums.Min());
+            }
+        }
+
         [Theory]
         [InlineData(typeof(TestOverloadedActor))]
+        [InlineData(typeof(TestOverloadedSyncActor))]
+        [InlineData(typeof(TestOverloadedExtendedActor))]
         public async Task Min2_Done(Type actorType)
         {
             // Arrange
@@ -60,6 +121,8 @@ namespace Akka.Interfaced
 
         [Theory]
         [InlineData(typeof(TestOverloadedActor))]
+        [InlineData(typeof(TestOverloadedSyncActor))]
+        [InlineData(typeof(TestOverloadedExtendedActor))]
         public async Task Min3_Done(Type actorType)
         {
             // Arrange
@@ -76,6 +139,8 @@ namespace Akka.Interfaced
 
         [Theory]
         [InlineData(typeof(TestOverloadedActor))]
+        [InlineData(typeof(TestOverloadedSyncActor))]
+        [InlineData(typeof(TestOverloadedExtendedActor))]
         public async Task Mins_Done(Type actorType)
         {
             // Arrange

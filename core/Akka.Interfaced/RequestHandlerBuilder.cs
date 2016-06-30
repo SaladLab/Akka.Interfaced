@@ -55,25 +55,10 @@ namespace Akka.Interfaced
                     var invokePayloadType = payloadTypeTable[i, 0];
                     var returnPayloadType = payloadTypeTable[i, 1];
                     var filterChain = _filterHandlerBuilder.Build(targetMethod, FilterChainKind.Request);
+                    var isSyncHandler = alternativeInterfaceAttribute != null && filterChain.AsyncFilterExists == false;
+                    var isReentrant = isSyncHandler == false && HandlerBuilderHelpers.IsReentrantMethod(targetMethod);
 
-                    if (alternativeInterfaceAttribute == null || filterChain.AsyncFilterExists)
-                    {
-                        _table.Add(invokePayloadType, new RequestHandlerItem
-                        {
-                            InterfaceType = ifs,
-                            IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
-                            AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
-                        });
-                    }
-                    else
-                    {
-                        _table.Add(invokePayloadType, new RequestHandlerItem
-                        {
-                            InterfaceType = ifs,
-                            IsReentrant = false,
-                            Handler = BuildHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
-                        });
-                    }
+                    AddHandler(ifs, targetMethod, invokePayloadType, returnPayloadType, filterChain, isSyncHandler, isReentrant);
                 }
             }
         }
@@ -152,28 +137,74 @@ namespace Akka.Interfaced
 
                     var isAsyncMethod = targetMethod.ReturnType.Name.StartsWith("Task");
                     var filterChain = _filterHandlerBuilder.Build(targetMethod, FilterChainKind.Request);
+                    var isSyncHandler = isAsyncMethod == false && filterChain.AsyncFilterExists == false;
+                    var isReentrant = isSyncHandler == false && HandlerBuilderHelpers.IsReentrantMethod(targetMethod);
 
-                    if (isAsyncMethod || filterChain.AsyncFilterExists)
-                    {
-                        _table.Add(invokePayloadType, new RequestHandlerItem
-                        {
-                            InterfaceType = ifs,
-                            IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
-                            AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
-                        });
-                    }
-                    else
-                    {
-                        if (targetMethod.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
-                            throw new InvalidOperationException($"Async void handler is not supported. ({_type.FullName}.{targetMethod.Name})");
+                    if (isAsyncMethod == false && targetMethod.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+                        throw new InvalidOperationException($"Async void handler is not supported. ({_type.FullName}.{targetMethod.Name})");
 
-                        _table.Add(invokePayloadType, new RequestHandlerItem
+                    AddHandler(ifs, targetMethod, invokePayloadType, returnPayloadType, filterChain, isSyncHandler, isReentrant);
+                }
+            }
+        }
+
+        private void AddHandler(Type interfaceType, MethodInfo targetMethod, Type invokePayloadType, Type returnPayloadType, FilterChain filterChain, bool isSyncHandler, bool isReentrant)
+        {
+            if (targetMethod.IsGenericMethod == false)
+            {
+                if (isSyncHandler)
+                {
+                    _table.Add(invokePayloadType, new RequestHandlerItem
+                    {
+                        InterfaceType = interfaceType,
+                        IsReentrant = isReentrant,
+                        Handler = BuildHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
+                    });
+                }
+                else
+                {
+                    _table.Add(invokePayloadType, new RequestHandlerItem
+                    {
+                        InterfaceType = interfaceType,
+                        IsReentrant = isReentrant,
+                        AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
+                    });
+                }
+            }
+            else
+            {
+                // because a generic method needs parameter types to construct handler
+                // so factory method is built to generate the handler when paramter types are ready
+
+                if (isSyncHandler)
+                {
+                    _table.Add(invokePayloadType, new RequestHandlerItem
+                    {
+                        InterfaceType = interfaceType,
+                        IsReentrant = isReentrant,
+                        IsGeneric = true,
+                        GenericHandlerBuilder = t => new RequestHandlerItem
                         {
-                            InterfaceType = ifs,
-                            IsReentrant = false,
-                            Handler = BuildHandler(_type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
-                        });
-                    }
+                            InterfaceType = interfaceType,
+                            IsReentrant = isReentrant,
+                            Handler = BuildGenericHandler(t, _type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
+                        }
+                    });
+                }
+                else
+                {
+                    _table.Add(invokePayloadType, new RequestHandlerItem
+                    {
+                        InterfaceType = interfaceType,
+                        IsReentrant = isReentrant,
+                        IsGeneric = true,
+                        GenericHandlerBuilder = t => new RequestHandlerItem
+                        {
+                            InterfaceType = interfaceType,
+                            IsReentrant = isReentrant,
+                            AsyncHandler = BuildGenericAsyncHandler(t, _type, invokePayloadType, returnPayloadType, targetMethod, filterChain)
+                        }
+                    });
                 }
             }
         }
@@ -436,6 +467,26 @@ namespace Akka.Interfaced
 
                 return response;
             };
+        }
+
+        private static RequestHandler BuildGenericHandler(
+            Type messageType, Type targetType, Type invokePayloadType, Type returnPayloadType, MethodInfo method, FilterChain filterChain)
+        {
+            var argTypes = messageType.GetGenericArguments();
+            var genericInvokePayloadType = invokePayloadType.MakeGenericType(argTypes);
+            var genericReturnPayloadType = returnPayloadType.MakeGenericType(argTypes);
+            var genericMethod = method.MakeGenericMethod(argTypes.Skip(targetType.GetGenericArguments().Length).ToArray());
+            return BuildHandler(targetType, genericInvokePayloadType, genericReturnPayloadType, genericMethod, filterChain);
+        }
+
+        private static RequestAsyncHandler BuildGenericAsyncHandler(
+            Type messageType, Type targetType, Type invokePayloadType, Type returnPayloadType, MethodInfo method, FilterChain filterChain)
+        {
+            var argTypes = messageType.GetGenericArguments();
+            var genericInvokePayloadType = invokePayloadType.MakeGenericType(argTypes);
+            var genericReturnPayloadType = returnPayloadType.MakeGenericType(argTypes);
+            var genericMethod = method.MakeGenericMethod(argTypes.Skip(targetType.GetGenericArguments().Length).ToArray());
+            return BuildAsyncHandler(targetType, genericInvokePayloadType, genericReturnPayloadType, genericMethod, filterChain);
         }
 
         private static Type[,] GetInterfacePayloadTypeTable(Type interfaceType)

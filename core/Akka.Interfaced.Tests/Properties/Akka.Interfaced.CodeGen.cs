@@ -1522,6 +1522,272 @@ namespace Akka.Interfaced
 }
 
 #endregion
+#region Akka.Interfaced.IOverloadedGeneric<T>
+
+namespace Akka.Interfaced
+{
+    [PayloadTable(typeof(IOverloadedGeneric<>), PayloadTableKind.Request)]
+    public static class IOverloadedGeneric_PayloadTable<T> where T : new()
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(GetDefault_Invoke), typeof(GetDefault_Return) },
+                { typeof(Min_Invoke<>), typeof(Min_Return<>) },
+                { typeof(Min_2_Invoke<>), typeof(Min_2_Return<>) },
+                { typeof(Min_3_Invoke<>), typeof(Min_3_Return<>) },
+            };
+        }
+
+        public class GetDefault_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IOverloadedGeneric<T>)__target).GetDefault();
+                return (IValueGetable)(new GetDefault_Return { v = __v });
+            }
+        }
+
+        public class GetDefault_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public T v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric<T>);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+
+        public class Min_Invoke<U>
+            : IInterfacedPayload, IAsyncInvokable where U : System.IComparable<U>
+        {
+            public U a;
+            public U b;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IOverloadedGeneric<T>)__target).Min(a, b);
+                return (IValueGetable)(new Min_Return<U> { v = __v });
+            }
+        }
+
+        public class Min_Return<U>
+            : IInterfacedPayload, IValueGetable where U : System.IComparable<U>
+        {
+            public U v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric<T>);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+
+        public class Min_2_Invoke<U>
+            : IInterfacedPayload, IAsyncInvokable where U : System.IComparable<U>
+        {
+            public U a;
+            public U b;
+            public U c;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IOverloadedGeneric<T>)__target).Min(a, b, c);
+                return (IValueGetable)(new Min_2_Return<U> { v = __v });
+            }
+        }
+
+        public class Min_2_Return<U>
+            : IInterfacedPayload, IValueGetable where U : System.IComparable<U>
+        {
+            public U v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric<T>);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+
+        public class Min_3_Invoke<U>
+            : IInterfacedPayload, IAsyncInvokable where U : System.IComparable<U>
+        {
+            public U[] nums;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IOverloadedGeneric<T>)__target).Min(nums);
+                return (IValueGetable)(new Min_3_Return<U> { v = __v });
+            }
+        }
+
+        public class Min_3_Return<U>
+            : IInterfacedPayload, IValueGetable where U : System.IComparable<U>
+        {
+            public U v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric<T>);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+    }
+
+    public interface IOverloadedGeneric_NoReply<T>
+    {
+        void GetDefault();
+        void Min<U>(U a, U b) where U : System.IComparable<U>;
+        void Min<U>(U a, U b, U c) where U : System.IComparable<U>;
+        void Min<U>(params U[] nums) where U : System.IComparable<U>;
+    }
+
+    public class OverloadedGenericRef<T> : InterfacedActorRef, IOverloadedGeneric<T>, IOverloadedGeneric_NoReply<T> where T : new()
+    {
+        public override Type InterfaceType => typeof(IOverloadedGeneric<T>);
+
+        public OverloadedGenericRef() : base(null)
+        {
+        }
+
+        public OverloadedGenericRef(IRequestTarget target) : base(target)
+        {
+        }
+
+        public OverloadedGenericRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
+        {
+        }
+
+        public IOverloadedGeneric_NoReply<T> WithNoReply()
+        {
+            return this;
+        }
+
+        public OverloadedGenericRef<T> WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new OverloadedGenericRef<T>(Target, requestWaiter, Timeout);
+        }
+
+        public OverloadedGenericRef<T> WithTimeout(TimeSpan? timeout)
+        {
+            return new OverloadedGenericRef<T>(Target, RequestWaiter, timeout);
+        }
+
+        public Task<T> GetDefault()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable<T>.GetDefault_Invoke {  }
+            };
+            return SendRequestAndReceive<T>(requestMessage);
+        }
+
+        public Task<U> Min<U>(U a, U b) where U : System.IComparable<U>
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable<T>.Min_Invoke<U> { a = a, b = b }
+            };
+            return SendRequestAndReceive<U>(requestMessage);
+        }
+
+        public Task<U> Min<U>(U a, U b, U c) where U : System.IComparable<U>
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable<T>.Min_2_Invoke<U> { a = a, b = b, c = c }
+            };
+            return SendRequestAndReceive<U>(requestMessage);
+        }
+
+        public Task<U> Min<U>(params U[] nums) where U : System.IComparable<U>
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable<T>.Min_3_Invoke<U> { nums = nums }
+            };
+            return SendRequestAndReceive<U>(requestMessage);
+        }
+
+        void IOverloadedGeneric_NoReply<T>.GetDefault()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable<T>.GetDefault_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IOverloadedGeneric_NoReply<T>.Min<U>(U a, U b)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable<T>.Min_Invoke<U> { a = a, b = b }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IOverloadedGeneric_NoReply<T>.Min<U>(U a, U b, U c)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable<T>.Min_2_Invoke<U> { a = a, b = b, c = c }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IOverloadedGeneric_NoReply<T>.Min<U>(params U[] nums)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable<T>.Min_3_Invoke<U> { nums = nums }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+
+    [AlternativeInterface(typeof(IOverloadedGeneric<>))]
+    public interface IOverloadedGenericSync<T> : IInterfacedActorSync where T : new()
+    {
+        T GetDefault();
+        U Min<U>(U a, U b) where U : System.IComparable<U>;
+        U Min<U>(U a, U b, U c) where U : System.IComparable<U>;
+        U Min<U>(params U[] nums) where U : System.IComparable<U>;
+    }
+}
+
+#endregion
 #region Akka.Interfaced.ISubject
 
 namespace Akka.Interfaced

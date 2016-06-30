@@ -18,8 +18,16 @@ namespace Akka.Interfaced
 
             for (int i = 0; i < a.Length; i++)
             {
-                if (a[i].ParameterType != b[i].ParameterType)
-                    return false;
+                if (a[i].ParameterType.ContainsGenericParameters)
+                {
+                    if (a[i].ParameterType.Name != b[i].ParameterType.Name)
+                        return false;
+                }
+                else
+                {
+                    if (a[i].ParameterType != b[i].ParameterType)
+                        return false;
+                }
             }
             return true;
         }

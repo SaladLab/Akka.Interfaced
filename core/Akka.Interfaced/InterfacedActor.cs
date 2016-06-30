@@ -225,18 +225,36 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var handlerItem = _handler.RequestDispatcher.GetHandler(request.InvokePayload.GetType());
+            var requestPayloadType = request.InvokePayload.GetType();
+            var handlerItem = _handler.RequestDispatcher.GetHandler(requestPayloadType);
             if (handlerItem == null)
             {
-                sender.Tell(new ResponseMessage
+                // if generic argument, try to instantiate a generic handler by the given payload type.
+
+                if (requestPayloadType.IsGenericType)
                 {
-                    RequestId = request.RequestId,
-                    Exception = new RequestHandlerNotFoundException()
-                });
-                Context.System.EventStream.Publish(new Event.Warning(
-                    Self.Path.ToString(), GetType(),
-                    $"Cannot find a handler for request {request.InvokePayload.GetType()} from {Sender}"));
-                return;
+                    var genericHandlerItem = _handler.RequestDispatcher.GetHandler(requestPayloadType.GetGenericTypeDefinition());
+                    if (genericHandlerItem != null)
+                    {
+                        handlerItem = genericHandlerItem.GenericHandlerBuilder(requestPayloadType);
+                        _handler.RequestDispatcher.AddHandler(requestPayloadType, handlerItem);
+                    }
+                }
+
+                // oops, no handler.
+
+                if (handlerItem == null)
+                {
+                    sender.Tell(new ResponseMessage
+                    {
+                        RequestId = request.RequestId,
+                        Exception = new RequestHandlerNotFoundException()
+                    });
+                    Context.System.EventStream.Publish(new Event.Warning(
+                        Self.Path.ToString(), GetType(),
+                        $"Cannot find a handler for request {requestPayloadType} from {Sender}"));
+                    return;
+                }
             }
 
             if (handlerItem.Handler != null)
