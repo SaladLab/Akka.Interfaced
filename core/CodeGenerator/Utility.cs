@@ -8,68 +8,6 @@ namespace CodeGenerator
 {
     public static class Utility
     {
-        public static string GetReferenceDisplay(this Type type)
-        {
-            if (type.IsGenericType)
-            {
-                return type.GetPureName() + "<" + new string(',', type.GetTypeInfo().GenericTypeParameters.Count() - 1) + ">";
-            }
-            else
-            {
-                return type.Name;
-            }
-        }
-
-        public static string GetTypeName(Type type)
-        {
-            if (type.IsGenericType)
-            {
-                var genericParams = string.Join(", ", type.GenericTypeArguments.Select(t => GetTypeName(t)));
-                var delimiterPos = type.Name.IndexOf('`');
-                return type.Namespace + "." + type.Name.Substring(0, delimiterPos) + "<" + genericParams + ">";
-            }
-            else if (type.IsGenericParameter)
-            {
-                return type.Name;
-            }
-            else
-            {
-                return type.FullName;
-            }
-        }
-
-        public static string GetIdFromType(Type type)
-        {
-            if (type.IsGenericType)
-            {
-                return type.Name.Replace('`', '_');
-            }
-            else
-            {
-                return type.Name;
-            }
-        }
-
-        public static string GetPureName(this Type type)
-        {
-            if (type.IsGenericType)
-            {
-                var delimiterPos = type.Name.IndexOf('`');
-                return type.Name.Substring(0, delimiterPos);
-            }
-            else
-            {
-                return type.Name;
-            }
-        }
-
-        public static string GetGenericParameterDeclaration(this Type type)
-        {
-            return type.IsGenericType
-                ? "<" + string.Join(", ", type.GetTypeInfo().GenericTypeParameters.Select(t => t.Name)) + ">"
-                : "";
-        }
-
         public static bool IsActorInterface(Type type)
         {
             return type.IsInterface &&
@@ -144,14 +82,6 @@ namespace CodeGenerator
             return "SurrogateFor" + typeName;
         }
 
-        public static string GetParameterDeclaration(ParameterInfo pi, bool includeDefaultExpression)
-        {
-            var defaultValue = pi.HasDefaultValue ? GetValueLiteral(pi.DefaultValue) : "";
-            return (pi.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") +
-                   (Utility.GetTypeName(pi.ParameterType) + " " + pi.Name) +
-                   (includeDefaultExpression && defaultValue != "" ? " = " + defaultValue : "");
-        }
-
         public static string GetParameterAssignment(ParameterInfo pi)
         {
             // for observer, add type check code to ensure that a parameter is an instance of concrete interfaced observer.
@@ -159,33 +89,6 @@ namespace CodeGenerator
                 return $"{pi.Name} = ({GetObserverClassName(pi.ParameterType)}){pi.Name}";
             else
                 return $"{pi.Name} = {pi.Name}";
-        }
-
-        public static bool HasNonTrivialDefaultValue(this ParameterInfo pi)
-        {
-            if (pi.HasDefaultValue == false || pi.DefaultValue == null)
-                return false;
-
-            if (pi.DefaultValue.GetType().IsValueType == false)
-                return true;
-
-            return pi.DefaultValue.Equals(Activator.CreateInstance(pi.ParameterType)) == false;
-        }
-
-        public static string GetValueLiteral(object value)
-        {
-            var literal = SymbolDisplay.FormatPrimitive(value, true, false);
-
-            if (value != null)
-            {
-                var type = value.GetType();
-                if (type.IsEnum)
-                    return $"({type.FullName}){literal}";
-                if (type == typeof(float))
-                    return literal + "f";
-            }
-
-            return literal;
         }
 
         public static IEnumerable<string> GetReachableMemebers(Type type, Func<Type, bool> filter)

@@ -19,7 +19,7 @@ namespace CodeGenerator
             if (Options.UseProtobuf && Options.UseSlimClient)
                 EnsureSurrogateForIRequestTarget(type, w);
 
-            w._($"#region {type.GetSymbolDisplay()}");
+            w._($"#region {type.GetSymbolDisplay(true)}");
             w._();
 
             var namespaceHandle = (string.IsNullOrEmpty(type.Namespace) == false)
@@ -101,8 +101,8 @@ namespace CodeGenerator
         {
             var tagName = Utility.GetActorInterfaceTagName(type);
 
-            w._($"[PayloadTable(typeof({type.GetReferenceDisplay()}), PayloadTableKind.Request)]");
-            using (w.B($"public static class {Utility.GetPayloadTableClassName(type)}{type.GetGenericParameterDeclaration()}{type.GetGenericConstraintClause()}"))
+            w._($"[PayloadTable(typeof({type.GetSymbolDisplay(typeless: true)}), PayloadTableKind.Request)]");
+            using (w.B($"public static class {Utility.GetPayloadTableClassName(type)}{type.GetGenericParameters()}{type.GetGenericConstraintClause()}"))
             {
                 // generate GetPayloadTypes method
 
@@ -155,17 +155,17 @@ namespace CodeGenerator
                             {
                                 var defaultValueAttr =
                                     parameter.HasNonTrivialDefaultValue()
-                                        ? $", DefaultValue({Utility.GetValueLiteral(parameter.DefaultValue)})"
+                                        ? $", DefaultValue({parameter.DefaultValue.GetValueLiteral()})"
                                         : "";
                                 attr = $"[ProtoMember({i + 1}){defaultValueAttr}] ";
 
                                 if (parameter.HasNonTrivialDefaultValue())
                                 {
-                                    defaultValueExpression = " = " + Utility.GetValueLiteral(parameter.DefaultValue);
+                                    defaultValueExpression = " = " + parameter.DefaultValue.GetValueLiteral();
                                 }
                             }
 
-                            var typeName = Utility.GetTypeName(parameter.ParameterType);
+                            var typeName = parameter.ParameterType.GetSymbolDisplay(true);
                             w._($"{attr}public {typeName} {parameter.Name}{defaultValueExpression};");
                         }
                         if (parameters.Any())
@@ -214,7 +214,7 @@ namespace CodeGenerator
                                 var tagParameter = parameters.FirstOrDefault(pi => pi.Name == tagName);
                                 if (tagParameter != null)
                                 {
-                                    var typeName = Utility.GetTypeName(tagParameter.ParameterType);
+                                    var typeName = tagParameter.ParameterType.GetSymbolDisplay(true);
                                     w._($"{tagName} = ({typeName})value;");
                                 }
                             }
@@ -257,7 +257,7 @@ namespace CodeGenerator
                                    $": IInterfacedPayload, IValueGetable{actorRefUpdatable}{method.GetGenericConstraintClause()}"))
                         {
                             var attr = (Options.UseProtobuf) ? "[ProtoMember(1)] " : "";
-                            w._($"{attr}public {Utility.GetTypeName(returnType)} v;");
+                            w._($"{attr}public {returnType.GetSymbolDisplay(true)} v;");
                             w._();
 
                             // GetInterfaceType
@@ -306,13 +306,13 @@ namespace CodeGenerator
 
             var baseNoReplys = baseTypes.Select(t => Utility.GetNoReplyInterfaceName(t));
             var baseNoReplysInherit = baseNoReplys.Any() ? " : " + string.Join(", ", baseNoReplys) : "";
-            using (w.B($"public interface {Utility.GetNoReplyInterfaceName(type)}{type.GetGenericParameterDeclaration()}{baseNoReplysInherit}"))
+            using (w.B($"public interface {Utility.GetNoReplyInterfaceName(type)}{type.GetGenericParameters()}{baseNoReplysInherit}"))
             {
                 foreach (var m in typeInfos.First().Item2)
                 {
                     var method = m.Item1;
                     var parameters = method.GetParameters();
-                    var paramStr = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
+                    var paramStr = string.Join(", ", parameters.Select(p => p.GetParameterDeclaration(true)));
                     w._($"void {method.Name}{method.GetGenericParameters()}({paramStr}){method.GetGenericConstraintClause()};");
                 }
             }
@@ -320,11 +320,11 @@ namespace CodeGenerator
             // ActorRef
 
             var refClassName = Utility.GetActorRefClassName(type);
-            var refClassGenericName = refClassName + type.GetGenericParameterDeclaration();
+            var refClassGenericName = refClassName + type.GetGenericParameters();
             var noReplyInterfaceName = Utility.GetNoReplyInterfaceName(type);
-            var noReplyInterfaceGenericName = noReplyInterfaceName + type.GetGenericParameterDeclaration();
+            var noReplyInterfaceGenericName = noReplyInterfaceName + type.GetGenericParameters();
 
-            using (w.B($"public class {refClassName}{type.GetGenericParameterDeclaration()} : InterfacedActorRef, {type.GetSymbolDisplay()}, {noReplyInterfaceName}{type.GetGenericParameterDeclaration()}{type.GetGenericConstraintClause()}"))
+            using (w.B($"public class {refClassName}{type.GetGenericParameters()} : InterfacedActorRef, {type.GetSymbolDisplay()}, {noReplyInterfaceName}{type.GetGenericParameters()}{type.GetGenericConstraintClause()}"))
             {
                 // InterfaceType property
 
@@ -366,7 +366,7 @@ namespace CodeGenerator
 
                 foreach (var t in typeInfos)
                 {
-                    var payloadTableClassName = Utility.GetPayloadTableClassName(t.Item1) + type.GetGenericParameterDeclaration();
+                    var payloadTableClassName = Utility.GetPayloadTableClassName(t.Item1) + type.GetGenericParameters();
 
                     foreach (var m in t.Item2)
                     {
@@ -374,7 +374,7 @@ namespace CodeGenerator
                         var payloadTypes = m.Item2;
                         var parameters = method.GetParameters();
 
-                        var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
+                        var parameterTypeNames = string.Join(", ", parameters.Select(p => p.GetParameterDeclaration(true)));
                         var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
                         var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
 
@@ -404,7 +404,7 @@ namespace CodeGenerator
                     var interfaceName = Utility.GetNoReplyInterfaceName(t.Item1);
                     var interfaceGenericName = interfaceName + t.Item1.GetGenericParameters();
 
-                    var payloadTableClassName = Utility.GetPayloadTableClassName(t.Item1) + type.GetGenericParameterDeclaration();
+                    var payloadTableClassName = Utility.GetPayloadTableClassName(t.Item1) + type.GetGenericParameters();
 
                     foreach (var m in t.Item2)
                     {
@@ -412,7 +412,7 @@ namespace CodeGenerator
                         var payloadTypes = m.Item2;
                         var parameters = method.GetParameters();
 
-                        var parameterTypeNames = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, false)));
+                        var parameterTypeNames = string.Join(", ", parameters.Select(p => p.GetParameterDeclaration(false)));
                         var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
 
                         // Request Methods
@@ -467,15 +467,15 @@ namespace CodeGenerator
             var baseSynces = baseTypes.Select(t => Utility.GetActorSyncInterfaceName(t));
             var baseSyncesInherit = baseSynces.Any() ? string.Join(", ", baseSynces) : "IInterfacedActorSync";
             w._($"[AlternativeInterface(typeof({type.GetSymbolDisplay(typeless: true)}))]");
-            using (w.B($"public interface {Utility.GetActorSyncInterfaceName(type)}{type.GetGenericParameterDeclaration()} : {baseSyncesInherit}{type.GetGenericConstraintClause()}"))
+            using (w.B($"public interface {Utility.GetActorSyncInterfaceName(type)}{type.GetGenericParameters()} : {baseSyncesInherit}{type.GetGenericConstraintClause()}"))
             {
                 foreach (var m in typeInfos.First().Item2)
                 {
                     var method = m.Item1;
                     var parameters = method.GetParameters();
-                    var paramStr = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
+                    var paramStr = string.Join(", ", parameters.Select(p => p.GetParameterDeclaration(true)));
                     var returnType = method.ReturnType.GenericTypeArguments.FirstOrDefault();
-                    var returnTypeLiteral = (returnType != null) ? Utility.GetTypeName(returnType) : "void";
+                    var returnTypeLiteral = (returnType != null) ? returnType.GetSymbolDisplay(true) : "void";
                     w._($"{returnTypeLiteral} {method.Name}{method.GetGenericParameters()}({paramStr}){method.GetGenericConstraintClause()};");
                 }
             }

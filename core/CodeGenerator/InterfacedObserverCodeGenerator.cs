@@ -129,7 +129,7 @@ namespace CodeGenerator
                             {
                                 var parameter = parameters[i];
                                 var attr = (Options.UseProtobuf) ? string.Format("[ProtoMember({0})] ", i + 1) : "";
-                                w._($"{attr}public {Utility.GetTypeName(parameter.ParameterType)} {parameter.Name};");
+                                w._($"{attr}public {parameter.ParameterType.GetSymbolDisplay(true)} {parameter.Name};");
                             }
                             if (parameters.Any())
                                 w._();
@@ -189,7 +189,7 @@ namespace CodeGenerator
                         var parameters = method.GetParameters();
 
                         var parameterNames = string.Join(", ", parameters.Select(p => p.Name));
-                        var parameterTypeNames = string.Join(", ", parameters.Select(p => (p.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") + Utility.GetTypeName(p.ParameterType) + " " + p.Name));
+                        var parameterTypeNames = string.Join(", ", parameters.Select(p => (p.GetCustomAttribute<ParamArrayAttribute>() != null ? "params " : "") + p.ParameterType.GetSymbolDisplay(true) + " " + p.Name));
                         var parameterInits = string.Join(", ", parameters.Select(Utility.GetParameterAssignment));
 
                         // Request Methods
@@ -249,7 +249,7 @@ namespace CodeGenerator
                 {
                     var method = m.Item1;
                     var parameters = method.GetParameters();
-                    var paramStr = string.Join(", ", parameters.Select(p => Utility.GetParameterDeclaration(p, true)));
+                    var paramStr = string.Join(", ", parameters.Select(p => p.GetParameterDeclaration(true)));
                     w._($"Task {method.Name}({paramStr});");
                 }
             }
