@@ -33,8 +33,15 @@ namespace Akka.Interfaced
                 if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedActor) && t != typeof(IInterfacedActorSync)))
                     continue;
 
+                var primaryInterface = ifs;
+
                 var alternativeInterfaceAttribute = ifs.GetCustomAttribute<AlternativeInterfaceAttribute>();
-                var primaryInterface = alternativeInterfaceAttribute != null ? alternativeInterfaceAttribute.Type : ifs;
+                if (alternativeInterfaceAttribute != null)
+                {
+                    primaryInterface = alternativeInterfaceAttribute.Type.IsGenericType
+                        ? alternativeInterfaceAttribute.Type.MakeGenericType(ifs.GetGenericArguments())
+                        : alternativeInterfaceAttribute.Type;
+                }
 
                 var interfaceMap = _type.GetInterfaceMap(ifs);
                 var methodItems = interfaceMap.InterfaceMethods.Zip(interfaceMap.TargetMethods, Tuple.Create)
