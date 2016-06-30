@@ -48,7 +48,7 @@ namespace Akka.Interfaced
         public class CallWithParameter_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Int32 value;
+            public int value;
 
             public Type GetInterfaceType()
             {
@@ -65,7 +65,7 @@ namespace Akka.Interfaced
         public class CallWithParameterAndReturn_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Int32 value;
+            public int value;
 
             public Type GetInterfaceType()
             {
@@ -82,7 +82,7 @@ namespace Akka.Interfaced
         public class CallWithParameterAndReturn_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -113,7 +113,7 @@ namespace Akka.Interfaced
         public class CallWithReturn_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -146,7 +146,7 @@ namespace Akka.Interfaced
         public class ThrowException_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -163,8 +163,8 @@ namespace Akka.Interfaced
     public interface IBasic_NoReply
     {
         void Call();
-        void CallWithParameter(System.Int32 value);
-        void CallWithParameterAndReturn(System.Int32 value);
+        void CallWithParameter(int value);
+        void CallWithParameterAndReturn(int value);
         void CallWithReturn();
         void ThrowException(Akka.Interfaced.ThrowExceptionType type);
     }
@@ -208,7 +208,7 @@ namespace Akka.Interfaced
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task CallWithParameter(System.Int32 value)
+        public Task CallWithParameter(int value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IBasic_PayloadTable.CallWithParameter_Invoke { value = value }
@@ -216,28 +216,28 @@ namespace Akka.Interfaced
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task<System.Int32> CallWithParameterAndReturn(System.Int32 value)
+        public Task<int> CallWithParameterAndReturn(int value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IBasic_PayloadTable.CallWithParameterAndReturn_Invoke { value = value }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task<System.Int32> CallWithReturn()
+        public Task<int> CallWithReturn()
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IBasic_PayloadTable.CallWithReturn_Invoke {  }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task<System.Int32> ThrowException(Akka.Interfaced.ThrowExceptionType type)
+        public Task<int> ThrowException(Akka.Interfaced.ThrowExceptionType type)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IBasic_PayloadTable.ThrowException_Invoke { type = type }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
         void IBasic_NoReply.Call()
@@ -248,7 +248,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void IBasic_NoReply.CallWithParameter(System.Int32 value)
+        void IBasic_NoReply.CallWithParameter(int value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IBasic_PayloadTable.CallWithParameter_Invoke { value = value }
@@ -256,7 +256,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void IBasic_NoReply.CallWithParameterAndReturn(System.Int32 value)
+        void IBasic_NoReply.CallWithParameterAndReturn(int value)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IBasic_PayloadTable.CallWithParameterAndReturn_Invoke { value = value }
@@ -285,10 +285,291 @@ namespace Akka.Interfaced
     public interface IBasicSync : IInterfacedActorSync
     {
         void Call();
-        void CallWithParameter(System.Int32 value);
-        System.Int32 CallWithParameterAndReturn(System.Int32 value);
-        System.Int32 CallWithReturn();
-        System.Int32 ThrowException(Akka.Interfaced.ThrowExceptionType type);
+        void CallWithParameter(int value);
+        int CallWithParameterAndReturn(int value);
+        int CallWithReturn();
+        int ThrowException(Akka.Interfaced.ThrowExceptionType type);
+    }
+}
+
+#endregion
+#region Akka.Interfaced.IBasic<T>
+
+namespace Akka.Interfaced
+{
+    [PayloadTable(typeof(IBasic<>), PayloadTableKind.Request)]
+    public static class IBasic_PayloadTable<T> where T : new()
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(Call_Invoke), null },
+                { typeof(CallWithParameter_Invoke), null },
+                { typeof(CallWithParameterAndReturn_Invoke), typeof(CallWithParameterAndReturn_Return) },
+                { typeof(CallWithReturn_Invoke), typeof(CallWithReturn_Return) },
+                { typeof(ThrowException_Invoke), typeof(ThrowException_Return) },
+            };
+        }
+
+        public class Call_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((IBasic<T>)__target).Call();
+                return null;
+            }
+        }
+
+        public class CallWithParameter_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public T value;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((IBasic<T>)__target).CallWithParameter(value);
+                return null;
+            }
+        }
+
+        public class CallWithParameterAndReturn_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public T value;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IBasic<T>)__target).CallWithParameterAndReturn(value);
+                return (IValueGetable)(new CallWithParameterAndReturn_Return { v = __v });
+            }
+        }
+
+        public class CallWithParameterAndReturn_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public T v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic<T>);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+
+        public class CallWithReturn_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IBasic<T>)__target).CallWithReturn();
+                return (IValueGetable)(new CallWithReturn_Return { v = __v });
+            }
+        }
+
+        public class CallWithReturn_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public T v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic<T>);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+
+        public class ThrowException_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public Akka.Interfaced.ThrowExceptionType type;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IBasic<T>)__target).ThrowException(type);
+                return (IValueGetable)(new ThrowException_Return { v = __v });
+            }
+        }
+
+        public class ThrowException_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public T v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IBasic<T>);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+    }
+
+    public interface IBasic_NoReply<T>
+    {
+        void Call();
+        void CallWithParameter(T value);
+        void CallWithParameterAndReturn(T value);
+        void CallWithReturn();
+        void ThrowException(Akka.Interfaced.ThrowExceptionType type);
+    }
+
+    public class BasicRef<T> : InterfacedActorRef, IBasic<T>, IBasic_NoReply<T> where T : new()
+    {
+        public override Type InterfaceType => typeof(IBasic<T>);
+
+        public BasicRef() : base(null)
+        {
+        }
+
+        public BasicRef(IRequestTarget target) : base(target)
+        {
+        }
+
+        public BasicRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
+        {
+        }
+
+        public IBasic_NoReply<T> WithNoReply()
+        {
+            return this;
+        }
+
+        public BasicRef<T> WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new BasicRef<T>(Target, requestWaiter, Timeout);
+        }
+
+        public BasicRef<T> WithTimeout(TimeSpan? timeout)
+        {
+            return new BasicRef<T>(Target, RequestWaiter, timeout);
+        }
+
+        public Task Call()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable<T>.Call_Invoke {  }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task CallWithParameter(T value)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable<T>.CallWithParameter_Invoke { value = value }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task<T> CallWithParameterAndReturn(T value)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable<T>.CallWithParameterAndReturn_Invoke { value = value }
+            };
+            return SendRequestAndReceive<T>(requestMessage);
+        }
+
+        public Task<T> CallWithReturn()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable<T>.CallWithReturn_Invoke {  }
+            };
+            return SendRequestAndReceive<T>(requestMessage);
+        }
+
+        public Task<T> ThrowException(Akka.Interfaced.ThrowExceptionType type)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable<T>.ThrowException_Invoke { type = type }
+            };
+            return SendRequestAndReceive<T>(requestMessage);
+        }
+
+        void IBasic_NoReply<T>.Call()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable<T>.Call_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IBasic_NoReply<T>.CallWithParameter(T value)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable<T>.CallWithParameter_Invoke { value = value }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IBasic_NoReply<T>.CallWithParameterAndReturn(T value)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable<T>.CallWithParameterAndReturn_Invoke { value = value }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IBasic_NoReply<T>.CallWithReturn()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable<T>.CallWithReturn_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IBasic_NoReply<T>.ThrowException(Akka.Interfaced.ThrowExceptionType type)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IBasic_PayloadTable<T>.ThrowException_Invoke { type = type }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+
+    [AlternativeInterface(typeof(IBasic<>))]
+    public interface IBasicSync<T> : IInterfacedActorSync where T : new()
+    {
+        void Call();
+        void CallWithParameter(T value);
+        T CallWithParameterAndReturn(T value);
+        T CallWithReturn();
+        T ThrowException(Akka.Interfaced.ThrowExceptionType type);
     }
 }
 
@@ -310,7 +591,7 @@ namespace Akka.Interfaced
         public class Call_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Object param;
+            public object param;
 
             public Type GetInterfaceType()
             {
@@ -327,7 +608,7 @@ namespace Akka.Interfaced
         public class Call_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Object v;
+            public object v;
 
             public Type GetInterfaceType()
             {
@@ -343,7 +624,7 @@ namespace Akka.Interfaced
 
     public interface IDummy_NoReply
     {
-        void Call(System.Object param);
+        void Call(object param);
     }
 
     public class DummyRef : InterfacedActorRef, IDummy, IDummy_NoReply
@@ -377,15 +658,15 @@ namespace Akka.Interfaced
             return new DummyRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Object> Call(System.Object param)
+        public Task<object> Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        void IDummy_NoReply.Call(System.Object param)
+        void IDummy_NoReply.Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
@@ -397,7 +678,7 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(IDummy))]
     public interface IDummySync : IInterfacedActorSync
     {
-        System.Object Call(System.Object param);
+        object Call(object param);
     }
 }
 
@@ -419,7 +700,7 @@ namespace Akka.Interfaced
         public class CallEx_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Object param;
+            public object param;
 
             public Type GetInterfaceType()
             {
@@ -436,7 +717,7 @@ namespace Akka.Interfaced
         public class CallEx_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Object v;
+            public object v;
 
             public Type GetInterfaceType()
             {
@@ -452,7 +733,7 @@ namespace Akka.Interfaced
 
     public interface IDummyEx_NoReply : IDummy_NoReply
     {
-        void CallEx(System.Object param);
+        void CallEx(object param);
     }
 
     public class DummyExRef : InterfacedActorRef, IDummyEx, IDummyEx_NoReply
@@ -486,23 +767,23 @@ namespace Akka.Interfaced
             return new DummyExRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Object> CallEx(System.Object param)
+        public Task<object> CallEx(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        public Task<System.Object> Call(System.Object param)
+        public Task<object> Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        void IDummyEx_NoReply.CallEx(System.Object param)
+        void IDummyEx_NoReply.CallEx(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
@@ -510,7 +791,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void IDummy_NoReply.Call(System.Object param)
+        void IDummy_NoReply.Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
@@ -522,7 +803,7 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(IDummyEx))]
     public interface IDummyExSync : IDummySync
     {
-        System.Object CallEx(System.Object param);
+        object CallEx(object param);
     }
 }
 
@@ -544,7 +825,7 @@ namespace Akka.Interfaced
         public class CallEx2_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Object param;
+            public object param;
 
             public Type GetInterfaceType()
             {
@@ -561,7 +842,7 @@ namespace Akka.Interfaced
         public class CallEx2_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Object v;
+            public object v;
 
             public Type GetInterfaceType()
             {
@@ -577,7 +858,7 @@ namespace Akka.Interfaced
 
     public interface IDummyEx2_NoReply : IDummy_NoReply
     {
-        void CallEx2(System.Object param);
+        void CallEx2(object param);
     }
 
     public class DummyEx2Ref : InterfacedActorRef, IDummyEx2, IDummyEx2_NoReply
@@ -611,23 +892,23 @@ namespace Akka.Interfaced
             return new DummyEx2Ref(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Object> CallEx2(System.Object param)
+        public Task<object> CallEx2(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        public Task<System.Object> Call(System.Object param)
+        public Task<object> Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        void IDummyEx2_NoReply.CallEx2(System.Object param)
+        void IDummyEx2_NoReply.CallEx2(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
@@ -635,7 +916,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void IDummy_NoReply.Call(System.Object param)
+        void IDummy_NoReply.Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
@@ -647,7 +928,7 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(IDummyEx2))]
     public interface IDummyEx2Sync : IDummySync
     {
-        System.Object CallEx2(System.Object param);
+        object CallEx2(object param);
     }
 }
 
@@ -669,7 +950,7 @@ namespace Akka.Interfaced
         public class CallExFinal_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Object param;
+            public object param;
 
             public Type GetInterfaceType()
             {
@@ -686,7 +967,7 @@ namespace Akka.Interfaced
         public class CallExFinal_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Object v;
+            public object v;
 
             public Type GetInterfaceType()
             {
@@ -702,7 +983,7 @@ namespace Akka.Interfaced
 
     public interface IDummyExFinal_NoReply : IDummyEx_NoReply, IDummy_NoReply, IDummyEx2_NoReply
     {
-        void CallExFinal(System.Object param);
+        void CallExFinal(object param);
     }
 
     public class DummyExFinalRef : InterfacedActorRef, IDummyExFinal, IDummyExFinal_NoReply
@@ -736,39 +1017,39 @@ namespace Akka.Interfaced
             return new DummyExFinalRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Object> CallExFinal(System.Object param)
+        public Task<object> CallExFinal(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyExFinal_PayloadTable.CallExFinal_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        public Task<System.Object> CallEx(System.Object param)
+        public Task<object> CallEx(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        public Task<System.Object> Call(System.Object param)
+        public Task<object> Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        public Task<System.Object> CallEx2(System.Object param)
+        public Task<object> CallEx2(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
             };
-            return SendRequestAndReceive<System.Object>(requestMessage);
+            return SendRequestAndReceive<object>(requestMessage);
         }
 
-        void IDummyExFinal_NoReply.CallExFinal(System.Object param)
+        void IDummyExFinal_NoReply.CallExFinal(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyExFinal_PayloadTable.CallExFinal_Invoke { param = param }
@@ -776,7 +1057,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void IDummyEx_NoReply.CallEx(System.Object param)
+        void IDummyEx_NoReply.CallEx(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx_PayloadTable.CallEx_Invoke { param = param }
@@ -784,7 +1065,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void IDummy_NoReply.Call(System.Object param)
+        void IDummy_NoReply.Call(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummy_PayloadTable.Call_Invoke { param = param }
@@ -792,7 +1073,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void IDummyEx2_NoReply.CallEx2(System.Object param)
+        void IDummyEx2_NoReply.CallEx2(object param)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IDummyEx2_PayloadTable.CallEx2_Invoke { param = param }
@@ -804,7 +1085,7 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(IDummyExFinal))]
     public interface IDummyExFinalSync : IDummyExSync, IDummySync, IDummyEx2Sync
     {
-        System.Object CallExFinal(System.Object param);
+        object CallExFinal(object param);
     }
 }
 
@@ -828,8 +1109,8 @@ namespace Akka.Interfaced
         public class Min_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Int32 a;
-            public System.Int32 b;
+            public int a;
+            public int b;
 
             public Type GetInterfaceType()
             {
@@ -846,7 +1127,7 @@ namespace Akka.Interfaced
         public class Min_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -862,9 +1143,9 @@ namespace Akka.Interfaced
         public class Min_2_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Int32 a;
-            public System.Int32 b;
-            public System.Int32 c;
+            public int a;
+            public int b;
+            public int c;
 
             public Type GetInterfaceType()
             {
@@ -881,7 +1162,7 @@ namespace Akka.Interfaced
         public class Min_2_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -914,7 +1195,7 @@ namespace Akka.Interfaced
         public class Min_3_Return
             : IInterfacedPayload, IValueGetable
         {
-            public System.Int32 v;
+            public int v;
 
             public Type GetInterfaceType()
             {
@@ -930,8 +1211,8 @@ namespace Akka.Interfaced
 
     public interface IOverloaded_NoReply
     {
-        void Min(System.Int32 a, System.Int32 b);
-        void Min(System.Int32 a, System.Int32 b, System.Int32 c);
+        void Min(int a, int b);
+        void Min(int a, int b, int c);
         void Min(params System.Int32[] nums);
     }
 
@@ -966,31 +1247,31 @@ namespace Akka.Interfaced
             return new OverloadedRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<System.Int32> Min(System.Int32 a, System.Int32 b)
+        public Task<int> Min(int a, int b)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IOverloaded_PayloadTable.Min_Invoke { a = a, b = b }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task<System.Int32> Min(System.Int32 a, System.Int32 b, System.Int32 c)
+        public Task<int> Min(int a, int b, int c)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IOverloaded_PayloadTable.Min_2_Invoke { a = a, b = b, c = c }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        public Task<System.Int32> Min(params System.Int32[] nums)
+        public Task<int> Min(params System.Int32[] nums)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IOverloaded_PayloadTable.Min_3_Invoke { nums = nums }
             };
-            return SendRequestAndReceive<System.Int32>(requestMessage);
+            return SendRequestAndReceive<int>(requestMessage);
         }
 
-        void IOverloaded_NoReply.Min(System.Int32 a, System.Int32 b)
+        void IOverloaded_NoReply.Min(int a, int b)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IOverloaded_PayloadTable.Min_Invoke { a = a, b = b }
@@ -998,7 +1279,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void IOverloaded_NoReply.Min(System.Int32 a, System.Int32 b, System.Int32 c)
+        void IOverloaded_NoReply.Min(int a, int b, int c)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IOverloaded_PayloadTable.Min_2_Invoke { a = a, b = b, c = c }
@@ -1018,9 +1299,225 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(IOverloaded))]
     public interface IOverloadedSync : IInterfacedActorSync
     {
-        System.Int32 Min(System.Int32 a, System.Int32 b);
-        System.Int32 Min(System.Int32 a, System.Int32 b, System.Int32 c);
-        System.Int32 Min(params System.Int32[] nums);
+        int Min(int a, int b);
+        int Min(int a, int b, int c);
+        int Min(params System.Int32[] nums);
+    }
+}
+
+#endregion
+#region Akka.Interfaced.IOverloadedGeneric
+
+namespace Akka.Interfaced
+{
+    [PayloadTable(typeof(IOverloadedGeneric), PayloadTableKind.Request)]
+    public static class IOverloadedGeneric_PayloadTable
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(Min_Invoke<>), typeof(Min_Return<>) },
+                { typeof(Min_2_Invoke<>), typeof(Min_2_Return<>) },
+                { typeof(Min_3_Invoke<>), typeof(Min_3_Return<>) },
+            };
+        }
+
+        public class Min_Invoke<T>
+            : IInterfacedPayload, IAsyncInvokable where T : System.IComparable<T>
+        {
+            public T a;
+            public T b;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IOverloadedGeneric)__target).Min(a, b);
+                return (IValueGetable)(new Min_Return<T> { v = __v });
+            }
+        }
+
+        public class Min_Return<T>
+            : IInterfacedPayload, IValueGetable where T : System.IComparable<T>
+        {
+            public T v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+
+        public class Min_2_Invoke<T>
+            : IInterfacedPayload, IAsyncInvokable where T : System.IComparable<T>
+        {
+            public T a;
+            public T b;
+            public T c;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IOverloadedGeneric)__target).Min(a, b, c);
+                return (IValueGetable)(new Min_2_Return<T> { v = __v });
+            }
+        }
+
+        public class Min_2_Return<T>
+            : IInterfacedPayload, IValueGetable where T : System.IComparable<T>
+        {
+            public T v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+
+        public class Min_3_Invoke<T>
+            : IInterfacedPayload, IAsyncInvokable where T : System.IComparable<T>
+        {
+            public T[] nums;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IOverloadedGeneric)__target).Min(nums);
+                return (IValueGetable)(new Min_3_Return<T> { v = __v });
+            }
+        }
+
+        public class Min_3_Return<T>
+            : IInterfacedPayload, IValueGetable where T : System.IComparable<T>
+        {
+            public T v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IOverloadedGeneric);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+    }
+
+    public interface IOverloadedGeneric_NoReply
+    {
+        void Min<T>(T a, T b) where T : System.IComparable<T>;
+        void Min<T>(T a, T b, T c) where T : System.IComparable<T>;
+        void Min<T>(params T[] nums) where T : System.IComparable<T>;
+    }
+
+    public class OverloadedGenericRef : InterfacedActorRef, IOverloadedGeneric, IOverloadedGeneric_NoReply
+    {
+        public override Type InterfaceType => typeof(IOverloadedGeneric);
+
+        public OverloadedGenericRef() : base(null)
+        {
+        }
+
+        public OverloadedGenericRef(IRequestTarget target) : base(target)
+        {
+        }
+
+        public OverloadedGenericRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
+        {
+        }
+
+        public IOverloadedGeneric_NoReply WithNoReply()
+        {
+            return this;
+        }
+
+        public OverloadedGenericRef WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new OverloadedGenericRef(Target, requestWaiter, Timeout);
+        }
+
+        public OverloadedGenericRef WithTimeout(TimeSpan? timeout)
+        {
+            return new OverloadedGenericRef(Target, RequestWaiter, timeout);
+        }
+
+        public Task<T> Min<T>(T a, T b) where T : System.IComparable<T>
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable.Min_Invoke<T> { a = a, b = b }
+            };
+            return SendRequestAndReceive<T>(requestMessage);
+        }
+
+        public Task<T> Min<T>(T a, T b, T c) where T : System.IComparable<T>
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable.Min_2_Invoke<T> { a = a, b = b, c = c }
+            };
+            return SendRequestAndReceive<T>(requestMessage);
+        }
+
+        public Task<T> Min<T>(params T[] nums) where T : System.IComparable<T>
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable.Min_3_Invoke<T> { nums = nums }
+            };
+            return SendRequestAndReceive<T>(requestMessage);
+        }
+
+        void IOverloadedGeneric_NoReply.Min<T>(T a, T b)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable.Min_Invoke<T> { a = a, b = b }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IOverloadedGeneric_NoReply.Min<T>(T a, T b, T c)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable.Min_2_Invoke<T> { a = a, b = b, c = c }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IOverloadedGeneric_NoReply.Min<T>(params T[] nums)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IOverloadedGeneric_PayloadTable.Min_3_Invoke<T> { nums = nums }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+
+    [AlternativeInterface(typeof(IOverloadedGeneric))]
+    public interface IOverloadedGenericSync : IInterfacedActorSync
+    {
+        T Min<T>(T a, T b) where T : System.IComparable<T>;
+        T Min<T>(T a, T b, T c) where T : System.IComparable<T>;
+        T Min<T>(params T[] nums) where T : System.IComparable<T>;
     }
 }
 
@@ -1044,7 +1541,7 @@ namespace Akka.Interfaced
         public class MakeEvent_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -1111,7 +1608,7 @@ namespace Akka.Interfaced
 
     public interface ISubject_NoReply
     {
-        void MakeEvent(System.String eventName);
+        void MakeEvent(string eventName);
         void Subscribe(Akka.Interfaced.ISubjectObserver observer);
         void Unsubscribe(Akka.Interfaced.ISubjectObserver observer);
     }
@@ -1147,7 +1644,7 @@ namespace Akka.Interfaced
             return new SubjectRef(Target, RequestWaiter, timeout);
         }
 
-        public Task MakeEvent(System.String eventName)
+        public Task MakeEvent(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject_PayloadTable.MakeEvent_Invoke { eventName = eventName }
@@ -1171,7 +1668,7 @@ namespace Akka.Interfaced
             return SendRequestAndWait(requestMessage);
         }
 
-        void ISubject_NoReply.MakeEvent(System.String eventName)
+        void ISubject_NoReply.MakeEvent(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject_PayloadTable.MakeEvent_Invoke { eventName = eventName }
@@ -1199,7 +1696,7 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(ISubject))]
     public interface ISubjectSync : IInterfacedActorSync
     {
-        void MakeEvent(System.String eventName);
+        void MakeEvent(string eventName);
         void Subscribe(Akka.Interfaced.ISubjectObserver observer);
         void Unsubscribe(Akka.Interfaced.ISubjectObserver observer);
     }
@@ -1226,7 +1723,7 @@ namespace Akka.Interfaced
         public class MakeEvent_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -1243,7 +1740,7 @@ namespace Akka.Interfaced
         public class MakeEvent2_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -1310,8 +1807,8 @@ namespace Akka.Interfaced
 
     public interface ISubject2_NoReply
     {
-        void MakeEvent(System.String eventName);
-        void MakeEvent2(System.String eventName);
+        void MakeEvent(string eventName);
+        void MakeEvent2(string eventName);
         void Subscribe(Akka.Interfaced.ISubject2Observer observer);
         void Unsubscribe(Akka.Interfaced.ISubject2Observer observer);
     }
@@ -1347,7 +1844,7 @@ namespace Akka.Interfaced
             return new Subject2Ref(Target, RequestWaiter, timeout);
         }
 
-        public Task MakeEvent(System.String eventName)
+        public Task MakeEvent(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject2_PayloadTable.MakeEvent_Invoke { eventName = eventName }
@@ -1355,7 +1852,7 @@ namespace Akka.Interfaced
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task MakeEvent2(System.String eventName)
+        public Task MakeEvent2(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject2_PayloadTable.MakeEvent2_Invoke { eventName = eventName }
@@ -1379,7 +1876,7 @@ namespace Akka.Interfaced
             return SendRequestAndWait(requestMessage);
         }
 
-        void ISubject2_NoReply.MakeEvent(System.String eventName)
+        void ISubject2_NoReply.MakeEvent(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject2_PayloadTable.MakeEvent_Invoke { eventName = eventName }
@@ -1387,7 +1884,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void ISubject2_NoReply.MakeEvent2(System.String eventName)
+        void ISubject2_NoReply.MakeEvent2(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubject2_PayloadTable.MakeEvent2_Invoke { eventName = eventName }
@@ -1415,8 +1912,8 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(ISubject2))]
     public interface ISubject2Sync : IInterfacedActorSync
     {
-        void MakeEvent(System.String eventName);
-        void MakeEvent2(System.String eventName);
+        void MakeEvent(string eventName);
+        void MakeEvent2(string eventName);
         void Subscribe(Akka.Interfaced.ISubject2Observer observer);
         void Unsubscribe(Akka.Interfaced.ISubject2Observer observer);
     }
@@ -1443,7 +1940,7 @@ namespace Akka.Interfaced
         public class MakeEvent_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -1460,7 +1957,7 @@ namespace Akka.Interfaced
         public class MakeEventEx_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -1527,8 +2024,8 @@ namespace Akka.Interfaced
 
     public interface ISubjectEx_NoReply
     {
-        void MakeEvent(System.String eventName);
-        void MakeEventEx(System.String eventName);
+        void MakeEvent(string eventName);
+        void MakeEventEx(string eventName);
         void Subscribe(Akka.Interfaced.ISubjectExObserver observer);
         void Unsubscribe(Akka.Interfaced.ISubjectExObserver observer);
     }
@@ -1564,7 +2061,7 @@ namespace Akka.Interfaced
             return new SubjectExRef(Target, RequestWaiter, timeout);
         }
 
-        public Task MakeEvent(System.String eventName)
+        public Task MakeEvent(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubjectEx_PayloadTable.MakeEvent_Invoke { eventName = eventName }
@@ -1572,7 +2069,7 @@ namespace Akka.Interfaced
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task MakeEventEx(System.String eventName)
+        public Task MakeEventEx(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubjectEx_PayloadTable.MakeEventEx_Invoke { eventName = eventName }
@@ -1596,7 +2093,7 @@ namespace Akka.Interfaced
             return SendRequestAndWait(requestMessage);
         }
 
-        void ISubjectEx_NoReply.MakeEvent(System.String eventName)
+        void ISubjectEx_NoReply.MakeEvent(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubjectEx_PayloadTable.MakeEvent_Invoke { eventName = eventName }
@@ -1604,7 +2101,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void ISubjectEx_NoReply.MakeEventEx(System.String eventName)
+        void ISubjectEx_NoReply.MakeEventEx(string eventName)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new ISubjectEx_PayloadTable.MakeEventEx_Invoke { eventName = eventName }
@@ -1632,8 +2129,8 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(ISubjectEx))]
     public interface ISubjectExSync : IInterfacedActorSync
     {
-        void MakeEvent(System.String eventName);
-        void MakeEventEx(System.String eventName);
+        void MakeEvent(string eventName);
+        void MakeEventEx(string eventName);
         void Subscribe(Akka.Interfaced.ISubjectExObserver observer);
         void Unsubscribe(Akka.Interfaced.ISubjectExObserver observer);
     }
@@ -1658,7 +2155,7 @@ namespace Akka.Interfaced
         public class Atomic_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Int32 id;
+            public int id;
 
             public Type GetInterfaceType()
             {
@@ -1675,7 +2172,7 @@ namespace Akka.Interfaced
         public class Reentrant_Invoke
             : IInterfacedPayload, IAsyncInvokable
         {
-            public System.Int32 id;
+            public int id;
 
             public Type GetInterfaceType()
             {
@@ -1692,8 +2189,8 @@ namespace Akka.Interfaced
 
     public interface IWorker_NoReply
     {
-        void Atomic(System.Int32 id);
-        void Reentrant(System.Int32 id);
+        void Atomic(int id);
+        void Reentrant(int id);
     }
 
     public class WorkerRef : InterfacedActorRef, IWorker, IWorker_NoReply
@@ -1727,7 +2224,7 @@ namespace Akka.Interfaced
             return new WorkerRef(Target, RequestWaiter, timeout);
         }
 
-        public Task Atomic(System.Int32 id)
+        public Task Atomic(int id)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IWorker_PayloadTable.Atomic_Invoke { id = id }
@@ -1735,7 +2232,7 @@ namespace Akka.Interfaced
             return SendRequestAndWait(requestMessage);
         }
 
-        public Task Reentrant(System.Int32 id)
+        public Task Reentrant(int id)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IWorker_PayloadTable.Reentrant_Invoke { id = id }
@@ -1743,7 +2240,7 @@ namespace Akka.Interfaced
             return SendRequestAndWait(requestMessage);
         }
 
-        void IWorker_NoReply.Atomic(System.Int32 id)
+        void IWorker_NoReply.Atomic(int id)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IWorker_PayloadTable.Atomic_Invoke { id = id }
@@ -1751,7 +2248,7 @@ namespace Akka.Interfaced
             SendRequest(requestMessage);
         }
 
-        void IWorker_NoReply.Reentrant(System.Int32 id)
+        void IWorker_NoReply.Reentrant(int id)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IWorker_PayloadTable.Reentrant_Invoke { id = id }
@@ -1763,8 +2260,8 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(IWorker))]
     public interface IWorkerSync : IInterfacedActorSync
     {
-        void Atomic(System.Int32 id);
-        void Reentrant(System.Int32 id);
+        void Atomic(int id);
+        void Reentrant(int id);
     }
 }
 
@@ -1786,7 +2283,7 @@ namespace Akka.Interfaced
 
         public class Event_Invoke : IInterfacedPayload, IInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -1801,7 +2298,7 @@ namespace Akka.Interfaced
 
         public class Event2_Invoke : IInterfacedPayload, IInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -1827,13 +2324,13 @@ namespace Akka.Interfaced
         {
         }
 
-        public void Event(System.String eventName)
+        public void Event(string eventName)
         {
             var payload = new ISubject2Observer_PayloadTable.Event_Invoke { eventName = eventName };
             Notify(payload);
         }
 
-        public void Event2(System.String eventName)
+        public void Event2(string eventName)
         {
             var payload = new ISubject2Observer_PayloadTable.Event2_Invoke { eventName = eventName };
             Notify(payload);
@@ -1843,8 +2340,8 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(ISubject2Observer))]
     public interface ISubject2ObserverAsync : IInterfacedObserverSync
     {
-        Task Event(System.String eventName);
-        Task Event2(System.String eventName);
+        Task Event(string eventName);
+        Task Event2(string eventName);
     }
 }
 
@@ -1865,7 +2362,7 @@ namespace Akka.Interfaced
 
         public class EventEx_Invoke : IInterfacedPayload, IInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -1891,13 +2388,13 @@ namespace Akka.Interfaced
         {
         }
 
-        public void EventEx(System.String eventName)
+        public void EventEx(string eventName)
         {
             var payload = new ISubjectExObserver_PayloadTable.EventEx_Invoke { eventName = eventName };
             Notify(payload);
         }
 
-        public void Event(System.String eventName)
+        public void Event(string eventName)
         {
             var payload = new ISubjectObserver_PayloadTable.Event_Invoke { eventName = eventName };
             Notify(payload);
@@ -1907,7 +2404,7 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(ISubjectExObserver))]
     public interface ISubjectExObserverAsync : ISubjectObserverAsync
     {
-        Task EventEx(System.String eventName);
+        Task EventEx(string eventName);
     }
 }
 
@@ -1928,7 +2425,7 @@ namespace Akka.Interfaced
 
         public class Event_Invoke : IInterfacedPayload, IInvokable
         {
-            public System.String eventName;
+            public string eventName;
 
             public Type GetInterfaceType()
             {
@@ -1954,7 +2451,7 @@ namespace Akka.Interfaced
         {
         }
 
-        public void Event(System.String eventName)
+        public void Event(string eventName)
         {
             var payload = new ISubjectObserver_PayloadTable.Event_Invoke { eventName = eventName };
             Notify(payload);
@@ -1964,7 +2461,7 @@ namespace Akka.Interfaced
     [AlternativeInterface(typeof(ISubjectObserver))]
     public interface ISubjectObserverAsync : IInterfacedObserverSync
     {
-        Task Event(System.String eventName);
+        Task Event(string eventName);
     }
 }
 

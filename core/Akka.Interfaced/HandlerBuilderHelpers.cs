@@ -26,12 +26,18 @@ namespace Akka.Interfaced
 
         public static object GetInterfacePayloadTypeTable(Type interfaceType, PayloadTableKind kind)
         {
+            // find payload table type
+
+            var needGenericConstruction = (interfaceType.IsGenericType && interfaceType.IsGenericTypeDefinition == false);
+
+            var definitionType = needGenericConstruction ? interfaceType.GetGenericTypeDefinition() : interfaceType;
+
             var payloadTableType =
                 interfaceType.Assembly.GetTypes()
                              .Where(t =>
                              {
                                  var attr = t.GetCustomAttribute<PayloadTableAttribute>();
-                                 return (attr != null && attr.Type == interfaceType && attr.Kind == kind);
+                                 return (attr != null && attr.Type == definitionType && attr.Kind == kind);
                              })
                              .FirstOrDefault();
 
@@ -40,6 +46,13 @@ namespace Akka.Interfaced
                 throw new InvalidOperationException(
                     $"Cannot find payload table class for {interfaceType.FullName}");
             }
+
+            if (needGenericConstruction)
+            {
+                payloadTableType = payloadTableType.MakeGenericType(interfaceType.GetGenericArguments());
+            }
+
+            // get table from calling GetPayloadTypes
 
             var queryMethodInfo = payloadTableType.GetMethod("GetPayloadTypes");
             if (queryMethodInfo == null)

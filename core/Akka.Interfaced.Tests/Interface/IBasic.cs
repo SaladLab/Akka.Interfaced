@@ -18,4 +18,14 @@ namespace Akka.Interfaced
         Task<int> CallWithParameterAndReturn(int value);
         Task<int> ThrowException(ThrowExceptionType type);
     }
+
+    public interface IBasic<T> : IInterfacedActor
+        where T : new()
+    {
+        Task Call();
+        Task CallWithParameter(T value);
+        Task<T> CallWithReturn();
+        Task<T> CallWithParameterAndReturn(T value);
+        Task<T> ThrowException(ThrowExceptionType type);
+    }
 }
