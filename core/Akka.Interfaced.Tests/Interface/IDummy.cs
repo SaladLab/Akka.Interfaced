@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Akka.Interfaced
 {
@@ -20,5 +21,13 @@ namespace Akka.Interfaced
     public interface IDummyExFinal : IDummyEx, IDummyEx2
     {
         Task<object> CallExFinal(object param);
+    }
+
+    public interface IDummy<T> : IInterfacedActor
+        where T : ICloneable
+    {
+        Task<T> Call(T param);
+        Task<T> Call<U>(T param, U param2)
+            where U : IComparable<U>;
     }
 }
