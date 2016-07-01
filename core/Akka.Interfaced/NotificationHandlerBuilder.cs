@@ -149,30 +149,26 @@ namespace Akka.Interfaced
             }
         }
 
-        private void AddHandler(Type interfaceType, MethodInfo targetMethod, Type invokePayloadType, FilterChain filterChain, bool isSyncHandler, bool isReentrant)
+        private void AddHandler(Type interfaceType, MethodInfo method, Type invokePayloadType, FilterChain filterChain, bool isSyncHandler, bool isReentrant)
         {
-            if (targetMethod.IsGenericMethod == false)
+            if (method.IsGenericMethod == false)
             {
                 if (isSyncHandler)
                 {
-                    // sync handler
-
                     _table.Add(invokePayloadType, new NotificationHandlerItem
                     {
                         InterfaceType = interfaceType,
                         IsReentrant = isReentrant,
-                        Handler = BuildHandler(_type, invokePayloadType, targetMethod, filterChain)
+                        Handler = BuildHandler(_type, invokePayloadType, method, filterChain)
                     });
                 }
                 else
                 {
-                    // async handler
-
                     _table.Add(invokePayloadType, new NotificationHandlerItem
                     {
                         InterfaceType = interfaceType,
                         IsReentrant = isReentrant,
-                        AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, targetMethod, filterChain)
+                        AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, method, filterChain)
                     });
                 }
             }
@@ -192,7 +188,7 @@ namespace Akka.Interfaced
                         {
                             InterfaceType = interfaceType,
                             IsReentrant = isReentrant,
-                            Handler = BuildGenericHandler(t, _type, invokePayloadType, targetMethod, filterChain)
+                            Handler = BuildGenericHandler(_type, t, method, filterChain)
                         }
                     });
                 }
@@ -207,7 +203,7 @@ namespace Akka.Interfaced
                         {
                             InterfaceType = interfaceType,
                             IsReentrant = isReentrant,
-                            AsyncHandler = BuildGenericAsyncHandler(t, _type, invokePayloadType, targetMethod, filterChain)
+                            AsyncHandler = BuildGenericAsyncHandler(_type, t, method, filterChain)
                         }
                     });
                 }
@@ -354,21 +350,19 @@ namespace Akka.Interfaced
         }
 
         private static NotificationHandler BuildGenericHandler(
-            Type messageType, Type targetType, Type invokePayloadType, MethodInfo method, FilterChain filterChain)
+            Type targetType, Type invokePayloadType, MethodInfo method, FilterChain filterChain)
         {
-            var argTypes = messageType.GetGenericArguments();
-            var genericInvokePayloadType = invokePayloadType.MakeGenericType(argTypes);
+            var argTypes = invokePayloadType.GetGenericArguments();
             var genericMethod = method.MakeGenericMethod(argTypes.Skip(argTypes.Length - method.GetGenericArguments().Length).ToArray());
-            return BuildHandler(targetType, genericInvokePayloadType, genericMethod, filterChain);
+            return BuildHandler(targetType, invokePayloadType, genericMethod, filterChain);
         }
 
         private static NotificationAsyncHandler BuildGenericAsyncHandler(
-            Type messageType, Type targetType, Type invokePayloadType, MethodInfo method, FilterChain filterChain)
+            Type targetType, Type invokePayloadType, MethodInfo method, FilterChain filterChain)
         {
-            var argTypes = messageType.GetGenericArguments();
-            var genericInvokePayloadType = invokePayloadType.MakeGenericType(argTypes);
+            var argTypes = invokePayloadType.GetGenericArguments();
             var genericMethod = method.MakeGenericMethod(argTypes.Skip(argTypes.Length - method.GetGenericArguments().Length).ToArray());
-            return BuildAsyncHandler(targetType, genericInvokePayloadType, genericMethod, filterChain);
+            return BuildAsyncHandler(targetType, invokePayloadType, genericMethod, filterChain);
         }
 
         private static Type[] GetInterfacePayloadTypeTable(Type interfaceType)
