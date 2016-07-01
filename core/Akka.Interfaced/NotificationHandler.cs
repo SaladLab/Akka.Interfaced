@@ -12,5 +12,9 @@ namespace Akka.Interfaced
         public bool IsReentrant;
         public NotificationHandler Handler;
         public NotificationAsyncHandler AsyncHandler;
+
+        // for generic method, GenericHandlerBuilder will be used to construct the handler when parameter types are ready.
+        public bool IsGeneric;
+        public Func<Type, NotificationHandlerItem> GenericHandlerBuilder;
     }
 }

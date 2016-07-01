@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 
 namespace Akka.Interfaced
 {
@@ -16,5 +16,13 @@ namespace Akka.Interfaced
     public interface ISubjectExObserver : ISubjectObserver
     {
         void EventEx(string eventName);
+    }
+
+    public interface ISubjectObserver<T> : IInterfacedObserver
+        where T : ICloneable
+    {
+        void Event(T eventName);
+        void Event<U>(T eventName, U eventParam)
+            where U : IComparable<U>;
     }
 }

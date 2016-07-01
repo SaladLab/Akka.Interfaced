@@ -33,8 +33,15 @@ namespace Akka.Interfaced
                 if (ifs.GetInterfaces().All(t => t != typeof(IInterfacedObserver) && t != typeof(IInterfacedObserverSync)))
                     continue;
 
+                var primaryInterface = ifs;
+
                 var alternativeInterfaceAttribute = ifs.GetCustomAttribute<AlternativeInterfaceAttribute>();
-                var primaryInterface = alternativeInterfaceAttribute != null ? alternativeInterfaceAttribute.Type : ifs;
+                if (alternativeInterfaceAttribute != null)
+                {
+                    primaryInterface = alternativeInterfaceAttribute.Type.IsGenericType
+                        ? alternativeInterfaceAttribute.Type.MakeGenericType(ifs.GetGenericArguments())
+                        : alternativeInterfaceAttribute.Type;
+                }
 
                 var interfaceMap = _type.GetInterfaceMap(ifs);
                 var methodItems = interfaceMap.InterfaceMethods.Zip(interfaceMap.TargetMethods, Tuple.Create)
@@ -49,29 +56,10 @@ namespace Akka.Interfaced
                     var targetMethod = methodItems[i].Item2;
                     var invokePayloadType = payloadTypeTable[i];
                     var filterChain = _filterHandlerBuilder.Build(targetMethod, FilterChainKind.Notification);
+                    var isSyncHandler = alternativeInterfaceAttribute == null && filterChain.AsyncFilterExists == false;
+                    var isReentrant = isSyncHandler == false && HandlerBuilderHelpers.IsReentrantMethod(targetMethod);
 
-                    if (alternativeInterfaceAttribute != null || filterChain.AsyncFilterExists)
-                    {
-                        // async handler
-
-                        _table.Add(invokePayloadType, new NotificationHandlerItem
-                        {
-                            InterfaceType = ifs,
-                            IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
-                            AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, targetMethod, filterChain)
-                        });
-                    }
-                    else
-                    {
-                        // sync handler
-
-                        _table.Add(invokePayloadType, new NotificationHandlerItem
-                        {
-                            InterfaceType = ifs,
-                            IsReentrant = false,
-                            Handler = BuildHandler(_type, invokePayloadType, targetMethod, filterChain)
-                        });
-                    }
+                    AddHandler(ifs, targetMethod, invokePayloadType, filterChain, isSyncHandler, isReentrant);
                 }
             }
         }
@@ -150,32 +138,78 @@ namespace Akka.Interfaced
 
                     var isAsyncMethod = targetMethod.ReturnType.Name.StartsWith("Task");
                     var filterChain = _filterHandlerBuilder.Build(targetMethod, FilterChainKind.Notification);
+                    var isSyncHandler = isAsyncMethod == false && filterChain.AsyncFilterExists == false;
+                    var isReentrant = isSyncHandler == false && HandlerBuilderHelpers.IsReentrantMethod(targetMethod);
 
-                    if (isAsyncMethod || filterChain.AsyncFilterExists)
+                    if (isAsyncMethod == false && targetMethod.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+                        throw new InvalidOperationException($"Async void handler is not supported. ({_type.FullName}.{targetMethod.Name})");
+
+                    AddHandler(ifs, targetMethod, invokePayloadType, filterChain, isSyncHandler, isReentrant);
+                }
+            }
+        }
+
+        private void AddHandler(Type interfaceType, MethodInfo targetMethod, Type invokePayloadType, FilterChain filterChain, bool isSyncHandler, bool isReentrant)
+        {
+            if (targetMethod.IsGenericMethod == false)
+            {
+                if (isSyncHandler)
+                {
+                    // sync handler
+
+                    _table.Add(invokePayloadType, new NotificationHandlerItem
                     {
-                        // async handler
+                        InterfaceType = interfaceType,
+                        IsReentrant = isReentrant,
+                        Handler = BuildHandler(_type, invokePayloadType, targetMethod, filterChain)
+                    });
+                }
+                else
+                {
+                    // async handler
 
-                        _table.Add(invokePayloadType, new NotificationHandlerItem
-                        {
-                            InterfaceType = ifs,
-                            IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(targetMethod),
-                            AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, targetMethod, filterChain)
-                        });
-                    }
-                    else
+                    _table.Add(invokePayloadType, new NotificationHandlerItem
                     {
-                        if (targetMethod.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
-                            throw new InvalidOperationException($"Async void handler is not supported. ({_type.FullName}.{targetMethod.Name})");
+                        InterfaceType = interfaceType,
+                        IsReentrant = isReentrant,
+                        AsyncHandler = BuildAsyncHandler(_type, invokePayloadType, targetMethod, filterChain)
+                    });
+                }
+            }
+            else
+            {
+                // because a generic method needs parameter types to construct handler
+                // so factory method is built to generate the handler when paramter types are ready
 
-                        // sync handler
-
-                        _table.Add(invokePayloadType, new NotificationHandlerItem
+                if (isSyncHandler)
+                {
+                    _table.Add(invokePayloadType, new NotificationHandlerItem
+                    {
+                        InterfaceType = interfaceType,
+                        IsReentrant = isReentrant,
+                        IsGeneric = true,
+                        GenericHandlerBuilder = t => new NotificationHandlerItem
                         {
-                            InterfaceType = ifs,
-                            IsReentrant = false,
-                            Handler = BuildHandler(_type, invokePayloadType, targetMethod, filterChain)
-                        });
-                    }
+                            InterfaceType = interfaceType,
+                            IsReentrant = isReentrant,
+                            Handler = BuildGenericHandler(t, _type, invokePayloadType, targetMethod, filterChain)
+                        }
+                    });
+                }
+                else
+                {
+                    _table.Add(invokePayloadType, new NotificationHandlerItem
+                    {
+                        InterfaceType = interfaceType,
+                        IsReentrant = isReentrant,
+                        IsGeneric = true,
+                        GenericHandlerBuilder = t => new NotificationHandlerItem
+                        {
+                            InterfaceType = interfaceType,
+                            IsReentrant = isReentrant,
+                            AsyncHandler = BuildGenericAsyncHandler(t, _type, invokePayloadType, targetMethod, filterChain)
+                        }
+                    });
                 }
             }
         }
@@ -317,6 +351,24 @@ namespace Akka.Interfaced
                     }
                 }
             };
+        }
+
+        private static NotificationHandler BuildGenericHandler(
+            Type messageType, Type targetType, Type invokePayloadType, MethodInfo method, FilterChain filterChain)
+        {
+            var argTypes = messageType.GetGenericArguments();
+            var genericInvokePayloadType = invokePayloadType.MakeGenericType(argTypes);
+            var genericMethod = method.MakeGenericMethod(argTypes.Skip(argTypes.Length - method.GetGenericArguments().Length).ToArray());
+            return BuildHandler(targetType, genericInvokePayloadType, genericMethod, filterChain);
+        }
+
+        private static NotificationAsyncHandler BuildGenericAsyncHandler(
+            Type messageType, Type targetType, Type invokePayloadType, MethodInfo method, FilterChain filterChain)
+        {
+            var argTypes = messageType.GetGenericArguments();
+            var genericInvokePayloadType = invokePayloadType.MakeGenericType(argTypes);
+            var genericMethod = method.MakeGenericMethod(argTypes.Skip(argTypes.Length - method.GetGenericArguments().Length).ToArray());
+            return BuildAsyncHandler(targetType, genericInvokePayloadType, genericMethod, filterChain);
         }
 
         private static Type[] GetInterfacePayloadTypeTable(Type interfaceType)

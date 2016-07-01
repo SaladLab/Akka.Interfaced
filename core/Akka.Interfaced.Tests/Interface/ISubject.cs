@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Akka.Interfaced
 {
@@ -23,5 +24,15 @@ namespace Akka.Interfaced
         Task MakeEventEx(string eventName);
         Task Subscribe(ISubjectExObserver observer);
         Task Unsubscribe(ISubjectExObserver observer);
+    }
+
+    public interface ISubject<T> : IInterfacedActor
+        where T : ICloneable
+    {
+        Task MakeEvent(T eventName);
+        Task MakeEvent<U>(T eventName, U eventParam)
+            where U : IComparable<U>;
+        Task Subscribe(ISubjectObserver<T> observer);
+        Task Unsubscribe(ISubjectObserver<T> observer);
     }
 }

@@ -225,19 +225,19 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var requestPayloadType = request.InvokePayload.GetType();
-            var handlerItem = _handler.RequestDispatcher.GetHandler(requestPayloadType);
+            var payloadType = request.InvokePayload.GetType();
+            var handlerItem = _handler.RequestDispatcher.GetHandler(payloadType);
             if (handlerItem == null)
             {
                 // if generic argument, try to instantiate a generic handler by the given payload type.
 
-                if (requestPayloadType.IsGenericType)
+                if (payloadType.IsGenericType)
                 {
-                    var genericHandlerItem = _handler.RequestDispatcher.GetHandler(requestPayloadType.GetGenericTypeDefinition());
+                    var genericHandlerItem = _handler.RequestDispatcher.GetHandler(payloadType.GetGenericTypeDefinition());
                     if (genericHandlerItem != null)
                     {
-                        handlerItem = genericHandlerItem.GenericHandlerBuilder(requestPayloadType);
-                        _handler.RequestDispatcher.AddHandler(requestPayloadType, handlerItem);
+                        handlerItem = genericHandlerItem.GenericHandlerBuilder(payloadType);
+                        _handler.RequestDispatcher.AddHandler(payloadType, handlerItem);
                     }
                 }
 
@@ -252,7 +252,7 @@ namespace Akka.Interfaced
                     });
                     Context.System.EventStream.Publish(new Event.Warning(
                         Self.Path.ToString(), GetType(),
-                        $"Cannot find a handler for request {requestPayloadType} from {Sender}"));
+                        $"Cannot find a handler for request {payloadType} from {Sender}"));
                     return;
                 }
             }
@@ -347,13 +347,31 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var handlerItem = _handler.NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
+            var payloadType = notification.InvokePayload.GetType();
+            var handlerItem = _handler.NotificationDispatcher.GetHandler(payloadType);
             if (handlerItem == null)
             {
-                Context.System.EventStream.Publish(new Event.Warning(
-                    Self.Path.ToString(), GetType(),
-                    $"Cannot find a handler for notification {notification.InvokePayload.GetType()} from {Sender}"));
-                return;
+                // if generic argument, try to instantiate a generic handler by the given payload type.
+
+                if (payloadType.IsGenericType)
+                {
+                    var genericHandlerItem = _handler.NotificationDispatcher.GetHandler(payloadType.GetGenericTypeDefinition());
+                    if (genericHandlerItem != null)
+                    {
+                        handlerItem = genericHandlerItem.GenericHandlerBuilder(payloadType);
+                        _handler.NotificationDispatcher.AddHandler(payloadType, handlerItem);
+                    }
+                }
+
+                // oops, no handler.
+
+                if (handlerItem == null)
+                {
+                    Context.System.EventStream.Publish(new Event.Warning(
+                        Self.Path.ToString(), GetType(),
+                        $"Cannot find a handler for notification {notification.InvokePayload.GetType()} from {Sender}"));
+                    return;
+                }
             }
 
             if (handlerItem.Handler != null)

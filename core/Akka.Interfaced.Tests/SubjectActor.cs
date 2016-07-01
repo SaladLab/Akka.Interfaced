@@ -77,4 +77,32 @@ namespace Akka.Interfaced
             _observers.Remove(observer);
         }
     }
+
+    public class SubjectActor<T> : InterfacedActor, ISubjectSync<T>
+        where T : ICloneable
+    {
+        private List<ISubjectObserver<T>> _observers = new List<ISubjectObserver<T>>();
+
+        void ISubjectSync<T>.MakeEvent(T eventName)
+        {
+            foreach (var observer in _observers)
+                observer.Event(eventName);
+        }
+
+        void ISubjectSync<T>.MakeEvent<U>(T eventName, U eventParam)
+        {
+            foreach (var observer in _observers)
+                observer.Event(eventName, eventParam);
+        }
+
+        void ISubjectSync<T>.Subscribe(ISubjectObserver<T> observer)
+        {
+            _observers.Add(observer);
+        }
+
+        void ISubjectSync<T>.Unsubscribe(ISubjectObserver<T> observer)
+        {
+            _observers.Remove(observer);
+        }
+    }
 }

@@ -37,8 +37,10 @@ namespace Akka.Interfaced
             if (type.IsInterface)
             {
                 // Namespace.IExampleObserver -> Namespace.ExampleObserver
-                var proxyTypeName = type.FullName.Substring(0, type.FullName.Length - type.Name.Length) + type.Name.Substring(1);
+                var proxyTypeName = (type.Namespace.Length > 0 ? type.Namespace + "." : "") + type.Name.Substring(1);
                 var proxyType = type.Assembly.GetType(proxyTypeName);
+                if (proxyType != null && proxyType.IsGenericType)
+                    proxyType = proxyType.MakeGenericType(type.GetGenericArguments());
                 if (proxyType == null || proxyType.BaseType != typeof(InterfacedObserver))
                     throw new ArgumentException("Cannot resolve the observer type from " + type.FullName);
 

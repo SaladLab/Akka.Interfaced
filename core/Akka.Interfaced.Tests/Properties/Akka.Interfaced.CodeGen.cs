@@ -441,7 +441,7 @@ namespace Akka.Interfaced
         }
     }
 
-    public interface IBasic_NoReply<T>
+    public interface IBasic_NoReply<T> where T : new()
     {
         void Call();
         void CallWithParameter(T value);
@@ -1335,7 +1335,7 @@ namespace Akka.Interfaced
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IOverloadedGeneric)__target).Min(a, b);
+                var __v = await ((IOverloadedGeneric)__target).Min<T>(a, b);
                 return (IValueGetable)(new Min_Return<T> { v = __v });
             }
         }
@@ -1370,7 +1370,7 @@ namespace Akka.Interfaced
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IOverloadedGeneric)__target).Min(a, b, c);
+                var __v = await ((IOverloadedGeneric)__target).Min<T>(a, b, c);
                 return (IValueGetable)(new Min_2_Return<T> { v = __v });
             }
         }
@@ -1403,7 +1403,7 @@ namespace Akka.Interfaced
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IOverloadedGeneric)__target).Min(nums);
+                var __v = await ((IOverloadedGeneric)__target).Min<T>(nums);
                 return (IValueGetable)(new Min_3_Return<T> { v = __v });
             }
         }
@@ -1583,7 +1583,7 @@ namespace Akka.Interfaced
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IOverloadedGeneric<T>)__target).Min(a, b);
+                var __v = await ((IOverloadedGeneric<T>)__target).Min<U>(a, b);
                 return (IValueGetable)(new Min_Return<U> { v = __v });
             }
         }
@@ -1618,7 +1618,7 @@ namespace Akka.Interfaced
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IOverloadedGeneric<T>)__target).Min(a, b, c);
+                var __v = await ((IOverloadedGeneric<T>)__target).Min<U>(a, b, c);
                 return (IValueGetable)(new Min_2_Return<U> { v = __v });
             }
         }
@@ -1651,7 +1651,7 @@ namespace Akka.Interfaced
 
             public async Task<IValueGetable> InvokeAsync(object __target)
             {
-                var __v = await ((IOverloadedGeneric<T>)__target).Min(nums);
+                var __v = await ((IOverloadedGeneric<T>)__target).Min<U>(nums);
                 return (IValueGetable)(new Min_3_Return<U> { v = __v });
             }
         }
@@ -1673,7 +1673,7 @@ namespace Akka.Interfaced
         }
     }
 
-    public interface IOverloadedGeneric_NoReply<T>
+    public interface IOverloadedGeneric_NoReply<T> where T : new()
     {
         void GetDefault();
         void Min<U>(U a, U b) where U : System.IComparable<U>;
@@ -1965,6 +1965,224 @@ namespace Akka.Interfaced
         void MakeEvent(string eventName);
         void Subscribe(Akka.Interfaced.ISubjectObserver observer);
         void Unsubscribe(Akka.Interfaced.ISubjectObserver observer);
+    }
+}
+
+#endregion
+#region Akka.Interfaced.ISubject<T>
+
+namespace Akka.Interfaced
+{
+    [PayloadTable(typeof(ISubject<>), PayloadTableKind.Request)]
+    public static class ISubject_PayloadTable<T> where T : System.ICloneable
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(MakeEvent_Invoke), null },
+                { typeof(MakeEvent_2_Invoke<>), null },
+                { typeof(Subscribe_Invoke), null },
+                { typeof(Unsubscribe_Invoke), null },
+            };
+        }
+
+        public class MakeEvent_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public T eventName;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject<T>)__target).MakeEvent(eventName);
+                return null;
+            }
+        }
+
+        public class MakeEvent_2_Invoke<U>
+            : IInterfacedPayload, IAsyncInvokable where U : System.IComparable<U>
+        {
+            public T eventName;
+            public U eventParam;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject<T>)__target).MakeEvent<U>(eventName, eventParam);
+                return null;
+            }
+        }
+
+        public class Subscribe_Invoke
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
+        {
+            public Akka.Interfaced.ISubjectObserver<T> observer;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject<T>)__target).Subscribe(observer);
+                return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
+            }
+        }
+
+        public class Unsubscribe_Invoke
+            : IInterfacedPayload, IAsyncInvokable, IPayloadObserverUpdatable
+        {
+            public Akka.Interfaced.ISubjectObserver<T> observer;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubject<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                await ((ISubject<T>)__target).Unsubscribe(observer);
+                return null;
+            }
+
+            void IPayloadObserverUpdatable.Update(Action<IInterfacedObserver> updater)
+            {
+                if (observer != null)
+                {
+                    updater(observer);
+                }
+            }
+        }
+    }
+
+    public interface ISubject_NoReply<T> where T : System.ICloneable
+    {
+        void MakeEvent(T eventName);
+        void MakeEvent<U>(T eventName, U eventParam) where U : System.IComparable<U>;
+        void Subscribe(Akka.Interfaced.ISubjectObserver<T> observer);
+        void Unsubscribe(Akka.Interfaced.ISubjectObserver<T> observer);
+    }
+
+    public class SubjectRef<T> : InterfacedActorRef, ISubject<T>, ISubject_NoReply<T> where T : System.ICloneable
+    {
+        public override Type InterfaceType => typeof(ISubject<T>);
+
+        public SubjectRef() : base(null)
+        {
+        }
+
+        public SubjectRef(IRequestTarget target) : base(target)
+        {
+        }
+
+        public SubjectRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
+        {
+        }
+
+        public ISubject_NoReply<T> WithNoReply()
+        {
+            return this;
+        }
+
+        public SubjectRef<T> WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new SubjectRef<T>(Target, requestWaiter, Timeout);
+        }
+
+        public SubjectRef<T> WithTimeout(TimeSpan? timeout)
+        {
+            return new SubjectRef<T>(Target, RequestWaiter, timeout);
+        }
+
+        public Task MakeEvent(T eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable<T>.MakeEvent_Invoke { eventName = eventName }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task MakeEvent<U>(T eventName, U eventParam) where U : System.IComparable<U>
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable<T>.MakeEvent_2_Invoke<U> { eventName = eventName, eventParam = eventParam }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task Subscribe(Akka.Interfaced.ISubjectObserver<T> observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable<T>.Subscribe_Invoke { observer = (SubjectObserver<T>)observer }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        public Task Unsubscribe(Akka.Interfaced.ISubjectObserver<T> observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable<T>.Unsubscribe_Invoke { observer = (SubjectObserver<T>)observer }
+            };
+            return SendRequestAndWait(requestMessage);
+        }
+
+        void ISubject_NoReply<T>.MakeEvent(T eventName)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable<T>.MakeEvent_Invoke { eventName = eventName }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubject_NoReply<T>.MakeEvent<U>(T eventName, U eventParam)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable<T>.MakeEvent_2_Invoke<U> { eventName = eventName, eventParam = eventParam }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubject_NoReply<T>.Subscribe(Akka.Interfaced.ISubjectObserver<T> observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable<T>.Subscribe_Invoke { observer = (SubjectObserver<T>)observer }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void ISubject_NoReply<T>.Unsubscribe(Akka.Interfaced.ISubjectObserver<T> observer)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new ISubject_PayloadTable<T>.Unsubscribe_Invoke { observer = (SubjectObserver<T>)observer }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+
+    [AlternativeInterface(typeof(ISubject<>))]
+    public interface ISubjectSync<T> : IInterfacedActorSync where T : System.ICloneable
+    {
+        void MakeEvent(T eventName);
+        void MakeEvent<U>(T eventName, U eventParam) where U : System.IComparable<U>;
+        void Subscribe(Akka.Interfaced.ISubjectObserver<T> observer);
+        void Unsubscribe(Akka.Interfaced.ISubjectObserver<T> observer);
     }
 }
 
@@ -2728,6 +2946,87 @@ namespace Akka.Interfaced
     public interface ISubjectObserverAsync : IInterfacedObserverSync
     {
         Task Event(string eventName);
+    }
+}
+
+#endregion
+#region Akka.Interfaced.ISubjectObserver<T>
+
+namespace Akka.Interfaced
+{
+    [PayloadTable(typeof(ISubjectObserver<>), PayloadTableKind.Notification)]
+    public static class ISubjectObserver_PayloadTable<T> where T : System.ICloneable
+    {
+        public static Type[] GetPayloadTypes()
+        {
+            return new Type[] {
+                typeof(Event_Invoke),
+                typeof(Event_2_Invoke<>),
+            };
+        }
+
+        public class Event_Invoke : IInterfacedPayload, IInvokable
+        {
+            public T eventName;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubjectObserver<T>);
+            }
+
+            public void Invoke(object __target)
+            {
+                ((ISubjectObserver<T>)__target).Event(eventName);
+            }
+        }
+
+        public class Event_2_Invoke<U> : IInterfacedPayload, IInvokable where U : System.IComparable<U>
+        {
+            public T eventName;
+            public U eventParam;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(ISubjectObserver<T>);
+            }
+
+            public void Invoke(object __target)
+            {
+                ((ISubjectObserver<T>)__target).Event<U>(eventName, eventParam);
+            }
+        }
+    }
+
+    public class SubjectObserver<T> : InterfacedObserver, ISubjectObserver<T> where T : System.ICloneable
+    {
+        public SubjectObserver()
+            : base(null, 0)
+        {
+        }
+
+        public SubjectObserver(INotificationChannel channel, int observerId = 0)
+            : base(channel, observerId)
+        {
+        }
+
+        public void Event(T eventName)
+        {
+            var payload = new ISubjectObserver_PayloadTable<T>.Event_Invoke { eventName = eventName };
+            Notify(payload);
+        }
+
+        public void Event<U>(T eventName, U eventParam) where U : System.IComparable<U>
+        {
+            var payload = new ISubjectObserver_PayloadTable<T>.Event_2_Invoke<U> { eventName = eventName, eventParam = eventParam };
+            Notify(payload);
+        }
+    }
+
+    [AlternativeInterface(typeof(ISubjectObserver<>))]
+    public interface ISubjectObserverAsync<T> : IInterfacedObserverSync where T : System.ICloneable
+    {
+        Task Event(T eventName);
+        Task Event<U>(T eventName, U eventParam) where U : System.IComparable<U>;
     }
 }
 
