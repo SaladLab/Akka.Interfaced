@@ -14,7 +14,7 @@ namespace CodeGenerator
 
         public void GenerateCode(Type type, CodeWriter.CodeWriter w)
         {
-            Console.WriteLine("GenerateCode: " + type.FullName);
+            Console.WriteLine("GenerateCode: " + type.GetSymbolDisplay(true));
 
             if (Options.UseProtobuf && Options.UseSlimClient)
                 EnsureSurrogateForIRequestTarget(type, w);
@@ -194,12 +194,12 @@ namespace CodeGenerator
                                 var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
                                 if (returnType != null)
                                 {
-                                    w._($"var __v = await (({type.GetSymbolDisplay()})__target).{method.Name}({parameterNames});",
+                                    w._($"var __v = await (({type.GetSymbolDisplay()})__target).{method.Name}{method.GetGenericParameters()}({parameterNames});",
                                         $"return (IValueGetable)(new {payloadTypes.Item2}{method.GetGenericParameters()} {{ v = __v }});");
                                 }
                                 else
                                 {
-                                    w._($"await (({type.GetSymbolDisplay()})__target).{method.Name}({parameterNames});",
+                                    w._($"await (({type.GetSymbolDisplay()})__target).{method.Name}{method.GetGenericParameters()}({parameterNames});",
                                         $"return null;");
                                 }
                             }
@@ -306,7 +306,7 @@ namespace CodeGenerator
 
             var baseNoReplys = baseTypes.Select(t => Utility.GetNoReplyInterfaceName(t));
             var baseNoReplysInherit = baseNoReplys.Any() ? " : " + string.Join(", ", baseNoReplys) : "";
-            using (w.B($"public interface {Utility.GetNoReplyInterfaceName(type)}{type.GetGenericParameters()}{baseNoReplysInherit}"))
+            using (w.B($"public interface {Utility.GetNoReplyInterfaceName(type)}{type.GetGenericParameters()}{baseNoReplysInherit}{type.GetGenericConstraintClause()}"))
             {
                 foreach (var m in typeInfos.First().Item2)
                 {

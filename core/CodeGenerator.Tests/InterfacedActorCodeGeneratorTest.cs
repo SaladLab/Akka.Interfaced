@@ -94,8 +94,24 @@ namespace CodeGenerator
         [Fact]
         public void GenerateActorCode_WithGeneric()
         {
-            var compilation = TestUtility.Generate(new Options { UseSlimClient = true }, new[] { typeof(IGeneric<>) }, _output);
-            Assert.NotEmpty(compilation.GetTypeSymbolNames());
+            var compilation = TestUtility.Generate(new Options(), new[] { typeof(IGeneric<>) }, _output);
+            Assert.Equal(
+                new[]
+                {
+                    "IGeneric_PayloadTable",
+                    "Create_Invoke",
+                    "Create_Return",
+                    "Echo_Invoke",
+                    "Echo_Return",
+                    "Echo_2_Invoke",
+                    "Echo_2_Return",
+                    "Equal_Invoke",
+                    "Equal_Return",
+                    "IGeneric_NoReply",
+                    "GenericRef",
+                    "IGenericSync",
+                },
+                compilation.GetTypeSymbolNames());
         }
     }
 }

@@ -14,12 +14,12 @@ namespace CodeGenerator
 
         public void GenerateCode(Type type, CodeWriter.CodeWriter w)
         {
-            Console.WriteLine("GenerateCode: " + type.FullName);
+            Console.WriteLine("GenerateCode: " + type.GetSymbolDisplay(true));
 
             if (Options.UseProtobuf && Options.UseSlimClient)
                 EnsureSurrogateForINotificationChannel(type, w);
 
-            w._($"#region {type.FullName}");
+            w._($"#region {type.GetSymbolDisplay(true)}");
             w._();
 
             var namespaceHandle = (string.IsNullOrEmpty(type.Namespace) == false)
@@ -92,8 +92,8 @@ namespace CodeGenerator
             Type type, CodeWriter.CodeWriter w,
             List<Tuple<MethodInfo, string>> method2PayloadTypeNames)
         {
-            w._($"[PayloadTable(typeof({type.Name}), PayloadTableKind.Notification)]");
-            using (w.B($"public static class {Utility.GetPayloadTableClassName(type)}"))
+            w._($"[PayloadTable(typeof({type.GetSymbolDisplay(typeless: true)}), PayloadTableKind.Notification)]");
+            using (w.B($"public static class {Utility.GetPayloadTableClassName(type)}{type.GetGenericParameters()}{type.GetGenericConstraintClause()}"))
             {
                 // generate GetPayloadTypes method
 
@@ -103,7 +103,8 @@ namespace CodeGenerator
                     {
                         foreach (var m in method2PayloadTypeNames)
                         {
-                            w._($"typeof({m.Item2}),");
+                            var genericParameters = m.Item1.GetGenericParameters(typeless: true);
+                            w._($"typeof({m.Item2}{genericParameters}),");
                         }
                     }
                 }
@@ -116,38 +117,54 @@ namespace CodeGenerator
                     var payloadTypeName = m.Item2;
 
                     // Invoke payload
+
+                    if (Options.UseProtobuf)
+                        w._("[ProtoContract, TypeAlias]");
+
+                    using (w.B($"public class {payloadTypeName}{method.GetGenericParameters()} : IInterfacedPayload, IInvokable{method.GetGenericConstraintClause()}"))
                     {
-                        if (Options.UseProtobuf)
-                            w._("[ProtoContract, TypeAlias]");
+                        // Parameters
 
-                        using (w.B($"public class {payloadTypeName} : IInterfacedPayload, IInvokable"))
+                        var parameters = method.GetParameters();
+                        for (var i = 0; i < parameters.Length; i++)
                         {
-                            // Parameters
+                            var parameter = parameters[i];
 
-                            var parameters = method.GetParameters();
-                            for (var i = 0; i < parameters.Length; i++)
+                            var attr = "";
+                            var defaultValueExpression = "";
+                            if (Options.UseProtobuf)
                             {
-                                var parameter = parameters[i];
-                                var attr = (Options.UseProtobuf) ? string.Format("[ProtoMember({0})] ", i + 1) : "";
-                                w._($"{attr}public {parameter.ParameterType.GetSymbolDisplay(true)} {parameter.Name};");
-                            }
-                            if (parameters.Any())
-                                w._();
+                                var defaultValueAttr =
+                                    parameter.HasNonTrivialDefaultValue()
+                                        ? $", DefaultValue({parameter.DefaultValue.GetValueLiteral()})"
+                                        : "";
+                                attr = $"[ProtoMember({i + 1}){defaultValueAttr}] ";
 
-                            // GetInterfaceType
-
-                            using (w.B("public Type GetInterfaceType()"))
-                            {
-                                w._($"return typeof({type.Name});");
+                                if (parameter.HasNonTrivialDefaultValue())
+                                {
+                                    defaultValueExpression = " = " + parameter.DefaultValue.GetValueLiteral();
+                                }
                             }
 
-                            // Invoke
+                            var typeName = parameter.ParameterType.GetSymbolDisplay(true);
+                            w._($"{attr}public {typeName} {parameter.Name}{defaultValueExpression};");
+                        }
+                        if (parameters.Any())
+                            w._();
 
-                            using (w.B("public void Invoke(object __target)"))
-                            {
-                                var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
-                                w._($"(({type.Name})__target).{method.Name}({parameterNames});");
-                            }
+                        // GetInterfaceType
+
+                        using (w.B("public Type GetInterfaceType()"))
+                        {
+                            w._($"return typeof({type.GetSymbolDisplay()});");
+                        }
+
+                        // Invoke
+
+                        using (w.B("public void Invoke(object __target)"))
+                        {
+                            var parameterNames = string.Join(", ", method.GetParameters().Select(p => p.Name));
+                            w._($"(({type.GetSymbolDisplay()})__target).{method.Name}{method.GetGenericParameters()}({parameterNames});");
                         }
                     }
                 }
@@ -160,7 +177,7 @@ namespace CodeGenerator
         {
             var className = Utility.GetObserverClassName(type);
 
-            using (w.B($"public class {className} : InterfacedObserver, {type.Name}"))
+            using (w.B($"public class {className}{type.GetGenericParameters()} : InterfacedObserver, {type.GetSymbolDisplay()}{type.GetGenericConstraintClause()}"))
             {
                 // Constructor
 
@@ -180,7 +197,7 @@ namespace CodeGenerator
 
                 foreach (var t in typeInfos)
                 {
-                    var payloadTableClassName = Utility.GetPayloadTableClassName(t.Item1);
+                    var payloadTableClassName = Utility.GetPayloadTableClassName(t.Item1) + type.GetGenericParameters();
 
                     foreach (var m in t.Item2)
                     {
@@ -194,9 +211,9 @@ namespace CodeGenerator
 
                         // Request Methods
 
-                        using (w.B($"public void {method.Name}({parameterTypeNames})"))
+                        using (w.B($"public void {method.Name}{method.GetGenericParameters()}({parameterTypeNames}){method.GetGenericConstraintClause()}"))
                         {
-                            w._($"var payload = new {payloadTableClassName}.{payloadType} {{ {parameterInits} }};",
+                            w._($"var payload = new {payloadTableClassName}.{payloadType}{method.GetGenericParameters()} {{ {parameterInits} }};",
                                 $"Notify(payload);");
                         }
                     }
@@ -242,15 +259,15 @@ namespace CodeGenerator
 
             var baseSynces = baseTypes.Select(t => Utility.GetObserverAsyncInterfaceName(t));
             var baseSyncesInherit = baseSynces.Any() ? string.Join(", ", baseSynces) : "IInterfacedObserverSync";
-            w._($"[AlternativeInterface(typeof({type.Name}))]");
-            using (w.B($"public interface {Utility.GetObserverAsyncInterfaceName(type)} : {baseSyncesInherit}"))
+            w._($"[AlternativeInterface(typeof({type.GetSymbolDisplay(typeless: true)}))]");
+            using (w.B($"public interface {Utility.GetObserverAsyncInterfaceName(type)}{type.GetGenericParameters()} : {baseSyncesInherit}{type.GetGenericConstraintClause()}"))
             {
                 foreach (var m in typeInfos.First().Item2)
                 {
                     var method = m.Item1;
                     var parameters = method.GetParameters();
                     var paramStr = string.Join(", ", parameters.Select(p => p.GetParameterDeclaration(true)));
-                    w._($"Task {method.Name}({paramStr});");
+                    w._($"Task {method.Name}{method.GetGenericParameters()}({paramStr}){method.GetGenericConstraintClause()};");
                 }
             }
         }
