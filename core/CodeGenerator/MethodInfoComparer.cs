@@ -21,7 +21,9 @@ namespace CodeGenerator
                 if (ret2 != 0)
                     return ret2;
 
-                var ret3 = string.Compare(xp[i].ParameterType.FullName, yp[i].ParameterType.FullName, StringComparison.Ordinal);
+                var ret3 = string.Compare(xp[i].ParameterType.FullName ?? xp[i].ParameterType.Name,
+                                          yp[i].ParameterType.FullName ?? yp[i].ParameterType.Name,
+                                          StringComparison.Ordinal);
                 if (ret3 != 0)
                     return ret3;
             }
