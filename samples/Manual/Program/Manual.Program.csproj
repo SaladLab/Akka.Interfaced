@@ -76,6 +76,7 @@
     <Compile Include="DemoActor.cs" />
     <Compile Include="DemoException.cs" />
     <Compile Include="DemoFilter.cs" />
+    <Compile Include="DemoGeneric.cs" />
     <Compile Include="DemoLogFilter.cs" />
     <Compile Include="DemoMessageHandler.cs" />
     <Compile Include="DemoObserver.cs" />

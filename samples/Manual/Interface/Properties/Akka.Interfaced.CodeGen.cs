@@ -171,6 +171,217 @@ namespace Manual
 }
 
 #endregion
+#region Manual.IGreeter<T>
+
+namespace Manual
+{
+    [PayloadTable(typeof(IGreeter<>), PayloadTableKind.Request)]
+    public static class IGreeter_PayloadTable<T> where T : System.ICloneable
+    {
+        public static Type[,] GetPayloadTypes()
+        {
+            return new Type[,] {
+                { typeof(GetCount_Invoke), typeof(GetCount_Return) },
+                { typeof(Greet_Invoke), typeof(Greet_Return) },
+                { typeof(Greet_2_Invoke<>), typeof(Greet_2_Return<>) },
+            };
+        }
+
+        public class GetCount_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public Type GetInterfaceType()
+            {
+                return typeof(IGreeter<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IGreeter<T>)__target).GetCount();
+                return (IValueGetable)(new GetCount_Return { v = __v });
+            }
+        }
+
+        public class GetCount_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public int v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IGreeter<T>);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+
+        public class Greet_Invoke
+            : IInterfacedPayload, IAsyncInvokable
+        {
+            public T name;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IGreeter<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IGreeter<T>)__target).Greet(name);
+                return (IValueGetable)(new Greet_Return { v = __v });
+            }
+        }
+
+        public class Greet_Return
+            : IInterfacedPayload, IValueGetable
+        {
+            public T v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IGreeter<T>);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+
+        public class Greet_2_Invoke<U>
+            : IInterfacedPayload, IAsyncInvokable where U : System.IComparable<U>
+        {
+            public U name;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IGreeter<T>);
+            }
+
+            public async Task<IValueGetable> InvokeAsync(object __target)
+            {
+                var __v = await ((IGreeter<T>)__target).Greet<U>(name);
+                return (IValueGetable)(new Greet_2_Return<U> { v = __v });
+            }
+        }
+
+        public class Greet_2_Return<U>
+            : IInterfacedPayload, IValueGetable where U : System.IComparable<U>
+        {
+            public T v;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IGreeter<T>);
+            }
+
+            public object Value
+            {
+                get { return v; }
+            }
+        }
+    }
+
+    public interface IGreeter_NoReply<T> where T : System.ICloneable
+    {
+        void GetCount();
+        void Greet(T name);
+        void Greet<U>(U name) where U : System.IComparable<U>;
+    }
+
+    public class GreeterRef<T> : InterfacedActorRef, IGreeter<T>, IGreeter_NoReply<T> where T : System.ICloneable
+    {
+        public override Type InterfaceType => typeof(IGreeter<T>);
+
+        public GreeterRef() : base(null)
+        {
+        }
+
+        public GreeterRef(IRequestTarget target) : base(target)
+        {
+        }
+
+        public GreeterRef(IRequestTarget target, IRequestWaiter requestWaiter, TimeSpan? timeout = null) : base(target, requestWaiter, timeout)
+        {
+        }
+
+        public IGreeter_NoReply<T> WithNoReply()
+        {
+            return this;
+        }
+
+        public GreeterRef<T> WithRequestWaiter(IRequestWaiter requestWaiter)
+        {
+            return new GreeterRef<T>(Target, requestWaiter, Timeout);
+        }
+
+        public GreeterRef<T> WithTimeout(TimeSpan? timeout)
+        {
+            return new GreeterRef<T>(Target, RequestWaiter, timeout);
+        }
+
+        public Task<int> GetCount()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable<T>.GetCount_Invoke {  }
+            };
+            return SendRequestAndReceive<int>(requestMessage);
+        }
+
+        public Task<T> Greet(T name)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable<T>.Greet_Invoke { name = name }
+            };
+            return SendRequestAndReceive<T>(requestMessage);
+        }
+
+        public Task<T> Greet<U>(U name) where U : System.IComparable<U>
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable<T>.Greet_2_Invoke<U> { name = name }
+            };
+            return SendRequestAndReceive<T>(requestMessage);
+        }
+
+        void IGreeter_NoReply<T>.GetCount()
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable<T>.GetCount_Invoke {  }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IGreeter_NoReply<T>.Greet(T name)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable<T>.Greet_Invoke { name = name }
+            };
+            SendRequest(requestMessage);
+        }
+
+        void IGreeter_NoReply<T>.Greet<U>(U name)
+        {
+            var requestMessage = new RequestMessage {
+                InvokePayload = new IGreeter_PayloadTable<T>.Greet_2_Invoke<U> { name = name }
+            };
+            SendRequest(requestMessage);
+        }
+    }
+
+    [AlternativeInterface(typeof(IGreeter<>))]
+    public interface IGreeterSync<T> : IInterfacedActorSync where T : System.ICloneable
+    {
+        int GetCount();
+        T Greet(T name);
+        T Greet<U>(U name) where U : System.IComparable<U>;
+    }
+}
+
+#endregion
 #region Manual.IGreeterWithObserver
 
 namespace Manual

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Akka.Interfaced;
 
 namespace Manual
@@ -6,6 +7,15 @@ namespace Manual
     public interface IGreeter : IInterfacedActor
     {
         Task<string> Greet(string name);
+        Task<int> GetCount();
+    }
+
+    public interface IGreeter<T> : IInterfacedActor
+        where T : ICloneable
+    {
+        Task<T> Greet(T name);
+        Task<T> Greet<U>(U name)
+            where U : IComparable<U>;
         Task<int> GetCount();
     }
 
