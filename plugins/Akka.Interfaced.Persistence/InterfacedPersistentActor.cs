@@ -156,12 +156,8 @@ namespace Akka.Interfaced.Persistence
 
         protected override void OnRecover(object message)
         {
-            var messageHandler = _handler.MessageDispatcher.GetHandler(message.GetType());
-            if (messageHandler != null)
-            {
-                HandleMessageByHandler(message, messageHandler);
+            if (TryHandleMessage(message))
                 return;
-            }
 
             OnReceiveUnhandled(message);
         }
@@ -210,12 +206,8 @@ namespace Akka.Interfaced.Persistence
                 return;
             }
 
-            var messageHandler = _handler.MessageDispatcher.GetHandler(message.GetType());
-            if (messageHandler != null)
-            {
-                HandleMessageByHandler(message, messageHandler);
+            if (TryHandleMessage(message))
                 return;
-            }
 
             if (HandleSnapshotResultMessages(message))
                 return;
@@ -240,18 +232,36 @@ namespace Akka.Interfaced.Persistence
                 return;
             }
 
-            var handlerItem = _handler.RequestDispatcher.GetHandler(request.InvokePayload.GetType());
+            var payloadType = request.InvokePayload.GetType();
+            var handlerItem = _handler.RequestDispatcher.GetHandler(payloadType);
             if (handlerItem == null)
             {
-                sender.Tell(new ResponseMessage
+                // if generic argument, try to instantiate a generic handler by the given payload type.
+
+                if (payloadType.IsGenericType)
                 {
-                    RequestId = request.RequestId,
-                    Exception = new RequestHandlerNotFoundException("Cannot find handler")
-                });
-                Context.System.EventStream.Publish(new Event.Warning(
-                    Self.Path.ToString(), GetType(),
-                    $"Cannot find a handler for request {request.InvokePayload.GetType()} from {Sender}"));
-                return;
+                    var genericHandlerItem = _handler.RequestDispatcher.GetHandler(payloadType.GetGenericTypeDefinition());
+                    if (genericHandlerItem != null)
+                    {
+                        handlerItem = genericHandlerItem.GenericHandlerBuilder(payloadType);
+                        _handler.RequestDispatcher.AddHandler(payloadType, handlerItem);
+                    }
+                }
+
+                // oops, no handler.
+
+                if (handlerItem == null)
+                {
+                    sender.Tell(new ResponseMessage
+                    {
+                        RequestId = request.RequestId,
+                        Exception = new RequestHandlerNotFoundException()
+                    });
+                    Context.System.EventStream.Publish(new Event.Warning(
+                        Self.Path.ToString(), GetType(),
+                        $"Cannot find a handler for request {payloadType} from {Sender}"));
+                    return;
+                }
             }
 
             if (handlerItem.Handler != null)
@@ -344,13 +354,31 @@ namespace Akka.Interfaced.Persistence
                 return;
             }
 
-            var handlerItem = _handler.NotificationDispatcher.GetHandler(notification.InvokePayload.GetType());
+            var payloadType = notification.InvokePayload.GetType();
+            var handlerItem = _handler.NotificationDispatcher.GetHandler(payloadType);
             if (handlerItem == null)
             {
-                Context.System.EventStream.Publish(new Event.Warning(
-                    Self.Path.ToString(), GetType(),
-                    $"Cannot find a handler for notification {notification.InvokePayload.GetType()} from {Sender}"));
-                return;
+                // if generic argument, try to instantiate a generic handler by the given payload type.
+
+                if (payloadType.IsGenericType)
+                {
+                    var genericHandlerItem = _handler.NotificationDispatcher.GetHandler(payloadType.GetGenericTypeDefinition());
+                    if (genericHandlerItem != null)
+                    {
+                        handlerItem = genericHandlerItem.GenericHandlerBuilder(payloadType);
+                        _handler.NotificationDispatcher.AddHandler(payloadType, handlerItem);
+                    }
+                }
+
+                // oops, no handler.
+
+                if (handlerItem == null)
+                {
+                    Context.System.EventStream.Publish(new Event.Warning(
+                        Self.Path.ToString(), GetType(),
+                        $"Cannot find a handler for notification {notification.InvokePayload.GetType()} from {Sender}"));
+                    return;
+                }
             }
 
             if (handlerItem.Handler != null)
@@ -424,8 +452,28 @@ namespace Akka.Interfaced.Persistence
             }
         }
 
-        private void HandleMessageByHandler(object message, MessageHandlerItem handlerItem)
+        private bool TryHandleMessage(object message)
         {
+            var messageType = message.GetType();
+            var handlerItem = _handler.MessageDispatcher.GetHandler(messageType);
+            if (handlerItem == null)
+            {
+                // if generic argument, try to instantiate a generic handler by the given payload type.
+
+                if (messageType.IsGenericType)
+                {
+                    var genericHandlerItem = _handler.MessageDispatcher.GetHandler(messageType.GetGenericTypeDefinition());
+                    if (genericHandlerItem != null)
+                    {
+                        handlerItem = genericHandlerItem.GenericHandlerBuilder(messageType);
+                        _handler.MessageDispatcher.AddHandler(messageType, handlerItem);
+                    }
+                }
+
+                if (handlerItem == null)
+                    return false;
+            }
+
             if (handlerItem.AsyncHandler != null)
             {
                 var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
@@ -450,6 +498,7 @@ namespace Akka.Interfaced.Persistence
             {
                 handlerItem.Handler(this, message);
             }
+            return true;
         }
 
         private void OnReceiveInAtomicTask(object message)
@@ -553,23 +602,23 @@ namespace Akka.Interfaced.Persistence
 
         // async support
 
-        protected void RunTask(Action action)
+        protected void RunTask(Action action, IActorRef self = null)
         {
             RunTask(() =>
             {
                 action();
                 return Task.FromResult(0);
-            });
+            }, self);
         }
 
-        protected void RunTask(Func<Task> function)
+        protected void RunTask(Func<Task> function, IActorRef self = null)
         {
-            RunTask(function, false);
+            RunTask(function, false, self);
         }
 
-        protected void RunTask(Func<Task> function, bool isReentrant)
+        protected void RunTask(Func<Task> function, bool isReentrant, IActorRef self = null)
         {
-            Self.Tell(new TaskRunMessage { Function = function, IsReentrant = isReentrant });
+            (self ?? Self).Tell(new TaskRunMessage { Function = function, IsReentrant = isReentrant });
         }
 
         // other messages
