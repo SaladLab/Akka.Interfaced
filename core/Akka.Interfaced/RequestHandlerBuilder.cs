@@ -474,7 +474,7 @@ namespace Akka.Interfaced
         {
             var argTypes = messageType.GetGenericArguments();
             var genericInvokePayloadType = invokePayloadType.MakeGenericType(argTypes);
-            var genericReturnPayloadType = returnPayloadType.MakeGenericType(argTypes);
+            var genericReturnPayloadType = returnPayloadType?.MakeGenericType(argTypes);
             var genericMethod = method.MakeGenericMethod(argTypes.Skip(targetType.GetGenericArguments().Length).ToArray());
             return BuildHandler(targetType, genericInvokePayloadType, genericReturnPayloadType, genericMethod, filterChain);
         }
@@ -484,7 +484,7 @@ namespace Akka.Interfaced
         {
             var argTypes = messageType.GetGenericArguments();
             var genericInvokePayloadType = invokePayloadType.MakeGenericType(argTypes);
-            var genericReturnPayloadType = returnPayloadType.MakeGenericType(argTypes);
+            var genericReturnPayloadType = returnPayloadType?.MakeGenericType(argTypes);
             var genericMethod = method.MakeGenericMethod(argTypes.Skip(targetType.GetGenericArguments().Length).ToArray());
             return BuildAsyncHandler(targetType, genericInvokePayloadType, genericReturnPayloadType, genericMethod, filterChain);
         }
