@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -36,26 +37,71 @@ namespace Akka.Interfaced
                 var messageType = attr.Type ?? method.GetParameters()[0].ParameterType;
                 var isAsyncMethod = (method.ReturnType.Name.StartsWith("Task"));
                 var filterChain = _filterHandlerBuilder.Build(method, FilterChainKind.Message);
+                var isSyncHandler = isAsyncMethod == false && filterChain.AsyncFilterExists == false;
+                var isReentrant = isSyncHandler == false && HandlerBuilderHelpers.IsReentrantMethod(method);
 
-                if (isAsyncMethod || filterChain.AsyncFilterExists)
+                if (isAsyncMethod == false && method.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+                    throw new InvalidOperationException($"Async void handler is not supported. ({_type.FullName}.{method.Name})");
+
+                AddHandler(method, messageType, filterChain, isSyncHandler, isReentrant);
+            }
+        }
+
+        private void AddHandler(MethodInfo method, Type messageType, FilterChain filterChain, bool isSyncHandler, bool isReentrant)
+        {
+            if (method.IsGenericMethod == false)
+            {
+                if (isSyncHandler)
                 {
                     var item = new MessageHandlerItem
                     {
-                        IsReentrant = HandlerBuilderHelpers.IsReentrantMethod(method),
-                        AsyncHandler = BuildAsyncHandler(_type, messageType, method, filterChain)
+                        IsReentrant = isReentrant,
+                        Handler = BuildHandler(_type, messageType, method, filterChain)
                     };
                     _table.Add(messageType, item);
                 }
                 else
                 {
-                    if (method.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
-                        throw new InvalidOperationException($"Async void handler is not supported. ({_type.FullName}.{method.Name})");
-
                     var item = new MessageHandlerItem
                     {
-                        Handler = BuildHandler(_type, messageType, method, filterChain)
+                        IsReentrant = isReentrant,
+                        AsyncHandler = BuildAsyncHandler(_type, messageType, method, filterChain)
                     };
                     _table.Add(messageType, item);
+                }
+            }
+            else
+            {
+                // because a generic method needs parameter types to construct handler
+                // so factory method is built to generate the handler when paramter types are ready
+
+                var defType = messageType.GetGenericTypeDefinition();
+
+                if (isSyncHandler)
+                {
+                    _table.Add(defType, new MessageHandlerItem
+                    {
+                        IsReentrant = isReentrant,
+                        IsGeneric = true,
+                        GenericHandlerBuilder = t => new MessageHandlerItem
+                        {
+                            IsReentrant = isReentrant,
+                            Handler = BuildGenericHandler(_type, t, method, filterChain)
+                        }
+                    });
+                }
+                else
+                {
+                    _table.Add(defType, new MessageHandlerItem
+                    {
+                        IsReentrant = isReentrant,
+                        IsGeneric = true,
+                        GenericHandlerBuilder = t => new MessageHandlerItem
+                        {
+                            IsReentrant = isReentrant,
+                            AsyncHandler = BuildGenericAsyncHandler(_type, t, method, filterChain)
+                        }
+                    });
                 }
             }
         }
@@ -200,6 +246,22 @@ namespace Akka.Interfaced
                     }
                 }
             };
+        }
+
+        private static MessageHandler BuildGenericHandler(
+            Type targetType, Type messageType, MethodInfo method, FilterChain filterChain)
+        {
+            var argTypes = messageType.GetGenericArguments();
+            var genericMethod = method.MakeGenericMethod(argTypes.Skip(argTypes.Length - method.GetGenericArguments().Length).ToArray());
+            return BuildHandler(targetType, messageType, genericMethod, filterChain);
+        }
+
+        private static MessageAsyncHandler BuildGenericAsyncHandler(
+            Type targetType, Type messageType, MethodInfo method, FilterChain filterChain)
+        {
+            var argTypes = messageType.GetGenericArguments();
+            var genericMethod = method.MakeGenericMethod(argTypes.Skip(argTypes.Length - method.GetGenericArguments().Length).ToArray());
+            return BuildAsyncHandler(targetType, messageType, genericMethod, filterChain);
         }
     }
 }

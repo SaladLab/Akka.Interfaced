@@ -198,12 +198,8 @@ namespace Akka.Interfaced
                 return;
             }
 
-            var messageHandler = _handler.MessageDispatcher.GetHandler(message.GetType());
-            if (messageHandler != null)
-            {
-                HandleMessageByHandler(message, messageHandler);
+            if (TryHandleMessage(message))
                 return;
-            }
 
             OnReceiveUnhandled(message);
         }
@@ -445,8 +441,28 @@ namespace Akka.Interfaced
             }
         }
 
-        private void HandleMessageByHandler(object message, MessageHandlerItem handlerItem)
+        private bool TryHandleMessage(object message)
         {
+            var messageType = message.GetType();
+            var handlerItem = _handler.MessageDispatcher.GetHandler(messageType);
+            if (handlerItem == null)
+            {
+                // if generic argument, try to instantiate a generic handler by the given payload type.
+
+                if (messageType.IsGenericType)
+                {
+                    var genericHandlerItem = _handler.MessageDispatcher.GetHandler(messageType.GetGenericTypeDefinition());
+                    if (genericHandlerItem != null)
+                    {
+                        handlerItem = genericHandlerItem.GenericHandlerBuilder(messageType);
+                        _handler.MessageDispatcher.AddHandler(messageType, handlerItem);
+                    }
+                }
+
+                if (handlerItem == null)
+                    return false;
+            }
+
             if (handlerItem.AsyncHandler != null)
             {
                 var context = new MessageHandleContext { Self = Self, Sender = base.Sender, CancellationToken = CancellationToken };
@@ -471,6 +487,7 @@ namespace Akka.Interfaced
             {
                 handlerItem.Handler(this, message);
             }
+            return true;
         }
 
         private void OnReceiveInAtomicTask(object message)

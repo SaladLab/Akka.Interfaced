@@ -97,6 +97,7 @@
     <Compile Include="MessageFilterFactoryTest.cs" />
     <Compile Include="MessageFilterOrderTest.cs" />
     <Compile Include="MessageDispatchTest.cs" />
+    <Compile Include="MessageGenericTest.cs" />
     <Compile Include="NotificationExceptionTest.cs" />
     <Compile Include="NotificationFilterAsyncTest.cs" />
     <Compile Include="NotificationFilterFactoryTest.cs" />
