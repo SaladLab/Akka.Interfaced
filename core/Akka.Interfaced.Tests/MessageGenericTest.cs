@@ -76,7 +76,7 @@ namespace Akka.Interfaced
         [Theory]
         [InlineData(typeof(TestMessageActor))]
         [InlineData(typeof(TestMessageActor<string>))]
-        public async Task HandleMessage(Type actorType)
+        public async Task HandleGenericMessage(Type actorType)
         {
             // Arrange
             var log = new LogBoard<string>();

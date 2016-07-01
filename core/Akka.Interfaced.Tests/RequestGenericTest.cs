@@ -105,7 +105,7 @@ namespace Akka.Interfaced
         [InlineData(typeof(TestDummyActor<string>))]
         [InlineData(typeof(TestDummySyncActor<string>))]
         [InlineData(typeof(TestDummyExtendedActor<string>))]
-        public async Task BasicCall_Done(Type actorType)
+        public async Task CallGenericMethod(Type actorType)
         {
             // Arrange
             var log = new LogBoard<string>();
