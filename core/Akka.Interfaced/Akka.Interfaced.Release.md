@@ -1,3 +1,7 @@
+## 0.5.0 (Released 2016/07/04)
+
+* Support generic interface and method. #30
+
 ## 0.4.1 (Released 2016/06/23)
 
 * Add Akka.Interfaced.SlimServer module.

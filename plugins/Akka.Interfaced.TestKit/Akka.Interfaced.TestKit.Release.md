@@ -1,3 +1,7 @@
+## 0.5.0 (Released 2016/07/04)
+
+* Sync with Akka.Interfaced 0.5.0
+
 ## 0.4.2 (Released 2016/06/24)
 
 * Sync with Akka.Interfaced.SlimServer 0.4.2
