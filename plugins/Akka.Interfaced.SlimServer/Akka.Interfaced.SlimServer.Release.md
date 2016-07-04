@@ -1,6 +1,8 @@
 ## 0.5.0 (Released 2016/07/04)
 
 * Sync with Akka.Interfaced 0.5.0
+* Gateway.OpenChannel returns BoundActorTarget
+* Add ChannelOpen to IActorBoundChannelObserver.
 
 ## 0.4.2 (Released 2016/06/24)
 
