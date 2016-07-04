@@ -27,7 +27,7 @@ let solution =
                               Template = true
                               PackagePrerelease = "beta"
                               Dependencies = 
-                                  [ ("Akka.Interfaced", "")
+                                  [ ("Akka.Interfaced.Templates", "")
                                     ("protobuf-net", "2.1.0-alpha-1")
                                     ("TypeAlias", "1.1.2") ] }
           { emptyProject with Name = "Akka.Interfaced-SlimClient.Templates"
@@ -39,7 +39,7 @@ let solution =
                               Template = true
                               PackagePrerelease = "beta"
                               Dependencies = 
-                                  [ ("Akka.Interfaced-Base", "")
+                                  [ ("Akka.Interfaced-SlimClient.Templates", "")
                                     ("protobuf-net", "2.1.0-alpha-1")
                                     ("TypeAlias", "1.1.2") ] }
           { // CodeVerifier

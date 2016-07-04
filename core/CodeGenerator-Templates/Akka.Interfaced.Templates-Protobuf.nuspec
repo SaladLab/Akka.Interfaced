@@ -18,12 +18,7 @@
   </metadata>
   <files>
     <!-- base path: /bin/nuget/work/id -->
-    <file src="..\..\..\..\core\CodeGenerator-Templates\Akka.Interfaced.Templates.Common.targets" target="build\Akka.Interfaced.Templates-Protobuf.targets" />
     <file src="..\..\..\..\core\CodeGenerator-Templates\Akka.Interfaced.Templates-Protobuf.props" target="build" />
-    <file src="..\..\..\..\core\CodeGenerator\bin\Release\*.exe" target="tools" />
-    <file src="..\..\..\..\core\CodeGenerator\bin\Release\*.dll" target="tools" />
-    <file src="..\..\..\..\core\CodeGenerator\bin\Release\*.config" target="tools" />
     <file src="..\..\..\..\core\CodeGenerator-Templates\protobuf-net\*" target="tools\protobuf-net" />
-    <file src="..\..\..\..\core\CodeGenerator-Templates\EmptyFile.cs" target="content\Properties\Akka.Interfaced.CodeGen.cs" />
   </files>
 </package>
