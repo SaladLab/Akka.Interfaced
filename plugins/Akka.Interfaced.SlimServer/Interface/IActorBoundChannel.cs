@@ -57,6 +57,7 @@ namespace Akka.Interfaced.SlimServer
     public interface IActorBoundChannelObserver : IInterfacedObserver
     {
         void ChannelOpen(IActorBoundChannel channel, object tag);
+        void ChannelOpenTimeout(object tag);
         void ChannelClose(IActorBoundChannel channel, object tag);
     }
 }

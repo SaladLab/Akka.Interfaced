@@ -172,6 +172,10 @@ namespace Akka.Interfaced.SlimServer
                 _tagByChannelOpen = tag;
             }
 
+            void IActorBoundChannelObserver.ChannelOpenTimeout(object tag)
+            {
+            }
+
             void IActorBoundChannelObserver.ChannelClose(IActorBoundChannel channel, object tag)
             {
                 _tagByChannelClose = tag;

@@ -582,6 +582,7 @@ namespace Akka.Interfaced.SlimServer
             return new Type[] {
                 typeof(ChannelClose_Invoke),
                 typeof(ChannelOpen_Invoke),
+                typeof(ChannelOpenTimeout_Invoke),
             };
         }
 
@@ -616,6 +617,21 @@ namespace Akka.Interfaced.SlimServer
                 ((IActorBoundChannelObserver)__target).ChannelOpen(channel, tag);
             }
         }
+
+        public class ChannelOpenTimeout_Invoke : IInterfacedPayload, IInvokable
+        {
+            public object tag;
+
+            public Type GetInterfaceType()
+            {
+                return typeof(IActorBoundChannelObserver);
+            }
+
+            public void Invoke(object __target)
+            {
+                ((IActorBoundChannelObserver)__target).ChannelOpenTimeout(tag);
+            }
+        }
     }
 
     public class ActorBoundChannelObserver : InterfacedObserver, IActorBoundChannelObserver
@@ -641,6 +657,12 @@ namespace Akka.Interfaced.SlimServer
             var payload = new IActorBoundChannelObserver_PayloadTable.ChannelOpen_Invoke { channel = channel, tag = tag };
             Notify(payload);
         }
+
+        public void ChannelOpenTimeout(object tag)
+        {
+            var payload = new IActorBoundChannelObserver_PayloadTable.ChannelOpenTimeout_Invoke { tag = tag };
+            Notify(payload);
+        }
     }
 
     [AlternativeInterface(typeof(IActorBoundChannelObserver))]
@@ -648,6 +670,7 @@ namespace Akka.Interfaced.SlimServer
     {
         Task ChannelClose(Akka.Interfaced.SlimServer.IActorBoundChannel channel, object tag);
         Task ChannelOpen(Akka.Interfaced.SlimServer.IActorBoundChannel channel, object tag);
+        Task ChannelOpenTimeout(object tag);
     }
 }
 
