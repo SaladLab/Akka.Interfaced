@@ -123,7 +123,7 @@ namespace Akka.Interfaced.ProtobufSerializer.Tests
 
             var obj = new ResponseMessage
             {
-                ReturnPayload = new NotificationChannelReturnMessage { v = new ActorNotificationChannel(actor) }
+                ReturnPayload = new NotificationChannelReturnMessage { v = new AkkaReceiverNotificationChannel(actor) }
             };
 
             var bytes = serializer.ToBinary(obj);

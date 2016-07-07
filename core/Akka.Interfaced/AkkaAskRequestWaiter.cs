@@ -8,13 +8,14 @@ namespace Akka.Interfaced
     {
         void IRequestWaiter.SendRequest(IRequestTarget target, RequestMessage requestMessage)
         {
-            ((AkkaActorTarget)target).Actor.Tell(requestMessage);
+            var sender = ActorCell.GetCurrentSelfOrNoSender();
+            ((AkkaReceiverTarget)target).Receiver.Tell(requestMessage, sender);
         }
 
         Task IRequestWaiter.SendRequestAndWait(IRequestTarget target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             requestMessage.RequestId = -1;
-            return ((AkkaActorTarget)target).Actor.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
+            return ((AkkaReceiverTarget)target).Receiver.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
             {
                 if (t.IsCanceled)
                     throw new TaskCanceledException();
@@ -33,7 +34,7 @@ namespace Akka.Interfaced
             IRequestTarget target, RequestMessage requestMessage, TimeSpan? timeout)
         {
             requestMessage.RequestId = -1;
-            return ((AkkaActorTarget)target).Actor.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
+            return ((AkkaReceiverTarget)target).Receiver.Ask<ResponseMessage>(requestMessage, timeout).ContinueWith(t =>
             {
                 if (t.IsCanceled)
                     throw new TaskCanceledException();

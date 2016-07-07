@@ -45,33 +45,40 @@ namespace Akka.Interfaced
             if (actorRef.Actor == null)
                 return null;
 
-            var target = new AkkaActorTarget(actorRef.Actor);
+            var target = new AkkaReceiverTarget(actorRef.Actor);
             var newActorRef = new TRef { Target = target, RequestWaiter = target.DefaultRequestWaiter };
             CheckIfActorImplementsOrThrow(actorRef.Type, newActorRef.InterfaceType);
 
             return newActorRef;
         }
 
-        // Wrap actor-ref into TRef (not type-safe cast)
+        // Wrap ICanTell into TRef (not type-safe cast)
 
-        public static TRef Cast<TRef>(this IActorRef actorRef)
+        public static TRef Cast<TRef>(this ICanTell receiver)
             where TRef : InterfacedActorRef, new()
         {
-            if (actorRef == null)
+            if (receiver == null)
                 return null;
 
-            var target = new AkkaActorTarget(actorRef);
+            var target = new AkkaReceiverTarget(receiver);
             return new TRef { Target = target, RequestWaiter = target.DefaultRequestWaiter };
         }
 
-        // Unwrap actor-ref from TRef
+        // Unwrap ICanTell from TRef
 
-        public static IActorRef CastToIActorRef(this InterfacedActorRef actor)
+        public static ICanTell CastToICanTell(this InterfacedActorRef actor)
         {
             if (actor == null || actor.Target == null)
                 return null;
 
-            return ((AkkaActorTarget)actor.Target).Actor;
+            return ((AkkaReceiverTarget)actor.Target).Receiver;
+        }
+
+        // Unwrap IActorRef from TRef
+
+        public static IActorRef CastToIActorRef(this InterfacedActorRef actor)
+        {
+            return (IActorRef)(actor.CastToICanTell());
         }
     }
 }

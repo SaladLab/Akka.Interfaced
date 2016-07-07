@@ -318,7 +318,7 @@ namespace Akka.Interfaced.SlimServer
             if (actor == null)
                 throw new ArgumentNullException(nameof(actor));
 
-            var targetActor = ((AkkaActorTarget)actor.Target).Actor;
+            var targetActor = actor.CastToIActorRef();
             if (targetActor == null)
                 throw new ArgumentException("InterfacedActorRef should have valid IActorRef target.");
 

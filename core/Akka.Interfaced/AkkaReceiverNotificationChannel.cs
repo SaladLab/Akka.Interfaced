@@ -2,15 +2,15 @@
 
 namespace Akka.Interfaced
 {
-    public class ActorNotificationChannel : INotificationChannel
+    public class AkkaReceiverNotificationChannel : INotificationChannel
     {
-        public IActorRef Actor { get; }
+        public ICanTell Receiver { get; }
 
         private int _lastNotificationId;
 
-        public ActorNotificationChannel(IActorRef actor)
+        public AkkaReceiverNotificationChannel(ICanTell receiver)
         {
-            Actor = actor;
+            Receiver = receiver;
         }
 
         public void Notify(NotificationMessage notificationMessage)
@@ -20,21 +20,23 @@ namespace Akka.Interfaced
                 notificationId = _lastNotificationId = 1;
 
             notificationMessage.NotificationId = notificationId;
-            Actor.Tell(notificationMessage);
+
+            var sender = ActorCell.GetCurrentSelfOrNoSender();
+            Receiver.Tell(notificationMessage, sender);
         }
 
         public override bool Equals(object obj)
         {
-            var c = obj as ActorNotificationChannel;
+            var c = obj as AkkaReceiverNotificationChannel;
             if (c == null)
                 return false;
 
-            return Actor.Equals(c.Actor);
+            return Receiver.Equals(c.Receiver);
         }
 
         public override int GetHashCode()
         {
-            return Actor.GetHashCode();
+            return Receiver.GetHashCode();
         }
     }
 }

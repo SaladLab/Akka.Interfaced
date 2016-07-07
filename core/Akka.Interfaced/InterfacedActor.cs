@@ -567,7 +567,8 @@ namespace Akka.Interfaced
 
         void IRequestWaiter.SendRequest(IRequestTarget target, RequestMessage requestMessage)
         {
-            ((AkkaActorTarget)target).Actor.Tell(requestMessage);
+            var sender = ActorCell.GetCurrentSelfOrNoSender();
+            ((AkkaReceiverTarget)target).Receiver.Tell(requestMessage, sender);
         }
 
         Task IRequestWaiter.SendRequestAndWait(IRequestTarget target, RequestMessage request, TimeSpan? timeout)
@@ -635,7 +636,7 @@ namespace Akka.Interfaced
 
             var proxy = InterfacedObserver.Create(typeof(TObserver));
             proxy.ObserverId = observerId;
-            proxy.Channel = new ActorNotificationChannel(Self);
+            proxy.Channel = new AkkaReceiverNotificationChannel(Self);
             return (TObserver)(object)proxy;
         }
 

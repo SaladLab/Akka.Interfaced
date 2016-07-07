@@ -79,7 +79,7 @@ namespace Akka.Interfaced
             // Fire request
 
             request.RequestId = requestId;
-            ((AkkaActorTarget)target).Actor.Tell(request, sender);
+            ((AkkaReceiverTarget)target).Receiver.Tell(request, sender);
             return tcs.Task;
         }
 

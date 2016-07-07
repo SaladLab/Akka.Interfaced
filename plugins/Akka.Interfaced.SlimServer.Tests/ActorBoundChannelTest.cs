@@ -94,7 +94,7 @@ namespace Akka.Interfaced.SlimServer
                             // because client-side of slim channel usually keep observer id unique.
                             _observerChannelMap[observer.ObserverId] = observer.Channel;
 
-                            observer.Channel = new ActorNotificationChannel(Self);
+                            observer.Channel = new AkkaReceiverNotificationChannel(Self);
                         }
                     });
                 }

@@ -180,7 +180,7 @@ namespace Akka.Interfaced.TestKit
             var observerUpdatable = requestMessage.InvokePayload as IPayloadObserverUpdatable;
             if (observerUpdatable != null)
             {
-                observerUpdatable.Update(o => ((InterfacedObserver)o).Channel = new ActorNotificationChannel(_self));
+                observerUpdatable.Update(o => ((InterfacedObserver)o).Channel = new AkkaReceiverNotificationChannel(_self));
             }
 
             target.Item1.Tell(new RequestMessage

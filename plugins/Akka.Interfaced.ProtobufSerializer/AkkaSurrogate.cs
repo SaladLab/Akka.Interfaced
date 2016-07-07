@@ -110,7 +110,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                 if (value == null)
                     return null;
 
-                var actor = ((AkkaActorTarget)value).Actor;
+                var actor = (IActorRef)(((AkkaReceiverTarget)value).Receiver);
                 var path = ((ActorRefBase.Surrogate)actor.ToSurrogate(CurrentSystem)).Path;
                 return new SurrogateForIRequestTarget { Path = path };
             }
@@ -122,7 +122,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                     return null;
 
                 var actor = (IActorRef)((new ActorRefBase.Surrogate(value.Path)).FromSurrogate(CurrentSystem));
-                return new AkkaActorTarget(actor);
+                return new AkkaReceiverTarget(actor);
             }
         }
 
@@ -137,7 +137,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                 if (value == null)
                     return null;
 
-                var actor = ((ActorNotificationChannel)value).Actor;
+                var actor = (IActorRef)(((AkkaReceiverNotificationChannel)value).Receiver);
                 return new SurrogateForINotificationChannel { Actor = actor };
             }
 
@@ -147,7 +147,7 @@ namespace Akka.Interfaced.ProtobufSerializer
                 if (value == null)
                     return null;
 
-                return new ActorNotificationChannel(value.Actor);
+                return new AkkaReceiverNotificationChannel(value.Actor);
             }
         }
 

@@ -21,7 +21,7 @@ namespace Akka.Interfaced
             var subjectActor = ActorOfAsTestActorRef<SubjectActor>("Subject");
             var subject = subjectActor.Cast<SubjectRef>();
             var observingActor = ActorOfAsTestActorRef<TObservingActor>(Props.Create<TObservingActor>(log));
-            await subject.Subscribe(new SubjectObserver(new ActorNotificationChannel(observingActor)));
+            await subject.Subscribe(new SubjectObserver(new AkkaReceiverNotificationChannel(observingActor)));
             return subject;
         }
 
@@ -31,7 +31,7 @@ namespace Akka.Interfaced
             var subjectActor = ActorOfAsTestActorRef<Subject2Actor>("Subject");
             var subject = subjectActor.Cast<Subject2Ref>();
             var observingActor = ActorOfAsTestActorRef<TObservingActor>(Props.Create<TObservingActor>(log));
-            await subject.Subscribe(new Subject2Observer(new ActorNotificationChannel(observingActor)));
+            await subject.Subscribe(new Subject2Observer(new AkkaReceiverNotificationChannel(observingActor)));
             return subject;
         }
 

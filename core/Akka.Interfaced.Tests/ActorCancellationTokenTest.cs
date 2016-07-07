@@ -102,7 +102,7 @@ namespace Akka.Interfaced
             var subjectActor = ActorOfAsTestActorRef<SubjectActor>("Subject");
             var subject = subjectActor.Cast<SubjectRef>();
             var observingActor = ActorOf(() => new TaskCancellationActor(log, 100));
-            await subject.Subscribe(new SubjectObserver(new ActorNotificationChannel(observingActor)));
+            await subject.Subscribe(new SubjectObserver(new AkkaReceiverNotificationChannel(observingActor)));
 
             await subject.MakeEvent("E");
             observingActor.Tell("E");
