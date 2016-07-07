@@ -1,3 +1,8 @@
+## 0.5.1 (Released 2016/07/07)
+
+* Update Akka 1.1
+* Change target type to ICanTell from IActorRef.
+
 ## 0.5.0 (Released 2016/07/04)
 
 * Support generic interface and method. #30
