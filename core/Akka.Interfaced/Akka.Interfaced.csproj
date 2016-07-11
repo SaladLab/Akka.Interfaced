@@ -78,6 +78,7 @@
     <Compile Include="MessageDispatcher.cs" />
     <Compile Include="MessageHandlerBuilderInternalHelper.cs" />
     <Compile Include="MessageHandlerBuilder.cs" />
+    <Compile Include="InterfacedMessageBuilder.cs" />
     <Compile Include="MethodInfoComparer.cs" />
     <Compile Include="NotificationDispatcher.cs" />
     <Compile Include="NotificationHandler.cs" />

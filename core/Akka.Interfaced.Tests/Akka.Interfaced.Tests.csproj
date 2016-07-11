@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InterfacedActorRefCastTest.cs" />
+    <Compile Include="InterfacedMessageBuilderTest.cs" />
     <Compile Include="Interface\IBasic.cs" />
     <Compile Include="Interface\IDummy.cs" />
     <Compile Include="Interface\IOverloaded.cs" />
