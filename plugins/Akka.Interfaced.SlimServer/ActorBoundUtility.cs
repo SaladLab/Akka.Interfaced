@@ -17,7 +17,7 @@ namespace Akka.Interfaced.SlimServer
             this ActorBoundChannelRef channel, IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags,
             string gatewayName, object tag, ActorBindingFlags bindingFlagsForOpenChannel)
         {
-            if (channel != null && channel.CastToIActorRef().Path.Address == actor.Path.Address)
+            if (string.IsNullOrEmpty(gatewayName) || (channel != null && channel.CastToIActorRef().Path.Address == actor.Path.Address))
             {
                 // link an actor to channel directly
                 return await channel.BindActor(actor, types, bindingFlags);
