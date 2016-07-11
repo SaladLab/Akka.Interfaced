@@ -54,7 +54,7 @@ namespace Akka.Interfaced.SlimServer
         public class BindActor_Return
             : IInterfacedPayload, IValueGetable
         {
-            public Akka.Interfaced.BoundActorTarget v;
+            public Akka.Interfaced.IRequestTarget v;
 
             public Type GetInterfaceType()
             {
@@ -277,12 +277,12 @@ namespace Akka.Interfaced.SlimServer
             return new ActorBoundChannelRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<Akka.Interfaced.BoundActorTarget> BindActor(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0)
+        public Task<Akka.Interfaced.IRequestTarget> BindActor(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IActorBoundChannel_PayloadTable.BindActor_Invoke { actor = actor, types = types, bindingFlags = bindingFlags }
             };
-            return SendRequestAndReceive<Akka.Interfaced.BoundActorTarget>(requestMessage);
+            return SendRequestAndReceive<Akka.Interfaced.IRequestTarget>(requestMessage);
         }
 
         public Task<Akka.Interfaced.InterfacedActorRef> BindActor(Akka.Interfaced.InterfacedActorRef actor, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0)
@@ -393,7 +393,7 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(IActorBoundChannel))]
     public interface IActorBoundChannelSync : IInterfacedActorSync
     {
-        Akka.Interfaced.BoundActorTarget BindActor(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0);
+        Akka.Interfaced.IRequestTarget BindActor(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0);
         Akka.Interfaced.InterfacedActorRef BindActor(Akka.Interfaced.InterfacedActorRef actor, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0);
         bool BindType(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types);
         void Close();
@@ -442,7 +442,7 @@ namespace Akka.Interfaced.SlimServer
         public class OpenChannel_Return
             : IInterfacedPayload, IValueGetable
         {
-            public Akka.Interfaced.BoundActorTarget v;
+            public Akka.Interfaced.IRequestTarget v;
 
             public Type GetInterfaceType()
             {
@@ -528,12 +528,12 @@ namespace Akka.Interfaced.SlimServer
             return new ActorBoundGatewayRef(Target, RequestWaiter, timeout);
         }
 
-        public Task<Akka.Interfaced.BoundActorTarget> OpenChannel(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, object tag = null, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0)
+        public Task<Akka.Interfaced.IRequestTarget> OpenChannel(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, object tag = null, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0)
         {
             var requestMessage = new RequestMessage {
                 InvokePayload = new IActorBoundGateway_PayloadTable.OpenChannel_Invoke { actor = actor, types = types, tag = tag, bindingFlags = bindingFlags }
             };
-            return SendRequestAndReceive<Akka.Interfaced.BoundActorTarget>(requestMessage);
+            return SendRequestAndReceive<Akka.Interfaced.IRequestTarget>(requestMessage);
         }
 
         public Task<Akka.Interfaced.InterfacedActorRef> OpenChannel(Akka.Interfaced.InterfacedActorRef actor, object tag = null, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0)
@@ -564,7 +564,7 @@ namespace Akka.Interfaced.SlimServer
     [AlternativeInterface(typeof(IActorBoundGateway))]
     public interface IActorBoundGatewaySync : IInterfacedActorSync
     {
-        Akka.Interfaced.BoundActorTarget OpenChannel(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, object tag = null, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0);
+        Akka.Interfaced.IRequestTarget OpenChannel(Akka.Actor.IActorRef actor, Akka.Interfaced.SlimServer.TaggedType[] types, object tag = null, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0);
         Akka.Interfaced.InterfacedActorRef OpenChannel(Akka.Interfaced.InterfacedActorRef actor, object tag = null, Akka.Interfaced.SlimServer.ActorBindingFlags bindingFlags = (Akka.Interfaced.SlimServer.ActorBindingFlags)0);
     }
 }

@@ -210,7 +210,7 @@ namespace Akka.Interfaced.SlimServer
             // Arrange
             var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var boundActor = await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyExFinal) });
+            var boundActor = (BoundActorTarget)await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyExFinal) });
             Assert.NotNull(boundActor);
 
             // Act
@@ -235,7 +235,7 @@ namespace Akka.Interfaced.SlimServer
             // Arrange
             var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var boundActor = await channel.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") });
+            var boundActor = (BoundActorTarget)await channel.BindActor(dummy, new[] { new TaggedType(typeof(IDummyWithTag), "ID") });
             Assert.NotNull(boundActor);
 
             // Act
@@ -283,7 +283,7 @@ namespace Akka.Interfaced.SlimServer
             // Arrange
             var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var boundActor = await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
+            var boundActor = (BoundActorTarget)await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
             Assert.NotNull(boundActor);
 
             // Act
@@ -308,7 +308,7 @@ namespace Akka.Interfaced.SlimServer
             // Arrange
             var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var boundActor = await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
+            var boundActor = (BoundActorTarget)await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
             Assert.NotNull(boundActor);
 
             // Act
@@ -335,7 +335,7 @@ namespace Akka.Interfaced.SlimServer
             // Arrange
             var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var boundActor = await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
+            var boundActor = (BoundActorTarget)await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
             Assert.NotNull(boundActor);
 
             // Act
@@ -362,7 +362,7 @@ namespace Akka.Interfaced.SlimServer
             // Arrange
             var channel = ActorOf<TestActorBoundChannel>().Cast<ActorBoundChannelRef>();
             var dummy = ActorOf<DummyActor>();
-            var boundActor = await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
+            var boundActor = (BoundActorTarget)await channel.BindActor(dummy, new TaggedType[] { typeof(IDummyEx) });
             Assert.NotNull(boundActor);
 
             // Act

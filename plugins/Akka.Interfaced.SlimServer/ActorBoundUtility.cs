@@ -6,14 +6,14 @@ namespace Akka.Interfaced.SlimServer
 {
     public static class ActorBoundUtility
     {
-        public static Task<BoundActorTarget> BindActorOrOpenChannel(
+        public static Task<IRequestTarget> BindActorOrOpenChannel(
             this ActorBoundChannelRef channel, IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags,
             string gatewayName, object tag)
         {
             return BindActorOrOpenChannel(channel, actor, types, bindingFlags, gatewayName, tag, bindingFlags);
         }
 
-        public static async Task<BoundActorTarget> BindActorOrOpenChannel(
+        public static async Task<IRequestTarget> BindActorOrOpenChannel(
             this ActorBoundChannelRef channel, IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags,
             string gatewayName, object tag, ActorBindingFlags bindingFlagsForOpenChannel)
         {

@@ -47,7 +47,7 @@ namespace Akka.Interfaced.SlimServer
     {
         Task SetTag(object tag);
         Task<InterfacedActorRef> BindActor(InterfacedActorRef actor, ActorBindingFlags bindingFlags = 0);
-        Task<BoundActorTarget> BindActor(IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags = 0);
+        Task<IRequestTarget> BindActor(IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags = 0);
         Task<bool> UnbindActor(IActorRef actor);
         Task<bool> BindType(IActorRef actor, TaggedType[] types);
         Task<bool> UnbindType(IActorRef actor, Type[] types);

@@ -333,7 +333,7 @@ namespace Akka.Interfaced.SlimServer
         }
 
         [ResponsiveExceptionAll]
-        BoundActorTarget IActorBoundChannelSync.BindActor(IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags)
+        IRequestTarget IActorBoundChannelSync.BindActor(IActorRef actor, TaggedType[] types, ActorBindingFlags bindingFlags)
         {
             if (actor == null)
                 throw new ArgumentNullException(nameof(actor));
