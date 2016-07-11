@@ -40,6 +40,36 @@ namespace Akka.Interfaced
         {
             return RequestWaiter.SendRequestAndReceive<TReturn>(Target, requestMessage, Timeout);
         }
+
+        public static InterfacedActorRef Create(Type type)
+        {
+            if (type.IsInterface)
+            {
+                // Namespace.IExampleActor -> Namespace.ExampleActorRef
+                var proxyTypeName = (type.Namespace.Length > 0 ? type.Namespace + "." : "") + type.Name.Substring(1) + "Ref";
+                var proxyType = type.Assembly.GetType(proxyTypeName);
+                if (proxyType != null && proxyType.IsGenericType)
+                    proxyType = proxyType.MakeGenericType(type.GetGenericArguments());
+                if (proxyType == null || proxyType.BaseType != typeof(InterfacedActorRef))
+                    throw new ArgumentException("Cannot resolve the InterfacedActorRef type from " + type.FullName);
+
+                var proxy = Activator.CreateInstance(proxyType);
+                return (InterfacedActorRef)proxy;
+            }
+            else if (type.IsClass)
+            {
+                // Namespace.ExampleObserver
+                if (type.BaseType != typeof(InterfacedActorRef))
+                    throw new ArgumentException("Cannot create InterfacedActorRef with " + type.FullName);
+
+                var proxy = Activator.CreateInstance(type);
+                return (InterfacedActorRef)proxy;
+            }
+            else
+            {
+                throw new ArgumentException("Cannot create InterfacedActorRef from " + type.FullName);
+            }
+        }
     }
 
     // Internal use only
