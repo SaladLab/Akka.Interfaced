@@ -20,7 +20,7 @@
 
         // Wrap target into TRef (not type-safe)
 
-        public static TRef Cast<TRef>(this BoundActorTarget target)
+        public static TRef Cast<TRef>(this IRequestTarget target)
             where TRef : InterfacedActorRef, new()
         {
             if (target == null)
