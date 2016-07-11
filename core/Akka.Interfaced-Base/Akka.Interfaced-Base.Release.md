@@ -1,3 +1,8 @@
+## 0.5.2 (Released 2016/07/11)
+
+* Add IRequestTarget.Cast instead of BoundActorTarget.Cast.
+* Add InterfacedActorRef.Create.
+
 ## 0.5.0 (Released 2016/07/04)
 
 * Sync with Akka.Interfaced 0.5.0

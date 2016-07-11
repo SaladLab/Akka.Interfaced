@@ -1,3 +1,9 @@
+## 0.5.2 (Released 2016/07/11)
+
+* Add ActorBoundDummyChannel.
+* Use IRequestTarget rather than BoundActorTarget in ActorBoundChannel.
+* BindActorOrOpenChannel uses channel when gateway is null.
+
 ## 0.5.1 (Released 2016/07/07)
 
 * Sync with Akka.Interfaced 0.5.1

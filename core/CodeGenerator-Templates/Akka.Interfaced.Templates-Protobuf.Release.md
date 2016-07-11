@@ -1,3 +1,8 @@
+## 0.5.2 (Released 2016/07/11)
+
+* Sync with Akka.Interfaced 0.5.2
+* Update CodeAnalysis 1.3.2
+
 ## 0.5.1 (Released 2016/07/07)
 
 * Sync with Akka.Interfaced 0.5.1
