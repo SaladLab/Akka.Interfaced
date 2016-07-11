@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActorBoundChannelBase.cs" />
+    <Compile Include="ActorBoundDummyChannel.cs" />
     <Compile Include="ActorBoundUtility.cs" />
     <Compile Include="Interface\IActorBoundChannel.cs" />
     <Compile Include="Interface\IActorBoundGateway.cs" />
