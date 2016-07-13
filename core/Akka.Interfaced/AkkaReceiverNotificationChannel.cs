@@ -4,7 +4,7 @@ namespace Akka.Interfaced
 {
     public class AkkaReceiverNotificationChannel : INotificationChannel
     {
-        public ICanTell Receiver { get; }
+        public ICanTell Receiver { get; private set; }
 
         private int _lastNotificationId;
 
@@ -37,6 +37,20 @@ namespace Akka.Interfaced
         public override int GetHashCode()
         {
             return Receiver.GetHashCode();
+        }
+
+        public static bool OverrideReceiver(INotificationChannel channel, ICanTell receiver)
+        {
+            var akkaChannel = channel as AkkaReceiverNotificationChannel;
+            if (akkaChannel != null)
+            {
+                akkaChannel.Receiver = receiver;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
