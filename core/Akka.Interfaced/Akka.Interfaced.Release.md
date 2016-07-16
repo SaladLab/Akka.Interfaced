@@ -1,3 +1,8 @@
+## 0.5.3 (Released 2016/07/16)
+
+* Update Akka 1.1.1
+* Add AkkaReceiverNotificationChannel.OverrideReceiver
+
 ## 0.5.2 (Released 2016/07/11)
 
 * Add IRequestTarget.Cast instead of BoundActorTarget.Cast.
