@@ -55,7 +55,7 @@ namespace Manual
                 Console.WriteLine("* " + method.Name);
                 Console.ForegroundColor = orgColor;
 
-                var system = ActorSystem.Create("Demo", "akka.loglevel=off \n akka.suppress-json-serializer-warning=on");
+                var system = ActorSystem.Create("Demo", "akka.suppress-json-serializer-warning=on");
                 DeadRequestProcessingActor.Install(system);
 
                 var demoInstance = Activator.CreateInstance(demo, system, args);
