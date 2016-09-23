@@ -44,7 +44,7 @@ namespace Akka.Interfaced.Tests
             [MessageHandler]
             protected async Task Handle(string message)
             {
-                if (message == null)
+                if (message == "Exception")
                     throw new ArgumentNullException(nameof(message));
 
                 _log.Add($"Handle({message}) Begin");
@@ -82,7 +82,7 @@ namespace Akka.Interfaced.Tests
             var log = new LogBoard<string>();
             var actor = ActorOf(Props.Create(() => new TestStartActor(log)));
 
-            actor.Tell(null);
+            actor.Tell("Exception");
             await actor.GracefulStop(TimeSpan.FromMinutes(1), InterfacedPoisonPill.Instance);
 
             Watch(actor);
