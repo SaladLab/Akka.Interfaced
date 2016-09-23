@@ -1,3 +1,7 @@
+## 0.5.4 (Released 2016/09/23)
+
+* Sync with Akka.Interfaced 0.5.4
+
 ## 0.5.3 (Released 2016/07/16)
 
 * Sync with Akka.Interfaced 0.5.3

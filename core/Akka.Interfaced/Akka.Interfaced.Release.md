@@ -1,3 +1,7 @@
+## 0.5.4 (Released 2016/09/23)
+
+* Update Akka 1.1.2
+
 ## 0.5.3 (Released 2016/07/16)
 
 * Update Akka 1.1.1
