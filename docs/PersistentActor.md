@@ -7,7 +7,7 @@ to derived actors using eventsourcing.
 - `InterfacedActor` = the interfaced class of `UntypedActor`
 - `InterfacedPersistentActor` = the interfaced class of `UntypedPersistentActor`
 
-If you are not familar `Akka.Persistence`, read [Persistent Actors](http://getakka.net/docs/persistence/persistent-actors)
+If you are not familar `Akka.Persistence`, read [Persistence](https://getakka.net/articles/persistence/architecture.html)
 
 #### Example
 
