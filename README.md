@@ -81,7 +81,7 @@ For a main project:
 PM> Install-Package Akka.Interfaced
 ```
 
-For a detailed explanation, read [Project configuration](./Configuration.md).
+For a detailed explanation, read [Project configuration](./docs/Configuration.md).
 
 ## Manual
 
